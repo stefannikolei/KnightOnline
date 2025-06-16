@@ -28,6 +28,9 @@ Client/data/
 *.lib
 *.rej
 *.aps
+*.scc
+*.opt
+*.plg
 .vs/
 enc_temp_folder/
 ItemEditor/Item/

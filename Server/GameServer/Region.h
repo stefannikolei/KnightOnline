@@ -1,28 +1,40 @@
-﻿#pragma once
+﻿// Region.h: interface for the CRegion class.
+//
+//////////////////////////////////////////////////////////////////////
 
-#include <set>
-#include "Define.h"
-#include "GameDefine.h"
-#include "../shared/STLMap.h"
+#if !defined(AFX_REGION_H__F79F27E6_C1E6_4ED5_904A_934AA8163C88__INCLUDED_)
+#define AFX_REGION_H__F79F27E6_C1E6_4ED5_904A_934AA8163C88__INCLUDED_
 
-typedef CSTLMap <_LOOT_BUNDLE>	ZoneItemArray;
-typedef std::set<uint16_t>    ZoneUserArray;
-typedef std::set<uint16_t>    ZoneNpcArray;
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
 
-class CNpc;
+#include "STLMap.h"
+
 class CUser;
+class CNpc;
+
+
+typedef CSTLMap <int>			ZoneUserArray;
+typedef CSTLMap <int>			ZoneNpcArray;
+
+//typedef CTypedPtrArray <CPtrArray, int*>	ZoneUserArray;
+//typedef CTypedPtrArray <CPtrArray, int*>	ZoneNpcArray;
 
 class CRegion  
 {
 public:
-	std::recursive_mutex m_lock;
-	
-	ZoneItemArray	m_RegionItemArray;
 	ZoneUserArray	m_RegionUserArray;
 	ZoneNpcArray	m_RegionNpcArray;
+	BYTE	m_byMoving;			// move : 1, not moving : 0
 
-	void Add(CUser * pUser);
-	void Remove(CUser * pUser);
-	void Add(CNpc * pNpc);
-	void Remove(CNpc * pNpc);
+protected:
+	int		m_nIndex;
+
+public:
+	CRegion();
+	virtual ~CRegion();
+	
 };
+
+#endif // !defined(AFX_REGION_H__F79F27E6_C1E6_4ED5_904A_934AA8163C88__INCLUDED_)

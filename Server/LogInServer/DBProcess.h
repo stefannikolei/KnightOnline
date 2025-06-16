@@ -1,40 +1,33 @@
-﻿#pragma once
+﻿// DBProcess.h: interface for the CDBProcess class.
+//
+//////////////////////////////////////////////////////////////////////
 
-#include "../shared/database/OdbcConnection.h"
+#if !defined(AFX_DBPROCESS_H__D7F54E57_B37F_40C8_9E76_8C9F083842BF__INCLUDED_)
+#define AFX_DBPROCESS_H__D7F54E57_B37F_40C8_9E76_8C9F083842BF__INCLUDED_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
+class CVersionManagerDlg;
 class CDBProcess  
 {
 public:
-	void UseShortFormVersionTable() {
-		m_bUseShortFormVersionTable = true;
-	}
+	BOOL IsCurrentUser( const char* accountid, char* strServerIP, int &serverno );
+	void ReConnectODBC(CDatabase *m_db, const char *strdb, const char *strname, const char *strpwd);
+	BOOL DeleteVersion( const char* filename );
+	BOOL InsertVersion( int version, const char* filename, const char* compname, int historyversion );
+	BOOL InitDatabase( char* strconnection );
+	int MgameLogin( const char* id, const char* pwd );
+	int AccountLogin( const char* id, const char* pwd );
+	BOOL LoadVersionList();
+	BOOL LoadUserCountList();
 
 	CDBProcess();
-	bool Connect(const std::string& szDSN, const std::string& szUser, const std::string& szPass);
+	virtual ~CDBProcess();
 
-	bool LoadVersionList(bool bSuppressErrors = false);
-	bool LoadUserCountList();
-	bool LoadAccountMap();
-
-	uint16_t AccountLogin(const std::string& strAccountID, const std::string& strPasswd) const;
-	bool IsAccountLoggedIn(const std::string& strAccountID, uint16_t* sServerPortNo, std::string* szServerIP);
-	int16_t AccountPremium(const std::string& strAccountID);
-
-	size_t GetRegisteredUserCount() const {
-		return m_accountMap.size();
-	}
-
-private:
-	OdbcConnection	m_dbConnection;
-	bool			m_bUseShortFormVersionTable;
-
-	struct _TB_USER
-	{
-		std::string	strAccountID;
-		std::string	strPasswd;
-		uint8_t		byAuthority;
-	};
-
-	std::map<std::string, _TB_USER>	m_accountMap;
-	mutable std::recursive_mutex	m_accountMapLock;
+	CDatabase	m_VersionDB;
+	CVersionManagerDlg* m_pMain;
 };
+
+#endif // !defined(AFX_DBPROCESS_H__D7F54E57_B37F_40C8_9E76_8C9F083842BF__INCLUDED_)

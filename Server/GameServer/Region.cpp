@@ -1,48 +1,33 @@
-﻿#include "stdafx.h"
+﻿// Region.cpp: implementation of the CRegion class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "Server.h"
 #include "Region.h"
-#include "User.h"
 #include "Npc.h"
+#include "User.h"
 
-/**
-* @brief	Adds user instance to the region.
-*
-* @param	pUser	The user to add.
-*/
-void CRegion::Add(CUser * pUser)
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+CRegion::CRegion()
 {
-	Guard lock(m_lock);
-	m_RegionUserArray.insert(pUser->GetID());
 }
 
-/**
-* @brief	Removes the given user instance from the region.
-*
-* @param	pUser	The user to remove.
-*/
-void CRegion::Remove(CUser * pUser)
+CRegion::~CRegion()
 {
-	Guard lock(m_lock);
-	m_RegionUserArray.erase(pUser->GetID());
+	if( !m_RegionUserArray.IsEmpty() )
+		m_RegionUserArray.DeleteAllData();
+
+	if( !m_RegionNpcArray.IsEmpty() )
+		m_RegionNpcArray.DeleteAllData();
 }
 
-/**
-* @brief	Adds the given NPC to the region.
-*
-* @param	pNpc	The NPC to add.
-*/
-void CRegion::Add(CNpc * pNpc)
-{
-	Guard lock(m_lock);
-	m_RegionNpcArray.insert(pNpc->GetID());
-}
-
-/**
-* @brief	Removes the given NPC from the region.
-*
-* @param	pNpc	The NPC to remove.
-*/
-void CRegion::Remove(CNpc * pNpc)
-{
-	Guard lock(m_lock);
-	m_RegionNpcArray.erase(pNpc->GetID());
-}

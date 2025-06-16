@@ -1,228 +1,360 @@
-﻿#include "stdafx.h"
+﻿// DBProcess.cpp: implementation of the CDBProcess class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "versionmanager.h"
+#include "define.h"
+#include "DBProcess.h"
+#include "VersionManagerDlg.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
 
 CDBProcess::CDBProcess()
-	: m_bUseShortFormVersionTable(false)
 {
+
 }
 
-bool CDBProcess::Connect(
-	const std::string& szDSN,
-	const std::string& szUser,
-	const std::string& szPass)
+CDBProcess::~CDBProcess()
 {
-	if (!m_dbConnection.Connect(szDSN, szUser, szPass))
-	{
-		g_pMain->ReportSQLError(m_dbConnection.GetError());
-		return false;
-	}
 
-	return true;
 }
 
-bool CDBProcess::LoadVersionList(
-	bool bSuppressErrors /*= false*/)
+BOOL CDBProcess::InitDatabase(char *strconnection)
 {
-	std::unique_ptr<OdbcCommand> dbCommand(m_dbConnection.CreateCommand());
-	if (dbCommand.get() == nullptr)
-		return false;
+	m_VersionDB.SetLoginTimeout(100);
 
-	std::string szSQL;
+	m_pMain = (CVersionManagerDlg*)AfxGetMainWnd();
 
-	if (m_bUseShortFormVersionTable)
-		szSQL = _T("SELECT version, hisversion, filename FROM VERSION");
-	else
-		szSQL = _T("SELECT sVersion, sHistoryVersion, strFilename FROM VERSION");
+	if( !m_VersionDB.Open( NULL,FALSE,FALSE, strconnection ) )
+		return FALSE;
 
-	if (!dbCommand->Execute(szSQL))
-	{
-		if (!bSuppressErrors)
-			g_pMain->ReportSQLError(m_dbConnection.GetError());
+	return TRUE;
+}
 
-		return false;
-	}
+void CDBProcess::ReConnectODBC(CDatabase *m_db, const char *strdb, const char *strname, const char *strpwd)
+{
+	char strlog[256];	memset( strlog, 0x00, 256);
+	CTime t = CTime::GetCurrentTime();
+	sprintf(strlog, "Try ReConnectODBC... %d월 %d일 %d시 %d분\r\n", t.GetMonth(), t.GetDay(), t.GetHour(), t.GetMinute());
+	LogFileWrite( strlog );
 
-	if (dbCommand->hasData())
-	{
-		g_pMain->m_sLastVersion = 0;
-		do
+	// DATABASE 연결...
+	CString strConnect;
+	strConnect.Format (_T("DSN=%s;UID=%s;PWD=%s"), strdb, strname, strpwd);
+	int iCount = 0;
+
+	do{	
+		iCount++;
+		if( iCount >= 4 )
+			break;
+
+		m_db->SetLoginTimeout(10);
+
+		try
 		{
-			_VERSION_INFO* pVersion = new _VERSION_INFO;
-
-			dbCommand->FetchUInt16(1, pVersion->sVersion);
-			dbCommand->FetchUInt16(2, pVersion->sHistoryVersion);
-			dbCommand->FetchString(3, pVersion->strFilename);
-
-			g_pMain->m_VersionList.insert(make_pair(pVersion->strFilename, pVersion));
-
-			if (g_pMain->m_sLastVersion < pVersion->sVersion)
-				g_pMain->m_sLastVersion = pVersion->sVersion;
-
+			m_db->OpenEx((LPCTSTR )strConnect, CDatabase::noOdbcDialog);
 		}
-		while (dbCommand->MoveNext());
-	}
-
-	return true;
-}
-
-bool CDBProcess::LoadUserCountList()
-{
-	std::lock_guard<std::recursive_mutex> lock(m_dbConnection.GetLock());
-	std::unique_ptr<OdbcCommand> dbCommand(m_dbConnection.CreateCommand());
-	if (dbCommand.get() == nullptr)
-		return false;
-
-	if (!dbCommand->Execute(_T("SELECT serverid, zone1_count, zone2_count, zone3_count FROM CONCURRENT")))
-	{
-		g_pMain->ReportSQLError(m_dbConnection.GetError());
-		return false;
-	}
-
-	if (dbCommand->hasData())
-	{
-		do
+		catch( CDBException* e )
 		{
-			uint16_t zone_1 = 0, zone_2 = 0, zone_3 = 0;
-			uint8_t serverID;
-
-			dbCommand->FetchByte(1, serverID);
-			dbCommand->FetchUInt16(2, zone_1);
-			dbCommand->FetchUInt16(3, zone_2);
-			dbCommand->FetchUInt16(4, zone_3);
-
-			if ((uint8_t) (serverID - 1) < g_pMain->m_ServerList.size())
-				g_pMain->m_ServerList[serverID - 1]->sUserCount = zone_1 + zone_2 + zone_3;
+			e->Delete();
 		}
-		while (dbCommand->MoveNext());
-	}
-
-	return true;
+		
+	}while(!m_db->IsOpen());	
 }
 
-bool CDBProcess::LoadAccountMap()
+BOOL CDBProcess::LoadVersionList()
 {
-	std::map<std::string, _TB_USER> accountMap;
-
-	{
-		std::lock_guard<std::recursive_mutex> lock(m_dbConnection.GetLock());
-
-		std::unique_ptr<OdbcCommand> dbCommand(m_dbConnection.CreateCommand());
-		if (dbCommand.get() == nullptr)
-			return false;
-
-		if (!dbCommand->Execute(_T("SELECT strAccountID, strPasswd, strAuthority FROM TB_USER")))
-		{
-			g_pMain->ReportSQLError(m_dbConnection.GetError());
-			return false;
-		}
-
-		if (dbCommand->hasData())
-		{
-			std::string key;
-			do
-			{
-				char strAccountID[MAX_ID_SIZE + 1] = {}, strPasswd[MAX_PW_SIZE + 1] = {};
-				_TB_USER user = {};
-
-				dbCommand->FetchString(1, strAccountID, sizeof(strAccountID) - 1);
-				dbCommand->FetchString(2, strPasswd, sizeof(strPasswd) - 1);
-				dbCommand->FetchByte(3, user.byAuthority);
-
-				user.strAccountID = strAccountID;
-				user.strPasswd = strPasswd;
-
-				key = user.strAccountID;
-
-				// NOTE: By default we use case-insensitive matching for account names.
-				// As such, we'll transform this to uppercase for the key.
-				STRTOUPPER(key);
-
-				accountMap.insert(
-					std::make_pair(key, std::move(user)));
-			}
-			while (dbCommand->MoveNext());
-		}
-	}
-
-	{
-		std::lock_guard<std::recursive_mutex> lock(m_accountMapLock);
-		m_accountMap.swap(accountMap);
-	}
-
-	return true;
-}
-
-uint16_t CDBProcess::AccountLogin(
-	const std::string& strAccountID,
-	const std::string& strPasswd)
-	const
-{
-	std::string key = strAccountID;
-
-	// NOTE: By default we use case-insensitive matching for account names.
-	// As such, we'll transform this to uppercase for the key.
-	STRTOUPPER(key);
-
-	std::lock_guard<std::recursive_mutex> lock(m_accountMapLock);
-	auto itr = m_accountMap.find(key);
-	if (itr == m_accountMap.end())
-		return AUTH_NOT_FOUND;
-
-	const auto& account = itr->second;
-
-	// NOTE: Ideally this should be vague and just return a generic
-	// "account not found or invalid password" error.
-	if (account.strPasswd != strPasswd)
-		return AUTH_INVALID_PW;
-
-	if (account.byAuthority == AUTHORITY_BANNED)
-		return AUTH_BANNED;
-
-	return AUTH_SUCCESS;
-}
-
-bool CDBProcess::IsAccountLoggedIn(
-	const std::string& strAccountID,
-	uint16_t* sServerPortNo,
-	std::string* szServerIP)
-{
-	std::unique_ptr<OdbcCommand> dbCommand(m_dbConnection.CreateCommand());
-	if (dbCommand.get() == nullptr)
-		return false;
-
-	dbCommand->AddParameter(SQL_PARAM_INPUT, strAccountID.c_str(), strAccountID.length());
-	if (!dbCommand->Execute(_T("SELECT nServerNo, strServerIP FROM CURRENTUSER WHERE strAccountID=?")))
-	{
-		g_pMain->ReportSQLError(m_dbConnection.GetError());
-		return false;
-	}
-
-	if (!dbCommand->hasData())
-		return false;
-
-	char strServerIP[MAX_IP_SIZE + 1] = {};
-	dbCommand->FetchUInt16(1, *sServerPortNo);
-	dbCommand->FetchString(2, strServerIP, sizeof(strServerIP) - 1);
-
-	*szServerIP = strServerIP;
-	return true;
-}
-
-int16_t CDBProcess::AccountPremium(
-	const std::string& strAccountID)
-{
-	int16_t sHours = -1;
-	return sHours;
-
-	// NOTE: not sure what this would correspond to on 1298 server
-	std::unique_ptr<OdbcCommand> dbCommand(m_dbConnection.CreateCommand());
-	if (dbCommand.get() == nullptr)
-		return sHours;
+	SQLHSTMT		hstmt = NULL;
+	SQLRETURN		retcode;
+	TCHAR			szSQL[1024];
 	
-	dbCommand->AddParameter(SQL_PARAM_OUTPUT, &sHours);
-	dbCommand->AddParameter(SQL_PARAM_INPUT, strAccountID.c_str(), strAccountID.length());
+	CString tempfilename, tempcompname;
 
-	if (!dbCommand->Execute(_T("{? = CALL ACCOUNT_PREMIUM(?)}")))
-		g_pMain->ReportSQLError(m_dbConnection.GetError());
+	memset(szSQL, 0x00, 1024);
+	wsprintf(szSQL, TEXT("select * from %s"), m_pMain->m_TableName);
+	
+	SQLSMALLINT	version = 0, historyversion = 0;
+	TCHAR strfilename[256], strcompname[256];
+	memset( strfilename, NULL, 256 );
+	memset( strcompname, NULL, 256 );
+	SQLINTEGER Indexind = SQL_NTS;
 
-	return sHours;
+	retcode = SQLAllocHandle( (SQLSMALLINT)SQL_HANDLE_STMT, m_VersionDB.m_hdbc, &hstmt );
+	if (retcode != SQL_SUCCESS)	return FALSE; 
+
+	retcode = SQLExecDirect (hstmt, (unsigned char *)szSQL, 1024);	
+	if( retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO ) {
+		if( DisplayErrorMsg(hstmt) == -1 ) {
+			m_VersionDB.Close();
+			if( !m_VersionDB.IsOpen() ) {
+				ReConnectODBC( &m_VersionDB, m_pMain->m_ODBCName, m_pMain->m_ODBCLogin, m_pMain->m_ODBCPwd );
+				return FALSE;
+			}
+		}
+		SQLFreeHandle((SQLSMALLINT)SQL_HANDLE_STMT,hstmt);
+		return FALSE;
+	}
+	while (retcode == SQL_SUCCESS|| retcode == SQL_SUCCESS_WITH_INFO) {
+		retcode = SQLFetch(hstmt);
+		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO){
+			SQLGetData(hstmt,1 ,SQL_C_SSHORT  , &version,   0, &Indexind);
+			SQLGetData(hstmt,2 ,SQL_C_CHAR  ,strfilename, 256, &Indexind);
+			SQLGetData(hstmt,3 ,SQL_C_CHAR  ,strcompname, 256, &Indexind);
+			SQLGetData(hstmt,4 ,SQL_C_SSHORT  , &historyversion,   0, &Indexind);
+
+			_VERSION_INFO* pInfo = new _VERSION_INFO;
+			
+			tempfilename = strfilename;	tempcompname = strcompname;
+			tempfilename.TrimRight(); tempcompname.TrimRight();
+
+			pInfo->sVersion = version;
+			pInfo->strFileName = tempfilename;
+			pInfo->strCompName = tempcompname;
+			pInfo->sHistoryVersion = historyversion;
+
+			if( !m_pMain->m_VersionList.PutData( pInfo->strFileName, pInfo ) ) {
+				TRACE("VersionInfo PutData Fail - %d\n", pInfo->strFileName );
+				delete pInfo;
+				pInfo = NULL;
+			}
+		}
+	}
+	SQLFreeHandle((SQLSMALLINT)SQL_HANDLE_STMT,hstmt);
+
+	m_pMain->m_nLastVersion = 0;
+
+	map<string,_VERSION_INFO*>::iterator	Iter1, Iter2;
+	Iter1 = m_pMain->m_VersionList.m_UserTypeMap.begin();
+	Iter2 = m_pMain->m_VersionList.m_UserTypeMap.end();
+	for( ; Iter1 != Iter2; Iter1++ ) {
+		if( m_pMain->m_nLastVersion < ((*Iter1).second)->sVersion )
+			m_pMain->m_nLastVersion = ((*Iter1).second)->sVersion;
+	}
+
+	return TRUE;
+}
+
+int CDBProcess::AccountLogin(const char *id, const char *pwd)
+{
+	SQLHSTMT		hstmt = NULL;
+	SQLRETURN		retcode;
+	TCHAR			szSQL[1024];
+	memset( szSQL, 0x00, 1024 );
+	SQLSMALLINT		sParmRet = 3;
+	SQLINTEGER		cbParmRet=SQL_NTS;
+
+	wsprintf( szSQL, TEXT( "{call ACCOUNT_LOGIN(\'%s\',\'%s\',?)}" ), id, pwd);
+
+	retcode = SQLAllocHandle( (SQLSMALLINT)SQL_HANDLE_STMT, m_VersionDB.m_hdbc, &hstmt );
+	if (retcode == SQL_SUCCESS)
+	{
+		retcode = SQLBindParameter(hstmt,1, SQL_PARAM_OUTPUT, SQL_C_SSHORT, SQL_SMALLINT, 0,0, &sParmRet,0, &cbParmRet );
+		if(retcode == SQL_SUCCESS)
+		{
+			retcode = SQLExecDirect (hstmt, (unsigned char *)szSQL, 1024);
+			if( retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO ) {
+				if( DisplayErrorMsg(hstmt) == -1 ) {
+					m_VersionDB.Close();
+					if( !m_VersionDB.IsOpen() ) {
+						ReConnectODBC( &m_VersionDB, m_pMain->m_ODBCName, m_pMain->m_ODBCLogin, m_pMain->m_ODBCPwd );
+						return 2;
+					}
+				}
+			}
+		}
+
+		SQLFreeHandle((SQLSMALLINT)SQL_HANDLE_STMT,hstmt);
+	}
+	
+	return sParmRet;
+}
+
+int CDBProcess::MgameLogin(const char *id, const char *pwd)
+{
+	SQLHSTMT		hstmt = NULL;
+	SQLRETURN		retcode;
+	TCHAR			szSQL[1024];
+	memset( szSQL, 0x00, 1024 );
+	SQLSMALLINT		sParmRet = -1;
+	SQLINTEGER		cbParmRet=SQL_NTS;
+
+	wsprintf( szSQL, TEXT( "{call MGAME_LOGIN(\'%s\',\'%s\',?)}" ), id, pwd);
+
+	retcode = SQLAllocHandle( (SQLSMALLINT)SQL_HANDLE_STMT, m_VersionDB.m_hdbc, &hstmt );
+	if (retcode == SQL_SUCCESS)
+	{
+		retcode = SQLBindParameter(hstmt,1, SQL_PARAM_OUTPUT, SQL_C_SSHORT, SQL_SMALLINT, 0,0, &sParmRet,0, &cbParmRet );
+		if(retcode == SQL_SUCCESS)
+		{
+			retcode = SQLExecDirect (hstmt, (unsigned char *)szSQL, 1024);
+			if( retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO ) {
+				if( DisplayErrorMsg(hstmt) == -1 ) {
+					m_VersionDB.Close();
+					if( !m_VersionDB.IsOpen() ) {
+						ReConnectODBC( &m_VersionDB, m_pMain->m_ODBCName, m_pMain->m_ODBCLogin, m_pMain->m_ODBCPwd );
+						return 2;
+					}
+				}
+			}
+		}
+
+		SQLFreeHandle((SQLSMALLINT)SQL_HANDLE_STMT,hstmt);
+	}
+	
+	return sParmRet;
+}
+
+BOOL CDBProcess::InsertVersion(int version, const char *filename, const char *compname, int historyversion)
+{
+	SQLHSTMT		hstmt = NULL;
+	SQLRETURN		retcode;
+	TCHAR			szSQL[1024];
+	memset( szSQL, 0x00, 1024 );
+	BOOL			retvalue = TRUE;
+
+	wsprintf( szSQL, TEXT( "INSERT INTO %s (sVersion, strFileName, strCompressName, sHistoryVersion) VALUES (%d, \'%s\', \'%s\', %d)" ), m_pMain->m_TableName, version, filename, compname, historyversion);
+
+	retcode = SQLAllocHandle( (SQLSMALLINT)SQL_HANDLE_STMT, m_VersionDB.m_hdbc, &hstmt );
+	if (retcode == SQL_SUCCESS)
+	{
+		retcode = SQLExecDirect (hstmt, (unsigned char *)szSQL, 1024);
+		if( retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO ) {
+			DisplayErrorMsg( hstmt );
+			retvalue = FALSE;
+		}
+
+		SQLFreeHandle((SQLSMALLINT)SQL_HANDLE_STMT,hstmt);
+	}
+	
+	return retvalue;
+}
+
+BOOL CDBProcess::DeleteVersion( const char *filename)
+{
+	SQLHSTMT		hstmt = NULL;
+	SQLRETURN		retcode;
+	TCHAR			szSQL[1024];
+	memset( szSQL, 0x00, 1024 );
+	BOOL			retvalue = TRUE;
+
+	wsprintf( szSQL, TEXT( "DELETE FROM %s WHERE strFileName = \'%s\'" ), m_pMain->m_TableName, filename);
+
+	retcode = SQLAllocHandle( (SQLSMALLINT)SQL_HANDLE_STMT, m_VersionDB.m_hdbc, &hstmt );
+	if (retcode == SQL_SUCCESS)
+	{
+		retcode = SQLExecDirect (hstmt, (unsigned char *)szSQL, 1024);
+		if( retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO ) {
+			DisplayErrorMsg( hstmt );
+			retvalue = FALSE;
+		}
+
+		SQLFreeHandle((SQLSMALLINT)SQL_HANDLE_STMT,hstmt);
+	}
+	
+	return retvalue;
+}
+
+BOOL CDBProcess::LoadUserCountList()
+{
+	SQLHSTMT		hstmt = NULL;
+	SQLRETURN		retcode;
+	TCHAR			szSQL[1024];
+	
+	CString tempfilename, tempcompname;
+
+	memset(szSQL, 0x00, 1024);
+	wsprintf(szSQL, TEXT("select * from CONCURRENT"));
+	
+	SQLCHAR serverid;
+	SQLSMALLINT	zone_1 = 0, zone_2 = 0, zone_3 = 0;
+	SQLINTEGER Indexind = SQL_NTS;
+
+	retcode = SQLAllocHandle( (SQLSMALLINT)SQL_HANDLE_STMT, m_VersionDB.m_hdbc, &hstmt );
+	if (retcode != SQL_SUCCESS)	return FALSE; 
+
+	retcode = SQLExecDirect (hstmt, (unsigned char *)szSQL, 1024);	
+	if( retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO ) {
+		if( DisplayErrorMsg(hstmt) == -1 ) {
+			m_VersionDB.Close();
+			if( !m_VersionDB.IsOpen() ) {
+				ReConnectODBC( &m_VersionDB, m_pMain->m_ODBCName, m_pMain->m_ODBCLogin, m_pMain->m_ODBCPwd );
+				return FALSE;
+			}
+		}
+		SQLFreeHandle((SQLSMALLINT)SQL_HANDLE_STMT,hstmt);
+		return FALSE;
+	}
+	while (retcode == SQL_SUCCESS|| retcode == SQL_SUCCESS_WITH_INFO) {
+		retcode = SQLFetch(hstmt);
+		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO){
+			SQLGetData(hstmt,1 ,SQL_C_TINYINT , &serverid,   0, &Indexind);
+			SQLGetData(hstmt,2 ,SQL_C_SSHORT  , &zone_1, 0, &Indexind);
+			SQLGetData(hstmt,3 ,SQL_C_SSHORT  , &zone_2, 0, &Indexind);
+			SQLGetData(hstmt,4 ,SQL_C_SSHORT  , &zone_3, 0, &Indexind);
+
+			// 여기에서 데이타를 받아서 알아서 사용....
+			if( serverid-1 < m_pMain->m_nServerCount )
+				m_pMain->m_ServerList[serverid-1]->sUserCount = zone_1 + zone_2 + zone_3;		// 기범이가 ^^;
+		}
+	}
+	SQLFreeHandle((SQLSMALLINT)SQL_HANDLE_STMT,hstmt);
+
+	return TRUE;
+}
+
+BOOL CDBProcess::IsCurrentUser(const char *accountid, char* strServerIP, int &serverno)
+{
+	SQLHSTMT		hstmt = NULL;
+	SQLRETURN		retcode;
+	BOOL retval;
+	TCHAR			szSQL[1024];
+	memset( szSQL, 0x00, 1024 );
+
+	SQLINTEGER	nServerNo = 0;
+	TCHAR strIP[20];
+	memset( strIP, 0x00, 20 );
+	SQLINTEGER Indexind = SQL_NTS;
+
+	wsprintf( szSQL, TEXT( "SELECT nServerNo, strServerIP FROM CURRENTUSER WHERE strAccountID = \'%s\'" ), accountid );
+
+	retcode = SQLAllocHandle( (SQLSMALLINT)SQL_HANDLE_STMT, m_VersionDB.m_hdbc, &hstmt );
+	if (retcode != SQL_SUCCESS)	return FALSE; 
+
+	retcode = SQLExecDirect (hstmt, (unsigned char *)szSQL, 1024);
+	if (retcode == SQL_SUCCESS|| retcode == SQL_SUCCESS_WITH_INFO) {
+		retcode = SQLFetch(hstmt);
+		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+			SQLGetData(hstmt,1 ,SQL_C_SSHORT, &nServerNo,	0,	&Indexind);
+			SQLGetData(hstmt,2 ,SQL_C_CHAR, strIP, 20,	&Indexind);
+
+			strcpy( strServerIP, strIP );
+			serverno = nServerNo;
+			retval = TRUE;
+		}
+		else
+			retval = FALSE;
+	}
+	else {
+		if( DisplayErrorMsg(hstmt) == -1 ) {
+			m_VersionDB.Close();
+			if( !m_VersionDB.IsOpen() ) {
+				ReConnectODBC( &m_VersionDB, m_pMain->m_ODBCName, m_pMain->m_ODBCLogin, m_pMain->m_ODBCPwd );
+				return FALSE;
+			}
+		}
+		retval = FALSE;
+	}
+	
+	SQLFreeHandle((SQLSMALLINT)SQL_HANDLE_STMT,hstmt);
+
+	return retval;
 }

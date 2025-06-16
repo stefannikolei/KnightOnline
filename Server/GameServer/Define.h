@@ -1,57 +1,355 @@
-﻿#pragma once
+﻿#ifndef _DEFINE_H
+#define _DEFINE_H
 
-#define CONF_GAME_SERVER	"./GameServer.ini"
+/*
+     ** Repent AI Server 작업시 참고 사항 **
+	1. #define AI_SOCKET_PORT	10020 -> 11020으로 수정됨..
+*/
 
-#define _UDP_PORT			8888
-#define CLIENT_SOCKSIZE		100
+//
+//	MAX VALUE DEFINE
+//
+#define _MAX_DWORD				0xFFFFFFFF
+#define _MAX_INT				0x7FFFFFFF
+#define _MAX_SHORT				0x7FFF
 
-#define MAX_NPC_SIZE		30
+//
+//	Defines About Communication
+//
+#define AI_KARUS_SOCKET_PORT		10020
+#define AI_ELMO_SOCKET_PORT			10030
+#define AI_BATTLE_SOCKET_PORT		10040
+#define USER_SOCKET_PORT			10000
+#define MAX_USER					3000
+#define MAX_SOCKET					100
+#define MAX_AI_SOCKET				10				// sungyong 2002.05.22
+#define CLIENT_SOCKSIZE		10
+#define MAX_PATH_LINE		100
 
-#define MAX_TYPE3_REPEAT	40
-#define MAX_TYPE4_BUFF		50
+#define NOW_TEST_MODE		1
 
+#define MAX_ID_SIZE			20
+#define MAX_WEAPON_NAME_SIZE	40
 #define MAX_ITEM			28
+#define VIEW_DIST			48		// 가시거리
+#define MAX_UPGRADE_WEAPON	12
 
-#define NPC_HAVE_ITEM_LIST	6
-#define ZONEITEM_MAX		2100000000
-#define COIN_MAX			2100000000
-#define LOYALTY_MAX			2100000000
+///////////////// NATION ///////////////////////////////////
+//
+#define UNIFY_ZONE			0
+#define KARUS_ZONE			1
+#define ELMORAD_ZONE		2
+#define BATTLE_ZONE			3
 
-#define MAX_CLASS			26
-#define MAX_LEVEL			80
-#define MAX_PLAYER_HP		14000
-#define MAX_DAMAGE			32000 // Game uses a signed 2 byte integer, so the limit is technically 32,767. The game, however, caps it at 32,000.
+//enum MOVE_SPEED {SPEED_SLOW=0, SPEED_NORMAL, SPEED_FAST};
+//enum USER_TYPE {TYPE_USER=0, TYPE_MONSTER, TYPE_NPC, TYPE_DOOR, TYPE_GUARD};
 
-#define MAX_MESSAGE_EVENT		10
+#define TIME_SLOW	500
+#define TIME_NORMAL	350
 
-// EVENT 시작 번호들 :)
-#define EVENT_POTION				1
-#define EVENT_FT_1					20
-#define EVENT_FT_3					36
-#define EVENT_FT_2					50
+//
+//	User Authority
+//
+#define MANAGER_USER	0	// 운영자, 관리자
+#define GENERAL_USER	1	// 일반유저
 
-#define EVENT_LOGOS_ELMORAD			1001
-#define EVENT_LOGOS_KARUS			2001
-#define EVENT_COUPON				4001
+// Npc InOut
+#define NPC_IN					0X01
+#define NPC_OUT					0X02
+
+
+////////////////////////////////////////////////////////////
+// 
+////////////////////////////////////////////////////////////
+#define TILE_SIZE		4
+#define CELL_SIZE		4
+
+#define SKILL_NUM			5
+
+
+////////////////////////////////////////////////////////////
+// Socket Define
+////////////////////////////////////////////////////////////
+#define SOCKET_BUFF_SIZE	(1024*32)
+#define MAX_PACKET_SIZE		(1024*8)
+
+#define MYDELETE(x) if(x!=NULL){delete x; x = NULL;} 
+#define INIT_PTR(p)		{ (p) = NULL;}
+#define COMPARE(x,min,max) ((x>=min)&&(x<max))
+
+#define PACKET_START1				0XAA
+#define PACKET_START2				0X55
+#define PACKET_END1					0X55
+#define PACKET_END2					0XAA
+//#define PROTOCOL_VER				0X01
+
+// Socket type
+#define TYPE_ACCEPT				0x01
+#define TYPE_CONNECT			0x02
+
+// Overlapped flag
+#define OVL_RECEIVE				0X01
+#define OVL_SEND				0X02
+#define OVL_CLOSE				0X03
 ////////////////////////////////////////////////////////////
 
-// BBS Related
-#define MAX_BBS_PAGE			22
-#define MAX_BBS_MESSAGE			40
-#define MAX_BBS_TITLE			20
-#define MAX_BBS_POST			500
+typedef union{
+	short int	i;
+	BYTE		b[2];
+} MYSHORT;
 
-#define BUY_POST_PRICE			500
-#define SELL_POST_PRICE			1000
+typedef union{
+	int			i;
+	BYTE		b[4];
+} MYINT;
 
-#define REMOTE_PURCHASE_PRICE	5000
-#define BBS_CHECK_TIME			36000
+typedef union{
+	DWORD		w;
+	BYTE		b[4];
+} MYDWORD;
 
-#define BATTLE 6
+struct _NpcPosition
+{
+	BYTE	byType;			// type
+	BYTE	bySpeed;		// speed
+	POINT	pPoint;			// position
+	float fXPos;
+	float fZPos;
+};
 
-#define KARUS_ARRAY (KARUS - 1)
-#define ELMORAD_ARRAY (ELMORAD - 1)
-#define MONSTER_CHALLENGE_COUNT 32
+struct _NpcMovePosition
+{
+	BOOL bX;				// x (true +, flase -)
+	BOOL bZ;				// z (true +, flase -)
+	float fMovePos;
+	float fAddPos;
+	float fAdd_ZPos;
+};
+
+struct _OBJECT_EVENT
+{
+	int sBelong;			// 소속
+	short sIndex;			// 100 번대 - 카루스 바인드 포인트 | 200 번대 엘모라드 바인드 포인트 | 1100 번대 - 카루스 성문들 1200 - 엘모라드 성문들
+	short sType;			// 0 - 바인드 포인트.. 1 - 좌우로 열리는 성문 2 - 상하로 열리는 성문 3 - 레버
+	short sControlNpcID;	// 조종할 NPC ID (조종할 Object Index)
+	short sStatus;			// status
+	float fPosX;			// 위치값
+	float fPosY;
+	float fPosZ;
+};
+
+// DEFINE MACRO PART...
+#define BufInc(x) (x)++;(x) %= SOCKET_BUF_SIZE;
+
+//
+//	Define CriticalSection Spin Count
+//
+#define SPIN_COUNT				4000
+
+//
+//	About USER
+//
+#define USER_DEAD				0X00
+#define USER_LIVE				0X01
+
+//
+//	About USER Log define 
+//
+#define USER_LOGIN				0X01
+#define USER_LOGOUT				0X02
+#define USER_LEVEL_UP			0X03
+
+
+//
+//	About NPC
+//
+#define NPC_NUM					20
+#define MAX_DUNGEON_BOSS_MONSTER	20
+	
+#define NPC_DEAD				0X00
+#define NPC_LIVE				0X01
+#define NPC_ATTACKING			0X02
+#define NPC_ATTACKED			0X03
+#define NPC_ESCAPE				0X04
+#define NPC_STANDING			0X05
+#define NPC_MOVING				0X06
+#define NPC_TRACING				0X07
+#define NPC_FIGHTING			0X08
+#define NPC_STRATEGY			0x09
+#define NPC_BACK				0x0A
+#define NPC_SLEEPING			0x0B
+#define NPC_FAINTING			0x0C
+#define NPC_HEALING				0x0D
+
+#define NPC_PASSIVE				150
+#define NPC_MAX_MOVE_RANGE		100
+
+//
+//	About Map Object
+//
+#define USER_BAND				0			// Map 위에 유저가 있다.
+#define NPC_BAND				10000		// Map 위에 NPC(몹포함)가 있다.
+#define INVALID_BAND			20000		// 잘못된 ID BAND
+
+//
+//	Defines About Max Value
+//
+#define MAX_BASIC_ITEM			1000
+#define MAX_EVENT				1000
+
+//
+//	To Who ???
+//
+#define SEND_ME					0x01
+#define SEND_REGION				0x02
+#define SEND_ALL				0x03
+#define SEND_ZONE				0x04
+
+
+//
+//	State Value
+//
+#define STATE_ACCEPTED			0X01
+#define STATE_CONNECTED			0X02
+#define STATE_DISCONNECTED		0X03
+#define STATE_GAMESTARTED		0X04
+#define STATE_INITED			0X05
+#define STATE_LOGOUT			0X06
+#define STATE_GAMERESTART		0X07
+
+
+//
+//  Item
+//
+//#define MAX_ITEM_IN_USER		45		// Body(10) + Inventory(35)
+//#define MAX_ITEM_IN_QUICK		4
+//#define ITEM_DATA_LENGTH		80
+#define TYPE_MONEY				0
+#define TYPE_ITEM				1
+
+#define ITEM_NAME_LENGTH		20
+#define MAX_THROW_ITEM			30000
+#define ITEM_MAX_USE_WEAR		13		// 아이템중 쓸수있는 속성들만 모아넣기위해, 이벤트 아이템과 구분
+
+////////////////////////////////////////////////////////////
+// Durability Type
+#define ATTACK				0x01
+#define DEFENCE				0x02
+////////////////////////////////////////////////////////////
+
+//
+//	Attack
+//
+#define		DEFAULT_AT_DELAY	700
+#define		DEFAULT_SP_DEC		1
+
+const BYTE	ATTACK_FAIL		=	0;
+const BYTE	ATTACK_SUCCESS	=	1;
+const BYTE	ATTACK_TARGET_DEAD	= 2;
+const BYTE	ATTACK_TARGET_DEAD_OK = 3;
+const BYTE	MAGIC_ATTACK_TARGET_DEAD	= 4;
+
+/*
+const BYTE	ATTACK_FAIL		=   0;
+const BYTE  ATTACK_NORMAL   =   1;
+const BYTE	ATTACK_SUCCESS	=	2;
+const BYTE  ATTACK_GREAT_SUCCESS  =   3;
+
+const BYTE	ATTACK_TARGET_DEAD	= 4;
+const BYTE	ATTACK_TARGET_DEAD_OK = 5;
+const BYTE	MAGIC_ATTACK_TARGET_DEAD = 6;
+*/
+
+const BYTE	ATTACK_MIN		=	20;
+const BYTE	ATTACK_MAX		=	80;
+
+#define		DAMAGE_DELAY_C_TIME	2000
+
+// 타격비별 성공률 //
+#define GREAT_SUCCESS			0X01		// 대성공
+#define SUCCESS					0X02		// 성공
+#define NORMAL					0X03		// 보통
+#define	FAIL					0X04		// 실패
+
+//
+//	User Status Value
+//
+#define USER_ABILITY_NUM		5		// 기본 상태 능력치 종류
+
+#define USER_STR				0
+#define USER_CON				1
+#define USER_DEX				2
+#define USER_VOL				3
+#define USER_WIS				4
+
+#define DIR_DOWN			0			// 각 보고있는 방향을 정의한다.
+#define	DIR_DOWNLEFT		1
+#define DIR_LEFT			2
+#define	DIR_UPLEFT			3
+#define DIR_UP				4
+#define DIR_UPRIGHT			5
+#define DIR_RIGHT			6
+#define	DIR_DOWNRIGHT		7
+
+#define NPC_EVENT_MOP		1000		// 이벤트 몹 번호
+#define NPC_MAGIC_ITEM		100			// 1~10000번을 기준
+#define NPC_RARE_ITEM		120			// 
+#define NPC_EVENT_CHANCE	20			// 이벤트 몹일경우 매직확률과 레어 확률울 올려준다. X 20 
+
+////////////////////////////////////////////////////////////
+// Npc Type
+// Monster는 0부터 시작 10까지의 타입
+#define NPCTYPE_MONSTER				0	// monster
+#define NPC_BOSS_MONSTER			3	// 대장 몬스터
+#define NPC_DUNGEON_MONSTER			4	// 던젼 몬스터
+#define NPC_TRAP_MONSTER			5	// 함정 몬스터
+// NPC는 11부터 시작
+#define NPC_GUARD					11	// 붙박이형 경비병
+#define NPC_PATROL_GUARD			12	// 일반 필드에서 정찰을 담당하는 정찰병
+#define NPC_STORE_GUARD				13	// 일반 필드에서 상점주변을 보호하는 경비병
+#define NPC_MERCHANT				21	// 상점주인 NPC 
+#define NPC_TINKER					22	// 대장장이
+#define NPC_WAREHOUSE				23	// 창고지기
+#define NPC_CAPTAIN_NPC				35	// 전직 시켜주는 NPC
+#define NPC_KNIGHTS_NPC				36	// 기사단 관리 NPC
+#define NPC_CLERIC					37	// 대사제 NPC
+#define NPC_HEALER					40	// Healer
+#define NPC_DOOR					50	// 성문 (6->50)
+#define NPC_PHOENIX_GATE			51	// 깨지지 않는 문 (8->51)
+#define NPC_SPECIAL_GATE			52	// 깨지지 않는 문이면서 2분마다 열렸다 닫혔다 하는 문
+#define NPC_GATE_LEVER				55	// 성문 레버...	(9->55)	
+#define NPC_ARTIFACT				60	// 결계석 (7->60)
+#define NPC_DESTORY_ARTIFACT		61	// 파괴되는 결계석
+#define NPC_DOMESTIC_ANIMAL			99	// 가축 NPC
+////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////
+// Magic State
+#define NONE				0x01
+#define CASTING				0x02
+////////////////////////////////////////////////////////////
+
+#define MORAL_SELF				1		// 나 자신..
+#define MORAL_FRIEND_WITHME		2		// 나를 포함한 우리편(국가) 중 하나 ..
+#define MORAL_FRIEND_EXCEPTME	3		// 나를 뺀 우리편 중 하나 
+#define MORAL_PARTY				4		// 나를 포함한 우리파티 중 하나..
+#define MORAL_NPC				5		// NPC중 하나.
+#define MORAL_PARTY_ALL			6		// 나를 호함한 파티 모두..
+#define MORAL_ENEMY				7		// 울편을 제외한 모든 적중 하나(NPC포함)
+#define MORAL_ALL				8		// 겜상에 존재하는 모든 것중 하나.
+#define MORAL_AREA_ENEMY		10		// 지역에 포함된 적
+#define MORAL_AREA_FRIEND		11		// 지역에 포함된 우리편
+#define MORAL_AREA_ALL			12		// 지역에 포함된 모두
+#define MORAL_SELF_AREA			13		// 나를 중심으로 한 지역
+
+////////////////////////////////////////////////////////////////
+// Magic Packet sub define 
+////////////////////////////////////////////////////////////////
+#define MAGIC_CASTING			0x01
+#define MAGIC_FLYING			0x02
+#define MAGIC_EFFECTING			0x03
+#define MAGIC_FAIL				0x04
+#define MAGIC_TYPE4_END			0x05	// For type 4 durational spells.					
 
 // Attack Type
 #define DIRECT_ATTACK		0
@@ -59,237 +357,48 @@
 #define MAGIC_ATTACK		2
 #define DURATION_ATTACK		3
 
-enum InOutType
-{
-	INOUT_IN		= 1,
-	INOUT_OUT		= 2,
-	INOUT_RESPAWN	= 3,
-	INOUT_WARP		= 4,
-	INOUT_SUMMON	= 5
-};
+#define GATE_OPEN		1
+#define GATE_CLOSE		0
 
-#define BLINK_TIME				(15) // in seconds
-#define CLAN_SUMMON_TIME		(180)
-#define PLAYER_IDLE_TIME		(300)
-
-// About Map Object
-#define USER_BAND				0
-#define NPC_BAND				10000
-#define INVALID_BAND			30000
-
-#define EVENT_MONSTER			20
-
-// Snow Event
-#define SNOW_EVENT_MONEY		2000
-#define SNOW_EVENT_SKILL		490077
-
-// Temple Event
-#define BIFROST_EVENT_COUNT				3
-#define CHAOS_EVENT_COUNT				3
-#define BORDER_DEFENSE_WAR_EVENT_COUNT	7
-#define JURAD_MOUNTAIN_EVENT_COUNT		3
-
-// Users under level 35 require 3,000 coins to shout.
-#define SHOUT_COIN_REQUIREMENT 3000
+#define NORMAL_OBJECT		0
+#define SPECIAL_OBJECT		1
 
 // Battlezone Announcement
-#define BATTLEZONE_OPEN					0x00
-#define BATTLEZONE_CLOSE				0x01
-#define DECLARE_WINNER					0x02
-#define DECLARE_LOSER					0x03
-#define DECLARE_BAN						0x04
-#define KARUS_CAPTAIN_NOTIFY			0x05
-#define ELMORAD_CAPTAIN_NOTIFY			0x06
-#define KARUS_CAPTAIN_DEPRIVE_NOTIFY	0x07
-#define ELMORAD_CAPTAIN_DEPRIVE_NOTIFY	0x08
-#define SNOW_BATTLEZONE_OPEN			0x09
-#define UNDER_ATTACK_NOTIFY				0x10
-#define DECLARE_BATTLE_ZONE_STATUS		0x11
-#define DECLARE_BATTLE_MONUMENT_STATUS	0x12
-#define DECLARE_NATION_MONUMENT_STATUS	0x13
-#define DECLARE_NATION_REWARD_STATUS	0x14
+#define BATTLEZONE_OPEN         0x00
+#define BATTLEZONE_CLOSE        0x01           
+#define DECLARE_WINNER          0x02
+#define DECLARE_BAN				0x03
 
-#define WAR_TIME_COUNT			3
-#define WAR_ZONE_COUNT			WAR_TIME_COUNT
-#define WAR_DAY_COUNT			7
+////////////////////////////////////////////////////////////////
+// weather define
+////////////////////////////////////////////////////////////////
+#define WEATHER_FINE			0x01
+#define WEATHER_RAIN			0x02
+#define WEATHER_SNOW			0x03
+////////////////////////////////////////////////////////////////
 
-// Battle define
-#define NO_BATTLE				0
-#define NATION_BATTLE			1
-#define SNOW_BATTLE				2
-#define CLAN_BATTLE				3
+////////////////////////////////////////////////////////////////
+// magic define
+////////////////////////////////////////////////////////////////
+#define MORAL_GOOD		0x01
+#define MORAL_BAD		0x02
+#define MORAL_NEUTRAL	0x03
 
-// Zone IDs
-#define ZONE_KARUS				1
-#define ZONE_ELMORAD			2
-#define ZONE_KARUS_ESLANT		11
-#define ZONE_ELMORAD_ESLANT		12
-#define ZONE_MORADON			21
-#define ZONE_DELOS				30
-#define ZONE_BIFROST			31
-#define ZONE_DESPERATION_ABYSS	32
-#define ZONE_HELL_ABYSS			33
-#define ZONE_DRAGON_CAVE		34
-#define ZONE_ARENA				48
-#define ZONE_ORC_ARENA			51
-#define ZONE_BLOOD_DON_ARENA	52
-#define ZONE_GOBLIN_ARENA		53
-#define ZONE_CAITHAROS_ARENA	54
-#define ZONE_FORGOTTEN_TEMPLE	55
+#define NONE_R				0
+#define	FIRE_R				1
+#define	COLD_R				2
+#define LIGHTNING_R			3
+#define MAGIC_R				4
+#define DISEASE_R			5
+#define POISON_R			6
+#define LIGHT_R				7
+#define DARKNESS_R			8
 
-#define ZONE_BATTLE_BASE		60
+////////////////////////////////////////////////////////////////
+// Type 3 Attribute define
+////////////////////////////////////////////////////////////////
+#define ATTRIBUTE_FIRE			 1
+#define ATTRIBUTE_ICE			 2
+#define ATTRIBUTE_LIGHTNING		 3
 
-#define ZONE_BATTLE				ZONE_BATTLE_BASE + 1 // Napies Gorge
-#define ZONE_BATTLE2			ZONE_BATTLE_BASE + 2 // Alseids Prairie
-#define ZONE_BATTLE3			ZONE_BATTLE_BASE + 3 // Nieds Triangle
-#define ZONE_BATTLE4			ZONE_BATTLE_BASE + 4 // Nereid's Island
-#define ZONE_BATTLE5			ZONE_BATTLE_BASE + 5 // Zipang
-#define ZONE_BATTLE6			ZONE_BATTLE_BASE + 6 // Oreads
-
-#define ZONE_SNOW_BATTLE		69
-#define ZONE_RONARK_LAND		71
-#define ZONE_ARDREAM			72
-#define ZONE_RONARK_LAND_BASE	73
-
-#define ZONE_KROWAZ_DOMINION	75
-#define ZONE_BORDER_DEFENSE_WAR	84
-#define ZONE_CHAOS_DUNGEON		85
-#define ZONE_JURAD_MOUNTAIN		87
-#define ZONE_PRISON				92
-#define ZONE_ISILOON_ARENA		93
-#define ZONE_FELANKOR_ARENA		94
-
-#define MAX_BATTLE_ZONE_USERS	150
-
-// Zone level requirements (should really be in a database or something...)
-#define MIN_LEVEL_NATION_BASE		1
-#define MIN_LEVEL_ESLANT			40
-#define MIN_LEVEL_BIFROST			35
-#define MIN_LEVEL_WAR_ZONE			35
-#define MIN_LEVEL_NIEDS_TRIANGLE	35
-#define MAX_LEVEL_NIEDS_TRIANGLE	59
-#define MIN_LEVEL_RONARK_LAND		35
-#define MIN_LEVEL_ARDREAM			35
-#define MAX_LEVEL_ARDREAM			59
-#define MIN_LEVEL_RONARK_LAND_BASE	35
-#define MAX_LEVEL_RONARK_LAND_BASE	69
-#define MIN_LEVEL_KROWAZ_DOMINION	70
-#define MIN_LEVEL_JURAD_MOUNTAIN	70
-
-// Where to respawn after dying in the Moradon arenas
-#define MINI_ARENA_RESPAWN_X		734
-#define MINI_ARENA_RESPAWN_Z		427
-#define MINI_ARENA_RESPAWN_RADIUS	5
-
-// Where to Warp dodo or laon camp in the enemy nation zone
-#define DODO_CAMP_WARP_X			1054
-#define DODO_CAMP_WARP_Z			1141
-#define LAON_CAMP_WARP_X			1012
-#define LAON_CAMP_WARP_Z			914
-#define DODO_LAON_WARP_RADIUS		5
-
-// Bonus experience in War zones or PK zones
-#define PVP_BONUS_EXP 10000
-
-// Automatic Ranking Minutes
-#define RELOAD_KNIGHTS_AND_USER_RATING 30 // Minute
-
-// Where to respawn after dying in the Chaos Stone boss
-#define CHAOS_STONE_MONSTER_RESPAWN_RADIUS 20
-#define CHAOS_STONE_MONSTER_LIVE_TIME 900  // (15 minutes)
-
-// Standard (pre-squared) range used for moradon mini arena.
-#define RANGE_20M 20.0f
-
-// Standard (pre-squared) range used for party rewards and such.
-#define RANGE_50M (50.0f * 50.0f)
-
-// Item IDs
-#define ITEM_CONT_RECOVERY		800370000
-#define ITEM_SCROLL_OF_IDENTITY	800032000
-#define ITEM_NATION_TRANSFER    800360000
-#define ITEM_GENDER_CHANGE		800560000
-#define ITEM_JOB_CHANGE			800560000
-#define ITEM_MEAT_DUMPLING		508216000
-#define GOLDEN_MATTOCK			389135000
-#define MATTOCK					389132000
-#define MYSTERIOUS_ORE			399210000
-#define MYSTERIOUS_GOLD_ORE		399200000
-#define SLING					389043000
-#define KING_SCEPTER			910074311
-#define CHAOS_MAP				910246000
-#define VOUCHER_OF_CHAOS		900106000
-#define VOUCHER_OF_ORACLE		900184000
-#define CERTIFICATE_OF_VICTORY	900017000
-#define BORDER_SECURITY_SCROLL	900055000
-#define RED_TREASURE_CHEST		379154000
-#define GREEN_TREASURE_CHEST	379155000
-#define BLUE_TREASURE_CHEST		379156000
-#define ITEM_MONSTER_STONE		900144023
-#define ITEM_LIGHT_PIT			700041000
-#define ITEM_DRAIN_RESTORE		700040000
-#define ITEM_KILLING_BLADE		700037000
-
-#define MONUMENT_KARUS_SPID		14003
-#define MONUMENT_ELMORAD_SPID	14004
-#define MONUMENT_ENEMY_SPID		14005
-
-#define ELMORAD_MONUMENT_SID		10301
-#define ASGA_VILLAGE_MONUMENT_SID	10302
-#define RAIBA_VILLAGE_MONUMENT_SID	10303
-#define DODO_CAMP_MONUMENT_SID		10304
-
-#define LUFERSON_MONUMENT_SID		20301
-#define LINATE_MONUMENT_SID			20302
-#define BELLUA_MONUMENT_SID			20303
-#define LAON_CAMP_MONUMENT_SID		20304
-
-#define SAW_BLADE_SSID				32153
-#define CHAOS_CUBE_SSID				31527
-
-enum UserStatus
-{
-	USER_STATUS_DOT		= 1,
-	USER_STATUS_POISON	= 2,
-	USER_STATUS_SPEED	= 3,
-	USER_STATUS_BLIND	= 4,
-	USER_STATUS_BLACK	= 5
-};
-
-enum UserStatusBehaviour
-{
-	USER_STATUS_CURE	= 0,
-	USER_STATUS_INFLICT	= 1
-};
-
-enum LoyaltyType
-{
-	LOYALTY_NATIONAL_POINTS = 1,
-	LOYALTY_MANNER_POINTS	= 2
-};
-
-enum AttributeType
-{
-	AttributeNone		= 0,
-	AttributeFire		= 1,
-	AttributeIce		= 2,
-	AttributeLightning	= 3,
-	AttributeLightMagic	= 4,
-	AttributeCurse		= 5,
-	AttributePosion		= 6
-};
-
-typedef union{
-	uint16_t		w;
-	uint8_t		b[2];
-} MYSHORT;
-
-typedef union{
-	uint64_t		i;
-	uint8_t		b[8];
-} MYINT64;
-
-#define TO_USER(v)	static_cast<CUser *>(v)
-#define TO_NPC(v)	static_cast<CNpc *>(v)
-
-#include "../shared/globals.h"
+#endif
