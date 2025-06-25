@@ -37,7 +37,7 @@ CAISocket::~CAISocket()
 
 void CAISocket::Initialize()
 {
-	m_pMain = (CEbenezerDlg*) AfxGetMainWnd();
+	m_pMain = (CEbenezerDlg*) AfxGetApp()->GetMainWnd();
 	m_MagicProcess.m_pMain = m_pMain;
 }
 
@@ -266,14 +266,14 @@ void CAISocket::RecvServerInfo(char* pBuf)
 void CAISocket::RecvNpcInfoAll(char* pBuf)
 {
 	int index = 0;
-	BYTE		byCount = 0;			// 마리수
-	BYTE        byType;				// 0:처음에 등장하지 않는 몬스터, 1:등장
-	short		nid;				// NPC index
-	short		sid;				// NPC index
-	short       sZone;				// Current zone number
-	short       sZoneIndex;			// Current zone index
-	short		sPid;				// NPC Picture Number
-	short		sSize = 100;				// NPC Size
+	BYTE		byCount = 0;	// 마리수
+	BYTE        byType;			// 0:처음에 등장하지 않는 몬스터, 1:등장
+	short		nid;			// NPC index
+	short		sid;			// NPC index
+	short       sZone;			// Current zone number
+	short       sZoneIndex;		// Current zone index
+	short		sPid;			// NPC Picture Number
+	short		sSize = 100;	// NPC Size
 	int			iweapon_1;
 	int			iweapon_2;
 	char		szName[MAX_NPC_NAME_SIZE + 1];		// NPC Name
@@ -282,7 +282,7 @@ void CAISocket::RecvNpcInfoAll(char* pBuf)
 	float		fPosX;			// X Position
 	float		fPosZ;			// Z Position
 	float		fPosY;			// Y Position
-	float		fDir;			// 
+	BYTE		byDirection;	// 
 	BYTE		tNpcType;		// 00	: Monster
 								// 01	: NPC
 	int			iSellingGroup;
@@ -311,7 +311,7 @@ void CAISocket::RecvNpcInfoAll(char* pBuf)
 		fPosX = Getfloat(pBuf, index);
 		fPosZ = Getfloat(pBuf, index);
 		fPosY = Getfloat(pBuf, index);
-		fDir = Getfloat(pBuf, index);
+		byDirection = GetByte(pBuf, index);
 		tNpcType = GetByte(pBuf, index);
 		iSellingGroup = GetDWORD(pBuf, index);
 		nMaxHP = GetDWORD(pBuf, index);
@@ -365,7 +365,7 @@ void CAISocket::RecvNpcInfoAll(char* pBuf)
 		pNpc->m_fCurX = fPosX;
 		pNpc->m_fCurZ = fPosZ;
 		pNpc->m_fCurY = fPosY;
-		pNpc->m_fDir = fDir;
+		pNpc->m_byDirection = byDirection;
 		pNpc->m_NpcState = NPC_LIVE;
 		pNpc->m_tNpcType = tNpcType;
 		pNpc->m_iSellingGroup = iSellingGroup;
@@ -473,7 +473,6 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 	int index = 0, send_index = 0;
 	int sid = -1, tid = -1;
 	BYTE type, result;
-	float fDir = 0.0f;
 	short damage = 0;
 	int nHP = 0;
 	BYTE  byAttackType = 0;
@@ -873,7 +872,7 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 	float		fPosX;						// X Position
 	float		fPosZ;						// Z Position
 	float		fPosY;						// Y Position
-	float		fDir;						// 방향
+	BYTE		byDirection;				// 방향
 	BYTE		tState;						// NPC 상태
 											// 00	: NPC Dead
 											// 01	: NPC Live
@@ -907,7 +906,7 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 	fPosX = Getfloat(pBuf, index);
 	fPosZ = Getfloat(pBuf, index);
 	fPosY = Getfloat(pBuf, index);
-	fDir = Getfloat(pBuf, index);
+	byDirection = GetByte(pBuf, index);
 	tState = GetByte(pBuf, index);
 	tNpcKind = GetByte(pBuf, index);
 	iSellingGroup = GetDWORD(pBuf, index);
@@ -953,7 +952,7 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 	pNpc->m_fCurX = fPosX;
 	pNpc->m_fCurZ = fPosZ;
 	pNpc->m_fCurY = fPosY;
-	pNpc->m_fDir = fDir;
+	pNpc->m_byDirection = byDirection;
 	pNpc->m_NpcState = tState;
 	pNpc->m_tNpcType = tNpcKind;
 	pNpc->m_iSellingGroup = iSellingGroup;
@@ -1111,8 +1110,8 @@ void CAISocket::RecvSystemMsg(char* pBuf)
 			SetByte(send_buff, bType, send_index);
 			SetByte(send_buff, 0x01, send_index);		// nation
 			SetShort(send_buff, -1, send_index);		// sid
-			SetShort(send_buff, sLength, send_index);
-			SetString(send_buff, strSysMsg, sLength, send_index);
+			SetByte(send_buff, 0, send_index);			// sender name length
+			SetString2(send_buff, strSysMsg, sLength, send_index);
 			m_pMain->Send_All(send_buff, send_index);
 			break;
 
@@ -1239,7 +1238,6 @@ void CAISocket::RecvUserFail(char* pBuf)
 
 	BYTE type = 0x01;
 	BYTE result = 0x02;
-	float fDir = 0.0f;
 
 	SetByte(pOutBuf, WIZ_ATTACK, send_index);
 	SetByte(pOutBuf, type, send_index);
@@ -1627,8 +1625,8 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 			SetByte(send_buff, WAR_SYSTEM_CHAT, send_index);
 			SetByte(send_buff, 1, send_index);
 			SetShort(send_buff, -1, send_index);
-			SetShort(send_buff, strlen(finalstr), send_index);
-			SetString(send_buff, finalstr, strlen(finalstr), send_index);
+			SetByte(send_buff, 0, send_index);			// sender name length
+			SetString2(send_buff, finalstr, static_cast<short>(strlen(finalstr)), send_index);
 			m_pMain->Send_All(send_buff, send_index);
 
 			memset(send_buff, 0, sizeof(send_buff));
@@ -1637,8 +1635,8 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 			SetByte(send_buff, PUBLIC_CHAT, send_index);
 			SetByte(send_buff, 1, send_index);
 			SetShort(send_buff, -1, send_index);
-			SetShort(send_buff, strlen(finalstr), send_index);
-			SetString(send_buff, finalstr, strlen(finalstr), send_index);
+			SetByte(send_buff, 0, send_index);			// sender name length
+			SetString2(send_buff, finalstr, static_cast<short>(strlen(finalstr)), send_index);
 			m_pMain->Send_All(send_buff, send_index);
 
 			SetByte(udp_buff, UDP_BATTLE_EVENT_PACKET, udp_index);

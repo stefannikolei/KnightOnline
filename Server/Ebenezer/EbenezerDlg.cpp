@@ -1104,7 +1104,7 @@ BOOL CEbenezerDlg::InitializeMMF()
 	BOOL bCreate = TRUE;
 	CString logstr;
 
-	DWORD filesize = MAX_USER * 4000;	// 1명당 4000 bytes 이내 소요
+	DWORD filesize = MAX_USER * ALLOCATED_USER_DATA_BLOCK;
 	m_hMMFile = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, filesize, _T("KNIGHT_DB"));
 
 	if (m_hMMFile != nullptr
@@ -1113,7 +1113,7 @@ BOOL CEbenezerDlg::InitializeMMF()
 		m_hMMFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, TRUE, _T("KNIGHT_DB"));
 		if (m_hMMFile == nullptr)
 		{
-			logstr = "Shared Memory Load Fail!!";
+			logstr = _T("Shared Memory Load Fail!!");
 			m_hMMFile = INVALID_HANDLE_VALUE;
 			return FALSE;
 		}
@@ -1121,7 +1121,7 @@ BOOL CEbenezerDlg::InitializeMMF()
 		bCreate = FALSE;
 	}
 
-	logstr = "Shared Memory Create Success!!";
+	logstr = _T("Shared Memory Create Success!!");
 	m_StatusList.AddString(logstr);
 
 	m_lpMMFile = (char*) MapViewOfFile(m_hMMFile, FILE_MAP_WRITE, 0, 0, 0);
@@ -1136,7 +1136,7 @@ BOOL CEbenezerDlg::InitializeMMF()
 	{
 		CUser* pUser = (CUser*) m_Iocport.m_SockArrayInActive[i];
 		if (pUser != nullptr)
-			pUser->m_pUserData = (_USER_DATA*) (m_lpMMFile + i * 4000);	// 1 Person Offset are 4000 bytes
+			pUser->m_pUserData = (_USER_DATA*) (m_lpMMFile + i * ALLOCATED_USER_DATA_BLOCK);
 	}
 
 	return TRUE;
@@ -2171,73 +2171,9 @@ int CEbenezerDlg::GetRegionUserIn(C3DMap* pMap, int region_x, int region_z, char
 			continue;
 
 		SetShort(buff, pUser->GetSocketID(), buff_index);
-		SetShort(buff, strlen(pUser->m_pUserData->m_id), buff_index);
-		SetString(buff, pUser->m_pUserData->m_id, strlen(pUser->m_pUserData->m_id), buff_index);
-		SetByte(buff, pUser->m_pUserData->m_bNation, buff_index);
-		SetShort(buff, pUser->m_pUserData->m_bKnights, buff_index);
-		// 666 work
-		SetByte(buff, pUser->m_pUserData->m_bFame, buff_index);
+		pUser->GetUserInfo(buff, buff_index);
 
-		CKnights* pKnights = m_KnightsArray.GetData(pUser->m_pUserData->m_bKnights);
-		if (pUser->m_pUserData->m_bKnights == 0)
-		{
-			SetShort(buff, 0, buff_index);
-			SetByte(buff, 0, buff_index);
-			SetByte(buff, 0, buff_index);
-		}
-		else
-		{
-			//pKnights = m_pMain->m_KnightsArray.GetData( m_pUserData->m_bKnights );
-			if (pKnights != nullptr)
-			{
-				int iLength = strlen(pKnights->m_strName);
-				SetShort(buff, (short) iLength, buff_index);
-				SetString(buff, pKnights->m_strName, iLength, buff_index);
-				SetByte(buff, pKnights->m_byGrade, buff_index);  // knights grade
-				SetByte(buff, pKnights->m_byRanking, buff_index);  // knights grade
-				//TRACE(_T("getregionuserin knights index = %d, kname=%s, name=%hs\n") , iLength, pKnights->strName, pUser->m_pUserData->m_id);
-			}
-			else
-			{
-				SetShort(buff, 0, buff_index);
-				SetByte(buff, 0, buff_index);
-				SetByte(buff, 0, buff_index);
-			}
-		}
-
-		SetByte(buff, pUser->m_pUserData->m_bLevel, buff_index);
-		SetByte(buff, pUser->m_pUserData->m_bRace, buff_index);
-		SetShort(buff, pUser->m_pUserData->m_sClass, buff_index);
-		SetShort(buff, (WORD) pUser->m_pUserData->m_curx * 10, buff_index);
-		SetShort(buff, pUser->m_pUserData->m_curz * 10, buff_index);
-		SetShort(buff, pUser->m_pUserData->m_cury * 10, buff_index);
-		SetByte(buff, pUser->m_pUserData->m_bFace, buff_index);
-		SetByte(buff, pUser->m_pUserData->m_bHairColor, buff_index);
-		SetByte(buff, pUser->m_bResHpType, buff_index);
-		// 비러머글 수능...
-		SetByte(buff, pUser->m_bAbnormalType, buff_index);
-		//
-		SetByte(buff, pUser->m_bNeedParty, buff_index);
-		// 여기두 주석처리
-		SetByte(buff, pUser->m_pUserData->m_bAuthority, buff_index);
-		//
-		SetDWORD(buff, pUser->m_pUserData->m_sItemArray[BREAST].nNum, buff_index);
-		SetShort(buff, pUser->m_pUserData->m_sItemArray[BREAST].sDuration, buff_index);
-		SetDWORD(buff, pUser->m_pUserData->m_sItemArray[LEG].nNum, buff_index);
-		SetShort(buff, pUser->m_pUserData->m_sItemArray[LEG].sDuration, buff_index);
-		SetDWORD(buff, pUser->m_pUserData->m_sItemArray[HEAD].nNum, buff_index);
-		SetShort(buff, pUser->m_pUserData->m_sItemArray[HEAD].sDuration, buff_index);
-		SetDWORD(buff, pUser->m_pUserData->m_sItemArray[GLOVE].nNum, buff_index);
-		SetShort(buff, pUser->m_pUserData->m_sItemArray[GLOVE].sDuration, buff_index);
-		SetDWORD(buff, pUser->m_pUserData->m_sItemArray[FOOT].nNum, buff_index);
-		SetShort(buff, pUser->m_pUserData->m_sItemArray[FOOT].sDuration, buff_index);
-		SetDWORD(buff, pUser->m_pUserData->m_sItemArray[SHOULDER].nNum, buff_index);
-		SetShort(buff, pUser->m_pUserData->m_sItemArray[SHOULDER].sDuration, buff_index);
-		SetDWORD(buff, pUser->m_pUserData->m_sItemArray[RIGHTHAND].nNum, buff_index);
-		SetShort(buff, pUser->m_pUserData->m_sItemArray[RIGHTHAND].sDuration, buff_index);
-		SetDWORD(buff, pUser->m_pUserData->m_sItemArray[LEFTHAND].nNum, buff_index);
-		SetShort(buff, pUser->m_pUserData->m_sItemArray[LEFTHAND].sDuration, buff_index);
-		t_count++;
+		++t_count;
 	}
 
 	LeaveCriticalSection(&g_region_critical);
@@ -2389,21 +2325,7 @@ int CEbenezerDlg::GetRegionNpcIn(C3DMap* pMap, int region_x, int region_z, char*
 			continue;
 
 		SetShort(buff, pNpc->m_sNid, buff_index);
-		SetShort(buff, pNpc->m_sPid, buff_index);
-		SetByte(buff, pNpc->m_tNpcType, buff_index);
-		SetDWORD(buff, pNpc->m_iSellingGroup, buff_index);
-		SetShort(buff, pNpc->m_sSize, buff_index);
-		SetDWORD(buff, pNpc->m_iWeapon_1, buff_index);
-		SetDWORD(buff, pNpc->m_iWeapon_2, buff_index);
-		SetShort(buff, strlen(pNpc->m_strName), buff_index);
-		SetString(buff, pNpc->m_strName, strlen(pNpc->m_strName), buff_index);
-		SetByte(buff, pNpc->m_byGroup, buff_index);
-		SetByte(buff, pNpc->m_byLevel, buff_index);
-		SetShort(buff, (WORD) pNpc->m_fCurX * 10, buff_index);
-		SetShort(buff, (WORD) pNpc->m_fCurZ * 10, buff_index);
-		SetShort(buff, (short) pNpc->m_fCurY * 10, buff_index);
-		SetDWORD(buff, (int) pNpc->m_byGateOpen, buff_index);
-		SetByte(buff, pNpc->m_byObjectType, buff_index);
+		pNpc->GetNpcInfo(buff, buff_index);
 
 		t_count++;
 
@@ -2441,8 +2363,6 @@ void CEbenezerDlg::RegionNpcInfoForMe(CUser* pSendUser, int nType)
 		return;
 
 	nid_sendindex = 3;	// packet command 와 user_count 는 나중에 셋팅한다...
-
-	char strLog[256];
 
 	// test
 	if (nType == 1)
@@ -2507,7 +2427,7 @@ void CEbenezerDlg::RegionNpcInfoForMe(CUser* pSendUser, int nType)
 	{
 		char strLog[256] = {};
 		SetByte(send_buff, WIZ_TEST_PACKET, temp_index);
-		sprintf(strLog, "**** RegionNpcInfoForMe end : name=%s, x=%d, z=%d, count **** \r\n", pSendUser->m_pUserData->m_id, pSendUser->m_RegionX, pSendUser->m_RegionZ, npc_count);
+		sprintf(strLog, "**** RegionNpcInfoForMe end : name=%s, x=%d, z=%d, count=%d **** \r\n", pSendUser->m_pUserData->m_id, pSendUser->m_RegionX, pSendUser->m_RegionZ, npc_count);
 		EnterCriticalSection(&g_LogFile_critical);
 		m_RegionLogFile.Write(strLog, strlen(strLog));
 		LeaveCriticalSection(&g_LogFile_critical);
@@ -2764,8 +2684,8 @@ BOOL CEbenezerDlg::PreTranslateMessage(MSG* pMsg)
 //
 			SetByte(buff, 0x01, buffindex);		// nation
 			SetShort(buff, -1, buffindex);		// sid
-			SetShort(buff, strlen(finalstr), buffindex);
-			SetString(buff, finalstr, strlen(finalstr), buffindex);
+			SetByte(buff, 0, buffindex);		// sender name length
+			SetString2(buff, finalstr, static_cast<short>(strlen(finalstr)), buffindex);
 			Send_All(buff, buffindex);
 
 			buffindex = 0;
@@ -3537,8 +3457,8 @@ void CEbenezerDlg::Announcement(BYTE type, int nation, int chat_type)
 	SetByte(send_buff, chat_type, send_index);
 	SetByte(send_buff, 1, send_index);
 	SetShort(send_buff, -1, send_index);
-	SetShort(send_buff, strlen(finalstr), send_index);
-	SetString(send_buff, finalstr, strlen(finalstr), send_index);
+	SetByte(send_buff, 0, send_index);			// sender name length
+	SetString2(send_buff, finalstr, static_cast<short>(strlen(finalstr)), send_index);
 
 	for (int i = 0; i < MAX_USER; i++)
 	{
@@ -3660,6 +3580,9 @@ BOOL CEbenezerDlg::LoadAllKnights()
 		strcpy(pKnights->m_strViceChief_2, CT2A(strViceChief_2));
 		strcpy(pKnights->m_strViceChief_3, CT2A(strViceChief_3));
 		pKnights->m_nMoney = atoi(CT2A(KnightsSet.m_Gold));
+		pKnights->m_sAllianceKnights = KnightsSet.m_AllianceKnights;
+		pKnights->m_sMarkVersion = KnightsSet.m_MarkVersion;
+		pKnights->m_sCape = KnightsSet.m_Cape;
 		pKnights->m_sDomination = KnightsSet.m_Domination;
 		pKnights->m_nPoints = KnightsSet.m_Points;
 		pKnights->m_byGrade = GetKnightsGrade(KnightsSet.m_Points);
@@ -4175,7 +4098,7 @@ BOOL CEbenezerDlg::LoadKnightsRankTable()
 			if (pUser->m_pUserData->m_bKnights == nKnightsIndex)
 			{
 				pUser->m_pUserData->m_bFame = COMMAND_CAPTAIN;
-				sprintf(strKarusCaptain[nKaursRank], "[%s][%s]", strKnightsName.GetString(), pUser->m_pUserData->m_id);
+				sprintf(strKarusCaptain[nKaursRank], "[%ls][%s]", strKnightsName.GetString(), pUser->m_pUserData->m_id);
 				nKaursRank++;
 
 				nFindKarus = 1;
@@ -4220,7 +4143,7 @@ BOOL CEbenezerDlg::LoadKnightsRankTable()
 			if (pUser->m_pUserData->m_bKnights == nKnightsIndex)
 			{
 				pUser->m_pUserData->m_bFame = COMMAND_CAPTAIN;
-				sprintf(strElmoCaptain[nElmoRank], "[%s][%s]", strKnightsName.GetString(), pUser->m_pUserData->m_id);
+				sprintf(strElmoCaptain[nElmoRank], "[%ls][%s]", strKnightsName.GetString(), pUser->m_pUserData->m_id);
 				nFindElmo = 1;
 				nElmoRank++;
 
@@ -4258,15 +4181,15 @@ BOOL CEbenezerDlg::LoadKnightsRankTable()
 	SetByte(send_buff, WAR_SYSTEM_CHAT, send_index);
 	SetByte(send_buff, 1, send_index);
 	SetShort(send_buff, -1, send_index);
-	SetShort(send_buff, strlen(strKarusCaptainName), send_index);
-	SetString(send_buff, strKarusCaptainName, strlen(strKarusCaptainName), send_index);
+	SetByte(send_buff, 0, send_index);			// sender name length
+	SetString2(send_buff, strKarusCaptainName, static_cast<short>(strlen(strKarusCaptainName)), send_index);
 
 	SetByte(temp_buff, WIZ_CHAT, temp_index);
 	SetByte(temp_buff, WAR_SYSTEM_CHAT, temp_index);
 	SetByte(temp_buff, 1, temp_index);
 	SetShort(temp_buff, -1, temp_index);
-	SetShort(temp_buff, strlen(strElmoCaptainName), temp_index);
-	SetString(temp_buff, strElmoCaptainName, strlen(strElmoCaptainName), temp_index);
+	SetByte(temp_buff, 0, send_index);			// sender name length
+	SetString2(temp_buff, strElmoCaptainName, static_cast<short>(strlen(strElmoCaptainName)), temp_index);
 
 	for (int i = 0; i < MAX_USER; i++)
 	{

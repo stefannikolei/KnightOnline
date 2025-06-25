@@ -3,6 +3,7 @@
 
 #include <mmsystem.h>
 #include <shared/globals.h>
+#include <shared/StringConversion.h>
 
 constexpr int MAX_USER				= 3000;
 
@@ -22,7 +23,7 @@ constexpr int MAX_ITEM				= 28;
 constexpr int NPC_HAVE_ITEM_LIST	= 6;
 constexpr int ZONEITEM_MAX			= 2'100'000'000;	// 존에 떨어지는 최대 아이템수...
 
-constexpr int MAX_LEVEL				= 60;			// 최고렙...
+constexpr int MAX_LEVEL				= 80;			// 최고렙...
 
 constexpr int SERVER_INFO_START		= 1;
 constexpr int SERVER_INFO_END		= 2;
@@ -74,9 +75,12 @@ enum e_Exec
 
 // EVENT 시작 번호들 :)
 constexpr int EVENT_POTION			= 1;
+constexpr int EVENT_FT_1			= 20;
+constexpr int EVENT_FT_3			= 36;
+constexpr int EVENT_FT_2			= 50;
 constexpr int EVENT_LOGOS_ELMORAD	= 1001;
 constexpr int EVENT_LOGOS_KARUS		= 2001;
-constexpr int EVENT_COUPON			= 3001;
+constexpr int EVENT_COUPON			= 4001;
 
 ////////////////////////////////////////////////////////////
 
@@ -214,13 +218,6 @@ constexpr int BBS_CHECK_TIME		= 36000;
 #define NATION_BATTLE			1
 #define SNOW_BATTLE				2
 
-// Zone IDs
-#define ZONE_KARUS				1
-#define ZONE_ELMORAD			2
-#define ZONE_BATTLE				101
-#define ZONE_SNOW_BATTLE		102
-#define	ZONE_FRONTIER			201
-
 #define MAX_BATTLE_ZONE_USERS	150
 
 //////////////////////////////////////////////////////////////////
@@ -310,7 +307,7 @@ inline int64_t GetInt64(char* sBuf, int& index)
 	return *(int64_t*) (sBuf + index - 8);
 }
 
-inline void SetString(char* tBuf, char* sBuf, int len, int& index)
+inline void SetString(char* tBuf, const char* sBuf, int len, int& index)
 {
 	memcpy(tBuf + index, sBuf, len);
 	index += len;
@@ -346,6 +343,18 @@ inline void SetInt64(char* tBuf, int64_t nInt64, int& index)
 {
 	CopyMemory(tBuf + index, &nInt64, 8);
 	index += 8;
+}
+
+inline void SetString1(char* tBuf, const char* sBuf, BYTE len, int& index)
+{
+	SetByte(tBuf, len, index);
+	SetString(tBuf, sBuf, len, index);
+}
+
+inline void SetString2(char* tBuf, const char* sBuf, short len, int& index)
+{
+	SetShort(tBuf, len, index);
+	SetString(tBuf, sBuf, len, index);
 }
 
 // sungyong 2001.11.06
@@ -416,21 +425,23 @@ inline CString GetProgPath()
 
 inline void LogFileWrite(LPCTSTR logstr)
 {
-	CString ProgPath, LogFileName;
+	CString LogFileName;
+	LogFileName.Format(_T("%s\\Ebenezer.log"), GetProgPath().GetString());
+
 	CFile file;
-	int loglength;
+	if (!file.Open(LogFileName, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite))
+		return;
 
-	ProgPath = GetProgPath();
-	loglength = static_cast<int>(_tcslen(logstr));
+	file.SeekToEnd();
 
-	LogFileName.Format(_T("%s\\Ebenezer.log"), ProgPath.GetString());
+#if defined(_UNICODE)
+	const std::string utf8 = WideToUtf8(logstr, wcslen(logstr));
+	file.Write(utf8.c_str(), static_cast<int>(utf8.size()));
+#else
+	file.Write(logstr, strlen(logstr));
+#endif
 
-	if (file.Open(LogFileName, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite))
-	{
-		file.SeekToEnd();
-		file.Write(logstr, loglength);
-		file.Close();
-	}
+	file.Close();
 }
 
 inline void DisplayErrorMsg(SQLHANDLE hstmt)

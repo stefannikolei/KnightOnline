@@ -2,6 +2,7 @@
 #define _DEFINE_H
 
 #include <shared/globals.h>
+#include <shared/StringConversion.h>
 #include <shared/_USER_DATA.h>
 
 constexpr int MAX_USER			= 3000;
@@ -254,7 +255,7 @@ inline int64_t GetInt64(char* sBuf, int& index)
 	return *(int64_t*) (sBuf + index - 8);
 }
 
-inline void SetString(char* tBuf, char* sBuf, int len, int& index)
+inline void SetString(char* tBuf, const char* sBuf, int len, int& index)
 {
 	memcpy(tBuf + index, sBuf, len);
 	index += len;
@@ -290,6 +291,18 @@ inline void SetInt64(char* tBuf, int64_t nInt64, int& index)
 {
 	CopyMemory(tBuf + index, &nInt64, 8);
 	index += 8;
+}
+
+inline void SetString1(char* tBuf, const char* sBuf, BYTE len, int& index)
+{
+	SetByte(tBuf, len, index);
+	SetString(tBuf, sBuf, len, index);
+}
+
+inline void SetString2(char* tBuf, const char* sBuf, short len, int& index)
+{
+	SetShort(tBuf, len, index);
+	SetString(tBuf, sBuf, len, index);
 }
 
 // sungyong 2001.11.06
@@ -331,30 +344,32 @@ inline CString GetProgPath()
 
 inline void LogFileWrite(LPCTSTR logstr)
 {
-	CString ProgPath, LogFileName;
+	CString LogFileName;
+	LogFileName.Format(_T("%s\\Aujard.log"), GetProgPath().GetString());
+
 	CFile file;
-	int loglength;
+	if (!file.Open(LogFileName, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite))
+		return;
 
-	ProgPath = GetProgPath();
-	loglength = _tcslen(logstr);
+	file.SeekToEnd();
 
-	LogFileName.Format(_T("%s\\Aujard.log"), ProgPath.GetString());
+#if defined(_UNICODE)
+	const std::string utf8 = WideToUtf8(logstr, wcslen(logstr));
+	file.Write(utf8.c_str(), static_cast<int>(utf8.size()));
+#else
+	file.Write(logstr, strlen(logstr));
+#endif
 
-	if (file.Open(LogFileName, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite))
-	{
-		file.SeekToEnd();
-		file.Write(logstr, loglength);
-		file.Close();
-	}
+	file.Close();
 }
 
 inline int DisplayErrorMsg(SQLHANDLE hstmt)
 {
-	SQLTCHAR      SqlState[6], Msg[1024];
+	SQLTCHAR      SqlState[6], Msg[4096];
 	SQLINTEGER    NativeError;
 	SQLSMALLINT   i, MsgLen;
 	SQLRETURN     rc2;
-	TCHAR		  logstr[512] = {};
+	TCHAR		  logstr[4096] = {};
 
 	i = 1;
 	while ((rc2 = SQLGetDiagRec(SQL_HANDLE_STMT, hstmt, i, SqlState, &NativeError, Msg, _countof(Msg), &MsgLen)) != SQL_NO_DATA)

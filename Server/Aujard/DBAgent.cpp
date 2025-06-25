@@ -31,7 +31,7 @@ BOOL CDBAgent::DatabaseInit()
 {
 	//	Main DB Connecting..
 	/////////////////////////////////////////////////////////////////////////////////////
-	m_pMain = (CAujardDlg*) AfxGetMainWnd();
+	m_pMain = (CAujardDlg*) AfxGetApp()->GetMainWnd();
 
 	CString strConnect;
 	strConnect.Format(_T("ODBC;DSN=%s;UID=%s;PWD=%s"), m_pMain->m_strGameDSN, m_pMain->m_strGameUID, m_pMain->m_strGamePWD);
@@ -102,71 +102,15 @@ void CDBAgent::ReConnectODBC(CDatabase* m_db, const TCHAR* strdb, const TCHAR* s
 
 void CDBAgent::MUserInit(int uid)
 {
-	_USER_DATA* pUser = nullptr;
-
-	pUser = (_USER_DATA*) m_UserDataArray[uid];
-	if (!pUser)
+	_USER_DATA* pUser = m_UserDataArray[uid];
+	if (pUser == nullptr)
 		return;
 
-	memset(pUser->m_id, 0, sizeof(pUser->m_id));
-	memset(pUser->m_Accountid, 0, sizeof(pUser->m_Accountid));
-
-	pUser->m_bZone = 0;
-	pUser->m_curx = 0;
-	pUser->m_curz = 0;
-	pUser->m_cury = 0;
-
-	pUser->m_bNation = 0;
-	pUser->m_bRace = 0;
-	pUser->m_sClass = 0;
-	pUser->m_bHairColor = 0;
-	pUser->m_bRank = 0;
-	pUser->m_bTitle = 0;
-	pUser->m_bLevel = 0;
-	pUser->m_iExp = 0;
-	pUser->m_iLoyalty = 0;
-	pUser->m_bFace = 0;
-	pUser->m_bCity = 0;
-	pUser->m_bKnights = 0;
-	//pUser->m_sClan = 0;
-	pUser->m_bFame = 0;
-	pUser->m_sHp = 0;
-	pUser->m_sMp = 0;
-	pUser->m_sSp = 0;
-	pUser->m_bStr = 0;
-	pUser->m_bSta = 0;
-	pUser->m_bDex = 0;
-	pUser->m_bIntel = 0;
-	pUser->m_bCha = 0;
-	pUser->m_iGold = 0;
-	pUser->m_sBind = -1;
-	pUser->m_iBank = 0;
-
-	// 스킬 초기화
-	for (int i = 0; i < 9; i++)
-		pUser->m_bstrSkill[i] = 0;
-
-	// 착용갯수 + 소유갯수(14+28=42)
-	for (int i = 0; i < SLOT_MAX + HAVE_MAX; i++)
-	{
-		pUser->m_sItemArray[i].nNum = 0;
-		pUser->m_sItemArray[i].sDuration = 0;
-		pUser->m_sItemArray[i].sCount = 0;
-	}
-
-	for (int i = 0; i < WAREHOUSE_MAX; i++)
-	{
-		pUser->m_sWarehouseArray[i].nNum = 0;
-		pUser->m_sWarehouseArray[i].sDuration = 0;
-		pUser->m_sWarehouseArray[i].sCount = 0;
-	}
-
-	pUser->m_bLogout = 0;
-	pUser->m_bWarehouse = 0;
-	pUser->m_dwTime = 0;
+	memset(pUser, 0, sizeof(_USER_DATA));
+	pUser->m_bAuthority = AUTHORITY_USER;
 }
 
-BOOL CDBAgent::LoadUserData(char* userid, int uid)
+BOOL CDBAgent::LoadUserData(const char* accountid, const char* userid, int uid)
 {
 	SQLHSTMT		hstmt;
 	SQLRETURN		retcode;
@@ -175,16 +119,17 @@ BOOL CDBAgent::LoadUserData(char* userid, int uid)
 	TCHAR			szSQL[1024] = {};
 
 	//wsprintf(szSQL, TEXT("{? = call LOAD_USER_DATA ('%hs')}"), userid);
-	wsprintf(szSQL, TEXT("{call LOAD_USER_DATA ('%hs', ?)}"), userid);
+	wsprintf(szSQL, TEXT("{call LOAD_USER_DATA ('%hs', '%hs', ?)}"), accountid, userid);
 
 	SQLCHAR Nation, Race, HairColor, Rank, Title, Level;
-	SQLINTEGER Exp, Loyalty, Gold, PX, PZ, PY, dwTime;
+	SQLINTEGER Exp, Loyalty, Gold, PX, PZ, PY, dwTime, MannerPoint, LoyaltyMonthly;
 	SQLCHAR Face, City, Fame, Authority, Points;
-	SQLSMALLINT Hp, Mp, Sp, sRet, Class, Bind, Knights;
+	SQLSMALLINT Hp, Mp, Sp, sRet, Class, Bind, Knights, QuestCount;
 	SQLCHAR Str, Sta, Dex, Intel, Cha, Zone;
 	char strSkill[10] = {},
 		strItem[400] = {},
-		strSerial[400] = {};
+		strSerial[400] = {},
+		strQuest[400] = {};
 
 	SQLINTEGER Indexind = SQL_NTS;
 
@@ -255,6 +200,10 @@ BOOL CDBAgent::LoadUserData(char* userid, int uid)
 			SQLGetData(hstmt, 31, SQL_C_CHAR, strSkill, 10, &Indexind);
 			SQLGetData(hstmt, 32, SQL_C_CHAR, strItem, 400, &Indexind);
 			SQLGetData(hstmt, 33, SQL_C_CHAR, strSerial, 400, &Indexind);
+			SQLGetData(hstmt, 34, SQL_C_SSHORT, &QuestCount, 0, &Indexind);
+			SQLGetData(hstmt, 35, SQL_C_CHAR, strQuest, 400, &Indexind);
+			SQLGetData(hstmt, 36, SQL_C_LONG, &MannerPoint, 0, &Indexind);
+			SQLGetData(hstmt, 37, SQL_C_LONG, &LoyaltyMonthly, 0, &Indexind);
 			retval = TRUE;
 		}
 		else
@@ -269,8 +218,7 @@ BOOL CDBAgent::LoadUserData(char* userid, int uid)
 	{
 		if (DisplayErrorMsg(hstmt) == -1)
 		{
-			char logstr[256];
-			memset(logstr, 0x00, 256);
+			char logstr[256] = {};
 			sprintf(logstr, "[Error-DB Fail] LoadUserData : name=%s\r\n", userid);
 	//		m_pMain->m_LogFile.Write(logstr, strlen(logstr));
 
@@ -299,7 +247,7 @@ BOOL CDBAgent::LoadUserData(char* userid, int uid)
 		return FALSE;
 	}	*/
 
-	if (!retval)
+	if (retval == 0)
 	{
 		memset(logstr, 0, sizeof(logstr));
 		sprintf(logstr, "LoadUserData Fail : name=%s, retval= %d \r\n", userid, retval);
@@ -381,6 +329,9 @@ BOOL CDBAgent::LoadUserData(char* userid, int uid)
 	pUser->m_sBind = Bind;
 	pUser->m_dwTime = dwTime + 1;
 
+	pUser->m_iMannerPoint = MannerPoint;
+	pUser->m_iLoyaltyMonthly = LoyaltyMonthly;
+
 	CTime t = CTime::GetCurrentTime();
 	memset(logstr, 0, sizeof(logstr));
 	sprintf(logstr, "[LoadUserData %d-%d-%d]: name=%s, nation=%d, zone=%d, level=%d, exp=%d, money=%d\r\n", t.GetHour(), t.GetMinute(), t.GetSecond(), userid, Nation, Zone, Level, Exp, Gold);
@@ -407,11 +358,13 @@ BOOL CDBAgent::LoadUserData(char* userid, int uid)
 
 		pTable = m_pMain->m_ItemtableArray.GetData(itemid);
 
-		if (pTable)
+		if (pTable != nullptr)
 		{
 			pUser->m_sItemArray[i].nNum = itemid;
 			pUser->m_sItemArray[i].sDuration = duration;
 			pUser->m_sItemArray[i].nSerialNum = serial;
+			pUser->m_sItemArray[i].byFlag = 0;
+			pUser->m_sItemArray[i].sTimeRemaining = 0;
 
 			if (count > ITEMCOUNT_MAX)
 			{
@@ -443,6 +396,8 @@ BOOL CDBAgent::LoadUserData(char* userid, int uid)
 			pUser->m_sItemArray[i].sDuration = 0;
 			pUser->m_sItemArray[i].sCount = 0;
 			pUser->m_sItemArray[i].nSerialNum = 0;
+			pUser->m_sItemArray[i].byFlag = 0;
+			pUser->m_sItemArray[i].sTimeRemaining = 0;
 
 			if (itemid > 0)
 			{
@@ -454,6 +409,28 @@ BOOL CDBAgent::LoadUserData(char* userid, int uid)
 			continue;
 		}
 	}
+
+	short sQuestTotal = 0;
+	index = 0;
+	for (int i = 0; i < MAX_QUEST; i++)
+	{
+		_USER_QUEST& quest = pUser->m_quests[i];
+		quest.sQuestID = GetShort(strQuest, index);
+		quest.byQuestState = GetByte(strQuest, index);
+
+		if (quest.sQuestID > 100
+			|| quest.byQuestState > 3)
+		{
+			memset(&quest, 0, sizeof(_USER_QUEST));
+			continue;
+		}
+
+		if (quest.sQuestID > 0)
+			++sQuestTotal;
+	}
+
+	if (QuestCount != sQuestTotal)
+		pUser->m_sQuestCount = sQuestTotal;
 
 	if (pUser->m_bLevel == 1
 		&& pUser->m_iExp == 0
@@ -526,8 +503,8 @@ int CDBAgent::UpdateUser(const char* userid, int uid, int type)
 {
 	SQLHSTMT		hstmt;
 	SQLRETURN		retcode;
-	TCHAR			szSQL[1024] = {};
-	SDWORD			sStrItem, sStrSkill, sStrSerial;
+	TCHAR			szSQL[4096] = {};
+	SDWORD			sStrItem, sStrSkill, sStrSerial, sStrQuest;
 
 	_USER_DATA*		pUser = nullptr;
 
@@ -548,14 +525,40 @@ int CDBAgent::UpdateUser(const char* userid, int uid, int type)
 
 	char strSkill[10] = {},
 		strItem[400] = {},
-		strSerial[400] = {};
+		strSerial[400] = {},
+		strQuest[400] = {};
+	short sQuestTotal = 0;
 	sStrSkill = sizeof(strSkill);
 	sStrItem = sizeof(strItem);
 	sStrSerial = sizeof(strSerial);
+	sStrQuest = sizeof(strQuest);
 
 	int index = 0, serial_index = 0;
 	for (int i = 0; i < 9; i++)
 		SetByte(strSkill, pUser->m_bstrSkill[i], index);
+
+	index = 0;
+	for (int i = 0; i < MAX_QUEST; i++)
+	{
+		_USER_QUEST& quest = pUser->m_quests[i];
+
+		if (quest.sQuestID > 100
+			|| quest.byQuestState > 3)
+		{
+			memset(&quest, 0, sizeof(_USER_QUEST));
+		}
+		else
+		{
+			if (quest.sQuestID > 0)
+				++sQuestTotal;
+		}
+
+		SetShort(strQuest, quest.sQuestID, index);
+		SetByte(strQuest, quest.byQuestState, index);
+	}
+
+	if (sQuestTotal != pUser->m_sQuestCount)
+		pUser->m_sQuestCount = sQuestTotal;
 
 	index = 0;
 
@@ -576,12 +579,47 @@ int CDBAgent::UpdateUser(const char* userid, int uid, int type)
 	}
 
 	// 작업 : clan정보도 업데이트
-	wsprintf(szSQL, TEXT("{call UPDATE_USER_DATA ( \'%hs\', %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,?,?,?)}"),
-		pUser->m_id, pUser->m_bNation, pUser->m_bRace, pUser->m_sClass, pUser->m_bHairColor, pUser->m_bRank,
-		pUser->m_bTitle, pUser->m_bLevel, pUser->m_iExp, pUser->m_iLoyalty, pUser->m_bFace,
-		pUser->m_bCity, pUser->m_bKnights, pUser->m_bFame, pUser->m_sHp, pUser->m_sMp, pUser->m_sSp,
-		pUser->m_bStr, pUser->m_bSta, pUser->m_bDex, pUser->m_bIntel, pUser->m_bCha, pUser->m_bAuthority, pUser->m_bPoints, pUser->m_iGold, pUser->m_bZone, pUser->m_sBind,
-		(int) (pUser->m_curx * 100), (int) (pUser->m_curz * 100), (int) (pUser->m_cury * 100), pUser->m_dwTime);
+	wsprintf(
+		szSQL,
+		TEXT("{call UPDATE_USER_DATA ( \'%hs\', %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,?,?,?,?,%d,%d)}"),
+		pUser->m_id,
+		pUser->m_bNation,
+		pUser->m_bRace,
+		pUser->m_sClass,
+		pUser->m_bHairColor,
+		pUser->m_bRank,
+		pUser->m_bTitle,
+		pUser->m_bLevel,
+		pUser->m_iExp,
+		pUser->m_iLoyalty,
+		pUser->m_bFace,
+		pUser->m_bCity,
+		pUser->m_bKnights,
+		pUser->m_bFame,
+		pUser->m_sHp,
+		pUser->m_sMp,
+		pUser->m_sSp,
+		pUser->m_bStr,
+		pUser->m_bSta,
+		pUser->m_bDex,
+		pUser->m_bIntel,
+		pUser->m_bCha,
+		pUser->m_bAuthority,
+		pUser->m_bPoints,
+		pUser->m_iGold,
+		pUser->m_bZone,
+		pUser->m_sBind,
+		static_cast<int>(pUser->m_curx * 100),
+		static_cast<int>(pUser->m_curz * 100),
+		static_cast<int>(pUser->m_cury * 100),
+		pUser->m_dwTime,
+		sQuestTotal,
+		// @strSkill
+		// @strItem
+		// @strSerial
+		// @strQuest
+		pUser->m_iMannerPoint,
+		pUser->m_iLoyaltyMonthly);
 
 	hstmt = nullptr;
 
@@ -591,6 +629,7 @@ int CDBAgent::UpdateUser(const char* userid, int uid, int type)
 		retcode = SQLBindParameter(hstmt, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, sizeof(strSkill), 0, strSkill, 0, &sStrSkill);
 		retcode = SQLBindParameter(hstmt, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, sizeof(strItem), 0, strItem, 0, &sStrItem);
 		retcode = SQLBindParameter(hstmt, 3, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, sizeof(strSerial), 0, strSerial, 0, &sStrSerial);
+		retcode = SQLBindParameter(hstmt, 4, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, sizeof(strQuest), 0, strQuest, 0, &sStrQuest);
 		if (retcode == SQL_SUCCESS)
 		{
 			retcode = SQLExecDirect(hstmt, (SQLTCHAR*) szSQL, SQL_NTS);
@@ -906,7 +945,9 @@ BOOL CDBAgent::LoadCharInfo(char* id, char* buff, int& buff_index)
 			|| i == SHOULDER
 			|| i == LEG
 			|| i == GLOVE
-			|| i == FOOT)
+			|| i == FOOT
+			|| i == LEFTHAND
+			|| i == RIGHTHAND)
 		{
 			SetDWORD(buff, tempid, buff_index);
 			SetShort(buff, duration, buff_index);
@@ -1606,15 +1647,16 @@ BOOL CDBAgent::SetLogInInfo(const char* accountid, const char* charid, const cha
 	return bSuccess;
 }
 
-int CDBAgent::AccountLogout(const char* accountid)
+int CDBAgent::AccountLogout(const char* accountid, int iLogoutCode)
 {
 	SQLHSTMT		hstmt = nullptr;
 	SQLRETURN		retcode;
 	TCHAR			szSQL[1024] = {};
 	SQLSMALLINT		sParmRet = 0;
+	SQLINTEGER		iUnk = 0;
 	SQLINTEGER		cbParmRet = SQL_NTS;
 
-	wsprintf(szSQL, TEXT("{call ACCOUNT_LOGOUT( \'%hs\', ?)}"), accountid);
+	wsprintf(szSQL, TEXT("{call ACCOUNT_LOGOUT( \'%hs\', %d, ?, ?)}"), accountid, iLogoutCode);
 
 	DBProcessNumber(19);
 
@@ -1629,6 +1671,7 @@ int CDBAgent::AccountLogout(const char* accountid)
 	if (retcode == SQL_SUCCESS)
 	{
 		retcode = SQLBindParameter(hstmt, 1, SQL_PARAM_OUTPUT, SQL_C_SSHORT, SQL_SMALLINT, 0, 0, &sParmRet, 0, &cbParmRet);
+		retcode = SQLBindParameter(hstmt, 2, SQL_PARAM_OUTPUT, SQL_C_SLONG, SQL_INTEGER, 0, 0, &iUnk, 0, &cbParmRet);
 		if (retcode == SQL_SUCCESS)
 		{
 			retcode = SQLExecDirect(hstmt, (SQLTCHAR*) szSQL, SQL_NTS);

@@ -14,6 +14,7 @@ constexpr int MAX_PW_SIZE		= 12;
 constexpr int MAX_IP_SIZE		= 15; // IPv4 addresses are max ###.###.###.### (3*4 + 3), or 15 bytes
 
 constexpr int MAX_ITEM_COUNT	= 9999;	// 한 슬롯에 가지는 최대 화살/송편 개수
+constexpr int MAX_QUEST			= 100;
 
 constexpr int VIEW_DISTANCE		= 48;
 
@@ -211,6 +212,24 @@ enum e_ZoneFlags
 	ZF_FRIENDLY_NPCS		= (1 << 4),
 	ZF_WAR_ZONE				= (1 << 5),
 	ZF_CLAN_UPDATE			= (1 << 6)  // Joining, disbanding, creating etc.
+};
+
+enum e_ZoneID
+{
+	ZONE_KARUS				= 1,
+	ZONE_ELMORAD			= 2,
+	ZONE_ESLANT_KARUS		= 11,
+	ZONE_ESLANT_ELMORAD		= 12,
+	ZONE_MORADON			= 21,
+	ZONE_DELOS				= 30,
+	ZONE_BIFROST			= 31,
+	ZONE_ARENA				= 48,
+	ZONE_CAITHAROS_ARENA	= 55,
+	ZONE_BATTLE				= 101,
+	ZONE_BATTLE2			= 102,
+	ZONE_BATTLE3			= 103,
+	ZONE_SNOW_BATTLE		= 111,
+	ZONE_FRONTIER			= 201
 };
 
 // ITEM_SLOT DEFINE

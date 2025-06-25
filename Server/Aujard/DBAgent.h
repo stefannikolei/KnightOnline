@@ -26,7 +26,7 @@ public:
 	void DBProcessNumber(int number);
 	void LoadKnightsAllList(int nation);
 	BOOL CheckUserData(const char* accountid, const char* charid, int type, int nTimeNumber, int comparedata);
-	int AccountLogout(const char* accountid);
+	int AccountLogout(const char* accountid, int iLogoutCode = 0);
 	BOOL SetLogInInfo(const char* accountid, const char* charid, const char* serverip, int serverno, const char* clientip, BYTE bInit);
 	BOOL LoadKnightsInfo(int index, char* buff, int& buff_index);
 	int UpdateWarehouseData(const char* accountid, int uid, int type);
@@ -43,7 +43,7 @@ public:
 	int CreateNewChar(char* accountid, int index, char* charid, int race, int Class, int hair, int face, int str, int sta, int dex, int intel, int cha);
 	int	 AccountLogInReq(char* id, char* pw);	// return Nation value
 	int UpdateUser(const char* userid, int uid, int type);
-	BOOL LoadUserData(char* userid, int uid);
+	BOOL LoadUserData(const char* accountid, const char* userid, int uid);
 	void ReConnectODBC(CDatabase* m_db, const TCHAR* strdb, const TCHAR* strname, const TCHAR* strpwd);
 	BOOL DatabaseInit();
 	void MUserInit(int uid);

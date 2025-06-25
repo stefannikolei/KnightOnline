@@ -190,8 +190,17 @@ public:
 
 	short	m_sEvent[MAX_CURRENT_EVENT];				// 이미 실행된 이밴트 리스트들 :)
 
+	bool				m_bIsPartyLeader;
+	BYTE				m_byInvisibilityState;
+	short				m_sDirection;
+	bool				m_bIsChicken;
+	BYTE				m_byKnightsRank;
+	BYTE				m_byPersonalRank;
 
 public:
+	void RecvZoneChange(char* pBuf);
+	void GameStart(char* pBuf);
+	void GetUserInfo(char* buff, int& buff_index);
 	void RecvDeleteChar(char* pBuf);
 	BOOL ExistComEvent(int eventid);
 	void SaveComEvent(int eventid);
@@ -211,7 +220,6 @@ public:
 	void SelectMsg(EXEC* pExec);
 	void SendNpcSay(EXEC* pExec);
 	BOOL CheckClass(short class1, short class2, short class3, short class4, short class5, short class6);
-	void Make_public_key();
 	void RecvSelectMsg(char* pBuf);
 	BOOL GiveItem(int itemid, short count);
 	BOOL RobItem(int itemid, short count);
@@ -354,7 +362,7 @@ public:
 	void Chat(char* pBuf);
 	void LogOut();
 	void SelCharToAgent(char* pBuf);
-	void SendMyInfo();
+	void SendMyInfo(int type);
 	void SelectCharacter(char* pBuf);
 	void Send2AI_UserUpdateInfo();
 	void Attack(char* pBuf);
