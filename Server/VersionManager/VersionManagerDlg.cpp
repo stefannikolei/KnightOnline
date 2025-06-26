@@ -209,6 +209,9 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 		m_News.Size = static_cast<short>(newsContent.size());
 	}
 
+	// Trigger a save to flush defaults to file.
+	ini.Save();
+
 	return TRUE;
 }
 

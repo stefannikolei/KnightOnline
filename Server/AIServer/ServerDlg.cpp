@@ -2810,6 +2810,9 @@ void CServerDlg::GetServerInfoIni()
 	inifile.GetString(_T("ODBC"), _T("GAME_DSN"), _T("KN_Online"), m_strGameDSN, sizeof(m_strGameDSN));
 	inifile.GetString(_T("ODBC"), _T("GAME_UID"), _T("knight"), m_strGameUID, sizeof(m_strGameUID));
 	inifile.GetString(_T("ODBC"), _T("GAME_PWD"), _T("knight"), m_strGamePWD, sizeof(m_strGamePWD));
+
+	// Trigger a save to flush defaults to file.
+	inifile.Save();
 }
 
 void CServerDlg::SendSystemMsg(char* pMsg, int zone, int type, int who)

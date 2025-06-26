@@ -771,8 +771,6 @@ void CEbenezerDlg::OnTimer(UINT nIDEvent)
 // sungyong 2002.05.22
 BOOL CEbenezerDlg::AIServerConnect()
 {
-	m_Ini.GetString("AI_SERVER", "IP", "192.203.143.119", m_AIServerIP, _countof(m_AIServerIP));
-
 	for (int i = 0; i < MAX_AI_SOCKET; i++)
 	{
 		if (!AISocketConnect(i))
@@ -1765,6 +1763,8 @@ void CEbenezerDlg::GetTimeFromIni()
 	m_Ini.GetString(_T("ODBC"), _T("GAME_UID"), _T("knight"), m_strGameUID, _countof(m_strGameUID));
 	m_Ini.GetString(_T("ODBC"), _T("GAME_PWD"), _T("knight"), m_strGamePWD, _countof(m_strGamePWD));
 
+	m_Ini.GetString("AI_SERVER", "IP", "127.0.0.1", m_AIServerIP, _countof(m_AIServerIP));
+
 	m_nCastleCapture = m_Ini.GetInt("CASTLE", "NATION", 1);
 	m_nServerNo = m_Ini.GetInt("ZONE_INFO", "MY_INFO", 1);
 	m_nServerGroup = m_Ini.GetInt("ZONE_INFO", "SERVER_NUM", 0);
@@ -1783,7 +1783,7 @@ void CEbenezerDlg::GetTimeFromIni()
 		pInfo->sServerNo = m_Ini.GetInt("ZONE_INFO", ipkey, 1);
 
 		sprintf(ipkey, "SERVER_IP_%02d", i);
-		m_Ini.GetString("ZONE_INFO", ipkey, "210.92.91.242", pInfo->strServerIP, _countof(pInfo->strServerIP));
+		m_Ini.GetString("ZONE_INFO", ipkey, "127.0.0.1", pInfo->strServerIP, _countof(pInfo->strServerIP));
 
 		pInfo->sPort = _LISTEN_PORT + pInfo->sServerNo;
 
@@ -1794,9 +1794,9 @@ void CEbenezerDlg::GetTimeFromIni()
 	{
 		m_nServerGroupNo = m_Ini.GetInt("SG_INFO", "GMY_INFO", 1);
 		sgroup_count = m_Ini.GetInt("SG_INFO", "GSERVER_COUNT", 1);
-		if (server_count < 1)
+		if (sgroup_count < 1)
 		{
-			AfxMessageBox(_T("ServerCount Error!!"));
+			AfxMessageBox(_T("Server group count error!!"));
 			return;
 		}
 
@@ -1808,13 +1808,16 @@ void CEbenezerDlg::GetTimeFromIni()
 			pInfo->sServerNo = m_Ini.GetInt("SG_INFO", ipkey, 1);
 
 			sprintf(ipkey, "GSERVER_IP_%02d", i);
-			m_Ini.GetString("SG_INFO", ipkey, "210.92.91.242", pInfo->strServerIP, _countof(pInfo->strServerIP));
+			m_Ini.GetString("SG_INFO", ipkey, "127.0.0.1", pInfo->strServerIP, _countof(pInfo->strServerIP));
 
 			pInfo->sPort = _LISTEN_PORT + pInfo->sServerNo;
 
 			m_ServerGroupArray.PutData(pInfo->sServerNo, pInfo);
 		}
 	}
+
+	// Trigger a save to flush defaults to file.
+	m_Ini.Save();
 
 	SetTimer(GAME_TIME, 6000, nullptr);
 	SetTimer(SEND_TIME, 200, nullptr);
@@ -1939,6 +1942,7 @@ void CEbenezerDlg::SetGameTime()
 	m_Ini.SetInt("TIMER", "DATE", m_nDate);
 	m_Ini.SetInt("TIMER", "HOUR", m_nHour);
 	m_Ini.SetInt("TIMER", "WEATHER", m_nWeather);
+	m_Ini.Save();
 }
 
 void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)

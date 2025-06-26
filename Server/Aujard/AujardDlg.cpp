@@ -205,6 +205,9 @@ BOOL CAujardDlg::OnInitDialog()
 	m_nServerNo = ini.GetInt(_T("ZONE_INFO"), _T("GROUP_INFO"), 1);
 	m_nZoneNo = ini.GetInt(_T("ZONE_INFO"), _T("ZONE_INFO"), 1);
 
+	// Trigger a save to flush defaults to file.
+	ini.Save();
+
 	if (!m_DBAgent.DatabaseInit())
 	{
 		AfxPostQuitMessage(0);
