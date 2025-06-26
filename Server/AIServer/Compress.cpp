@@ -39,9 +39,9 @@ int CCompressManager::AddData(char* add_data, long nLen)
 
 	char* dataPtr;
 	if (nLen == 0)
-		l_len = strlen(add_data);
+		l_len = static_cast<short>(strlen(add_data));
 	else
-		l_len = (short) nLen;
+		l_len = static_cast<short>(nLen);
 
 	CCompressData* pData;
 

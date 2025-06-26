@@ -1031,7 +1031,7 @@ BOOL CServerDlg::CreateNpcThread()
 	int		nSerial = m_sMapEventNpc;
 	int		nPathSerial = 1;
 	int		nNpcCount = 0;
-	int		i = 0, j = 0;
+	int		j = 0;
 	int		nRandom = 0, nServerNum = 0;
 	double  dbSpeed = 0;
 
@@ -1289,16 +1289,18 @@ BOOL CServerDlg::CreateNpcThread()
 
 					pNpc->m_ZoneIndex = -1;
 
-					for (i = 0; i < g_arZone.size(); i++)
+					MAP* pMap = nullptr;
+					for (size_t i = 0; i < g_arZone.size(); i++)
 					{
 						if (g_arZone[i]->m_nZoneNumber == pNpc->m_sCurZone)
 						{
-							pNpc->m_ZoneIndex = i;
+							pNpc->m_ZoneIndex = static_cast<short>(i);
+							pMap = g_arZone[i];
 							break;
 						}
 					}
 
-					if (pNpc->m_ZoneIndex == -1)
+					if (pMap == nullptr)
 					{
 						AfxMessageBox(_T("Error : CServerDlg,, Invaild zone Index!!"));
 						return FALSE;
@@ -1313,13 +1315,11 @@ BOOL CServerDlg::CreateNpcThread()
 						pNpc = nullptr;
 					}
 
-					// 
 					if (pNpc != nullptr
-						&& g_arZone[pNpc->m_ZoneIndex]->m_byRoomEvent > 0
+						&& pMap->m_byRoomEvent > 0
 						&& pNpc->m_byDungeonFamily > 0)
 					{
-						pRoom = nullptr;
-						pRoom = g_arZone[pNpc->m_ZoneIndex]->m_arRoomEventArray.GetData(pNpc->m_byDungeonFamily);
+						pRoom = pMap->m_arRoomEventArray.GetData(pNpc->m_byDungeonFamily);
 						if (pRoom == nullptr)
 						{
 							TRACE(_T("Error : CServerDlg,, Map Room Npc Fail!! : nid=%d, sid=%d, name=%hs, fam=%d, zoneindex=%d\n"), pNpc->m_sNid + NPC_BAND, pNpc->m_sSid, pNpc->m_strName, pNpc->m_byDungeonFamily, pNpc->m_ZoneIndex);
@@ -1353,7 +1353,6 @@ BOOL CServerDlg::CreateNpcThread()
 
 		NpcPosSet.Close();
 	}
-
 	catch (CMemoryException* e)
 	{
 		e->ReportError();
@@ -1373,12 +1372,12 @@ BOOL CServerDlg::CreateNpcThread()
 	int nThreadNumber = 0;
 	CNpcThread* pNpcThread = nullptr;
 
-	for (i = 0; i < m_arNpc.GetSize(); i++)
+	for (auto& [_, pNpc] : m_arNpc)
 	{
 		if (step == 0)
 			pNpcThread = new CNpcThread;
 
-		pNpcThread->m_pNpc[step] = m_arNpc.GetData(i);
+		pNpcThread->m_pNpc[step] = pNpc;
 		pNpcThread->m_pNpc[step]->m_sThreadNumber = nThreadNumber;
 		pNpcThread->m_pNpc[step]->Init();
 
@@ -1714,17 +1713,15 @@ void CServerDlg::AllNpcInfo()
 {
 	// server alive check
 	CNpc* pNpc = nullptr;
-	MAP* pMap = nullptr;
-	int nZone = 0, i = 0;
+	int nZone = 0;
 	int size = m_arNpc.GetSize();
 
 	int send_index = 0, zone_index = 0, packet_size = 0;
 	int count = 0, send_count = 0, send_tot = 0;
 	char send_buff[2048] = {};
 
-	for (i = 0; i < m_sTotalMap; i++)
+	for (MAP* pMap : g_arZone)
 	{
-		pMap = g_arZone[i];
 		if (pMap == nullptr)
 			continue;
 
@@ -1932,8 +1929,6 @@ void CServerDlg::DeleteAllUserList(int zone)
 				}
 			}
 		}
-
-		int size = g_arZone.size();
 
 		EnterCriticalSection(&g_User_critical);
 		// User Array Delete
@@ -2226,12 +2221,12 @@ CNpc* CServerDlg::GetEventNpcPtr()
 	return nullptr;
 }
 
-int  CServerDlg::MonsterSummon(const char* pNpcName, int zone, float fx, float fz)
+int CServerDlg::MonsterSummon(const char* pNpcName, int zone_id, float fx, float fz)
 {
-	if (zone < 0
-		|| zone > (g_arZone.size() + 1))
+	MAP* pMap = GetMapByID(zone_id);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### 소환 실패 : %hs, zoneindex=%d #####\n"), pNpcName, zone);
+		TRACE(_T("#### 소환 실패 : %hs, zone_id=%d #####\n"), pNpcName, zone_id);
 		return -1;
 	}
 
@@ -2243,13 +2238,13 @@ int  CServerDlg::MonsterSummon(const char* pNpcName, int zone, float fx, float f
 	}
 
 	BOOL bFlag = FALSE;
-	bFlag = SetSummonNpcData(pNpc, zone, fx, fz);
+	bFlag = SetSummonNpcData(pNpc, zone_id, fx, fz);
 
 	return 1;
 }
 
 //	소환할 몹의 데이타값을 셋팅한다.
-BOOL CServerDlg::SetSummonNpcData(CNpc* pNpc, int zone, float fx, float fz)
+BOOL CServerDlg::SetSummonNpcData(CNpc* pNpc, int zone_id, float fx, float fz)
 {
 	int  iCount = 0;
 	CNpc* pEventNpc = GetEventNpcPtr();
@@ -2319,7 +2314,7 @@ BOOL CServerDlg::SetSummonNpcData(CNpc* pNpc, int zone, float fx, float fz)
 	pEventNpc->m_byWhatAttackType = pNpc->m_byWhatAttackType;
 
 	//////// MONSTER POS ////////////////////////////////////////
-	pEventNpc->m_sCurZone = zone;
+	pEventNpc->m_sCurZone = static_cast<short>(zone_id);
 	pEventNpc->m_fCurX = fx;
 	pEventNpc->m_fCurY = 0;
 	pEventNpc->m_fCurZ = fz;
@@ -2336,11 +2331,11 @@ BOOL CServerDlg::SetSummonNpcData(CNpc* pNpc, int zone, float fx, float fz)
 	pEventNpc->m_NpcState = NPC_DEAD;						// 상태는 죽은것으로 해야 한다.. 
 	pEventNpc->m_bFirstLive = 1;							// 처음 살아난 경우로 해줘야 한다..
 
-	for (int i = 0; i < g_arZone.size(); i++)
+	for (size_t i = 0; i < g_arZone.size(); i++)
 	{
-		if (g_arZone[i]->m_nZoneNumber == zone)
+		if (g_arZone[i]->m_nZoneNumber == zone_id)
 		{
-			pEventNpc->m_ZoneIndex = i;
+			pEventNpc->m_ZoneIndex = static_cast<short>(i);
 			break;
 		}
 	}
@@ -2756,27 +2751,26 @@ BOOL CServerDlg::AddObjectEventNpc(_OBJECT_EVENT* pEvent, int zone_number)
 	return TRUE;
 }
 
-int CServerDlg::GetZoneIndex(int zonenumber)
+int CServerDlg::GetZoneIndex(int zone_id) const
 {
-	int t_count = g_arZone.size();
-	for (int i = 0; i < t_count; i++)
+	for (size_t i = 0; i < g_arZone.size(); i++)
 	{
-		if (g_arZone[i]
-			&& (zonenumber == g_arZone[i]->m_nZoneNumber))
+		MAP* pMap = g_arZone[i];
+		if (pMap != nullptr
+			&& pMap->m_nZoneNumber == zone_id)
 			return i;
 	}
 
 	return -1;
 }
 
-int CServerDlg::GetServerNumber(int zonenumber)
+int CServerDlg::GetServerNumber(int zone_id) const
 {
-	int t_count = g_arZone.size();
-	for (int i = 0; i < t_count; i++)
+	for (MAP* pMap : g_arZone)
 	{
-		if (g_arZone[i]
-			&& (zonenumber == g_arZone[i]->m_nZoneNumber))
-			return g_arZone[i]->m_nServerNo;
+		if (pMap != nullptr
+			&& pMap->m_nZoneNumber == zone_id)
+			return pMap->m_nServerNo;
 	}
 
 	return -1;
@@ -2854,6 +2848,27 @@ void CServerDlg::ResetBattleZone()
 	}
 
 	TRACE(_T("ServerDlg - ResetBattleZone() : end \n"));
+}
+
+MAP* CServerDlg::GetMapByIndex(int iZoneIndex) const
+{
+	if (iZoneIndex < 0
+		|| iZoneIndex >= static_cast<int>(g_arZone.size()))
+		return nullptr;
+
+	return g_arZone[iZoneIndex];
+}
+
+MAP* CServerDlg::GetMapByID(int iZoneID) const
+{
+	for (MAP* pMap : g_arZone)
+	{
+		if (pMap != nullptr
+			&& pMap->m_nZoneNumber == iZoneID)
+			return pMap;
+	}
+
+	return nullptr;
 }
 
 CString CServerDlg::GetGameDBConnectionString()

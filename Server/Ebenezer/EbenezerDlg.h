@@ -65,6 +65,8 @@ public:
 	}
 
 	CString GetGameDBConnectionString();
+	C3DMap* GetMapByID(int iZoneID) const;
+	C3DMap* GetMapByIndex(int iZoneIndex) const;
 	void WriteEventLog(char* pBuf);
 	void FlySanta();
 	void BattleZoneCurrentUsers();
@@ -117,8 +119,8 @@ public:
 	void UpdateGameTime();
 	void GetTimeFromIni();
 	void Send_NearRegion(char* pBuf, int len, int zone, int region_x, int region_z, float curx, float curz, CUser* pExceptUser = nullptr);
-	void Send_FilterUnitRegion(char* pBuf, int len, int zoneindex, int x, int z, float ref_x, float ref_z, CUser* pExceptUser = nullptr);
-	void Send_UnitRegion(char* pBuf, int len, int zoneindex, int x, int z, CUser* pExceptUser = nullptr, bool bDirect = true);
+	void Send_FilterUnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int z, float ref_x, float ref_z, CUser* pExceptUser = nullptr);
+	void Send_UnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int z, CUser* pExceptUser = nullptr, bool bDirect = true);
 	BOOL LoadCoefficientTable();
 	BOOL LoadMagicTable();
 	BOOL LoadItemTable();

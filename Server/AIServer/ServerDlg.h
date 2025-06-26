@@ -88,10 +88,10 @@ public:
 	CUser* GetActiveUserPtr(int index);
 	CNpc* GetNpcPtr(const char* pNpcName);
 	CNpc* GetEventNpcPtr();
-	BOOL   SetSummonNpcData(CNpc* pNpc, int zone, float fx, float fz);
-	int    MonsterSummon(const char* pNpcName, int zone, float fx, float fz);
-	int GetZoneIndex(int zonenumber);
-	int GetServerNumber(int zonenumber);
+	BOOL   SetSummonNpcData(CNpc* pNpc, int zone_id, float fx, float fz);
+	int    MonsterSummon(const char* pNpcName, int zone_id, float fx, float fz);
+	int GetZoneIndex(int zone_id) const;
+	int GetServerNumber(int zone_id) const;
 	void ClostSocket(int zonenumber);
 
 	void CheckAliveTest();
@@ -101,6 +101,8 @@ public:
 	int Send(char* pData, int length, int nZone = 0);
 	void SendSystemMsg(char* pMsg, int zone, int type = 0, int who = 0);
 	void ResetBattleZone();
+	MAP* GetMapByIndex(int iZoneIndex) const;
+	MAP* GetMapByID(int iZoneID) const;
 	CString GetGameDBConnectionString();
 
 	CServerDlg(CWnd* pParent = nullptr);	// standard constructor

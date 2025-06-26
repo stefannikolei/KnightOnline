@@ -238,8 +238,8 @@ void CUser::SendAll(const char* pBuf, int nLength)
 	if (m_pIocport == nullptr)
 		return;
 
-	if (m_sZoneIndex < 0
-		|| m_sZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
+	if (pMap == nullptr)
 		return;
 
 	SEND_DATA* pNewData = nullptr;
@@ -296,17 +296,10 @@ void CUser::Dead(int tid, int nDamage)
 	InitNpcAttack();
 
 	// region에서 삭제...
-	if (m_sZoneIndex < 0
-		|| m_sZoneIndex >= m_pMain->g_arZone.size())
-	{
-		TRACE(_T("#### User-Dead ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strUserID, m_sZoneIndex);
-		return;
-	}
-
-	MAP* pMap = m_pMain->g_arZone[m_sZoneIndex];
+	MAP* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### CUser-Dead() Fail : [nid=%d, name=%hs], pMap == NULL #####\n"), m_iUserId, m_strUserID);
+		TRACE(_T("#### CUser-Dead() Fail : [nid=%d, name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_iUserId, m_strUserID, m_sZoneIndex);
 		return;
 	}
 
@@ -986,16 +979,12 @@ void CUser::HealMagic()
 	int region_x = m_curx / VIEW_DIST;
 	int region_z = m_curz / VIEW_DIST;
 
-	if (m_sZoneIndex < 0
-		|| m_sZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
+	if (pMap == nullptr)
 	{
 		TRACE(_T("#### CUser--HealMagic ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strUserID, m_sZoneIndex);
 		return;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_sZoneIndex];
-	if (pMap == nullptr)
-		return;
 
 	int max_xx = pMap->m_sizeRegion.cx;
 	int max_zz = pMap->m_sizeRegion.cy;
@@ -1028,16 +1017,12 @@ void CUser::HealMagic()
 
 void CUser::HealAreaCheck(int rx, int rz)
 {
-	if (m_sZoneIndex < 0
-		|| m_sZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
+	if (pMap == nullptr)
 	{
 		TRACE(_T("#### CUser--HealAreaCheck ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strUserID, m_sZoneIndex);
 		return;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_sZoneIndex];
-	if (pMap == nullptr)
-		return;
 
 	// 자신의 region에 있는 NpcArray을 먼저 검색하여,, 가까운 거리에 Monster가 있는지를 판단..
 	if (rx < 0

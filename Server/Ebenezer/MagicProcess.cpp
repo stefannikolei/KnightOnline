@@ -2405,6 +2405,7 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 	for (int j = 0; j < party_index; j++)
 	{
 		_OBJECT_EVENT* pEvent = nullptr;
+		C3DMap* pTMap = nullptr;
 
 		float x = 0.0f, z = 0.0f;
 		x = (float) (myrand(0, 400) / 100.0f);
@@ -2420,6 +2421,10 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 		if (pTUser == nullptr)
 			continue;
 
+		pTMap = m_pMain->GetMapByIndex(pTUser->m_iZoneIndex);
+		if (pTMap == nullptr)
+			continue;
+
 		// 비러머글 대만 써비스 >.<
 		_HOME_INFO* pHomeInfo = m_pMain->m_HomeArray.GetData(pTUser->m_pUserData->m_bNation);
 		if (pHomeInfo == nullptr)
@@ -2428,9 +2433,8 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 		// Warp or Summon related.
 		if (pType->bWarpType != 11)
 		{
-			// Check if target exists and not already dead.
-			if (pTUser == nullptr
-				|| pTUser->m_bResHpType == USER_DEAD)
+			// Check if target is not already dead.
+			if (pTUser->m_bResHpType == USER_DEAD)
 			{
 				result = 0;
 				goto packet_send;
@@ -2439,9 +2443,8 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 		// Resurrection related.
 		else
 		{
-			// Check if target exists and not alive.
-			if (pTUser == nullptr
-				|| pTUser->m_bResHpType != USER_DEAD)
+			// Check if target is not already alive.
+			if (pTUser->m_bResHpType != USER_DEAD)
 			{
 				result = 0;
 				goto packet_send;
@@ -2475,9 +2478,7 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 				pTUser->Regene(nullptr);	// Use Regene() to warp player to resurrection point.
 */
 
-			//	pEvent = m_pMain->m_ZoneArray[m_iZoneIndex]->GetObjectEvent(m_pUserData->m_sBind);
-				pEvent = m_pMain->m_ZoneArray[pTUser->m_iZoneIndex]->GetObjectEvent(pTUser->m_pUserData->m_sBind);
-
+				pEvent = pTMap->GetObjectEvent(pTUser->m_pUserData->m_sBind);
 				if (pEvent != nullptr)
 				{
 
@@ -2532,17 +2533,11 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 					SetShort(send_buff, (WORD) ((pHomeInfo->FreeZoneZ * 10) + z), send_index);
 					pTUser->Warp(send_buff);
 				}
-//
 				// No, I don't have any idea what this part means....
 				else
 				{
-
-//					m_pUserData->m_curx = m_pMain->m_ZoneArray[m_iZoneIndex]->m_fInitX + x;
-//					m_pUserData->m_curz = m_pMain->m_ZoneArray[m_iZoneIndex]->m_fInitZ + z;
-//					m_pUserData->m_cury = 0;
-
-					SetShort(send_buff, (WORD) ((m_pMain->m_ZoneArray[pTUser->m_iZoneIndex]->m_fInitX * 10) + x), send_index);
-					SetShort(send_buff, (WORD) ((m_pMain->m_ZoneArray[pTUser->m_iZoneIndex]->m_fInitZ * 10) + z), send_index);
+					SetShort(send_buff, (WORD) ((pTMap->m_fInitX * 10) + x), send_index);
+					SetShort(send_buff, (WORD) ((pTMap->m_fInitZ * 10) + z), send_index);
 					pTUser->Warp(send_buff);
 				}
 

@@ -372,7 +372,6 @@ void CGameSocket::RecvUserInOut(char* pBuf)
 
 	// 수정할것,,, : 지금 존 번호를 0으로 했는데.. 유저의 존 정보의 번호를 읽어야,, 함,,
 	MAP* pMap = nullptr;
-	//m_pMain->g_arZone[pUser->m_curZone];
 
 	CUser* pUser = m_pMain->GetUserPtr(uid);
 
@@ -400,18 +399,10 @@ void CGameSocket::RecvUserInOut(char* pBuf)
 			}
 		}
 
-		if (pUser->m_sZoneIndex < 0
-			|| pUser->m_sZoneIndex > m_pMain->g_arZone.size())
-		{
-			TRACE(_T("#### GameSocket-RecvUserInOut ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), pUser->m_strUserID, x1, z1);
-			return;
-		}
-
-		pMap = m_pMain->g_arZone[pUser->m_sZoneIndex];
-
+		pMap = m_pMain->GetMapByIndex(pUser->m_sZoneIndex);
 		if (pMap == nullptr)
 		{
-			TRACE(_T("#### Fail : pMap == NULL ####\n"));
+			TRACE(_T("#### GameSocket-RecvUserInOut ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), pUser->m_strUserID, x1, z1);
 			return;
 		}
 
@@ -509,17 +500,10 @@ BOOL CGameSocket::SetUid(float x, float z, int id, int speed)
 	}
 
 	// Zone번호도 받아야 함,,,
-	if (pUser->m_sZoneIndex < 0
-		|| pUser->m_sZoneIndex > m_pMain->g_arZone.size())
-	{
-		TRACE(_T("#### GameSocket-SetUid ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), pUser->m_strUserID, pUser->m_sZoneIndex);
-		return FALSE;
-	}
-
-	MAP* pMap = m_pMain->g_arZone[pUser->m_sZoneIndex];
+	MAP* pMap = m_pMain->GetMapByIndex(pUser->m_sZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### User등록 실패 sid = %d ####\n"), id);
+		TRACE(_T("#### GameSocket-SetUid ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), pUser->m_strUserID, pUser->m_sZoneIndex);
 		return FALSE;
 	}
 

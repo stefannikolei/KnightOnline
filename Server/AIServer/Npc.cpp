@@ -66,14 +66,12 @@ inline BOOL CNpc::SetUid(float x, float z, int id)
 		int x = 0;
 	}
 
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-SetUid ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-SetUid ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
 		return FALSE;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
 
 	int x1 = (int) x / TILE_SIZE;
 	int z1 = (int) z / TILE_SIZE;
@@ -273,14 +271,14 @@ void CNpc::Init()
 	m_Delay = 0;
 	m_fDelayTime = TimeGet();
 
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-Init ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-Init ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
 		return;
 	}
 
-	m_pOrgMap = m_pMain->g_arZone[m_ZoneIndex]->m_pMap;	// MapInfo 정보 셋팅
+	m_pOrgMap = pMap->m_pMap;	// MapInfo 정보 셋팅
 }
 
 //	NPC 기본위치 정보 초기화(패스 따라 움직이는 NPC의 진형을 맞추어 준다..
@@ -791,10 +789,10 @@ void CNpc::NpcStanding()
 		return;
 	}	*/
 
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("### NpcStanding Zone Index Error : nid=%d, name=%hs, zoneindex=%d ###\n"), m_sNid + NPC_BAND, m_strName, m_ZoneIndex);
+		TRACE(_T("### NpcStanding Zone Index Error : nid=%d, name=%hs, zoneindex=%d, pMap == NULL ###\n"), m_sNid + NPC_BAND, m_strName, m_ZoneIndex);
 		return;
 	}
 
@@ -1040,16 +1038,12 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 	}
 
 	// NPC 초기위치 결정 ------------------------//
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-SetLive ZoneIndex Fail : [nid=%d,sid=%d,name=%hs], th_num=%d, zoneindex=%d #####\n"), m_sNid + NPC_BAND, m_sSid, m_strName, m_sThreadNumber, m_ZoneIndex);
+		TRACE(_T("#### Npc-SetLive ZoneIndex Fail : [nid=%d,sid=%d,name=%hs], th_num=%d, zoneindex=%d, pMap == NULL #####\n"), m_sNid + NPC_BAND, m_sSid, m_strName, m_sThreadNumber, m_ZoneIndex);
 		return FALSE;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
-	if (pMap == nullptr)
-		return FALSE;
 
 	// NPC 가 처음 살아나는 경우	
 	if (m_bFirstLive)
@@ -1250,11 +1244,13 @@ BOOL CNpc::RandomMove()
 		return FALSE;
 
 	float fDestX = -1.0f, fDestZ = -1.0f;
-	if (m_ZoneIndex < 0)
+
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 		return FALSE;
 
-	int max_xx = m_pMain->g_arZone[m_ZoneIndex]->m_sizeMap.cx;
-	int max_zz = m_pMain->g_arZone[m_ZoneIndex]->m_sizeMap.cy;
+	int max_xx = pMap->m_sizeMap.cx;
+	int max_zz = pMap->m_sizeMap.cy;
 	int x = 0, y = 0;
 
 	__Vector3 vStart, vEnd, vNewPos;
@@ -1436,7 +1432,7 @@ BOOL CNpc::RandomMove()
 		return FALSE;
 	}
 
-	int mapWidth = (max_xx - 1) * m_pMain->g_arZone[m_ZoneIndex]->m_fUnitDist;
+	int mapWidth = (max_xx - 1) * pMap->m_fUnitDist;
 
 	if (m_fCurX > mapWidth
 		|| m_fCurZ > mapWidth
@@ -1553,16 +1549,17 @@ BOOL CNpc::RandomBackMove()
 	if (m_bySearchRange == 0)
 		return FALSE;
 
-	float fDestX = -1.0f, fDestZ = -1.0f;
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-RandomBackMove ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-RandomBackMove ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
 		return FALSE;
 	}
 
-	int max_xx = m_pMain->g_arZone[m_ZoneIndex]->m_sizeMap.cx;
-	int max_zz = m_pMain->g_arZone[m_ZoneIndex]->m_sizeMap.cy;
+	float fDestX = -1.0f, fDestZ = -1.0f;
+
+	int max_xx = pMap->m_sizeMap.cx;
+	int max_zz = pMap->m_sizeMap.cy;
 	int x = 0, y = 0;
 
 	// 일시적으로 보정한다.
@@ -1958,16 +1955,12 @@ int CNpc::PathFind(CPoint start, CPoint end, float fDistance)
 //	NPC 사망처리
 void CNpc::Dead(CIOCPort* pIOCP, int iDeadType)
 {
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-Dead ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-Dead ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
 		return;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
-	if (pMap == nullptr)
-		return;
 
 	m_iHP = 0;
 	m_NpcState = NPC_DEAD;
@@ -2054,10 +2047,10 @@ BOOL CNpc::FindEnemy()
 		|| m_tNpcType == NPC_DESTORY_ARTIFACT)
 		return FALSE;
 
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-FindEnemy ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-FindEnemy ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
 		return FALSE;
 	}
 
@@ -2096,10 +2089,6 @@ BOOL CNpc::FindEnemy()
 		if (iMonsterNid != 0)
 			return TRUE;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
-	if (pMap == nullptr)
-		return FALSE;
 
 	CUser* pUser = nullptr;
 	CNpc* pNpc = nullptr;
@@ -2392,17 +2381,14 @@ int CNpc::FindEnemyRegion()
 
 float CNpc::FindEnemyExpand(int nRX, int nRZ, float fCompDis, int nType)
 {
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
 		TRACE(_T("#### Npc-FindEnemyExpand ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
 		return 0.0f;
 	}
 
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
 	float fDis = 0.0f;
-	if (pMap == nullptr)
-		return fDis;
 
 	float fComp = fCompDis;
 	float fSearchRange = (float) m_bySearchRange;
@@ -2649,18 +2635,14 @@ BOOL CNpc::IsMovable(float x, float z)
 		|| z < 0)
 		return FALSE;
 
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-IsMovable ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-IsMovable ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
 		return FALSE;
 	}
 
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
-	if (pMap == nullptr)
-		return FALSE;
-
-	if (!pMap->m_pMap)
+	if (pMap->m_pMap == nullptr)
 		return FALSE;
 
 	if (x >= pMap->m_sizeMap.cx
@@ -3122,16 +3104,12 @@ int CNpc::GetTargetPath(int option)
 		iTempRange = (float) m_byTracingRange;				// 일시적으로 보정한다.
 	}
 
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-GetTargetPath ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-GetTargetPath ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
 		return -1;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
-	if (pMap == nullptr)
-		return -1;
 
 	int max_xx = pMap->m_sizeMap.cx;
 	int max_zz = pMap->m_sizeMap.cy;
@@ -4625,10 +4603,10 @@ BOOL CNpc::SetDamage(int nAttackType, int nDamage, const char* id, int uid, CIOC
 		return TRUE;
 
 	// Npc의 포인터가 잘못된 경우에는 리턴..
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex > m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-Setdamage ZoneIndex Fail : [name=%d,%hs], zoneindex=%d #####\n"), m_sNid + NPC_BAND, m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-Setdamage ZoneIndex Fail : [name=%d,%hs], zoneindex=%d, pMap == NULL #####\n"), m_sNid + NPC_BAND, m_strName, m_ZoneIndex);
 		return TRUE;
 	}
 
@@ -4810,10 +4788,10 @@ BOOL CNpc::SetHMagicDamage(int nDamage, CIOCPort* pIOCP)
 //	NPC 사망처리시 경험치 분배를 계산한다.(일반 유저와 버디 사용자구분)
 void CNpc::SendExpToUserList()
 {
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-SendExpToUserList() ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-SendExpToUserList() ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
 		return;
 	}
 
@@ -4832,9 +4810,6 @@ void CNpc::SendExpToUserList()
 	CUser* pMaxDamageUser = nullptr;
 	_PARTY_GROUP* pParty = nullptr;
 	char strMaxDamageUser[MAX_ID_SIZE + 1] = {};
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
-	if (pMap == nullptr)
-		return;
 
 	IsUserInSight();	// 시야권내에 있는 유저 셋팅..
 
@@ -5235,26 +5210,19 @@ BOOL CNpc::IsCloseTarget(CUser* pUser, int nRange)
 //        2:사제NPC가 같은 아군의 상태를 체크해서 치료할 목적으로,, 리턴으로 치료될 아군의 NID를 리턴한다
 int CNpc::FindFriend(int type)
 {
-	CNpc* pNpc = nullptr;
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-FindFriend ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-FindFriend ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
 		return 0;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
-	if (pMap == nullptr)
-		return 0;
 
 	if (m_bySearchRange == 0)
 		return 0;
 
-	if (type != 2)
-	{
-		if (m_Target.id == -1)
-			return 0;
-	}
+	if (type != 2
+		&& m_Target.id == -1)
+		return 0;
 
 	int max_xx = pMap->m_sizeRegion.cx;
 	int max_zz = pMap->m_sizeRegion.cy;
@@ -5741,16 +5709,12 @@ float CNpc::GetDistance(__Vector3 vOrig, __Vector3 vDest)
 
 BOOL CNpc::GetUserInView()
 {
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex > m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-GetUserInView ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-GetUserInView ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
 		return FALSE;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
-	if (pMap == nullptr)
-		return FALSE;
 
 	//if( m_ZoneIndex > 5 || m_ZoneIndex < 0) return FALSE;		// 임시코드 ( 2002.03.24 )
 	int max_xx = pMap->m_sizeRegion.cx;
@@ -5792,14 +5756,12 @@ BOOL CNpc::GetUserInView()
 
 BOOL CNpc::GetUserInViewRange(int x, int z)
 {
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-GetUserInViewRange ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-GetUserInViewRange ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
 		return FALSE;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
 
 	if (x < 0
 		|| z < 0
@@ -6096,14 +6058,12 @@ BOOL CNpc::IsPathFindCheck(float fDistance)
 	int count = 0;
 	int nError = 0;
 
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-IsPathFindCheck ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-IsPathFindCheck ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
 		return FALSE;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
 
 	nX = (int) (vStart.x / TILE_SIZE);
 	nZ = (int) (vStart.z / TILE_SIZE);
@@ -6210,15 +6170,13 @@ void CNpc::IsNoPathFind(float fDistance)
 		return;
 	}
 
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
+	if (pMap == nullptr)
 	{
 		ClearPathFindData();
-		TRACE(_T("#### Npc-IsNoPathFind ZoneIndex Fail : [nid=%d, name=%hs], zoneindex=%d #####\n"), m_sNid + NPC_BAND, m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-IsNoPathFind ZoneIndex Fail : [nid=%d, name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_sNid + NPC_BAND, m_strName, m_ZoneIndex);
 		return;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
 
 	while (1)
 	{
@@ -6570,14 +6528,12 @@ BOOL CNpc::CheckFindEnermy()
 		)
 		return TRUE;
 
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-CheckFindEnermy ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-CheckFindEnermy ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
 		return FALSE;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
 
 	if (m_iRegion_X > pMap->GetXRegionMax()
 		|| m_iRegion_Z > pMap->GetZRegionMax()
@@ -7067,16 +7023,12 @@ void CNpc::DurationMagic_4(CIOCPort* pIOCP, float currenttime)
 	char send_buff[128] = {};
 
 	// Dungeon Work : 던젼몬스터의 경우 해당 대장몬스터가 죽은경우 나의 상태를 죽은 상태로....
-	if (m_ZoneIndex < 0
-		|| m_ZoneIndex >= m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-DurationMagic_4() ZoneIndex Fail : [nid=%d, name=%hs], zoneindex=%d #####\n"), m_sNid + NPC_BAND, m_strName, m_ZoneIndex);
+		TRACE(_T("#### Npc-DurationMagic_4() ZoneIndex Fail : [nid=%d, name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_sNid + NPC_BAND, m_strName, m_ZoneIndex);
 		return;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
-	if (pMap == nullptr)
-		return;
 
 	if (m_byDungeonFamily > 0)
 	{
@@ -7658,7 +7610,8 @@ BOOL CNpc::Teleport(CIOCPort* pIOCP)
 	int send_index = 0, i = 0;
 	char buff[256] = {};
 	int nX = 0, nZ = 0, nTileX = 0, nTileZ = 0;
-	MAP* pMap = m_pMain->g_arZone[m_ZoneIndex];
+
+	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 		return FALSE;
 

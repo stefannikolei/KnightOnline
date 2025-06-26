@@ -782,7 +782,7 @@ fail_return:
 
 void CUser::SelCharToAgent(char* pBuf)
 {
-	int index = 0, idlen1 = 0, idlen2 = 0, send_index = 0, retvalue = 0, zone = 0, zoneindex = 0;
+	int index = 0, idlen1 = 0, idlen2 = 0, send_index = 0, retvalue = 0, zone = 0;
 	char userid[MAX_ID_SIZE + 1] = {},
 		accountid[MAX_ID_SIZE + 1] = {},
 		send_buff[256] = {};
@@ -836,18 +836,10 @@ void CUser::SelCharToAgent(char* pBuf)
 		goto fail_return;
 	}
 
-	zoneindex = m_pMain->GetZoneIndex(zone);
-	if (zoneindex < 0
-		|| zoneindex >= m_pMain->m_ZoneArray.size())
-	{
-		TRACE(_T("### SelCharToAgent zoneindex Fail : zone=%d, zoneindex=%d\n"), zone, zoneindex);
-		goto fail_return;
-	}
-
-	pMap = m_pMain->m_ZoneArray[zoneindex];
+	pMap = m_pMain->GetMapByID(zone);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("### SelCharToAgent map load Fail : zoneindex=%d\n"), zoneindex);
+		TRACE(_T("### SelCharToAgent map load Fail : zone=%d\n"), zone);
 		goto fail_return;
 	}
 
@@ -914,7 +906,7 @@ fail_return:
 
 void CUser::SelectCharacter(char* pBuf)
 {
-	int index = 0, send_index = 0, zoneindex = -1, retvalue = 0;
+	int index = 0, send_index = 0, retvalue = 0;
 	char send_buff[256] = {};
 	BYTE result, bInit;
 	C3DMap* pMap = nullptr;
@@ -932,12 +924,7 @@ void CUser::SelectCharacter(char* pBuf)
 	if (m_pUserData->m_bZone == 0)
 		goto fail_return;
 
-	zoneindex = m_pMain->GetZoneIndex(m_pUserData->m_bZone);
-	if (zoneindex < 0
-		|| zoneindex >= m_pMain->m_ZoneArray.size())
-		goto fail_return;
-
-	pMap = m_pMain->m_ZoneArray[zoneindex];
+	pMap = m_pMain->GetMapByID(m_pUserData->m_bZone);
 	if (pMap == nullptr)
 		goto fail_return;
 
@@ -1309,11 +1296,7 @@ void CUser::MoveProcess(char* pBuf)
 	real_z = will_z / 10.0f;
 	real_y = will_y / 10.0f;
 
-	if (m_iZoneIndex < 0
-		|| m_iZoneIndex >= m_pMain->m_ZoneArray.size())
-		return;
-
-	pMap = m_pMain->m_ZoneArray[m_iZoneIndex];
+	pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
 		return;
 
@@ -1382,11 +1365,7 @@ void CUser::UserInOut(BYTE Type)
 	int send_index = 0;
 	char send_buff[256] = {};
 
-	if (m_iZoneIndex < 0
-		|| m_iZoneIndex >= m_pMain->m_ZoneArray.size())
-		return;
-
-	C3DMap* pMap = m_pMain->m_ZoneArray[m_iZoneIndex];
+	C3DMap* pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
 		return;
 
@@ -1715,10 +1694,11 @@ void CUser::SendMyInfo(int type)
 	if (type != 0)
 		return;
 
-	CKnights* pKnights = nullptr;
-	C3DMap* pMap = (C3DMap*) m_pMain->m_ZoneArray[m_iZoneIndex];
+	C3DMap* pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
 		return;
+
+	CKnights* pKnights = nullptr;
 
 	int send_index = 0;
 	char send_buff[2048] = {};
@@ -2116,6 +2096,7 @@ void CUser::Regene(char* pBuf, int magicid)
 	_OBJECT_EVENT* pEvent = nullptr;
 	_HOME_INFO* pHomeInfo = nullptr;
 	_MAGIC_TYPE5* pType = nullptr;
+	C3DMap* pMap = nullptr;
 
 	int index = 0;
 	BYTE regene_type = 0;
@@ -2146,8 +2127,8 @@ void CUser::Regene(char* pBuf, int magicid)
 	int send_index = 0;
 	char send_buff[1024] = {};
 
-	if (m_iZoneIndex < 0
-		|| m_iZoneIndex >= m_pMain->m_ZoneArray.size())
+	pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
+	if (pMap == nullptr)
 		return;
 
 	UserInOut(USER_OUT);	// 원래는 이 한줄밖에 없었음 --;
@@ -2161,7 +2142,7 @@ void CUser::Regene(char* pBuf, int magicid)
 	if (z < 2.5f)
 		z += 1.5f;
 
-	pEvent = m_pMain->m_ZoneArray[m_iZoneIndex]->GetObjectEvent(m_pUserData->m_sBind);
+	pEvent = pMap->GetObjectEvent(m_pUserData->m_sBind);
 
 	if (magicid == 0)
 	{
@@ -2384,11 +2365,7 @@ void CUser::ZoneChange(int zone, float x, float z)
 
 	zoneindex = m_pMain->GetZoneIndex(zone);
 
-	if (zoneindex < 0
-		|| zoneindex >= m_pMain->m_ZoneArray.size())
-		return;
-
-	pMap = m_pMain->m_ZoneArray[zoneindex];
+	pMap = m_pMain->GetMapByIndex(zoneindex);
 	if (pMap == nullptr)
 		return;
 
@@ -2589,11 +2566,7 @@ void CUser::Warp(char* pBuf)
 	warp_x = GetShort(pBuf, index);
 	warp_z = GetShort(pBuf, index);
 
-	if (m_iZoneIndex < 0
-		|| m_iZoneIndex >= m_pMain->m_ZoneArray.size())
-		return;
-
-	pMap = m_pMain->m_ZoneArray[m_iZoneIndex];
+	pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
 		return;
 
@@ -2682,11 +2655,7 @@ void CUser::RegisterRegion()
 	if (m_RegionX != iRegX
 		|| m_RegionZ != iRegZ)
 	{
-		if (m_iZoneIndex < 0
-			|| m_iZoneIndex >= m_pMain->m_ZoneArray.size())
-			return;
-
-		C3DMap* pMap = m_pMain->m_ZoneArray[m_iZoneIndex];
+		C3DMap* pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 		if (pMap == nullptr)
 			return;
 
@@ -2718,14 +2687,9 @@ void CUser::RemoveRegion(int del_x, int del_z)
 {
 	int send_index = 0;
 	char send_buff[256] = {};
-	C3DMap* pMap = nullptr;
 	CUser* pUser = nullptr;
 
-	if (m_iZoneIndex < 0
-		|| m_iZoneIndex >= m_pMain->m_ZoneArray.size())
-		return;
-
-	pMap = m_pMain->m_ZoneArray[m_iZoneIndex];
+	C3DMap* pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
 		return;
 
@@ -2736,9 +2700,9 @@ void CUser::RemoveRegion(int del_x, int del_z)
 	// x 축으로 이동되었을때...
 	if (del_x != 0)
 	{
-		m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX + del_x * 2, m_RegionZ + del_z - 1);
-		m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX + del_x * 2, m_RegionZ + del_z);
-		m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX + del_x * 2, m_RegionZ + del_z + 1);
+		m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x * 2, m_RegionZ + del_z - 1);
+		m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x * 2, m_RegionZ + del_z);
+		m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x * 2, m_RegionZ + del_z + 1);
 
 		// TRACE(_T("Remove : (%d %d), (%d %d), (%d %d)\n"), m_RegionX+del_x*2, m_RegionZ+del_z-1, m_RegionX+del_x*2, m_RegionZ+del_z, m_RegionX+del_x*2, m_RegionZ+del_z+1 );
 	}
@@ -2746,21 +2710,21 @@ void CUser::RemoveRegion(int del_x, int del_z)
 	// z 축으로 이동되었을때...
 	if (del_z != 0)
 	{
-		m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX + del_x, m_RegionZ + del_z * 2);
+		m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x, m_RegionZ + del_z * 2);
 
 		// x, z 축 둘다 이동되었을때 겹치는 부분 한번만 보낸다..
 		if (del_x < 0)
 		{
-			m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX + del_x + 1, m_RegionZ + del_z * 2);
+			m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x + 1, m_RegionZ + del_z * 2);
 		}
 		else if (del_x > 0)
 		{
-			m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX + del_x - 1, m_RegionZ + del_z * 2);
+			m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x - 1, m_RegionZ + del_z * 2);
 		}
 		else
 		{
-			m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX + del_x - 1, m_RegionZ + del_z * 2);
-			m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX + del_x + 1, m_RegionZ + del_z * 2);
+			m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x - 1, m_RegionZ + del_z * 2);
+			m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x + 1, m_RegionZ + del_z * 2);
 
 			// TRACE(_T("Remove : (%d %d), (%d %d), (%d %d)\n"), m_RegionX+del_x-1, m_RegionZ+del_z*2, m_RegionX+del_x, m_RegionZ+del_z*2, m_RegionX+del_x+1, m_RegionZ+del_z*2 );
 		}
@@ -2772,11 +2736,7 @@ void CUser::InsertRegion(int del_x, int del_z)
 	int send_index = 0;
 	char send_buff[256] = {};
 
-	if (m_iZoneIndex < 0
-		|| m_iZoneIndex >= m_pMain->m_ZoneArray.size())
-		return;
-
-	C3DMap* pMap = m_pMain->m_ZoneArray[m_iZoneIndex];
+	C3DMap* pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
 		return;
 
@@ -2788,9 +2748,9 @@ void CUser::InsertRegion(int del_x, int del_z)
 	// x 축으로 이동되었을때...
 	if (del_x != 0)
 	{
-		m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX + del_x, m_RegionZ - 1);
-		m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX + del_x, m_RegionZ);
-		m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX + del_x, m_RegionZ + 1);
+		m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x, m_RegionZ - 1);
+		m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x, m_RegionZ);
+		m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x, m_RegionZ + 1);
 
 		// TRACE(_T("Insert : (%d %d), (%d %d), (%d %d)\n"), m_RegionX+del_x, m_RegionZ-1, m_RegionX+del_x, m_RegionZ, m_RegionX+del_x, m_RegionZ+1 );
 	}
@@ -2798,21 +2758,21 @@ void CUser::InsertRegion(int del_x, int del_z)
 	// z 축으로 이동되었을때...
 	if (del_z != 0)
 	{
-		m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX, m_RegionZ + del_z);
+		m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX, m_RegionZ + del_z);
 		
 		// x, z 축 둘다 이동되었을때 겹치는 부분 한번만 보낸다..
 		if (del_x < 0)
 		{
-			m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX + 1, m_RegionZ + del_z);
+			m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + 1, m_RegionZ + del_z);
 		}
 		else if (del_x > 0)
 		{
-			m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX - 1, m_RegionZ + del_z);
+			m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX - 1, m_RegionZ + del_z);
 		}
 		else
 		{
-			m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX - 1, m_RegionZ + del_z);
-			m_pMain->Send_UnitRegion(send_buff, send_index, m_iZoneIndex, m_RegionX + 1, m_RegionZ + del_z);
+			m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX - 1, m_RegionZ + del_z);
+			m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + 1, m_RegionZ + del_z);
 
 			// TRACE(_T("Insert : (%d %d), (%d %d), (%d %d)\n"), m_RegionX-1, m_RegionZ+del_z, m_RegionX, m_RegionZ+del_z, m_RegionX+1, m_RegionZ+del_z );
 		}
@@ -5075,11 +5035,7 @@ void CUser::BundleOpenReq(char* pBuf)
 	if (bundle_index < 1)
 		return;
 
-	if (m_iZoneIndex < 0
-		|| m_iZoneIndex >= m_pMain->m_ZoneArray.size())
-		return;
-
-	pMap = m_pMain->m_ZoneArray[m_iZoneIndex];
+	pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
 		return;
 
@@ -5156,11 +5112,8 @@ void CUser::ItemGet(char* pBuf)
 
 	if (m_sExchangeUser != -1)
 		goto fail_return;
-	if (m_iZoneIndex < 0
-		|| m_iZoneIndex >= m_pMain->m_ZoneArray.size())
-		return;
 
-	pMap = m_pMain->m_ZoneArray[m_iZoneIndex];
+	pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
 		goto fail_return;
 
@@ -9435,10 +9388,10 @@ void CUser::GoldChange(short tid, int gold)
 
 void CUser::SelectWarpList(char* pBuf)
 {
-	int index = 0, send_index = 0, warpid = 0, zoneindex = 0;
+	int index = 0, send_index = 0, warpid = 0;
 	_WARP_INFO* pWarp = nullptr;
 	_ZONE_SERVERINFO* pInfo = nullptr;
-	C3DMap* pMap = nullptr;
+	C3DMap* pCurrentMap = nullptr, *pTargetMap = nullptr;
 	char send_buff[128] = {};
 
 // 비러머글 순간이동 >.<
@@ -9446,27 +9399,19 @@ void CUser::SelectWarpList(char* pBuf)
 //		
 	warpid = GetShort(pBuf, index);
 
-	if (m_iZoneIndex < 0
-		|| m_iZoneIndex >= m_pMain->m_ZoneArray.size())
-		return;
-	
-	pMap = m_pMain->m_ZoneArray[m_iZoneIndex];
-	if (pMap == nullptr)
+	pCurrentMap = m_pMain->GetMapByIndex(m_iZoneIndex);
+	if (pCurrentMap == nullptr)
 		return;
 
-	pWarp = pMap->m_WarpArray.GetData(warpid);
+	pWarp = pCurrentMap->m_WarpArray.GetData(warpid);
 	if (pWarp == nullptr)
 		return;
 
-	zoneindex = m_pMain->GetZoneIndex(pWarp->sZone);
-	if (zoneindex < 0)
+	pTargetMap = m_pMain->GetMapByID(pWarp->sZone);
+	if (pTargetMap == nullptr)
 		return;
 
-	pMap = m_pMain->m_ZoneArray[zoneindex];
-	if (pMap == nullptr)
-		return;
-
-	pInfo = m_pMain->m_ServerArray.GetData(pMap->m_nServerNo);
+	pInfo = m_pMain->m_ServerArray.GetData(pTargetMap->m_nServerNo);
 	if (pInfo == nullptr)
 		return;
 
@@ -9542,11 +9487,7 @@ void CUser::ServerChangeOk(char* pBuf)
 */
 	warpid = GetShort(pBuf, index);
 
-	if (m_iZoneIndex < 0
-		|| m_iZoneIndex >= m_pMain->m_ZoneArray.size())
-		return;
-
-	pMap = m_pMain->m_ZoneArray[m_iZoneIndex];
+	pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
 		return;
 
@@ -9570,7 +9511,6 @@ void CUser::ServerChangeOk(char* pBuf)
 
 BOOL CUser::GetWarpList(int warp_group)
 {
-	C3DMap* pMap = nullptr;
 	int warpid = 0, send_index = 0;	// 헤더와 카운트를 나중에 패킹...
 	int zoneindex = -1, temp_index = 0, count = 0;
 	char buff[8192] = {};
@@ -9578,15 +9518,12 @@ BOOL CUser::GetWarpList(int warp_group)
 // 비러머글 마을 이름 표시 >.<
 	BYTE type = 1;		// 1이면 일반, 2이면 워프 성공했는지 않했는지 ^^;
 //
-	if (m_iZoneIndex < 0
-		|| m_iZoneIndex >= m_pMain->m_ZoneArray.size())
+
+	C3DMap* pCurrentMap = m_pMain->GetMapByIndex(m_iZoneIndex);
+	if (pCurrentMap == nullptr)
 		return FALSE;
 
-	pMap = m_pMain->m_ZoneArray[m_iZoneIndex];
-	if (pMap == nullptr)
-		return FALSE;
-
-	for (const auto& [_, pWarp] : pMap->m_WarpArray)
+	for (const auto& [_, pWarp] : pCurrentMap->m_WarpArray)
 	{
 		if (pWarp == nullptr)
 			continue;
@@ -9596,15 +9533,13 @@ BOOL CUser::GetWarpList(int warp_group)
 
 		SetShort(buff, pWarp->sWarpID, send_index);
 
-		SetShort(buff, strlen(pWarp->strWarpName), send_index);
-		SetString(buff, pWarp->strWarpName, strlen(pWarp->strWarpName), send_index);
-		SetShort(buff, strlen(pWarp->strAnnounce), send_index);
-		SetString(buff, pWarp->strAnnounce, strlen(pWarp->strAnnounce), send_index);
+		SetString2(buff, pWarp->strWarpName, static_cast<short>(strlen(pWarp->strWarpName)), send_index);
+		SetString2(buff, pWarp->strAnnounce, static_cast<short>(strlen(pWarp->strAnnounce)), send_index);
 		SetShort(buff, pWarp->sZone, send_index);
 
-		zoneindex = m_pMain->GetZoneIndex(pWarp->sZone);
-		if (zoneindex > -1)
-			SetShort(buff, m_pMain->m_ZoneArray[zoneindex]->m_sMaxUser, send_index);
+		C3DMap* pTargetMap = m_pMain->GetMapByID(pWarp->sZone);
+		if (pTargetMap != nullptr)
+			SetShort(buff, pTargetMap->m_sMaxUser, send_index);
 		else
 			SetShort(buff, 0, send_index);
 
@@ -9647,7 +9582,11 @@ BOOL CUser::BindObjectEvent(short objectindex, short nid)
 	int send_index = 0, result = 0;
 	char send_buff[128] = {};
 
-	_OBJECT_EVENT* pEvent = m_pMain->m_ZoneArray[m_iZoneIndex]->GetObjectEvent(objectindex);
+	C3DMap* pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
+	if (pMap == nullptr)
+		return FALSE;
+
+	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectindex);
 	if (pEvent == nullptr)
 		return FALSE;
 
@@ -9679,7 +9618,11 @@ BOOL CUser::GateObjectEvent(short objectindex, short nid)
 	int send_index = 0, result = 0;
 	char send_buff[128] = {};
 
-	_OBJECT_EVENT* pEvent = m_pMain->m_ZoneArray[m_iZoneIndex]->GetObjectEvent(objectindex);
+	C3DMap* pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
+	if (pMap == nullptr)
+		return FALSE;
+
+	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectindex);
 	if (pEvent == nullptr)
 		return FALSE;
 
@@ -9727,7 +9670,11 @@ BOOL CUser::GateLeverObjectEvent(short objectindex, short nid)
 	int send_index = 0, result = 0;
 	char send_buff[128] = {};
 
-	_OBJECT_EVENT* pEvent = m_pMain->m_ZoneArray[m_iZoneIndex]->GetObjectEvent(objectindex);
+	C3DMap* pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
+	if (pMap == nullptr)
+		return FALSE;
+
+	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectindex);
 	if (pEvent == nullptr)
 		return FALSE;
 
@@ -9735,7 +9682,7 @@ BOOL CUser::GateLeverObjectEvent(short objectindex, short nid)
 	if (pNpc == nullptr)
 		return FALSE;
 
-	_OBJECT_EVENT* pGateEvent = m_pMain->m_ZoneArray[m_iZoneIndex]->GetObjectEvent(pEvent->sControlNpcID);
+	_OBJECT_EVENT* pGateEvent = pMap->GetObjectEvent(pEvent->sControlNpcID);
 	if (pGateEvent == nullptr)
 		return FALSE;
 
@@ -9808,10 +9755,14 @@ BOOL CUser::FlagObjectEvent(short objectindex, short nid)
 	if (!m_pMain->m_bPointCheckFlag)
 		return FALSE;
 
-	int  send_index = 0, result = 0;
+	int send_index = 0, result = 0;
 	char send_buff[128] = {};
 
-	_OBJECT_EVENT* pEvent = m_pMain->m_ZoneArray[m_iZoneIndex]->GetObjectEvent(objectindex);
+	C3DMap* pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
+	if (pMap == nullptr)
+		return FALSE;
+
+	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectindex);
 	if (pEvent == nullptr)
 		return FALSE;
 
@@ -9819,7 +9770,7 @@ BOOL CUser::FlagObjectEvent(short objectindex, short nid)
 	if (pNpc == nullptr)
 		return FALSE;
 
-	_OBJECT_EVENT* pFlagEvent = m_pMain->m_ZoneArray[m_iZoneIndex]->GetObjectEvent(pEvent->sControlNpcID);
+	_OBJECT_EVENT* pFlagEvent = pMap->GetObjectEvent(pEvent->sControlNpcID);
 	if (pFlagEvent == nullptr)
 		return FALSE;
 
@@ -9909,7 +9860,11 @@ BOOL CUser::WarpListObjectEvent(short objectindex, short nid)
 	int send_index = 0, result = 0;
 	char send_buff[128] = {};
 
-	_OBJECT_EVENT* pEvent = m_pMain->m_ZoneArray[m_iZoneIndex]->GetObjectEvent(objectindex);
+	C3DMap* pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
+	if (pMap == nullptr)
+		return FALSE;
+
+	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectindex);
 	if (pEvent == nullptr)
 		return FALSE;
 
@@ -9924,16 +9879,17 @@ void CUser::ObjectEvent(char* pBuf)
 	int index = 0, objectindex = 0, send_index = 0, result = 0, nid = 0;
 	char send_buff[128] = {};
 
+	C3DMap* pMap = nullptr;
 	_OBJECT_EVENT* pEvent = nullptr;
 
 	objectindex = GetShort(pBuf, index);
 	nid = GetShort(pBuf, index);
 
-	if (m_iZoneIndex < 0
-		|| m_iZoneIndex >= m_pMain->m_ZoneArray.size())
+	pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
+	if (pMap == nullptr)
 		goto fail_return;
 
-	pEvent = m_pMain->m_ZoneArray[m_iZoneIndex]->GetObjectEvent(objectindex);
+	pEvent = pMap->GetObjectEvent(objectindex);
 	if (pEvent == nullptr)
 		goto fail_return;
 
@@ -12236,7 +12192,7 @@ void CUser::KickOutZoneUser(BOOL home)
 	if (zoneindex < 0)
 		return;
 
-	C3DMap* pMap = m_pMain->m_ZoneArray[zoneindex];
+	C3DMap* pMap = m_pMain->GetMapByIndex(zoneindex);
 	if (pMap == nullptr)
 		return;
 
@@ -12295,11 +12251,7 @@ void CUser::EventMoneyItemGet(int itemid, int count)
 	if  m_sExchangeUser != -1)
 	goto fail_return;
 
-	if (m_iZoneIndex < 0
-		|| m_iZoneIndex >= m_pMain->m_ZoneArray.size())
-		return;
-
-	pMap = m_pMain->m_ZoneArray[m_iZoneIndex];
+	pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
 		goto fail_return;
 

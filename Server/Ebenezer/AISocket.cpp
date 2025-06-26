@@ -227,7 +227,7 @@ void CAISocket::RecvServerInfo(char* pBuf)
 	BYTE type = GetByte(pBuf, index);
 	BYTE byZone = GetByte(pBuf, index);
 	CString logstr;
-	int size = m_pMain->m_ZoneArray.size();
+	int size = static_cast<int>(m_pMain->m_ZoneArray.size());
 
 	if (type == SERVER_INFO_START)
 	{
@@ -329,14 +329,17 @@ void CAISocket::RecvNpcInfoAll(char* pBuf)
 			continue;		// 잘못된 monster 아이디 
 		}
 
-		if (sZoneIndex < 0
-			|| sZoneIndex >= m_pMain->m_ZoneArray.size()
-			|| nid < 0
+		C3DMap* pMap = m_pMain->GetMapByIndex(sZoneIndex);
+		if (pMap == nullptr)
+		{
+			TRACE(_T("#### Recv --> NpcUserInfoAll Fail (invalid zone index): uid=%d, sid=%d, name=%hs, zoneindex=%d, x=%f, z=%f.. \n"), nid, sPid, szName, sZoneIndex, fPosX, fPosZ);
+			continue;
+		}
+
+		if (nid < 0
 			|| sPid < 0)
 		{
-			TRACE(_T("#### Recv --> NpcUserInfoAll Fail: uid=%d, sid=%d, name=%hs, zoneindex=%d, x=%f, z=%f.. \n"), nid, sPid, szName, sZoneIndex, fPosX, fPosZ);
-			//delete pNpc;
-			//pNpc = nullptr;
+			TRACE(_T("#### Recv --> NpcUserInfoAll Fail (invalid ID): uid=%d, sid=%d, name=%hs, zoneindex=%d, x=%f, z=%f.. \n"), nid, sPid, szName, sZoneIndex, fPosX, fPosZ);
 			continue;
 		}
 
@@ -385,16 +388,12 @@ void CAISocket::RecvNpcInfoAll(char* pBuf)
 		_OBJECT_EVENT* pEvent = nullptr;
 		if (pNpc->m_byObjectType == SPECIAL_OBJECT)
 		{
-			pEvent = m_pMain->m_ZoneArray[pNpc->m_sZoneIndex]->GetObjectEvent(pNpc->m_sSid);
+			pEvent = pMap->GetObjectEvent(pNpc->m_sSid);
 			if (pEvent != nullptr)
 				pEvent->byLife = 1;
 		}
 
-		int size = m_pMain->m_ZoneArray.size();
-
-		if (pNpc->m_sZoneIndex < 0
-			|| pNpc->m_sZoneIndex >= m_pMain->m_ZoneArray.size()
-			|| nRegX < 0
+		if (nRegX < 0
 			|| nRegZ < 0)
 		{
 			TRACE(_T("#### Recv --> NpcUserInfoAll Fail: uid=%d, sid=%d, name=%hs, zoneindex=%d, x=%f, z=%f.. \n"), nid, sPid, szName, sZoneIndex, fPosX, fPosZ);
@@ -416,13 +415,6 @@ void CAISocket::RecvNpcInfoAll(char* pBuf)
 		if (byType == 0)
 		{
 			TRACE(_T("Recv --> NpcUserInfoAll : 등록하면 안돼여,, uid=%d, sid=%d, name=%hs\n"), nid, sPid, szName);
-			continue;		// region에 등록하지 말기...
-		}
-
-		C3DMap* pMap = m_pMain->m_ZoneArray[(int) pNpc->m_sZoneIndex];
-		if (pMap == nullptr)
-		{
-			TRACE(_T("Recv --> NpcUserInfoAll : fail,, uid=%d, sid=%d, name=%hs\n"), nid, sPid, szName);
 			continue;		// region에 등록하지 말기...
 		}
 
@@ -580,7 +572,10 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 		if (result == 0x02
 			|| result == 0x04)
 		{
-			C3DMap* pMap = m_pMain->m_ZoneArray[(int) pNpc->m_sZoneIndex];
+			C3DMap* pMap = m_pMain->GetMapByIndex(pNpc->m_sZoneIndex);
+			if (pMap == nullptr)
+				return;
+
 			pMap->RegionNpcRemove(pNpc->m_sRegion_X, pNpc->m_sRegion_Z, tid);
 
 			// TRACE(_T("--- Npc Dead : Npc를 Region에서 삭제처리.. ,, region_x=%d, y=%d\n"), pNpc->m_sRegion_X, pNpc->m_sRegion_Z);
@@ -590,7 +585,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 
 			if (pNpc->m_byObjectType == SPECIAL_OBJECT)
 			{
-				pEvent = m_pMain->m_ZoneArray[pNpc->m_sZoneIndex]->GetObjectEvent(pNpc->m_sSid);
+				pEvent = pMap->GetObjectEvent(pNpc->m_sSid);
 				if (pEvent != nullptr)
 					pEvent->byLife = 0;
 			}
@@ -741,7 +736,10 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 			// npc dead
 			if (result == 0x02)
 			{
-				C3DMap* pMap = m_pMain->m_ZoneArray[(int) pMon->m_sZoneIndex];
+				C3DMap* pMap = m_pMain->GetMapByIndex(pMon->m_sZoneIndex);
+				if (pMap == nullptr)
+					return;
+
 				pMap->RegionNpcRemove(pMon->m_sRegion_X, pMon->m_sRegion_Z, tid);
 				// TRACE(_T("--- Npc Dead : Npc를 Region에서 삭제처리.. ,, region_x=%d, y=%d\n"), pMon->m_sRegion_X, pMon->m_sRegion_Z);
 				pMon->m_sRegion_X = 0;
@@ -749,7 +747,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 				pMon->m_NpcState = NPC_DEAD;
 				if (pNpc->m_byObjectType == SPECIAL_OBJECT)
 				{
-					pEvent = m_pMain->m_ZoneArray[pNpc->m_sZoneIndex]->GetObjectEvent(pMon->m_sSid);
+					pEvent = pMap->GetObjectEvent(pMon->m_sSid);
 					if (pEvent != nullptr)
 						pEvent->byLife = 0;
 				}
@@ -968,10 +966,18 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 	pNpc->m_sRegion_X = nRegX;
 	pNpc->m_sRegion_Z = nRegZ;
 
+	C3DMap* pMap = m_pMain->GetMapByIndex(pNpc->m_sZoneIndex);
+	if (pMap == nullptr)
+	{
+		pNpc->m_NpcState = NPC_DEAD;
+		TRACE(_T("RecvNpcInfo - nid=%d, name=%hs, invalid zone index=%d\n"), pNpc->m_sNid, pNpc->m_strName, pNpc->m_sZoneIndex);
+		return;
+	}
+
 	_OBJECT_EVENT* pEvent = nullptr;
 	if (pNpc->m_byObjectType == SPECIAL_OBJECT)
 	{
-		pEvent = m_pMain->m_ZoneArray[pNpc->m_sZoneIndex]->GetObjectEvent(pNpc->m_sSid);
+		pEvent = pMap->GetObjectEvent(pNpc->m_sSid);
 		if (pEvent != nullptr)
 			pEvent->byLife = 1;
 	}
@@ -1006,10 +1012,9 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 
 	m_pMain->Send_Region(pOutBuf, send_index, pNpc->m_sCurZone, nRegX, nRegZ);
 
-	C3DMap* pMap = m_pMain->m_ZoneArray[(int) pNpc->m_sZoneIndex];
 	pMap->RegionNpcAdd(pNpc->m_sRegion_X, pNpc->m_sRegion_Z, pNpc->m_sNid);
 
-	int nTotMon = m_pMain->m_arNpcArray.GetSize();
+//	int nTotMon = m_pMain->m_arNpcArray.GetSize();
 //	TRACE(_T("Recv --> NpcUserInfo : uid = %d, x=%f, z=%f.. ,, tot = %d\n"), nid, fPosX, fPosZ, nTotMon);
 }
 
@@ -1123,7 +1128,7 @@ void CAISocket::RecvSystemMsg(char* pBuf)
 
 void CAISocket::RecvNpcGiveItem(char* pBuf)
 {
-	int index = 0, send_index = 0, zoneindex = -1;
+	int index = 0, send_index = 0;
 	char send_buff[1024] = {};
 	short sUid, sNid, sZone, regionx, regionz;
 	float fX, fZ, fY;
@@ -1154,9 +1159,12 @@ void CAISocket::RecvNpcGiveItem(char* pBuf)
 		|| sUid >= MAX_USER)
 		return;
 
-	zoneindex = m_pMain->GetZoneIndex(sZone);
-	if (zoneindex == -1)
+	pMap = m_pMain->GetMapByID(sZone);
+	if (pMap == nullptr)
+	{
+		delete pItem;
 		return;
+	}
 
 	pItem = new _ZONE_ITEM;
 	for (int i = 0; i < 6; i++)
@@ -1165,7 +1173,7 @@ void CAISocket::RecvNpcGiveItem(char* pBuf)
 		pItem->count[i] = 0;
 	}
 
-	pItem->bundle_index = m_pMain->m_ZoneArray[zoneindex]->m_wBundle;
+	pItem->bundle_index = pMap->m_wBundle;
 	pItem->time = TimeGet();
 	pItem->x = fX;
 	pItem->z = fZ;
@@ -1178,13 +1186,6 @@ void CAISocket::RecvNpcGiveItem(char* pBuf)
 			pItem->itemid[i] = nItemNumber[i];
 			pItem->count[i] = sCount[i];
 		}
-	}
-
-	pMap = m_pMain->m_ZoneArray[zoneindex];
-	if (pMap == nullptr)
-	{
-		delete pItem;
-		return;
 	}
 
 	if (!pMap->RegionItemAdd(regionx, regionz, pItem))
@@ -1392,19 +1393,19 @@ void CAISocket::RecvNpcDead(char* pBuf)
 		if (pNpc == nullptr)
 			return;
 
+		C3DMap* pMap = m_pMain->GetMapByIndex(pNpc->m_sZoneIndex);
+		if (pMap == nullptr)
+			return;
+
 		if (pNpc->m_byObjectType == SPECIAL_OBJECT)
 		{
-			pEvent = m_pMain->m_ZoneArray[pNpc->m_sZoneIndex]->GetObjectEvent(pNpc->m_sSid);
-			if (pEvent)
+			pEvent = pMap->GetObjectEvent(pNpc->m_sSid);
+			if (pEvent != nullptr)
 				pEvent->byLife = 0;
 		}
 
 		//pNpc->NpcInOut( NPC_OUT );
 		//TRACE(_T("RecvNpcDead - (%d,%hs)\n"), pNpc->m_sNid, pNpc->m_strName);
-
-		C3DMap* pMap = m_pMain->m_ZoneArray[(int) pNpc->m_sZoneIndex];
-		if (pMap == nullptr)
-			return;
 
 		pMap->RegionNpcRemove(pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nid);
 		//TRACE(_T("--- RecvNpcDead : Npc를 Region에서 삭제처리.. ,, zone=%d, region_x=%d, y=%d\n"), pNpc->m_sZoneIndex, pNpc->m_sRegion_X, pNpc->m_sRegion_Z);

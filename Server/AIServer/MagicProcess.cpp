@@ -748,16 +748,13 @@ short CMagicProcess::AreaAttack(int magictype, int magicid, int moral, int data1
 	int region_x = data1 / VIEW_DIST;
 	int region_z = data3 / VIEW_DIST;
 
-	if (m_pSrcUser->m_sZoneIndex < 0
-		|| m_pSrcUser->m_sZoneIndex > m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_pSrcUser->m_sZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### CMagicProcess--AreaAttack ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_pSrcUser->m_strUserID, m_pSrcUser->m_sZoneIndex);
+		TRACE(_T("#### CMagicProcess--AreaAttack ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_pSrcUser->m_strUserID, m_pSrcUser->m_sZoneIndex);
+		return 0;
 		return 0;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_pSrcUser->m_sZoneIndex];
-	if (pMap == nullptr)
-		return 0;
 
 	int max_xx = pMap->m_sizeRegion.cx;
 	int max_zz = pMap->m_sizeRegion.cy;
@@ -794,16 +791,12 @@ short CMagicProcess::AreaAttack(int magictype, int magicid, int moral, int data1
 
 void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid, int moral, int data1, int data2, int data3, int dexpoint, int righthand_damage)
 {
-	if (m_pSrcUser->m_sZoneIndex < 0
-		|| m_pSrcUser->m_sZoneIndex > m_pMain->g_arZone.size())
+	MAP* pMap = m_pMain->GetMapByIndex(m_pSrcUser->m_sZoneIndex);
+	if (pMap == nullptr)
 	{
-		TRACE(_T("#### CMagicProcess--AreaAttackDamage ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_pSrcUser->m_strUserID, m_pSrcUser->m_sZoneIndex);
+		TRACE(_T("#### CMagicProcess--AreaAttackDamage ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_pSrcUser->m_strUserID, m_pSrcUser->m_sZoneIndex);
 		return;
 	}
-
-	MAP* pMap = m_pMain->g_arZone[m_pSrcUser->m_sZoneIndex];
-	if (pMap == nullptr)
-		return;
 
 	// 자신의 region에 있는 UserArray을 먼저 검색하여,, 가까운 거리에 유저가 있는지를 판단..
 	if (rx < 0

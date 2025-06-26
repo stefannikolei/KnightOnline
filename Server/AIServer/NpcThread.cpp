@@ -161,17 +161,12 @@ UINT NpcThreadProc(LPVOID pParam /* NPC_THREAD_INFO ptr */)
 UINT ZoneEventThreadProc(LPVOID pParam/* = nullptr */)
 {
 	CServerDlg* m_pMain = (CServerDlg*) pParam;
-	float  fCurrentTime = 0.0f;
-	MAP* pMap = nullptr;
-	CRoomEvent* pRoom = nullptr;
-	int i = 0, j = 0;
 
 	while (!g_bNpcExit)
 	{
-		fCurrentTime = TimeGet();
-		for (i = 0; i < m_pMain->g_arZone.size(); i++)
+		float fCurrentTime = TimeGet();
+		for (MAP* pMap : m_pMain->g_arZone)
 		{
-			pMap = m_pMain->g_arZone[i];
 			if (pMap == nullptr)
 				continue;
 
@@ -184,9 +179,8 @@ UINT ZoneEventThreadProc(LPVOID pParam/* = nullptr */)
 				continue;
 
 			// 방번호는 1번부터 시작
-			for (j = 1; j < pMap->m_arRoomEventArray.GetSize() + 1; j++)
+			for (auto& [_, pRoom] : pMap->m_arRoomEventArray)
 			{
-				pRoom = pMap->m_arRoomEventArray.GetData(j);
 				if (pRoom == nullptr)
 					continue;
 

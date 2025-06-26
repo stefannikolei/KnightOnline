@@ -878,24 +878,23 @@ void CEbenezerDlg::Send_All(char* pBuf, int len, CUser* pExceptUser, int nation)
 
 void CEbenezerDlg::Send_Region(char* pBuf, int len, int zone, int x, int z, CUser* pExceptUser, bool bDirect)
 {
-	int zoneindex = GetZoneIndex(zone);
-	if (zoneindex == -1)
+	C3DMap* pMap = GetMapByID(zone);
+	if (pMap == nullptr)
 		return;
 
-	Send_UnitRegion(pBuf, len, zoneindex, x, z, pExceptUser, bDirect);
-	Send_UnitRegion(pBuf, len, zoneindex, x - 1, z - 1, pExceptUser, bDirect);	// NW
-	Send_UnitRegion(pBuf, len, zoneindex, x, z - 1, pExceptUser, bDirect);		// N
-	Send_UnitRegion(pBuf, len, zoneindex, x + 1, z - 1, pExceptUser, bDirect);	// NE
-	Send_UnitRegion(pBuf, len, zoneindex, x - 1, z, pExceptUser, bDirect);		// W
-	Send_UnitRegion(pBuf, len, zoneindex, x + 1, z, pExceptUser, bDirect);		// E
-	Send_UnitRegion(pBuf, len, zoneindex, x - 1, z + 1, pExceptUser, bDirect);	// SW
-	Send_UnitRegion(pBuf, len, zoneindex, x, z + 1, pExceptUser, bDirect);		// S
-	Send_UnitRegion(pBuf, len, zoneindex, x + 1, z + 1, pExceptUser, bDirect);	// SE
+	Send_UnitRegion(pMap, pBuf, len, x, z, pExceptUser, bDirect);
+	Send_UnitRegion(pMap, pBuf, len, x - 1, z - 1, pExceptUser, bDirect);	// NW
+	Send_UnitRegion(pMap, pBuf, len, x, z - 1, pExceptUser, bDirect);		// N
+	Send_UnitRegion(pMap, pBuf, len, x + 1, z - 1, pExceptUser, bDirect);	// NE
+	Send_UnitRegion(pMap, pBuf, len, x - 1, z, pExceptUser, bDirect);		// W
+	Send_UnitRegion(pMap, pBuf, len, x + 1, z, pExceptUser, bDirect);		// E
+	Send_UnitRegion(pMap, pBuf, len, x - 1, z + 1, pExceptUser, bDirect);	// SW
+	Send_UnitRegion(pMap, pBuf, len, x, z + 1, pExceptUser, bDirect);		// S
+	Send_UnitRegion(pMap, pBuf, len, x + 1, z + 1, pExceptUser, bDirect);	// SE
 }
 
-void CEbenezerDlg::Send_UnitRegion(char* pBuf, int len, int zoneindex, int x, int z, CUser* pExceptUser, bool bDirect)
+void CEbenezerDlg::Send_UnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int z, CUser* pExceptUser, bool bDirect)
 {
-	C3DMap* pMap = m_ZoneArray[zoneindex];
 	if (pMap == nullptr)
 		return;
 
@@ -932,12 +931,13 @@ void CEbenezerDlg::Send_UnitRegion(char* pBuf, int len, int zoneindex, int x, in
 
 void CEbenezerDlg::Send_NearRegion(char* pBuf, int len, int zone, int region_x, int region_z, float curx, float curz, CUser* pExceptUser)
 {
-	int left_border = region_x * VIEW_DISTANCE, top_border = region_z * VIEW_DISTANCE;
-	int zoneindex = GetZoneIndex(zone);
-	if (zoneindex == -1)
+	C3DMap* pMap = GetMapByID(zone);
+	if (pMap == nullptr)
 		return;
 
-	Send_FilterUnitRegion(pBuf, len, zoneindex, region_x, region_z, curx, curz, pExceptUser);
+	int left_border = region_x * VIEW_DISTANCE, top_border = region_z * VIEW_DISTANCE;
+
+	Send_FilterUnitRegion(pMap, pBuf, len, region_x, region_z, curx, curz, pExceptUser);
 
 	// RIGHT
 	if (((curx - left_border) > (VIEW_DISTANCE / 2.0f)))
@@ -945,16 +945,16 @@ void CEbenezerDlg::Send_NearRegion(char* pBuf, int len, int zone, int region_x, 
 		// BOTTOM
 		if (((curz - top_border) > (VIEW_DISTANCE / 2.0f)))
 		{
-			Send_FilterUnitRegion(pBuf, len, zoneindex, region_x + 1, region_z, curx, curz, pExceptUser);
-			Send_FilterUnitRegion(pBuf, len, zoneindex, region_x, region_z + 1, curx, curz, pExceptUser);
-			Send_FilterUnitRegion(pBuf, len, zoneindex, region_x + 1, region_z + 1, curx, curz, pExceptUser);
+			Send_FilterUnitRegion(pMap, pBuf, len, region_x + 1, region_z, curx, curz, pExceptUser);
+			Send_FilterUnitRegion(pMap, pBuf, len, region_x, region_z + 1, curx, curz, pExceptUser);
+			Send_FilterUnitRegion(pMap, pBuf, len, region_x + 1, region_z + 1, curx, curz, pExceptUser);
 		}
 		// TOP
 		else
 		{
-			Send_FilterUnitRegion(pBuf, len, zoneindex, region_x + 1, region_z, curx, curz, pExceptUser);
-			Send_FilterUnitRegion(pBuf, len, zoneindex, region_x, region_z - 1, curx, curz, pExceptUser);
-			Send_FilterUnitRegion(pBuf, len, zoneindex, region_x + 1, region_z - 1, curx, curz, pExceptUser);
+			Send_FilterUnitRegion(pMap, pBuf, len, region_x + 1, region_z, curx, curz, pExceptUser);
+			Send_FilterUnitRegion(pMap, pBuf, len, region_x, region_z - 1, curx, curz, pExceptUser);
+			Send_FilterUnitRegion(pMap, pBuf, len, region_x + 1, region_z - 1, curx, curz, pExceptUser);
 		}
 	}
 	// LEFT
@@ -963,23 +963,22 @@ void CEbenezerDlg::Send_NearRegion(char* pBuf, int len, int zone, int region_x, 
 		// BOTTOM
 		if (((curz - top_border) > (VIEW_DISTANCE / 2.0f)))
 		{
-			Send_FilterUnitRegion(pBuf, len, zoneindex, region_x - 1, region_z, curx, curz, pExceptUser);
-			Send_FilterUnitRegion(pBuf, len, zoneindex, region_x, region_z + 1, curx, curz, pExceptUser);
-			Send_FilterUnitRegion(pBuf, len, zoneindex, region_x - 1, region_z + 1, curx, curz, pExceptUser);
+			Send_FilterUnitRegion(pMap, pBuf, len, region_x - 1, region_z, curx, curz, pExceptUser);
+			Send_FilterUnitRegion(pMap, pBuf, len, region_x, region_z + 1, curx, curz, pExceptUser);
+			Send_FilterUnitRegion(pMap, pBuf, len, region_x - 1, region_z + 1, curx, curz, pExceptUser);
 		}
 		// TOP
 		else
 		{
-			Send_FilterUnitRegion(pBuf, len, zoneindex, region_x - 1, region_z, curx, curz, pExceptUser);
-			Send_FilterUnitRegion(pBuf, len, zoneindex, region_x, region_z - 1, curx, curz, pExceptUser);
-			Send_FilterUnitRegion(pBuf, len, zoneindex, region_x - 1, region_z - 1, curx, curz, pExceptUser);
+			Send_FilterUnitRegion(pMap, pBuf, len, region_x - 1, region_z, curx, curz, pExceptUser);
+			Send_FilterUnitRegion(pMap, pBuf, len, region_x, region_z - 1, curx, curz, pExceptUser);
+			Send_FilterUnitRegion(pMap, pBuf, len, region_x - 1, region_z - 1, curx, curz, pExceptUser);
 		}
 	}
 }
 
-void CEbenezerDlg::Send_FilterUnitRegion(char* pBuf, int len, int zoneindex, int x, int z, float ref_x, float ref_z, CUser* pExceptUser)
+void CEbenezerDlg::Send_FilterUnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int z, float ref_x, float ref_z, CUser* pExceptUser)
 {
-	C3DMap* pMap = m_ZoneArray[zoneindex];
 	if (pMap == nullptr)
 		return;
 
@@ -1955,11 +1954,7 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 	if (pSendUser == nullptr)
 		return;
 
-	if (pSendUser->m_iZoneIndex < 0
-		|| pSendUser->m_iZoneIndex >= m_ZoneArray.size())
-		return;
-
-	pMap = m_ZoneArray[pSendUser->m_iZoneIndex];
+	pMap = GetMapByIndex(pSendUser->m_iZoneIndex);
 	if (pMap == nullptr)
 		return;
 
@@ -2077,11 +2072,7 @@ void CEbenezerDlg::RegionUserInOutForMe(CUser* pSendUser)
 	if (pSendUser == nullptr)
 		return;
 
-	if (pSendUser->m_iZoneIndex < 0
-		|| pSendUser->m_iZoneIndex >= m_ZoneArray.size())
-		return;
-
-	pMap = m_ZoneArray[pSendUser->m_iZoneIndex];
+	pMap = GetMapByIndex(pSendUser->m_iZoneIndex);
 	if (pMap == nullptr)
 		return;
 
@@ -2143,7 +2134,6 @@ void CEbenezerDlg::RegionUserInOutForMe(CUser* pSendUser)
 
 int CEbenezerDlg::GetRegionUserIn(C3DMap* pMap, int region_x, int region_z, char* buff, int& t_count)
 {
-
 	if (pMap == nullptr)
 		return 0;
 
@@ -2230,11 +2220,7 @@ void CEbenezerDlg::NpcInOutForMe(CUser* pSendUser)
 	if (pSendUser == nullptr)
 		return;
 
-	if (pSendUser->m_iZoneIndex < 0
-		|| pSendUser->m_iZoneIndex >= m_ZoneArray.size())
-		return;
-
-	pMap = m_ZoneArray[pSendUser->m_iZoneIndex];
+	pMap = GetMapByIndex(pSendUser->m_iZoneIndex);
 	if (pMap == nullptr)
 		return;
 
@@ -2358,11 +2344,7 @@ void CEbenezerDlg::RegionNpcInfoForMe(CUser* pSendUser, int nType)
 	if (pSendUser == nullptr)
 		return;
 
-	if (pSendUser->m_iZoneIndex < 0
-		|| pSendUser->m_iZoneIndex >= m_ZoneArray.size())
-		return;
-
-	pMap = m_ZoneArray[pSendUser->m_iZoneIndex];
+	pMap = GetMapByIndex(pSendUser->m_iZoneIndex);
 	if (pMap == nullptr)
 		return;
 
@@ -2526,13 +2508,12 @@ int CEbenezerDlg::GetRegionNpcList(C3DMap* pMap, int region_x, int region_z, cha
 
 int CEbenezerDlg::GetZoneIndex(int zonenumber)
 {
-	int t_count = m_ZoneArray.size();
-	for (int i = 0; i < t_count; i++)
+	for (size_t i = 0; i < m_ZoneArray.size(); i++)
 	{
 		C3DMap* pMap = m_ZoneArray[i];
 		if (pMap != nullptr
 			&& zonenumber == pMap->m_nZoneNumber)
-			return i;
+			return static_cast<int>(i);
 	}
 
 	return -1;
@@ -3081,15 +3062,9 @@ void CEbenezerDlg::WithdrawUserOut()
 		if (pUser != nullptr
 			&& pUser->m_pUserData->m_bZone == pUser->m_pUserData->m_bNation)
 		{
-			int zoneindex = GetZoneIndex(pUser->m_pUserData->m_bNation);
-			if (zoneindex < 0)
-				continue;
-
-			C3DMap* pMap = m_ZoneArray[zoneindex];
-			if (pMap == nullptr)
-				continue;
-
-			pUser->ZoneChange(pMap->m_nZoneNumber, pMap->m_fInitX, pMap->m_fInitZ);
+			C3DMap* pMap = GetMapByID(pUser->m_pUserData->m_bNation);
+			if (pMap != nullptr)
+				pUser->ZoneChange(pMap->m_nZoneNumber, pMap->m_fInitX, pMap->m_fInitZ);
 		}
 	}
 }
@@ -3937,15 +3912,9 @@ void CEbenezerDlg::KickOutZoneUsers(short zone)
 		// Only kick out users in requested zone.
 		if (pTUser->m_pUserData->m_bZone == zone)
 		{
-			int zoneindex = GetZoneIndex(pTUser->m_pUserData->m_bNation);
-			if (zoneindex < 0)
-				continue;
-
-			C3DMap* pMap = m_ZoneArray[zoneindex];
-			if (pMap == nullptr)
-				continue;
-
-			pTUser->ZoneChange(pMap->m_nZoneNumber, pMap->m_fInitX, pMap->m_fInitZ);	// Move user to native zone.
+			C3DMap* pMap = GetMapByID(pTUser->m_pUserData->m_bNation);
+			if (pMap != nullptr)
+				pTUser->ZoneChange(pMap->m_nZoneNumber, pMap->m_fInitX, pMap->m_fInitZ);	// Move user to native zone.
 		}
 	}
 }
@@ -4215,8 +4184,7 @@ BOOL CEbenezerDlg::LoadKnightsRankTable()
 
 void CEbenezerDlg::BattleZoneCurrentUsers()
 {
-	int nBattleZoneIndex = GetZoneIndex(ZONE_BATTLE);
-	C3DMap* pMap = m_ZoneArray[nBattleZoneIndex];
+	C3DMap* pMap = GetMapByID(ZONE_BATTLE);
 	if (pMap == nullptr)
 		return;
 
@@ -4270,6 +4238,27 @@ void CEbenezerDlg::WriteEventLog(char* pBuf)
 	EnterCriticalSection(&g_LogFile_critical);
 	m_EvnetLogFile.Write(strLog, _tcslen(strLog));
 	LeaveCriticalSection(&g_LogFile_critical);
+}
+
+C3DMap* CEbenezerDlg::GetMapByIndex(int iZoneIndex) const
+{
+	if (iZoneIndex < 0
+		|| iZoneIndex >= static_cast<int>(m_ZoneArray.size()))
+		return nullptr;
+
+	return m_ZoneArray[iZoneIndex];
+}
+
+C3DMap* CEbenezerDlg::GetMapByID(int iZoneID) const
+{
+	for (C3DMap* pMap : m_ZoneArray)
+	{
+		if (pMap != nullptr
+			&& pMap->m_nZoneNumber == iZoneID)
+			return pMap;
+	}
+
+	return nullptr;
 }
 
 CString CEbenezerDlg::GetGameDBConnectionString()
