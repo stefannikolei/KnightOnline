@@ -62,8 +62,8 @@ int CJvCryption::JvDecryptionWithCRC32(int len, uint8_t* datain, uint8_t* dataou
 		result = -1;
 
 	return result;
-#endif
-
+#else
 	dataout = datain;
 	return (len - 4);
+#endif
 }

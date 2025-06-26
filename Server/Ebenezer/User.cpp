@@ -39,10 +39,6 @@ void CUser::Initialize()
 
 	// Cryption
 	jct.GenerateKey();
-
-	m_CryptionFlag = 0;
-	m_Sen_val = 0;
-	m_Rec_val = 0;
 	///~
 
 	m_MagicProcess.m_pMain = m_pMain;
@@ -221,6 +217,9 @@ void CUser::Parsing(int len, char* pData)
 	float currenttime;
 
 	BYTE command = GetByte(pData, index);
+
+	TRACE(_T("%d: id=%hs - %02X (%d)\n"), GetSocketID(), m_pUserData->m_id, command, len);
+
 	switch (command)
 	{
 		case WIZ_LOGIN:

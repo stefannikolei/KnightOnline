@@ -337,140 +337,167 @@ void CIOCPSocket2::ReceivedData(int length)
 
 BOOL CIOCPSocket2::PullOutCore(char*& data, int& length)
 {
-	BYTE*		pTmp;
-	BYTE*		pBuff;
-	int			len;
-	BOOL		foundCore;
-	MYSHORT		slen;
-	DWORD		wSerial = 0;
+	int buffer_len = m_pBuffer->GetValidCount();
 
-	len = m_pBuffer->GetValidCount();
+	// We expect at least 7 bytes (header, length, data [at least 1 byte], tail)
+	if (buffer_len < 7)
+		return FALSE; // wait for more data
 
-	if (len <= 0)
-		return FALSE;
+	std::vector<BYTE> tmp_buffer(buffer_len);
+	m_pBuffer->GetData((char*) &tmp_buffer[0], buffer_len);
 
-	pTmp = new BYTE[len];
-
-	m_pBuffer->GetData((char*) pTmp, len);
-
-	foundCore = FALSE;
-
-	int	sPos = 0, ePos = 0;
-
-	for (int i = 0; i < len && !foundCore; i++)
+	if (tmp_buffer[0] != PACKET_START1
+		&& tmp_buffer[1] != PACKET_START2)
 	{
-		if (i + 2 >= len)
-			break;
-
-		if (pTmp[i] == PACKET_START1
-			&& pTmp[i + 1] == PACKET_START2)
-		{
-//			if (m_wPacketSerial >= wSerial)
-//				goto cancelRoutine;
-
-			sPos = i + 2;
-
-			slen.b[0] = pTmp[sPos];
-			slen.b[1] = pTmp[sPos + 1];
-
-			length = slen.w;
-
-			if (length < 0)
-				goto cancelRoutine;
-
-			if (length > len)
-				goto cancelRoutine;
-
-			ePos = sPos + length + 2;
-
-			if ((ePos + 2) > len)
-				goto cancelRoutine;
-
-			// ASSERT(ePos+2 <= len);
-
-			if (pTmp[ePos] == PACKET_END1
-				&& pTmp[ePos + 1] == PACKET_END2)
-			{
-				// 암호화
-				if (m_CryptionFlag)
-				{
-					pBuff = new BYTE[length];
-					if (jct.JvDecryptionWithCRC32(length, &pTmp[sPos + 2], pBuff) < 0)
-					{
-						m_pBuffer->HeadIncrease(6 + length); // 6: header 2+ end 2+ length 2
-						break;
-					}
-
-					int index = 0;
-					DWORD recv_packet = GetDWORD((char*) pBuff, index);
-
-					//TRACE(_T("^^^ IOCPSocket2,, PullOutCore ,,, recv_val = %d ^^^\n"), recv_packet);
-
-					// 무시,,
-					if (recv_packet != 0
-						&& m_Rec_val > recv_packet)
-					{
-						TRACE(_T("CIOCPSocket2::PutOutCore - recv_packet Error... sockid(%d), len=%d, recv_packet=%d, prev=%d \n"), m_Socket, length, recv_packet, m_Rec_val);
-						delete[] pBuff;
-						m_pBuffer->HeadIncrease(10 + length); // 10: header (2) + end (2) + length (2) + cryption (4)
-						goto cancelRoutine;
-					}
-
-					m_Rec_val = recv_packet;
-
-					length -= 8;
-
-					if (length <= 0)
-					{
-						TRACE(_T("CIOCPSocket2::PutOutCore - length Error... sockid(%d), len=%d\n"), m_Socket, length);
-						delete[] pBuff;
-						Close();
-						goto cancelRoutine;
-					}
-
-					data = new char[length];
-					CopyMemory(data, pBuff + 4, length);
-					foundCore = TRUE;
-					int head = m_pBuffer->GetHeadPos(), tail = m_pBuffer->GetTailPos();
-					delete[] pBuff;
-				}
-				else
-				{
-					data = new char[length];
-					CopyMemory(data, (pTmp + sPos + 2), length);
-					foundCore = TRUE;
-					int head = m_pBuffer->GetHeadPos(), tail = m_pBuffer->GetTailPos();
-					//TRACE(_T("data : %hs, len : %d\n"), data, length);
-				}
-//				TRACE(_T("data : %hs, len : %d\n"), data, length);
-//				TRACE(_T("head : %d, tail : %d\n"), head, tail );
-				break;
-			}
-			else
-			{
-				m_pBuffer->HeadIncrease(3);
-				break;
-			}
-		}
+		TRACE(
+			_T("%d: PullOutCore() - failed to detect header (%02X, %02X)\n"),
+			m_Sid,
+			tmp_buffer[0],
+			tmp_buffer[1]);
+			
+		Close();
+		return FALSE;
 	}
 
+	// Find the packet's start position - this is in front of the 2 byte header.
+	int sPos = 2;
+
+	// Build the length (2 bytes, network order)
+	MYSHORT slen;
+	slen.b[0] = tmp_buffer[sPos];
+	slen.b[1] = tmp_buffer[sPos + 1];
+
+	length = slen.w;
+
+	int original_length = length;
+
+	if (length < 0)
+	{
+		TRACE(
+			_T("%d: PullOutCore() - invalid length (%d)\n"),
+			m_Sid,
+			length);
+
+		Close();
+		return FALSE;
+	}
+
+	if (length > buffer_len)
+	{
+		TRACE(
+			_T("%d: PullOutCore() - reported length (%d) is not in buffer (%d) - waiting for now\n"),
+			m_Sid,
+			length,
+			buffer_len);
+		return FALSE; // wait for more data
+	}
+
+	// Find the end position of the packet data.
+	// From the start position, that is after 2 bytes for the length,
+	// then the length of the data itself.
+	int ePos = sPos + 2 + length;
+
+	// We expect a 2 byte tail after the end position.
+	if ((ePos + 2) > buffer_len)
+	{
+		TRACE(
+			_T("%d: PullOutCore() - tail not in buffer - waiting for now\n"),
+			m_Sid);
+		return FALSE; // wait for more data
+	}
+
+	if (tmp_buffer[ePos] != PACKET_END1
+		|| tmp_buffer[ePos + 1] != PACKET_END2)
+	{
+		TRACE(
+			_T("%d: PullOutCore() - failed to detect tail (%02X, %02X)\n"),
+			m_Sid,
+			tmp_buffer[ePos],
+			tmp_buffer[ePos + 1]);
+
+		Close();
+		return FALSE;
+	}
+
+	// We've found the entire packet.
+	// Do we need to decrypt it?
 	if (m_CryptionFlag)
 	{
-		if (foundCore)
-			m_pBuffer->HeadIncrease(10 + length); // 10: header (2) + end (2) + length (2) + cryption (4)
+		// Encrypted packets contain a checksum (4) and sequence number (4).
+		// We should also expect at least 1 byte for its data in addition to this.
+		if (length <= 8)
+		{
+			TRACE(
+				_T("%d: PullOutCore() - Insufficient packet length [%d] for a decrypted packet\n"),
+				m_Sid,
+				length);
+
+			Close();
+			return FALSE;
+		}
+
+		std::vector<BYTE> decryption_buffer(length);
+
+		int decrypted_len = jct.JvDecryptionWithCRC32(length, &tmp_buffer[sPos + 2], &decryption_buffer[0]);
+		if (decrypted_len < 0)
+		{
+			TRACE(
+				_T("%d: PullOutCore() - Failed decryption\n"),
+				m_Sid);
+
+			Close();
+			return FALSE;
+		}
+
+		int index = 0;
+		DWORD recv_packet = GetDWORD((char*) &decryption_buffer[0], index);
+
+		// Verify the sequence number.
+		// If it wraps back around, we should simply let it reset.
+		if (recv_packet != 0
+			&& m_Rec_val > recv_packet)
+		{
+			TRACE(
+				_T("%d: PullOutCore() - recv_packet error... len=%d, recv_packet=%d, prev=%d\n"),
+				m_Sid,
+				length,
+				recv_packet,
+				m_Rec_val);
+
+			Close();
+			return FALSE;
+		}
+
+		m_Rec_val = recv_packet;
+
+		// Now we need to trim out the extra data from the packet, so it's just the base packet data remaining.
+		// Make sure that there is still data for this.
+		length = decrypted_len - index;
+		if (length <= 0)
+		{
+			TRACE(
+				_T("%d: PullOutCore() - decrypted packet length too small... len=%d\n"),
+				m_Sid,
+				length);
+
+			Close();
+			return FALSE;
+		}
+
+		data = new char[length];
+		memcpy(data, &decryption_buffer[index], length);
 	}
+	// Packet not encrypted, we can just copy it over as-is.
 	else
 	{
-		if (foundCore)
-			m_pBuffer->HeadIncrease(6 + length); // 6: header (2) + end (2) + length(2)
+		data = new char[length];
+		memcpy(data, &tmp_buffer[sPos + 2], length);
 	}
 
-	delete[] pTmp;
-	return foundCore;
+	m_pBuffer->HeadIncrease(6 + original_length); // 6: header (2) + end (2) + length (2)
 
-cancelRoutine:
-	delete[] pTmp;
-	return foundCore;
+	// Found a packet in this attempt.
+	return TRUE;
 }
 
 BOOL CIOCPSocket2::AsyncSelect(long lEvent)
@@ -534,6 +561,10 @@ void CIOCPSocket2::InitSocket(CIOCPort* pIOCPort)
 	m_nPending = 0;
 	m_nWouldblock = 0;
 
+	m_CryptionFlag = 0;
+	m_Sen_val = 0;
+	m_Rec_val = 0;
+
 	Initialize();
 }
 
@@ -577,7 +608,6 @@ void CIOCPSocket2::Initialize()
 	m_wPacketSerial = 0;
 	m_pRegionBuffer->iLength = 0;
 	memset(m_pRegionBuffer->pDataBuff, 0, sizeof(m_pRegionBuffer->pDataBuff));
-	m_CryptionFlag = 0;
 }
 
 void CIOCPSocket2::SendCompressingPacket(const char* pData, int len)
