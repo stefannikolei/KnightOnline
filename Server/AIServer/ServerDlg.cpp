@@ -1236,11 +1236,14 @@ BOOL CServerDlg::CreateNpcThread()
 
 					pNpc->m_sMaxPathCount = NpcPosSet.m_DotCnt;
 
-					if (pNpc->m_byMoveType >= 2
-						&& NpcPosSet.m_DotCnt == 0)
+					if (pNpc->m_byMoveType == 2
+						|| pNpc->m_byMoveType == 3)
 					{
-						TRACE(_T("##### ServerDlg:CreateNpcThread - Path type Error :  nid=%d, sid=%d, name=%hs, acttype=%d, path=%d #####\n"), pNpc->m_sNid + NPC_BAND, pNpc->m_sSid, pNpc->m_strName, pNpc->m_byMoveType, pNpc->m_sMaxPathCount);
-						return FALSE;
+						if (NpcPosSet.m_DotCnt == 0)
+						{
+							TRACE(_T("##### ServerDlg:CreateNpcThread - Path type Error :  nid=%d, sid=%d, name=%hs, acttype=%d, path=%d #####\n"), pNpc->m_sNid + NPC_BAND, pNpc->m_sSid, pNpc->m_strName, pNpc->m_byMoveType, pNpc->m_sMaxPathCount);
+							return FALSE;
+						}
 					}
 
 					int index = 0;
