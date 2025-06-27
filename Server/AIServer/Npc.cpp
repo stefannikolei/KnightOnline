@@ -2113,33 +2113,57 @@ BOOL CNpc::FindEnemy()
 		return FALSE;
 	}
 
-	fCompareDis = FindEnemyExpand(m_iRegion_X, m_iRegion_Z, fCompareDis, 1);
+	bool bIsHostileToPlayers = true;
 
-	int x = 0, y = 0;
-
-	// 이웃해 있는 Region을 검색해서,,  몬의 위치와 제일 가까운 User을 향해.. 이동..
-	for (int l = 0; l < 4; l++)
+	if (m_sCurZone == ZONE_BIFROST
+		|| m_sCurZone == ZONE_MORADON
+		|| (m_sCurZone / 10) == 5)
 	{
-		if (m_iFind_X[l] == 0
-			&& m_iFind_Y[l] == 0)
-			continue;
-
-		x = m_iRegion_X + (m_iFind_X[l]);
-		y = m_iRegion_Z + (m_iFind_Y[l]);
-
-		// 이부분 수정요망,,
-		if (x < 0
-			|| y < 0
-			|| x > pMap->GetXRegionMax()
-			|| y > pMap->GetZRegionMax())
-			continue;
-
-		fCompareDis = FindEnemyExpand(x, y, fCompareDis, 1);
+		if (m_byGroup != 0)
+			bIsHostileToPlayers = false;
+	}
+	
+	// NOTE: This should be included in the above, but officially it checks both
+	// (although it erroneously does so in the loop, rather than upfront)
+	if (m_tNpcType == NPC_GUARD
+		|| m_tNpcType == NPC_PATROL_GUARD
+		|| m_tNpcType == NPC_STORE_GUARD)
+	{
+		if (m_sCurZone == ZONE_MORADON)
+			bIsHostileToPlayers = false;
 	}
 
-	if (m_Target.id >= 0
-		&& fCompareDis <= fSearchRange)
-		return TRUE;
+	if (bIsHostileToPlayers)
+	{
+		fCompareDis = FindEnemyExpand(m_iRegion_X, m_iRegion_Z, fCompareDis, 1);
+
+		int x = 0, y = 0;
+
+		// 이웃해 있는 Region을 검색해서,,  몬의 위치와 제일 가까운 User을 향해.. 이동..
+		for (int l = 0; l < 4; l++)
+		{
+			if (m_iFind_X[l] == 0
+				&& m_iFind_Y[l] == 0)
+				continue;
+
+			x = m_iRegion_X + (m_iFind_X[l]);
+			y = m_iRegion_Z + (m_iFind_Y[l]);
+
+			// 이부분 수정요망,,
+			if (x < 0
+				|| y < 0
+				|| x > pMap->GetXRegionMax()
+				|| y > pMap->GetZRegionMax())
+				continue;
+
+			fCompareDis = FindEnemyExpand(x, y, fCompareDis, 1);
+		}
+
+
+		if (m_Target.id >= 0
+			&& fCompareDis <= fSearchRange)
+			return TRUE;
+	}
 
 	fCompareDis = 0.0f;
 
@@ -2433,58 +2457,58 @@ float CNpc::FindEnemyExpand(int nRX, int nRZ, float fCompDis, int nType)
 				continue;
 
 			pUser = m_pMain->GetUserPtr(nUserid);
-			if (pUser != nullptr
-				&& pUser->m_bLive == USER_LIVE)
+			if (pUser == nullptr
+				|| pUser->m_bLive != USER_LIVE)
+				continue;
+
+			// 같은 국가의 유저는 공격을 하지 않도록 한다...
+			if (m_byGroup == pUser->m_bNation)
+				continue;
+
+			// 운영자 무시
+			if (pUser->m_byIsOP == MANAGER_USER)
+				continue;
+
+			vUser.Set(pUser->m_curx, pUser->m_cury, pUser->m_curz);
+			fDis = GetDistance(vUser, vNpc);
+
+			// 작업 : 여기에서 나의 공격거리에 있는 유저인지를 판단
+			if (fDis > fSearchRange)
+				continue;
+
+			if (fDis >= fComp)
 			{
-				// 같은 국가의 유저는 공격을 하지 않도록 한다...
-				if (m_byGroup == pUser->m_bNation)
-					continue;
+				target_uid = pUser->m_iUserId;
+				fComp = fDis;
 
-				// 운영자 무시
-				if (pUser->m_byIsOP == MANAGER_USER)
-					continue;
-
-				vUser.Set(pUser->m_curx, pUser->m_cury, pUser->m_curz);
-				fDis = GetDistance(vUser, vNpc);
-
-				// 작업 : 여기에서 나의 공격거리에 있는 유저인지를 판단
-				if (fDis > fSearchRange)
-					continue;
-
-				if (fDis >= fComp)
+				//후공몹...
+				// 날 공격한 놈을 찾는다.
+				if (m_tNpcAttType == 0)
 				{
-					target_uid = pUser->m_iUserId;
-					fComp = fDis;
-
-					//후공몹...
-					// 날 공격한 놈을 찾는다.
-					if (m_tNpcAttType == 0)
+					if (IsDamagedUserList(pUser)
+						|| (m_tNpcGroupType && m_Target.id == target_uid))
 					{
-						if (IsDamagedUserList(pUser)
-							|| (m_tNpcGroupType && m_Target.id == target_uid))
-						{
-							m_Target.id = target_uid;
-							m_Target.failCount = 0;
-							m_Target.x = pUser->m_curx;
-							m_Target.y = pUser->m_cury;
-							m_Target.z = pUser->m_curz;
-						}
-					}
-					// 선공몹...
-					else
-					{
-						iLevelComprison = pUser->m_sLevel - m_sLevel;
-
-						// 작업할 것 : 타입에 따른 공격성향으로..
-						//if(iLevelComprison > ATTACK_LIMIT_LEVEL)	continue;
-
 						m_Target.id = target_uid;
 						m_Target.failCount = 0;
 						m_Target.x = pUser->m_curx;
 						m_Target.y = pUser->m_cury;
 						m_Target.z = pUser->m_curz;
-						//TRACE(_T("Npc-FindEnemyExpand - target_x = %.2f, z=%.2f\n"), m_Target.x, m_Target.z);
 					}
+				}
+				// 선공몹...
+				else
+				{
+					iLevelComprison = pUser->m_sLevel - m_sLevel;
+
+					// 작업할 것 : 타입에 따른 공격성향으로..
+					//if(iLevelComprison > ATTACK_LIMIT_LEVEL)	continue;
+
+					m_Target.id = target_uid;
+					m_Target.failCount = 0;
+					m_Target.x = pUser->m_curx;
+					m_Target.y = pUser->m_cury;
+					m_Target.z = pUser->m_curz;
+					//TRACE(_T("Npc-FindEnemyExpand - target_x = %.2f, z=%.2f\n"), m_Target.x, m_Target.z);
 				}
 			}
 		}
@@ -2530,32 +2554,40 @@ float CNpc::FindEnemyExpand(int nRX, int nRZ, float fCompDis, int nType)
 			if (m_sNid == pNpc->m_sNid)
 				continue;
 
-			if (pNpc != nullptr
-				&& pNpc->m_NpcState != NPC_DEAD
-				&& pNpc->m_sNid != m_sNid)
+			if (pNpc == nullptr
+				|| pNpc->m_NpcState == NPC_DEAD
+				|| pNpc->m_sNid == m_sNid)
+				continue;
+
+			if (m_sCurZone == ZONE_BIFROST
+				|| m_sCurZone == ZONE_MORADON
+				|| (m_sCurZone / 10) == 5)
 			{
-				// 같은 국가의 몬스터는 공격을 하지 않도록 한다...
-				if (m_byGroup == pNpc->m_byGroup)
+				if (pNpc->m_byGroup != 0)
 					continue;
+			}
 
-				vMon.Set(pNpc->m_fCurX, pNpc->m_fCurY, pNpc->m_fCurZ);
-				fDis = GetDistance(vMon, vNpc);
+			// 같은 국가의 몬스터는 공격을 하지 않도록 한다...
+			if (m_byGroup == pNpc->m_byGroup)
+				continue;
 
-				// 작업 : 여기에서 나의 공격거리에 있는 유저인지를 판단
-				if (fDis > fSearchRange)
-					continue;
+			vMon.Set(pNpc->m_fCurX, pNpc->m_fCurY, pNpc->m_fCurZ);
+			fDis = GetDistance(vMon, vNpc);
 
-				if (fDis >= fComp)
-				{
-					target_uid = nNpcid;
-					fComp = fDis;
-					m_Target.id = target_uid;
-					m_Target.failCount = 0;
-					m_Target.x = pNpc->m_fCurX;
-					m_Target.y = pNpc->m_fCurY;
-					m_Target.z = pNpc->m_fCurZ;
-				//	TRACE(_T("Npc-IsCloseTarget - target_x = %.2f, z=%.2f\n"), m_Target.x, m_Target.z);
-				}
+			// 작업 : 여기에서 나의 공격거리에 있는 유저인지를 판단
+			if (fDis > fSearchRange)
+				continue;
+
+			if (fDis >= fComp)
+			{
+				target_uid = nNpcid;
+				fComp = fDis;
+				m_Target.id = target_uid;
+				m_Target.failCount = 0;
+				m_Target.x = pNpc->m_fCurX;
+				m_Target.y = pNpc->m_fCurY;
+				m_Target.z = pNpc->m_fCurZ;
+			//	TRACE(_T("Npc-IsCloseTarget - target_x = %.2f, z=%.2f\n"), m_Target.x, m_Target.z);
 			}
 		}
 	}
