@@ -78,9 +78,12 @@ We may deviate in some minor aspects where it makes sense to fix, for example, U
 
 Pull requests for such changes will be accepted on a case-by-case basis.
 
-As a hard-and-fast rule, this means we **DO NOT** change client assets or network protocol.
+As a hard-and-fast rule, this means we **DO NOT** change client assets or the network protocol between the client and game server (Ebenezer).
 
 The client **MUST** remain compatible with the official client and the official server.
+
+We do not intend to keep the backend servers compatible with the official ones (e.g. our AI server standing in for the 1.298 AI server and vice versa).
+This is largely more work than really necessary to maintain. Side-by-side testing with the server files as a collective is more than sufficient here.
 
 Late in development when side-by-side development is rarely necessary, it will make sense to start deviating from official behaviour for improvements and custom features.
 At such time, we will welcome such changes, but doing so this early just creates incompatibilities (making it harder to test them side-by-side) and unnecessarily diverts
