@@ -604,3 +604,40 @@ CPlayerBase* CGameBase::CharacterGetByID(int iID, bool bFromAlive)
 	return s_pOPMgr->CharacterGetByID(iID, bFromAlive);
 }
 
+std::string CGameBase::FormatNumber(int iNumber)
+{
+	// Original unformatted number in string form
+	const std::string szOrigNum = std::to_string(iNumber);
+
+	// Where the digits actually start - if it has a sign, this will be at 1.
+	// Otherwise, it will start at 0.
+	size_t nDigitStart = (iNumber < 0 ? 1 : 0);
+
+	// Full number of digits (excluding the sign).
+	size_t nDigitCount = szOrigNum.size() - nDigitStart;
+
+	// Number of commas that will be generated.
+	size_t nCommaCount = (nDigitCount - 1) / 3;
+
+	// Number of leading digits. 
+	size_t nLeadingDigits = nDigitCount % 3;
+	if (nLeadingDigits == 0)
+		nLeadingDigits = 3;
+
+	// Pre-reserve the buffer for us to append to.
+	std::string szFormattedNum;
+	szFormattedNum.reserve(szOrigNum.size() + nCommaCount);
+
+	// Append sign (if applicable) and variable number of leading digits.
+	size_t nStartPos = nDigitStart + nLeadingDigits;
+	szFormattedNum.append(szOrigNum, 0, nStartPos);
+
+	// The remaining groups of 3 are guaranteed, so we can append them in their full 3s.
+	for (size_t i = nStartPos; i < szOrigNum.size(); i += 3)
+	{
+		szFormattedNum += ',';
+		szFormattedNum.append(szOrigNum, i, 3);
+	}
+
+	return szFormattedNum;
+}
