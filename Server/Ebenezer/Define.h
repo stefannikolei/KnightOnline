@@ -23,8 +23,6 @@ constexpr int MAX_ITEM				= 28;
 constexpr int NPC_HAVE_ITEM_LIST	= 6;
 constexpr int ZONEITEM_MAX			= 2'100'000'000;	// 존에 떨어지는 최대 아이템수...
 
-constexpr int MAX_LEVEL				= 80;			// 최고렙...
-
 constexpr int SERVER_INFO_START		= 1;
 constexpr int SERVER_INFO_END		= 2;
 
