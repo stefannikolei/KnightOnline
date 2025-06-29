@@ -3353,7 +3353,7 @@ bool CGameProcMain::MsgRecv_ItemMove(Packet& pkt)
 
 bool CGameProcMain::MsgRecv_ItemWeightChange(Packet& pkt)		// 아이템 무게 변화..
 {
-	__InfoPlayerMySelf* pInfoExt = &(s_pPlayer->m_InfoExt);
+	__InfoPlayerMySelf* pInfoExt = &s_pPlayer->m_InfoExt;
 	pInfoExt->iWeight = pkt.read<int16_t>();
 	m_pUIVar->m_pPageState->UpdateWeight(pInfoExt->iWeight, pInfoExt->iWeightMax);
 

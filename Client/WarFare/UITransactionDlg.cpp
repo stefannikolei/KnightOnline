@@ -53,6 +53,7 @@ CUITransactionDlg::CUITransactionDlg()
 	m_pUIInn		= NULL;
 	m_pUIBlackSmith	= NULL;
 	m_pUIStore		= NULL;
+	m_pText_Weight = nullptr;
 
 	this->SetVisible(false);
 }
@@ -187,6 +188,7 @@ void CUITransactionDlg::InitIconWnd(e_UIWND eWnd)
 	m_pUIInn		= (CN3UIImage*)GetChildByID("img_inn");			__ASSERT(m_pUIInn, "NULL UI Component!!");
 	m_pUIBlackSmith = (CN3UIImage*)GetChildByID("img_blacksmith");	__ASSERT(m_pUIBlackSmith, "NULL UI Component!!");
 	m_pUIStore		= (CN3UIImage*)GetChildByID("img_store");		__ASSERT(m_pUIStore, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pText_Weight, (CN3UIString*) GetChildByID("text_weight"));
 }
 
 void CUITransactionDlg::InitIconUpdate()
@@ -364,6 +366,7 @@ void CUITransactionDlg::EnterTransactionState()
 
 	ItemMoveFromInvToThis();
 
+
 	if(m_pStrMyGold)
 	{
 		__InfoPlayerMySelf*	pInfoExt = &(CGameBase::s_pPlayer->m_InfoExt);
@@ -380,6 +383,12 @@ void CUITransactionDlg::EnterTransactionState()
 			ShowTitle(UI_STORE);
 			break;
 	}
+}
+
+void CUITransactionDlg::UpdateWeight(const std::string& szWeight)
+{
+	if (m_pText_Weight != nullptr)
+		m_pText_Weight->SetString(szWeight);
 }
 
 void CUITransactionDlg::GoldUpdate()
