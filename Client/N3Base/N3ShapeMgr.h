@@ -17,20 +17,18 @@
 #include "N3BaseFileAccess.h"
 #endif // end of #ifndef _3DSERVER
 
-
-const int CELL_MAIN_DEVIDE = 4; // 메인셀은 4 X 4 의 서브셀로 나뉜다..
-const int CELL_SUB_SIZE = 4; // 4 Meter 가 서브셀의 사이즈이다..
-const int CELL_MAIN_SIZE = CELL_MAIN_DEVIDE * CELL_SUB_SIZE; // 메인셀 크기는 서브셀갯수 X 서브셀 크기이다.
-const int MAX_CELL_MAIN = 4096 / CELL_MAIN_SIZE; // 메인셀의 최대 갯수는 지형크기 / 메인셀크기 이다.
-const int MAX_CELL_SUB = MAX_CELL_MAIN * CELL_MAIN_DEVIDE; // 서브셀 최대 갯수는 메인셀 * 메인셀나눔수 이다.
+constexpr int CELL_MAIN_DIVIDE = 4; // 메인셀은 4 X 4 의 서브셀로 나뉜다..
+constexpr int CELL_SUB_SIZE = 4; // 4 Meter 가 서브셀의 사이즈이다..
+constexpr int CELL_MAIN_SIZE = CELL_MAIN_DIVIDE * CELL_SUB_SIZE; // 메인셀 크기는 서브셀갯수 X 서브셀 크기이다.
+constexpr int MAX_CELL_MAIN = 4096 / CELL_MAIN_SIZE; // 메인셀의 최대 갯수는 지형크기 / 메인셀크기 이다.
+constexpr int MAX_CELL_SUB = MAX_CELL_MAIN * CELL_MAIN_DIVIDE; // 서브셀 최대 갯수는 메인셀 * 메인셀나눔수 이다.
 
 #ifdef _3DSERVER
 class CN3ShapeMgr
 #else
 #include <list>
 #include <vector>
-typedef std::list<class CN3Shape*>::iterator	it_Shp;
-typedef std::list<__Vector3>::iterator			it_Vector3;
+class CN3Shape;
 class CN3ShapeMgr : public CN3BaseFileAccess
 #endif // end of #ifndef _3DSERVER
 {
@@ -38,7 +36,7 @@ public:
 	struct __CellSub // 하위 셀 데이터
 	{
 		int 		nCCPolyCount; // Collision Check Polygon Count
-		uint32_t*	pdwCCVertIndices; // Collision Check Polygon Vertex Indices - wCCPolyCount * 3 만큼 생성된다.
+		uint32_t* pdwCCVertIndices; // Collision Check Polygon Vertex Indices - wCCPolyCount * 3 만큼 생성된다.
 
 		void Load(HANDLE hFile)
 		{
@@ -83,7 +81,7 @@ public:
 	{
 		int		nShapeCount; // Shape Count;
 		uint16_t* pwShapeIndices; // Shape Indices
-		__CellSub SubCells[CELL_MAIN_DEVIDE][CELL_MAIN_DEVIDE];
+		__CellSub SubCells[CELL_MAIN_DIVIDE][CELL_MAIN_DIVIDE];
 
 		void Load(HANDLE hFile)
 		{
@@ -98,9 +96,9 @@ public:
 				ReadFile(hFile, pwShapeIndices, nShapeCount * 2, &dwRWC, nullptr);
 			}
 
-			for (int z = 0; z < CELL_MAIN_DEVIDE; z++)
+			for (int z = 0; z < CELL_MAIN_DIVIDE; z++)
 			{
-				for (int x = 0; x < CELL_MAIN_DEVIDE; x++)
+				for (int x = 0; x < CELL_MAIN_DIVIDE; x++)
 					SubCells[x][z].Load(hFile);
 			}
 		}
@@ -113,9 +111,9 @@ public:
 			if (nShapeCount > 0)
 				WriteFile(hFile, pwShapeIndices, nShapeCount * 2, &dwRWC, nullptr);
 
-			for (int z = 0; z < CELL_MAIN_DEVIDE; z++)
+			for (int z = 0; z < CELL_MAIN_DIVIDE; z++)
 			{
-				for (int x = 0; x < CELL_MAIN_DEVIDE; x++)
+				for (int x = 0; x < CELL_MAIN_DIVIDE; x++)
 					SubCells[x][z].Save(hFile);
 			}
 		}
@@ -145,7 +143,7 @@ protected:
 	float					m_fMapWidth;	// 맵 너비.. 미터 단위
 	float					m_fMapLength;	// 맵 길이.. 미터 단위
 	int						m_nCollisionFaceCount;
-	__CellMain* m_pCells[MAX_CELL_MAIN][MAX_CELL_MAIN];
+	__CellMain*				m_pCells[MAX_CELL_MAIN][MAX_CELL_MAIN];
 
 #ifdef _N3TOOL
 	std::list<__Vector3>	m_CollisionExtras; // 추가로 넣을 충돌체크 데이터
@@ -209,7 +207,10 @@ public:
 
 #ifndef _3DSERVER
 	void		ReleaseShapes();
-	void		RenderCollision(const __Vector3& vPos); // 넣은 위치에 있는 충돌 메시를 그려준다.. 디버깅용...
+
+	// 넣은 위치에 있는 충돌 메시를 그려준다.. 디버깅용...
+	void		RenderCollision(const __Vector3& vPos);
+
 	void		Tick();
 	void		Render();
 	bool		Load(HANDLE hFile);
@@ -217,18 +218,21 @@ public:
 	static int SortByCameraDistance(const void* pArg1, const void* pArg2);
 #endif // end of #ifndef _3DSERVER
 
-	bool		CheckCollision(const __Vector3& vPos,			// 충돌 위치
-								const __Vector3& vDir,			// 방향 벡터
-								float fSpeedPerSec,				// 초당 움직이는 속도
-								__Vector3* pvCol = nullptr,		// 충돌 지점
-								__Vector3* pvNormal = nullptr,		// 충돌한면의 법선벡터
-								__Vector3* pVec = nullptr);		// 충돌한 면 의 폴리곤 __Vector3[3]
+	bool		CheckCollision(
+		const __Vector3& vPos,			// 충돌 위치
+		const __Vector3& vDir,			// 방향 벡터
+		float fSpeedPerSec,				// 초당 움직이는 속도
+		__Vector3* pvCol = nullptr,		// 충돌 지점
+		__Vector3* pvNormal = nullptr,	// 충돌한면의 법선벡터
+		__Vector3* pVec = nullptr);		// 충돌한 면 의 폴리곤 __Vector3[3]
 
 	bool		Create(float fMapWidth, float fMapLength); // 맵의 너비와 높이를 미터 단위로 넣는다..
 	bool		LoadCollisionData(HANDLE hFile);
 
 #ifdef _N3TOOL
-	void		MakeMoveTable(int16_t** pMoveArray);	//지형에서 shape가 있는 타일은 1, 없는 타일은 0으로 셋팅한 테이블을 만든다.
+	//지형에서 shape가 있는 타일은 1, 없는 타일은 0으로 셋팅한 테이블을 만든다.
+	void		MakeMoveTable(int16_t** pMoveArray);
+
 	int			Add(CN3Shape* pShape);
 	bool		AddCollisionTriangle(const __Vector3& v1, const __Vector3& v2, const __Vector3& v3);
 	void		GenerateCollisionData();
