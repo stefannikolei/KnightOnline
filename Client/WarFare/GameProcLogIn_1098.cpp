@@ -1,22 +1,22 @@
 ﻿#include "stdafx.h"
 
 #if defined(LOGIN_SCENE_VERSION) && LOGIN_SCENE_VERSION == 1098
-#include "resource.h"
-#include "GameEng.h"
 #include "GameProcLogIn_1098.h"
+#include "GameEng.h"
 #include "UILogIn_1098.h"
 #include "PlayerMySelf.h"
 #include "UIManager.h"
 #include "LocalInput.h"
 #include "APISocket.h"
 #include "PacketDef.h"
+#include "resource.h"
 
-#include "N3Camera.h"
-#include "N3Light.h"
-#include "N3Chr.h"
-#include "N3SndObj.h"
-#include "N3SndObjStream.h"
-#include "N3SndMgr.h"
+#include <N3Base/N3Camera.h>
+#include <N3Base/N3Light.h>
+#include <N3Base/N3Chr.h>
+#include <N3Base/N3SndObj.h>
+#include <N3Base/N3SndObjStream.h>
+#include <N3Base/N3SndMgr.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
