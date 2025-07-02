@@ -570,6 +570,10 @@ void CUILogIn_1298::OpenServerList()
 	if (m_pStr_Premium != nullptr)
 		m_pStr_Premium->SetVisible(true);
 
+	// Select first server by default.
+	if (m_pList_Group[0] != nullptr)
+		ReceiveMessage(m_pList_Group[0], UIMSG_STRING_LCLICK);
+
 	m_bIsNewsVisible = false;
 }
 
