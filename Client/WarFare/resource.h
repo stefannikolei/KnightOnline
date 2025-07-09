@@ -401,24 +401,23 @@
 #define IDS_HELP_TIP_ALL                5034
 #define IDS_EDIT_BOX_GOLD               6033
 #define IDS_EDIT_BOX_COUNT              6034
-#define IDS_SKILL_INFO_BASE             6035
-#define IDS_SKILL_INFO_BLADE0           6036
-#define IDS_SKILL_INFO_BLADE1           6037
-#define IDS_SKILL_INFO_BLADE2           6038
-#define IDS_SKILL_INFO_BLADE3           6039
-#define IDS_SKILL_INFO_RANGER0          6044
-#define IDS_SKILL_INFO_RANGER1          6045
-#define IDS_SKILL_INFO_RANGER2          6046
-#define IDS_SKILL_INFO_RANGER3          6047
-#define IDS_SKILL_INFO_MAGE0            6052
-#define IDS_SKILL_INFO_MAGE1            6053
-#define IDS_SKILL_INFO_MAGE2            6054
-#define IDS_SKILL_INFO_MAGE3            6055
-#define IDS_SKILL_INFO_CLERIC0          6060
-#define IDS_SKILL_INFO_CLERIC1          6061
-#define IDS_SKILL_INFO_CLERIC2          6062
-#define IDS_SKILL_INFO_CLERIC3          6063
-#define IDS_SKILL_INFO_SHAMAN3          6064
+#define IDS_SKILL_INFO_BASE             6035	// Basic skills that you get before you choose a specialty.
+#define IDS_SKILL_INFO_BLADE0           6036	// Learn various attack skills. 
+#define IDS_SKILL_INFO_BLADE1           6037	// Learn various defense skills. 
+#define IDS_SKILL_INFO_BLADE2           6038	// Increases Warrior's mental power.   
+#define IDS_SKILL_INFO_BLADE3           6039	// Learn the Master Skills of various weapons. 
+#define IDS_SKILL_INFO_RANGER0          6044	// Learn various archery skills.
+#define IDS_SKILL_INFO_RANGER1          6045	// Learn the various techniques of assassination.
+#define IDS_SKILL_INFO_RANGER2          6046	// Learn the various techniques of exploring. 
+#define IDS_SKILL_INFO_RANGER3          6047	// Learn the Master Skills of Archery and Assassination.
+#define IDS_SKILL_INFO_MAGE0            6052	// Learn various magic that uses flame. 
+#define IDS_SKILL_INFO_MAGE1            6053	// Learn various magic that uses Glacier. 
+#define IDS_SKILL_INFO_MAGE2            6054	// Learn various magic that uses Lightning. 
+#define IDS_SKILL_INFO_MAGE3            6055	// Learn the Master Skills of elemental magic.
+#define IDS_SKILL_INFO_CLERIC0          6060	// Learn various healing magic. 
+#define IDS_SKILL_INFO_CLERIC1          6061	// Learn magic that increase character's stat points. 
+#define IDS_SKILL_INFO_CLERIC2          6062	// Learn simple attack magic. 
+#define IDS_SKILL_INFO_CLERIC3          6063	// Learn the Master Skill of a Priest.
 #define IDS_ERR_CHARACTER_SELECT        6066
 #define IDS_DROPPED_NOAH_GET            6067
 #define IDS_DURABILITY_EXOAST           6068

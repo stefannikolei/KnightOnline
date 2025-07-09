@@ -274,12 +274,6 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			SetPageInIconRegion(3, 0);
 		if ((pSender->m_szID == "btn_master"))
 			SetPageInIconRegion(4, 0);
-		/*
-		if( (pSender->m_szID == "btn_ranger3") || (pSender->m_szID == "btn_blade3") || (pSender->m_szID == "btn_mage3") || 
-				(pSender->m_szID == "btn_cleric3") || (pSender->m_szID == "btn_hunter3") || (pSender->m_szID == "btn_berserker3") || 
-				(pSender->m_szID == "btn_sorcerer3") || (pSender->m_szID == "btn_shaman3") )
-			SetPageInIconRegion(4, 0);
-		*/
 	}
 
 // Temp Define
@@ -803,13 +797,13 @@ void CUISkillTreeDlg::CheckButtonTooltipRenderEnable()
 			rect[SKILL_DEF_SPECIAL0]	= ((CN3UIButton* )GetChildByID("btn_blade0"))->GetClickRect();
 			rect[SKILL_DEF_SPECIAL1]	= ((CN3UIButton* )GetChildByID("btn_blade1"))->GetClickRect();
 			rect[SKILL_DEF_SPECIAL2]	= ((CN3UIButton* )GetChildByID("btn_blade2"))->GetClickRect();
-			//rect[SKILL_DEF_SPECIAL3]	= ((CN3UIButton* )GetChildByID("btn_blade3"))->GetClickRect();
+			rect[SKILL_DEF_SPECIAL3]	= ((CN3UIButton* )GetChildByID("btn_master"))->GetClickRect();
 			break;
 		case NATION_KARUS:
 			rect[SKILL_DEF_SPECIAL0]	= ((CN3UIButton* )GetChildByID("btn_berserker0"))->GetClickRect();
 			rect[SKILL_DEF_SPECIAL1]	= ((CN3UIButton* )GetChildByID("btn_berserker1"))->GetClickRect();
 			rect[SKILL_DEF_SPECIAL2]	= ((CN3UIButton* )GetChildByID("btn_berserker2"))->GetClickRect();
-			//rect[SKILL_DEF_SPECIAL3]	= ((CN3UIButton* )GetChildByID("btn_berserker3"))->GetClickRect();
+			rect[SKILL_DEF_SPECIAL3]	= ((CN3UIButton* )GetChildByID("btn_master"))->GetClickRect();
 			break;
 	}
 
@@ -822,6 +816,7 @@ void CUISkillTreeDlg::CheckButtonTooltipRenderEnable()
 	}
 }
 
+// Tool tip on hoverover of skill tabs
 void CUISkillTreeDlg::ButtonTooltipRender(int iIndex)
 {
 	std::string szStr;
@@ -830,105 +825,134 @@ void CUISkillTreeDlg::ButtonTooltipRender(int iIndex)
 
 	switch (iIndex)
 	{
+		// basic skill tab
 		case SKILL_DEF_BASIC:
 			CGameBase::GetText(IDS_SKILL_INFO_BASE, &szStr);
 			break;
 
+		// first skill tab
 		case SKILL_DEF_SPECIAL0:
 			switch (CGameBase::s_pPlayer->m_InfoBase.eClass)
 			{
 				case CLASS_EL_BLADE:
+				case CLASS_EL_PROTECTOR:
 				case CLASS_KA_BERSERKER:
+				case CLASS_KA_GUARDIAN:
 					CGameBase::GetText(IDS_SKILL_INFO_BLADE0, &szStr);
 					break;
 
 				case CLASS_EL_RANGER:
+				case CLASS_EL_ASSASIN:
 				case CLASS_KA_HUNTER:
+				case CLASS_KA_PENETRATOR:
 					CGameBase::GetText(IDS_SKILL_INFO_RANGER0, &szStr);
 					break;
 
 				case CLASS_EL_CLERIC:
+				case CLASS_EL_DRUID:
 				case CLASS_KA_SHAMAN:
+				case CLASS_KA_DARKPRIEST:
 					CGameBase::GetText(IDS_SKILL_INFO_CLERIC0, &szStr);
 					break;
 
 				case CLASS_EL_MAGE:
+				case CLASS_EL_ENCHANTER:
 				case CLASS_KA_SORCERER:
+				case CLASS_KA_NECROMANCER:
 					CGameBase::GetText(IDS_SKILL_INFO_MAGE0, &szStr);
 					break;
 			}
 			break;
 
+		// second skill tab
 		case SKILL_DEF_SPECIAL1:
 			switch (CGameBase::s_pPlayer->m_InfoBase.eClass)
 			{
 				case CLASS_EL_BLADE:
+				case CLASS_EL_PROTECTOR:
 				case CLASS_KA_BERSERKER:
+				case CLASS_KA_GUARDIAN:
 					CGameBase::GetText(IDS_SKILL_INFO_BLADE1, &szStr);
 					break;
 
 				case CLASS_EL_RANGER:
+				case CLASS_EL_ASSASIN:
 				case CLASS_KA_HUNTER:
+				case CLASS_KA_PENETRATOR:
 					CGameBase::GetText(IDS_SKILL_INFO_RANGER1, &szStr);
 					break;
 
 				case CLASS_EL_CLERIC:
+				case CLASS_EL_DRUID:
 				case CLASS_KA_SHAMAN:
+				case CLASS_KA_DARKPRIEST:
 					CGameBase::GetText(IDS_SKILL_INFO_CLERIC1, &szStr);
 					break;
 
 				case CLASS_EL_MAGE:
+				case CLASS_EL_ENCHANTER:
 				case CLASS_KA_SORCERER:
+				case CLASS_KA_NECROMANCER:
 					CGameBase::GetText(IDS_SKILL_INFO_MAGE1, &szStr);
 					break;
 			}
 			break;
 
+		// third skill tab
 		case SKILL_DEF_SPECIAL2:
 			switch (CGameBase::s_pPlayer->m_InfoBase.eClass)
 			{
 				case CLASS_EL_BLADE:
+				case CLASS_EL_PROTECTOR:
 				case CLASS_KA_BERSERKER:
+				case CLASS_KA_GUARDIAN:
 					CGameBase::GetText(IDS_SKILL_INFO_BLADE2, &szStr);
 					break;
 
 				case CLASS_EL_RANGER:
+				case CLASS_EL_ASSASIN:
 				case CLASS_KA_HUNTER:
+				case CLASS_KA_PENETRATOR:
 					CGameBase::GetText(IDS_SKILL_INFO_RANGER2, &szStr);
 					break;
 
 				case CLASS_EL_CLERIC:
+				case CLASS_EL_DRUID:
 				case CLASS_KA_SHAMAN:
+				case CLASS_KA_DARKPRIEST:
 					CGameBase::GetText(IDS_SKILL_INFO_CLERIC2, &szStr);
 					break;
 
 				case CLASS_EL_MAGE:
+				case CLASS_EL_ENCHANTER:
 				case CLASS_KA_SORCERER:
+				case CLASS_KA_NECROMANCER:
 					CGameBase::GetText(IDS_SKILL_INFO_MAGE2, &szStr);
 					break;
 			}
 			break;
 
+		// master skill tab
 		case SKILL_DEF_SPECIAL3:
 			switch (CGameBase::s_pPlayer->m_InfoBase.eClass)
 			{
-				case CLASS_EL_BLADE:
-				case CLASS_KA_BERSERKER:
+				case CLASS_EL_PROTECTOR:
+				case CLASS_KA_GUARDIAN:
 					CGameBase::GetText(IDS_SKILL_INFO_BLADE3, &szStr);
 					break;
 
-				case CLASS_EL_RANGER:
-				case CLASS_KA_HUNTER:
+				case CLASS_EL_ASSASIN:
+				case CLASS_KA_PENETRATOR:
 					CGameBase::GetText(IDS_SKILL_INFO_RANGER3, &szStr);
 					break;
 
-				case CLASS_EL_CLERIC:
-				case CLASS_KA_SHAMAN:
+				case CLASS_EL_DRUID:
+				case CLASS_KA_DARKPRIEST:
 					CGameBase::GetText(IDS_SKILL_INFO_CLERIC3, &szStr);
 					break;
 
-				case CLASS_EL_MAGE:
-				case CLASS_KA_SORCERER:
+				case CLASS_EL_ENCHANTER:
+				case CLASS_KA_NECROMANCER:
 					CGameBase::GetText(IDS_SKILL_INFO_MAGE3, &szStr);
 					break;
 			}
@@ -1214,124 +1238,162 @@ void CUISkillTreeDlg::ButtonVisibleStateSet()
 }
 
 	CN3UIButton* pButton;
-	pButton = (CN3UIButton* )GetChildByID("btn_public");	
+	pButton = (CN3UIButton*) GetChildByID("btn_public");
 	__ASSERT(pButton, "NULL UI Component!!");
 	pButton->SetState(UI_STATE_BUTTON_NORMAL);
 
 	// All Button Set Invisible..
 	// Elmorad..
-	switch ( CGameBase::s_pPlayer->m_InfoBase.eNation )
+	switch (CGameBase::s_pPlayer->m_InfoBase.eNation)
 	{
 		case NATION_ELMORAD:
-			pButton = (CN3UIButton* )GetChildByID("btn_ranger0");	ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_ranger1");	ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_ranger2");	ASSET_0
-			//pButton = (CN3UIButton* )GetChildByID("btn_ranger3");	ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_blade0");	ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_blade1");	ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_blade2");	ASSET_0
-			//pButton = (CN3UIButton* )GetChildByID("btn_blade3");	ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_mage0");		ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_mage1");		ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_mage2");		ASSET_0
-			//pButton = (CN3UIButton* )GetChildByID("btn_mage3");		ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_cleric0");	ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_cleric1");	ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_cleric2");	ASSET_0
-			//pButton = (CN3UIButton* )GetChildByID("btn_cleric3");	ASSET_0
+			pButton = (CN3UIButton*) GetChildByID("btn_ranger0");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_ranger1");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_ranger2");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_blade0");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_blade1");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_blade2");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_mage0");			ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_mage1");			ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_mage2");			ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_cleric0");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_cleric1");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_cleric2");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_0;
 			break;
 
-	// Karus..
+		// Karus..
 		case NATION_KARUS:
-			pButton = (CN3UIButton* )GetChildByID("btn_hunter0");		ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_hunter1");		ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_hunter2");		ASSET_0
-//			pButton = (CN3UIButton* )GetChildByID("btn_hunter3");		ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_berserker0");	ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_berserker1");	ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_berserker2");	ASSET_0
-//			pButton = (CN3UIButton* )GetChildByID("btn_berserker3");	ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_sorcerer0");		ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_sorcerer1");		ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_sorcerer2");		ASSET_0
-//			pButton = (CN3UIButton* )GetChildByID("btn_sorcerer3");		ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_shaman0");		ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_shaman1");		ASSET_0
-			pButton = (CN3UIButton* )GetChildByID("btn_shaman2");		ASSET_0
-//			pButton = (CN3UIButton* )GetChildByID("btn_shaman3");		ASSET_0	
+			pButton = (CN3UIButton*) GetChildByID("btn_hunter0");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_hunter1");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_hunter2");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_hunter3");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_berserker0");	ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_berserker1");	ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_berserker2");	ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_berserker3");	ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer0");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer1");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer2");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer3");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_shaman0");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_shaman1");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_shaman2");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_shaman3");		ASSET_0;
+			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_0;
 			break;
 	}
 
 	if (m_iCurKindOf == 0)
 	{
-		pButton = (CN3UIButton* )GetChildByID("btn_public");
+		pButton = (CN3UIButton*) GetChildByID("btn_public");
 		pButton->SetState(UI_STATE_BUTTON_DOWN);
 	}
 
-	switch ( CGameBase::s_pPlayer->m_InfoBase.eClass )
+	switch (CGameBase::s_pPlayer->m_InfoBase.eClass)
 	{
 		case CLASS_KA_BERSERKER:
+			pButton = (CN3UIButton*) GetChildByID("btn_berserker0");	ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_berserker1");	ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_berserker2");	ASSET_3;
+			break;
+
 		case CLASS_KA_GUARDIAN:
-			pButton = (CN3UIButton* )GetChildByID("btn_berserker0");	ASSET_1
-			pButton = (CN3UIButton* )GetChildByID("btn_berserker1");	ASSET_2
-			pButton = (CN3UIButton* )GetChildByID("btn_berserker2");	ASSET_3
-			//pButton = (CN3UIButton* )GetChildByID("btn_berserker3");	ASSET_4
+			pButton = (CN3UIButton*) GetChildByID("btn_berserker0");	ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_berserker1");	ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_berserker2");	ASSET_3;
+			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
+			break;
+
+		case CLASS_KA_HUNTER:
+			pButton = (CN3UIButton*) GetChildByID("btn_hunter0");		ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_hunter1");		ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_hunter2");		ASSET_3;
 			break;
 
 		case CLASS_KA_PENETRATOR:
-		case CLASS_KA_HUNTER:
-			pButton = (CN3UIButton* )GetChildByID("btn_hunter0");		ASSET_1
-			pButton = (CN3UIButton* )GetChildByID("btn_hunter1");		ASSET_2
-			pButton = (CN3UIButton* )GetChildByID("btn_hunter2");		ASSET_3
-			//pButton = (CN3UIButton* )GetChildByID("btn_hunter3");		ASSET_4
+			pButton = (CN3UIButton*) GetChildByID("btn_hunter0");		ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_hunter1");		ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_hunter2");		ASSET_3;
+			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
 			break;
 
 		case CLASS_KA_SHAMAN:
+			pButton = (CN3UIButton*) GetChildByID("btn_shaman0");		ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_shaman1");		ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_shaman2");		ASSET_3;
+			break;
+
 		case CLASS_KA_DARKPRIEST:
-			pButton = (CN3UIButton* )GetChildByID("btn_shaman0");		ASSET_1
-			pButton = (CN3UIButton* )GetChildByID("btn_shaman1");		ASSET_2
-			pButton = (CN3UIButton* )GetChildByID("btn_shaman2");		ASSET_3
-			//pButton = (CN3UIButton* )GetChildByID("btn_shaman3");		ASSET_4
+			pButton = (CN3UIButton*) GetChildByID("btn_shaman0");		ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_shaman1");		ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_shaman2");		ASSET_3;
+			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
 			break;
 
 		case CLASS_KA_SORCERER:
+			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer0");		ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer1");		ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer2");		ASSET_3;
+			break;
+
 		case CLASS_KA_NECROMANCER:
-			pButton = (CN3UIButton* )GetChildByID("btn_sorcerer0");		ASSET_1
-			pButton = (CN3UIButton* )GetChildByID("btn_sorcerer1");		ASSET_2
-			pButton = (CN3UIButton* )GetChildByID("btn_sorcerer2");		ASSET_3
-			//pButton = (CN3UIButton* )GetChildByID("btn_sorcerer3");		ASSET_4
+			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer0");		ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer1");		ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer2");		ASSET_3;
+			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
 			break;
 
 		case CLASS_EL_BLADE:
+			pButton = (CN3UIButton*) GetChildByID("btn_blade0");		ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_blade1");		ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_blade2");		ASSET_3;
+			break;
+
 		case CLASS_EL_PROTECTOR:
-			pButton = (CN3UIButton* )GetChildByID("btn_blade0");	ASSET_1
-			pButton = (CN3UIButton* )GetChildByID("btn_blade1");	ASSET_2
-			pButton = (CN3UIButton* )GetChildByID("btn_blade2");	ASSET_3
-			//pButton = (CN3UIButton* )GetChildByID("btn_blade3");	ASSET_4
+			pButton = (CN3UIButton*) GetChildByID("btn_blade0");		ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_blade1");		ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_blade2");		ASSET_3;
+			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
 			break;
 
 		case CLASS_EL_RANGER:
+			pButton = (CN3UIButton*) GetChildByID("btn_ranger0");		ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_ranger1");		ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_ranger2");		ASSET_3;
+			break;
+
 		case CLASS_EL_ASSASIN:
-			pButton = (CN3UIButton* )GetChildByID("btn_ranger0");	ASSET_1
-			pButton = (CN3UIButton* )GetChildByID("btn_ranger1");	ASSET_2
-			pButton = (CN3UIButton* )GetChildByID("btn_ranger2");	ASSET_3
-			//pButton = (CN3UIButton* )GetChildByID("btn_ranger3");	ASSET_4
+			pButton = (CN3UIButton*) GetChildByID("btn_ranger0");		ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_ranger1");		ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_ranger2");		ASSET_3;
+			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
 			break;
 
 		case CLASS_EL_CLERIC:
+			pButton = (CN3UIButton*) GetChildByID("btn_cleric0");		ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_cleric1");		ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_cleric2");		ASSET_3;
+			break;
+
 		case CLASS_EL_DRUID:
-			pButton = (CN3UIButton* )GetChildByID("btn_cleric0");	ASSET_1
-			pButton = (CN3UIButton* )GetChildByID("btn_cleric1");	ASSET_2
-			pButton = (CN3UIButton* )GetChildByID("btn_cleric2");	ASSET_3
-			//pButton = (CN3UIButton* )GetChildByID("btn_cleric3");	ASSET_4
+			pButton = (CN3UIButton*) GetChildByID("btn_cleric0");		ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_cleric1");		ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_cleric2");		ASSET_3;
+			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
 			break;
 
 		case CLASS_EL_MAGE:
+			pButton = (CN3UIButton*) GetChildByID("btn_mage0");			ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_mage1");			ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_mage2");			ASSET_3;
+			break;
+
 		case CLASS_EL_ENCHANTER:
-			pButton = (CN3UIButton* )GetChildByID("btn_mage0");		ASSET_1
-			pButton = (CN3UIButton* )GetChildByID("btn_mage1");		ASSET_2
-			pButton = (CN3UIButton* )GetChildByID("btn_mage2");		ASSET_3
-			//pButton = (CN3UIButton* )GetChildByID("btn_mage3");		ASSET_4
+			pButton = (CN3UIButton*) GetChildByID("btn_mage0");		ASSET_1;
+			pButton = (CN3UIButton*) GetChildByID("btn_mage1");		ASSET_2;
+			pButton = (CN3UIButton*) GetChildByID("btn_mage2");		ASSET_3;
+			pButton = (CN3UIButton*) GetChildByID("btn_master");	ASSET_4;
 			break;
 	}
 }
@@ -1341,7 +1403,7 @@ void CUISkillTreeDlg::AddSkillToPage(__TABLE_UPC_SKILL* pUSkill, int iOffset, bo
 	int i, j;
 	bool bFound = false;
 
-	// m_pMySkillTree[iOffset]에 같은 아이디가 있는지 살펴본다..
+	// Check if the same ID exists for m_pMySkillTree[iOffset]
 	for( i = 0; i < MAX_SKILL_PAGE_NUM; i++ )
 		for ( j = 0; j < MAX_SKILL_IN_PAGE; j++ )
 		{
@@ -1352,7 +1414,7 @@ void CUISkillTreeDlg::AddSkillToPage(__TABLE_UPC_SKILL* pUSkill, int iOffset, bo
 			}
 		}
 
-	// m_pMySkillTree[iOffset]에 들어갈 수 있는지 살펴본다..
+	// Check if skill can be placed in m_pMySkillTree[iOffset]
 	for( i = 0; i < MAX_SKILL_PAGE_NUM; i++ )
 		for ( j = 0; j < MAX_SKILL_IN_PAGE; j++ )
 		{
@@ -1582,55 +1644,76 @@ void CUISkillTreeDlg::SetPageInIconRegion(int iKindOf, int iPageNum)		// 아이�
 	if(pStr) pStr->SetString(cstr);
 }
 
-void CUISkillTreeDlg::AllClearImageByName(const std::string& szFN, bool bTrueOrNot)
+void CUISkillTreeDlg::AllClearImageByName(const std::string& szFN, bool bVisible)
 {
-//	CN3UIImage* pImage;
 	CN3UIBase* pBase;
-	CN3UIButton* pButton;
-
 	std::string str;
-	char	cstr[4];
 
-	for ( int i = 0; i < 4; i++ )
+	for (int i = 0; i < 4; i++)
 	{
-		str = "img_";	str += szFN;	sprintf(cstr, "_%d", i);	str+= cstr;
+		str = "img_" + szFN + "_" + std::to_string(i);
+
 		pBase = GetChildByID(str);
-		if (pBase) pBase->SetVisible(bTrueOrNot);	
+		if (pBase != nullptr)
+			pBase->SetVisible(bVisible);
 	}
 
-	str = "img_";	str += szFN;
-	pBase = GetChildByID(str);
-	if (pBase) pBase->SetVisible(bTrueOrNot);
+	str = "img_" + szFN;
 
-	for (int i = 0; i < 4; i++ )
+	pBase = GetChildByID(str);
+	if (pBase != nullptr)
+		pBase->SetVisible(bVisible);
+
+	for (int i = 0; i < 4; i++)
 	{
-		str = "btn_";	str += szFN;	sprintf(cstr, "%d", i);	str+= cstr;
-		pButton = GetChildButtonByName(str);
-		if (pButton) pButton->SetVisible(bTrueOrNot);
+		str = "btn_" + szFN + std::to_string(i);
+
+		CN3UIButton* pButton = GetChildButtonByName(str);
+		if (pButton != nullptr)
+			pButton->SetVisible(bVisible);
 	}
 }
 
-void CUISkillTreeDlg::SetPageInCharRegion()						// 문자 역역에서 현재 페이지 설정..
+void CUISkillTreeDlg::AllClearImageByNameMaster(const std::string& szFN, bool bVisible)
 {
-	
+	CN3UIBase* pBase;
+	CN3UIButton* pButton;
+	std::string str;
+
+	pBase = GetChildByID("img_master");
+	if (pBase != nullptr)
+		pBase->SetVisible(bVisible);
+
+	pButton = GetChildButtonByName("btn_master");
+	if (pButton != nullptr)
+		pButton->SetVisible(bVisible);
+
+	str = "img_" + szFN;
+	pBase = GetChildByID(str);
+	if (pBase != nullptr)
+		pBase->SetVisible(bVisible);
+}
+
+// 문자 역역에서 현재 페이지 설정..
+void CUISkillTreeDlg::SetPageInCharRegion()
+{
 	AllClearImageByName("public", false);
 
-	switch ( CGameBase::s_pPlayer->m_InfoBase.eNation )
+	switch (CGameBase::s_pPlayer->m_InfoBase.eNation)
 	{
-		
-		case NATION_KARUS:			// 카루스..
-			AllClearImageByName("hunter", false);  
+		// 카루스..
+		case NATION_KARUS:
 			AllClearImageByName("berserker", false);
+			AllClearImageByNameMaster("Berserker Hero", false);
+			AllClearImageByName("hunter", false);
+			AllClearImageByNameMaster("Shadow Bane", false);
 			AllClearImageByName("sorcerer", false);
+			AllClearImageByNameMaster("Elemental Lord", false);
 			AllClearImageByName("shaman", false);
-			AllClearImageByName("Shadow Knight",false);
-			AllClearImageByName("Berserker Hero", false);
-			AllClearImageByName("Elemental Lord", false);
-			AllClearImageByName("Shadow Bane", false);
-			
+			AllClearImageByNameMaster("Shadow Knight", false);
 
 			// 직업.. 
-			switch ( CGameBase::s_pPlayer->m_InfoBase.eClass )
+			switch (CGameBase::s_pPlayer->m_InfoBase.eClass)
 			{
 				case CLASS_KA_WARRIOR:
 				case CLASS_KA_ROGUE:
@@ -1656,39 +1739,36 @@ void CUISkillTreeDlg::SetPageInCharRegion()						// 문자 역역에서 현재 �
 					break;
 
 				case CLASS_KA_GUARDIAN:
-					AllClearImageByName("berserker", true);
-					AllClearImageByName("Berserker Hero", true);
+					AllClearImageByNameMaster("Berserker Hero", true);
 					break;
 
 				case CLASS_KA_PENETRATOR:
-					AllClearImageByName("hunter", true);
-					AllClearImageByName("Shadow Bane", true);
+					AllClearImageByNameMaster("Shadow Bane", true);
 					break;
 
 				case CLASS_KA_NECROMANCER:
-					AllClearImageByName("sorcerer", true);
-					AllClearImageByName("Elemental Lord", true);
+					AllClearImageByNameMaster("Elemental Lord", true);
 					break;
 
 				case CLASS_KA_DARKPRIEST:
-					AllClearImageByName("shaman", true);
-					AllClearImageByName("Shadow Knight", true);
+					AllClearImageByNameMaster("Shadow Knight", true);
 					break;
 			}
 			break;
 
-		case NATION_ELMORAD:		// 엘모라도..
-			AllClearImageByName("ranger", false);
+		// 엘모라도..
+		case NATION_ELMORAD:
 			AllClearImageByName("blade", false);
+			AllClearImageByNameMaster("Blade Master", false);
+			AllClearImageByName("ranger", false);
+			AllClearImageByNameMaster("Kasar Hood", false);
 			AllClearImageByName("mage", false);
+			AllClearImageByNameMaster("Arc Mage", false);
 			AllClearImageByName("cleric", false);
-			AllClearImageByName("Blade Master", false);
-			AllClearImageByName("Kasar Hood", false);
-			AllClearImageByName("Arc Mage", false);
-			AllClearImageByName("Paladin", false);
+			AllClearImageByNameMaster("Paladin", false);
 
 			// 직업.. 
-			switch ( CGameBase::s_pPlayer->m_InfoBase.eClass )
+			switch (CGameBase::s_pPlayer->m_InfoBase.eClass)
 			{
 				case CLASS_EL_WARRIOR:
 				case CLASS_EL_ROGUE:
@@ -1714,29 +1794,22 @@ void CUISkillTreeDlg::SetPageInCharRegion()						// 문자 역역에서 현재 �
 					break;
 
 				case CLASS_EL_PROTECTOR:
-					AllClearImageByName("blade", true);
-					AllClearImageByName("Blade Master", true);
+					AllClearImageByNameMaster("Blade Master", true);
 					break;
 
 				case CLASS_EL_ASSASIN:
-					AllClearImageByName("ranger", true);
-					AllClearImageByName("Kasar Hood", true);
+					AllClearImageByNameMaster("Kasar Hood", true);
 					break;
-					
+
 				case CLASS_EL_ENCHANTER:
-					AllClearImageByName("mage", true);
-					AllClearImageByName("Arc Mage", true);
+					AllClearImageByNameMaster("Arc Mage", true);
 					break;
 
 				case CLASS_EL_DRUID:
-					AllClearImageByName("cleric", true);
-					AllClearImageByName("Paladin", true);
+					AllClearImageByNameMaster("Paladin", true);
 					break;
-
 			}
-			break;
 	}
-	
 }
 
 CN3UIImage*	CUISkillTreeDlg::GetChildImageByName(const std::string& szID)
