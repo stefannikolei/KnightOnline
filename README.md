@@ -55,10 +55,10 @@ Solutions are available in the root directory:
 
 Currently we have:
 * `Client.sln` - for just the client project (WarFare) and its dependencies.
-* `ClientTools.sln` - for just the client tool projects (KscViewer) and their dependencies.
+* `ClientTools.sln` - for just the client tool projects (KscViewer, Launcher, Option) and their dependencies.
 * `Server.sln` - for just the server projects (AIServer, Aujard, Ebenezer, ItemManager, VersionManager) and their dependencies.
 * `Tools.sln` - for just the tool projects (ItemEditor, N3CE, N3FXE, N3ME, N3TexViewer, N3Viewer, SkyViewer,  TblEditor, UIE) and their dependencies.
-* `All.sln` - intended to house all of the various solutions, although at the current time we do not include some client projects such as the Launcher or Options editor (these are instead found in their respective folders).
+* `All.sln` - all of the various projects.
 
 ## Goals
 
