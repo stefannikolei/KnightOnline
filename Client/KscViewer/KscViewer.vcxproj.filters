@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\JPEG\JpegFile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="KscViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -43,9 +40,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\JPEG\JpegFile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="KscViewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>

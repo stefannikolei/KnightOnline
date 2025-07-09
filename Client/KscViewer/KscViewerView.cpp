@@ -6,7 +6,7 @@
 
 #include "KscViewerDoc.h"
 #include "KscViewerView.h"
-#include "..\WarFare\JpegFile.h"
+#include <JpegFile/JpegFile.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

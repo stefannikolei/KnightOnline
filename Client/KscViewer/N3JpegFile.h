@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "..\WarFare\JpegFile.h"
+#include <JpegFile/JpegFile.h>
 
 class CN3JpegFile  : public CJpegFile
 {

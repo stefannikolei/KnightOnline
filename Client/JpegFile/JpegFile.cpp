@@ -10,7 +10,7 @@
 //	See jpegfile.h for usage.
 //
 ////////////////////////////////////////////////////////////
-#include "StdAfx.h"
+#include <Windows.h>
 #include "JpegFile.h"
 
 #include <assert.h>
@@ -1197,7 +1197,7 @@ HANDLE CJpegFile::AllocRoomForDIB(BITMAPINFOHEADER bi, HBITMAP hBitmap)
 
 HDIB FAR CJpegFile::ChangeBitmapFormat(HBITMAP  hBitmap, WORD     wBitCount, DWORD    dwCompression, HPALETTE hPal)
 {
-	HDC                hDC;          // Screen DC
+	HDC                hDC = nullptr;// Screen DC
 	HDIB               hNewDIB=NULL; // Handle to new DIB
 	BITMAP             Bitmap;       // BITMAP data structure
 	BITMAPINFOHEADER   bi;           // Bitmap info. header
