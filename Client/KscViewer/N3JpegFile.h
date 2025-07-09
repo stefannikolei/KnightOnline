@@ -1,4 +1,4 @@
-// N3JpegFile.h: interface for the CN3JpegFile class.
+﻿// N3JpegFile.h: interface for the CN3JpegFile class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "..\\JPEG\\JpegFile.h"
+#include "..\WarFare\JpegFile.h"
 
 class CN3JpegFile  : public CJpegFile
 {

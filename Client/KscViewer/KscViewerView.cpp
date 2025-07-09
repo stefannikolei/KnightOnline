@@ -1,4 +1,4 @@
-// KscViewerView.cpp : implementation of the CKscViewerView class
+﻿// KscViewerView.cpp : implementation of the CKscViewerView class
 //
 
 #include "stdafx.h"
@@ -6,7 +6,7 @@
 
 #include "KscViewerDoc.h"
 #include "KscViewerView.h"
-#include "..\\JPEG\\JpegFile.h"
+#include "..\WarFare\JpegFile.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
