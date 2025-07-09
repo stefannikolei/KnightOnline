@@ -15,5 +15,10 @@
     <LinkIncremental>false</LinkIncremental>
     <LinkIncremental Condition="$(Configuration.Contains('Debug'))">true</LinkIncremental>
   </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalLibraryDirectories>$(OutDir);$(RootDir)lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
   <ImportGroup Label="PropertySheets" />
 </Project>

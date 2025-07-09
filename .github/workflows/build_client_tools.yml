@@ -3,14 +3,14 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Build client
+name: Build client tools
 
 on:
   push:
     branches:
     - master
 
-    # This specifically builds only the client (KnightOnline.exe) project.
+    # This specifically builds only the client tool projects.
     # Everything else can be ignored.
     paths:
       - 'props/**'
@@ -18,16 +18,17 @@ on:
       - 'deps/libjpeg-turbo/**'
       - 'deps/libjpeg-turbo-msvc/**'
       - 'Client/JpegFile/**'
-      - 'Client/N3Base/**'
-      - 'Client/WarFare/**'
-      - 'Server/shared/**'
-      - 'Client.sln'
+      - 'Client/KscViewer/**'
+      - 'Client/Launcher/**'
+      - 'Client/Option/**'
+      - 'ClientTools.sln'
+      - 'ThirdParty.sln'
 
   pull_request:
     branches:
     - master
 
-    # This specifically builds only the client (KnightOnline.exe) project.
+    # This specifically builds only the client tool projects.
     # Everything else can be ignored.
     paths:
       - 'props/**'
@@ -35,12 +36,13 @@ on:
       - 'deps/libjpeg-turbo/**'
       - 'deps/libjpeg-turbo-msvc/**'
       - 'Client/JpegFile/**'
-      - 'Client/N3Base/**'
-      - 'Client/WarFare/**'
-      - 'Server/shared/**'
-      - 'Client.sln'
+      - 'Client/KscViewer/**'
+      - 'Client/Launcher/**'
+      - 'Client/Option/**'
+      - 'ClientTools.sln'
+      - 'ThirdParty.sln'
  
-  merge_group:
+  merge_group: 
   workflow_dispatch:
     
 env:
@@ -48,6 +50,7 @@ env:
   BUILD_CONFIGURATION: Debug
   BUILD_PLATFORM: Win32
 
+# These should really be moved into the one solution.
 jobs:
   build:
     runs-on: windows-latest
@@ -59,6 +62,6 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
 
-    - name: Build client
+    - name: Build tools
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: msbuild /p:Configuration="${{env.BUILD_CONFIGURATION}}" /p:Platform="${{env.BUILD_PLATFORM}}" /p:NO_CLIENT_ASSETS="1" Client.sln
+      run: msbuild /p:Configuration="${{env.BUILD_CONFIGURATION}}" /p:Platform="${{env.BUILD_PLATFORM}}" ClientTools.sln

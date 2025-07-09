@@ -27,7 +27,6 @@ on:
       - 'Client/N3Base/My_3DStruct.h'
       - 'Client/N3Base/N3ShapeMgr.h'
       - 'Client/N3Base/N3ShapeMgr.cpp'
-      - 'All.sln'
       - 'Server.sln'
       - 'ThirdParty.sln'
 
@@ -52,7 +51,6 @@ on:
       - 'Client/N3Base/My_3DStruct.h'
       - 'Client/N3Base/N3ShapeMgr.h'
       - 'Client/N3Base/N3ShapeMgr.cpp'
-      - 'All.sln'
       - 'Server.sln'
       - 'ThirdParty.sln'
  

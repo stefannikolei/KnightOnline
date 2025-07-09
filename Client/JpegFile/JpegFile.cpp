@@ -10,8 +10,10 @@
 //	See jpegfile.h for usage.
 //
 ////////////////////////////////////////////////////////////
-#include "StdAfx.h"
+#include <Windows.h>
 #include "JpegFile.h"
+
+#include <assert.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -802,7 +804,7 @@ int FAR CJpegFile::PalEntriesOnDevice(HDC hDC)
 	 */
 	if (!nColors)
 		nColors = GetDeviceCaps(hDC, NUMCOLORS);
-	__ASSERT(nColors, "GetDeviceCaps() Fail");
+	assert(nColors);
 	return nColors;
 }
 
@@ -1195,7 +1197,7 @@ HANDLE CJpegFile::AllocRoomForDIB(BITMAPINFOHEADER bi, HBITMAP hBitmap)
 
 HDIB FAR CJpegFile::ChangeBitmapFormat(HBITMAP  hBitmap, WORD     wBitCount, DWORD    dwCompression, HPALETTE hPal)
 {
-	HDC                hDC;          // Screen DC
+	HDC                hDC = nullptr;// Screen DC
 	HDIB               hNewDIB=NULL; // Handle to new DIB
 	BITMAP             Bitmap;       // BITMAP data structure
 	BITMAPINFOHEADER   bi;           // Bitmap info. header
@@ -1451,7 +1453,7 @@ WORD FAR CJpegFile::SaveDIB(HDIB hDib, LPSTR lpFileName)
 	{
 		encrypt_data[j] = Encrypt(*((BYTE *)lpBI + i));
 	}
-	__ASSERT(j == encrypt_len, "Size Different");
+	assert(j == encrypt_len);
 	WriteFile(fh, (LPCVOID)encrypt_data, encrypt_len, &nWritten, NULL);
 	/* Write the file header */
 //	WriteFile(fh, (LPCVOID)&bmfHdr, sizeof(BITMAPFILEHEADER), &nWritten, NULL);

@@ -52,6 +52,7 @@ IF "$(NO_CLIENT_ASSETS)"=="" (
 	CALL "$(RootDir)build_scripts\build_dependency.cmd" "$(DependencyName)" "$(LocalDependencyDir)" "$(Configuration)" "$(Platform)" "$(VCToolsVersion)" "$(RealProjectPath)"
 )
     </NMakeReBuildCommandLine>
+	<NMakeCleanCommandLine>ECHO Skipping clean...</NMakeCleanCommandLine>
   </PropertyGroup>
   <ItemGroup>
   </ItemGroup>
