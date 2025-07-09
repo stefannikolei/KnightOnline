@@ -26,7 +26,6 @@ on:
       - 'UIE/**'
       - 'Server/shared/**'
       - 'Client/N3Base/**'
-      - 'All.sln'
       - 'Tools.sln'
       - 'ThirdParty.sln'
 
@@ -50,7 +49,6 @@ on:
       - 'UIE/**'
       - 'Server/shared/**'
       - 'Client/N3Base/**'
-      - 'All.sln'
       - 'Tools.sln'
       - 'ThirdParty.sln'
  
