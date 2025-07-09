@@ -141,6 +141,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KscViewer", "Client\KscView
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client tools", "client tools", "{D754A6DF-7CD9-4A54-82AA-B31C5AF65C23}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Launcher", "Client\Launcher\Launcher.vcxproj", "{03AF3BCF-B1A8-49F3-840E-10642257873A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6E97FD6E-7530-4BE3-B8E6-9E17ED45CD45} = {6E97FD6E-7530-4BE3-B8E6-9E17ED45CD45}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -249,6 +254,10 @@ Global
 		{4EC5FE5E-13CF-4568-93CD-4B4BA52C90AF}.Debug|Win32.Build.0 = Debug|Win32
 		{4EC5FE5E-13CF-4568-93CD-4B4BA52C90AF}.Release|Win32.ActiveCfg = Release|Win32
 		{4EC5FE5E-13CF-4568-93CD-4B4BA52C90AF}.Release|Win32.Build.0 = Release|Win32
+		{03AF3BCF-B1A8-49F3-840E-10642257873A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{03AF3BCF-B1A8-49F3-840E-10642257873A}.Debug|Win32.Build.0 = Debug|Win32
+		{03AF3BCF-B1A8-49F3-840E-10642257873A}.Release|Win32.ActiveCfg = Release|Win32
+		{03AF3BCF-B1A8-49F3-840E-10642257873A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -282,6 +291,7 @@ Global
 		{56988836-40F9-F81D-C8B4-4DC1CE5901E2} = {6EEB718D-CCE4-446E-A0BE-172669B7BC98}
 		{E3CE5B4F-97BC-46B1-B36D-25AB39D4A3F9} = {657121FA-968C-4276-9AA6-EC6692DC6465}
 		{4EC5FE5E-13CF-4568-93CD-4B4BA52C90AF} = {D754A6DF-7CD9-4A54-82AA-B31C5AF65C23}
+		{03AF3BCF-B1A8-49F3-840E-10642257873A} = {D754A6DF-7CD9-4A54-82AA-B31C5AF65C23}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D9937074-3E07-4102-9EF1-BE6E87CF35E4}
