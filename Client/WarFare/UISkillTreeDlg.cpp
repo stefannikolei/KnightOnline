@@ -997,20 +997,15 @@ void CUISkillTreeDlg::TooltipRenderEnable(__IconItemSkill* spSkill)
 
 	// Basic skills
 	if ((spSkill->pSkill->iNeedSkill % 10) == 0)
-	{
 		CGameBase::GetTextF(IDS_SKILL_TOOLTIP_NEED_LEVEL, &szStr, spSkill->pSkill->iNeedLevel);
-		m_pStr_skill_point->SetString(szStr);
-		szStr.clear();
-	}
 	// 2nd job and master skills
 	else
-	{
 		CGameBase::GetTextF(IDS_SKILL_TOOLTIP_NEED_SKILL_PT, &szStr, spSkill->pSkill->iNeedLevel);
-		m_pStr_skill_point->SetString(szStr);
-		szStr.clear();
-	}
 
-	// Tooltip - required item (eg.weapon)
+	m_pStr_skill_point->SetString(szStr);
+	szStr.clear();
+
+	// Tooltip - required item (e.g. weapon)
 	if (!m_pStr_skill_item0->IsVisible())
 		m_pStr_skill_item0->SetVisible(true);
 
@@ -1055,10 +1050,11 @@ void CUISkillTreeDlg::TooltipRenderEnable(__IconItemSkill* spSkill)
 			default:	CGameBase::GetText(IDS_SKILL_TOOLTIP_NEED_ITEM_NO,	 &szStr); break;
 		}
 	}
+
 	m_pStr_skill_item0->SetString(szStr);
 	szStr.clear();
 
-	// Tooltip - item required (eg. scroll or arrows)
+	// Tooltip - item required (e.g. scroll or arrows)
 	if (!m_pStr_skill_item1->IsVisible())
 		m_pStr_skill_item1->SetVisible(true);
 
