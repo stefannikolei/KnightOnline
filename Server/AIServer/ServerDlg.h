@@ -12,7 +12,6 @@
 #include "GameSocket.h"
 
 #include "MAP.h"
-#include "NpcTable.h"
 #include "NpcItem.h"
 #include "Pathfind.h"
 #include "User.h"
@@ -21,7 +20,7 @@
 #include "Server.h"
 #include "Party.h"
 
-#include "extern.h"			// 전역 객체
+#include "Extern.h"			// 전역 객체
 
 #include "resource.h"
 
@@ -29,23 +28,28 @@
 #include <vector>
 #include <list>
 
+namespace recordset_loader
+{
+	struct Error;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CServerDlg dialog
 
 typedef std::vector <CNpcThread*>			NpcThreadArray;
-typedef CSTLMap <CNpcTable>					NpcTableArray;
+typedef CSTLMap <model::Npc>				NpcTableArray;
 typedef CSTLMap <CNpc>						NpcArray;
-typedef CSTLMap <_MAGIC_TABLE>				MagictableArray;
-typedef CSTLMap <_MAGIC_TYPE1>				Magictype1Array;
-typedef CSTLMap <_MAGIC_TYPE2>				Magictype2Array;
-typedef CSTLMap <_MAGIC_TYPE3>				Magictype3Array;
-typedef CSTLMap	<_MAGIC_TYPE4>				Magictype4Array;
+typedef CSTLMap <model::Magic>				MagictableArray;
+typedef CSTLMap <model::MagicType1>			Magictype1Array;
+typedef CSTLMap <model::MagicType2>			Magictype2Array;
+typedef CSTLMap <model::MagicType3>			Magictype3Array;
+typedef CSTLMap	<model::MagicType4>			Magictype4Array;
 typedef CSTLMap <_PARTY_GROUP>				PartyArray;
-typedef CSTLMap <_MAKE_WEAPON>				MakeWeaponItemTableArray;
-typedef CSTLMap <_MAKE_ITEM_GRADE_CODE>		MakeGradeItemTableArray;
-typedef CSTLMap <_MAKE_ITEM_LARE_CODE>		MakeLareItemTableArray;
+typedef CSTLMap <model::MakeWeapon>			MakeWeaponItemTableArray;
+typedef CSTLMap <model::MakeItemGradeCode>	MakeGradeItemTableArray;
+typedef CSTLMap <model::MakeItemRareCode>	MakeLareItemTableArray;
 typedef std::list <int>						ZoneNpcInfoList;
-typedef std::vector <MAP*>				ZoneArray;
+typedef std::vector <MAP*>					ZoneArray;
 
 /*
 	 ** Repent AI Server 작업시 참고 사항 **
@@ -59,7 +63,9 @@ class CServerDlg : public CDialog
 {
 private:
 	void ResumeAI();
+	BOOL LoadNpcPosTable(std::vector<model::NpcPos*>& rows);
 	BOOL CreateNpcThread();
+	void ReportTableLoadError(const recordset_loader::Error& err, const char* source);
 	BOOL GetMagicTableData();
 	BOOL GetMagicType1Data();
 	BOOL GetMagicType2Data();
@@ -102,9 +108,9 @@ public:
 	void ResetBattleZone();
 	MAP* GetMapByIndex(int iZoneIndex) const;
 	MAP* GetMapByID(int iZoneID) const;
-	CString GetGameDBConnectionString();
 
 	CServerDlg(CWnd* pParent = nullptr);	// standard constructor
+	~CServerDlg();
 
 	static inline CServerDlg* GetInstance() {
 		return s_pInstance;
@@ -190,10 +196,6 @@ private:
 	// ~패킷 압축에 필요 변수   -------------
 
 	BYTE				m_byZone;
-
-	TCHAR				m_strGameDSN[24];
-	TCHAR				m_strGameUID[24];
-	TCHAR				m_strGamePWD[24];
 
 // Implementation
 protected:

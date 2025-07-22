@@ -1,16 +1,21 @@
 ﻿#ifndef _DEFINE_H
 #define _DEFINE_H
 
+#if defined(_DEBUG)
+#include <iostream>
+#endif
 #include <string>
 #include <mmsystem.h>
 
 #include <shared/globals.h>
 #include <shared/StringConversion.h>
+#include <shared/STLMap.h>
 
-constexpr int MAX_USER			= 3000;
+constexpr int MAX_USER				= 3000;
 
-#define _LISTEN_PORT			15100
-#define CLIENT_SOCKSIZE			10
+constexpr int _LISTEN_PORT			= 15100;
+constexpr int CLIENT_SOCKSIZE		= 10;
+constexpr int DB_PROCESS_TIMEOUT	= 100;
 
 ////////////////////////////////////////////////////////////
 // Socket Define
@@ -56,18 +61,13 @@ typedef union
 	BYTE		b[4];
 } MYDWORD;
 
+import VersionManagerModel;
+namespace model = versionmanager_model; 
+
 struct _NEWS
 {
 	char Content[4096]	= {};
 	short Size			= 0;
-};
-
-struct _VERSION_INFO
-{
-	short		sVersion;
-	short		sHistoryVersion;
-	std::string	strFileName;
-	std::string	strCompName;
 };
 
 struct _SERVER_INFO
@@ -78,6 +78,8 @@ struct _SERVER_INFO
 	short	sUserLimit			= 0;
 	short	sServerID			= 1;
 };
+
+typedef CSTLMap <model::Version>	VersionInfoList;
 
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -202,7 +204,8 @@ inline void LogFileWrite(const TCHAR* logstr)
 {
 	CString LogFileName;
 	LogFileName.Format(_T("%s\\Login.log"), GetProgPath().GetString());
-
+	
+	
 	CFile file;
 	if (!file.Open(LogFileName, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite))
 		return;
@@ -211,12 +214,24 @@ inline void LogFileWrite(const TCHAR* logstr)
 
 #if defined(_UNICODE)
 	const std::string utf8 = WideToUtf8(logstr, wcslen(logstr));
+#if defined(_DEBUG)
+	std::cout << "using query: " << utf8 << '\n';
+#endif
 	file.Write(utf8.c_str(), static_cast<int>(utf8.size()));
 #else
+#if defined(_DEBUG)
+	std::cout << "using query: " << logstr << '\n';
+#endif
 	file.Write(logstr, strlen(logstr));
 #endif
 
 	file.Close();
+}
+
+inline void LogFileWrite(const std::string& logStr)
+{
+	CString clog = logStr.c_str();
+	LogFileWrite(clog);
 }
 
 inline int DisplayErrorMsg(SQLHANDLE hstmt)
@@ -240,6 +255,25 @@ inline int DisplayErrorMsg(SQLHANDLE hstmt)
 		return -1;
 
 	return 0;
+}
+
+// ini config variable names
+namespace ini
+{
+	// ODBC Config Section
+	static constexpr char ODBC[] = "ODBC";
+	static constexpr char DSN[] = "DSN";
+	static constexpr char UID[] = "UID";
+	static constexpr char PWD[] = "PWD";
+	static constexpr char TABLE[] = "TABLE";
+
+	// CONFIGURATION section
+	static constexpr char CONFIGURATION[] = "CONFIGURATION";
+	static constexpr char DEFAULT_PATH[] = "DEFAULT_PATH";
+
+	// SERVER_LIST section
+	static constexpr char SERVER_LIST[] = "SERVER_LIST";
+	static constexpr char COUNT[] = "COUNT";
 }
 
 #endif

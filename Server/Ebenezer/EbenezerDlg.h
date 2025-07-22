@@ -26,26 +26,31 @@
 
 #include "resource.h"
 
+namespace recordset_loader
+{
+	struct Error;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CEbenezerDlg dialog
 
 typedef std::vector <C3DMap*>				ZoneArray;
-typedef std::vector <_LEVELUP*>				LevelUpArray;
-typedef CSTLMap <_CLASS_COEFFICIENT>		CoefficientArray;
-typedef CSTLMap <_ITEM_TABLE>				ItemtableArray;
-typedef CSTLMap <_MAGIC_TABLE>				MagictableArray;
-typedef CSTLMap <_MAGIC_TYPE1>				Magictype1Array;
-typedef CSTLMap <_MAGIC_TYPE2>				Magictype2Array;
-typedef CSTLMap <_MAGIC_TYPE3>				Magictype3Array;
-typedef CSTLMap	<_MAGIC_TYPE4>				Magictype4Array;
-typedef CSTLMap <_MAGIC_TYPE5>				Magictype5Array;
-typedef CSTLMap <_MAGIC_TYPE8>				Magictype8Array;
+typedef std::vector <model::LevelUp*>		LevelUpArray;
+typedef CSTLMap <model::Coefficient>		CoefficientArray;
+typedef CSTLMap <model::Item>				ItemtableArray;
+typedef CSTLMap <model::Magic>				MagictableArray;
+typedef CSTLMap <model::MagicType1>			Magictype1Array;
+typedef CSTLMap <model::MagicType2>			Magictype2Array;
+typedef CSTLMap <model::MagicType3>			Magictype3Array;
+typedef CSTLMap	<model::MagicType4>			Magictype4Array;
+typedef CSTLMap <model::MagicType5>			Magictype5Array;
+typedef CSTLMap <model::MagicType8>			Magictype8Array;
 typedef CSTLMap <CNpc>						NpcArray;
 typedef CSTLMap <CAISocket>					AISocketArray;
 typedef CSTLMap <_PARTY_GROUP>				PartyArray;
 typedef CSTLMap <CKnights>					KnightsArray;
 typedef CSTLMap <_ZONE_SERVERINFO>			ServerArray;
-typedef CSTLMap <_HOME_INFO>				HomeArray;
+typedef CSTLMap <model::Home>				HomeArray;
 typedef	CSTLMap	<EVENT>						QuestArray;
 
 enum class NameType
@@ -63,7 +68,6 @@ public:
 		return s_pInstance;
 	}
 
-	CString GetGameDBConnectionString();
 	C3DMap* GetMapByID(int iZoneID) const;
 	C3DMap* GetMapByIndex(int iZoneIndex) const;
 	void WriteEventLog(char* pBuf);
@@ -123,6 +127,7 @@ public:
 	BOOL LoadCoefficientTable();
 	BOOL LoadMagicTable();
 	BOOL LoadItemTable();
+	void ReportTableLoadError(const recordset_loader::Error& err, const char* source);
 	BOOL MapFileLoad();
 	void UserAcceptThread();
 	// sungyong 2001.11.06
@@ -141,7 +146,9 @@ public:
 	void Send_All(char* pBuf, int len, CUser* pExceptUser = nullptr, int nation = 0);	// pointer != NULL don`t send to that user pointer
 	void Send_AIServer(int zone, char* pBuf, int len);
 	static CUser* GetUserPtr(const char* userid, NameType type);
+
 	CEbenezerDlg(CWnd* pParent = nullptr);	// standard constructor
+	~CEbenezerDlg();
 
 	static CEbenezerDlg* s_pInstance;
 	static CIOCPort	m_Iocport;
@@ -251,10 +258,6 @@ public:
 	CFile				m_RegionLogFile;
 	CFile				m_LogFile;
 	CFile				m_EvnetLogFile;
-
-	TCHAR				m_strGameDSN[24];
-	TCHAR				m_strGameUID[24];
-	TCHAR				m_strGamePWD[24];
 
 // Dialog Data
 	//{{AFX_DATA(CEbenezerDlg)

@@ -5,26 +5,12 @@
 #include "EbenezerDlg.h"
 #include "User.h"
 
-#include "ItemTableSet.h"
-#include "MagicTableSet.h"
-#include "MagicType1Set.h"
-#include "MagicType2Set.h"
-#include "MagicType3Set.h"
-#include "MagicType4Set.h"
-#include "MagicType5Set.h"
-#include "MagicType8Set.h"
-#include "ZoneInfoSet.h"
-#include "CoefficientSet.h"
-#include "LevelUpTableSet.h"
-#include "KnightsSet.h"
-#include "KnightsUserSet.h"
-#include "KnightsRankSet.h"
-#include "HomeSet.h"
-#include "BattleSet.h"
-
 #include <shared/crc32.h>
 #include <shared/lzf.h>
 #include <shared/packets.h>
+#include <shared/StringUtils.h>
+
+#include <db-library/ConnectionManager.h>
 
 constexpr int GAME_TIME       	= 100;
 constexpr int SEND_TIME			= 200;
@@ -40,6 +26,14 @@ constexpr int AWARD_GOLD          = 5000;
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+// NOTE: Explicitly handled under DEBUG_NEW override
+#include <db-library/RecordSetLoader_STLMap.h>
+#include <db-library/RecordSetLoader_Vector.h>
+
+import EbenezerBinder;
+
+using namespace db;
 
 CRITICAL_SECTION g_serial_critical;
 CRITICAL_SECTION g_region_critical;
@@ -271,11 +265,14 @@ CEbenezerDlg::CEbenezerDlg(CWnd* pParent /*=nullptr*/)
 	memset(m_strKarusCaptain, 0, sizeof(m_strKarusCaptain));
 	memset(m_strElmoradCaptain, 0, sizeof(m_strElmoradCaptain));
 
-	memset(m_strGameDSN, 0, sizeof(m_strGameDSN));
-	memset(m_strGameUID, 0, sizeof(m_strGameUID));
-	memset(m_strGamePWD, 0, sizeof(m_strGamePWD));
-
 	m_bSanta = FALSE;		// 갓댐 산타!!! >.<
+
+	ConnectionManager::Create();
+}
+
+CEbenezerDlg::~CEbenezerDlg()
+{
+	ConnectionManager::Destroy();
 }
 
 void CEbenezerDlg::DoDataExchange(CDataExchange* pDX)
@@ -659,7 +656,7 @@ BOOL CEbenezerDlg::DestroyWindow()
 		delete pMap;
 	m_ZoneArray.clear();
 
-	for (_LEVELUP* pLevelUp : m_LevelUpArray)
+	for (model::LevelUp* pLevelUp : m_LevelUpArray)
 		delete pLevelUp;
 	m_LevelUpArray.clear();
 
@@ -1143,184 +1140,103 @@ BOOL CEbenezerDlg::InitializeMMF()
 
 BOOL CEbenezerDlg::MapFileLoad()
 {
-	CFile file;
-	CString szFullPath, errormsg;
+	using ModelType = model::ZoneInfo;
 
-	CZoneInfoSet ZoneInfoSet;
+	BOOL loaded = FALSE;
 
-	if (!ZoneInfoSet.Open())
+	recordset_loader::Base<ModelType> loader;
+	loader.SetProcessFetchCallback([&](db::ModelRecordSet<ModelType>& recordset)
 	{
-		AfxMessageBox(_T("ZoneInfoTable Open Fail!"));
-		return FALSE;
-	}
+		CString szFullPath, errormsg;
 
-	if (ZoneInfoSet.IsBOF()
-		|| ZoneInfoSet.IsEOF())
-	{
-		AfxMessageBox(_T("ZoneInfoTable Empty!"));
-		return FALSE;
-	}
+		m_ZoneArray.reserve(10);
 
-	m_ZoneArray.reserve(10);
+		// Build the base MAP directory
+		std::filesystem::path mapDir(GetProgPath().GetString());
+		mapDir /= MAP_DIR;
 
-	// Build the base MAP directory
-	std::filesystem::path mapDir(GetProgPath().GetString());
-	mapDir /= MAP_DIR;
+		// Resolve it to strip the relative references to be nice.
+		if (std::filesystem::exists(mapDir))
+			mapDir = std::filesystem::canonical(mapDir);
 
-	// Resolve it to strip the relative references to be nice.
-	if (std::filesystem::exists(mapDir))
-		mapDir = std::filesystem::canonical(mapDir);
-
-	ZoneInfoSet.MoveFirst();
-
-	while (!ZoneInfoSet.IsEOF())
-	{
-		std::filesystem::path mapPath
-			= mapDir / ZoneInfoSet.m_strZoneName.GetString();
-
-		szFullPath.Format(_T("%ls"), mapPath.c_str());
-
-		if (!file.Open(szFullPath, CFile::modeRead))
+		do
 		{
-			errormsg.Format(_T("File Open Fail - %s\n"), szFullPath);
-			AfxMessageBox(errormsg);
-			return FALSE;
-		}
+			ModelType row = {};
+			recordset.get_ref(row);
 
-		C3DMap* pMap = new C3DMap;
+			std::filesystem::path mapPath
+				= mapDir / row.Name;
 
-		pMap->m_nServerNo = ZoneInfoSet.m_ServerNo;
-		pMap->m_nZoneNumber = ZoneInfoSet.m_ZoneNo;
-		strcpy(pMap->m_MapName, CT2A(ZoneInfoSet.m_strZoneName));
-		pMap->m_fInitX = (float) (ZoneInfoSet.m_InitX / 100.0);
-		pMap->m_fInitZ = (float) (ZoneInfoSet.m_InitZ / 100.0);
-		pMap->m_fInitY = (float) (ZoneInfoSet.m_InitY / 100.0);
-		pMap->m_bType = ZoneInfoSet.m_Type;
+			szFullPath.Format(_T("%ls"), mapPath.c_str());
 
-		if (!pMap->LoadMap(file.m_hFile))
-		{
-			errormsg.Format(_T("Map Load Fail - %s\n"), szFullPath);
-			AfxMessageBox(errormsg);
-			delete pMap;
-			return FALSE;
-		}
+			CFile file;
+			if (!file.Open(szFullPath, CFile::modeRead))
+			{
+				errormsg.Format(_T("File Open Fail - %s\n"), szFullPath);
+				AfxMessageBox(errormsg);
+				return;
+			}
 
-		m_ZoneArray.push_back(pMap);
+			C3DMap* pMap = new C3DMap();
 
-		// 스트립트를 읽어 들인다.
-		EVENT* pEvent = new EVENT;
-		if (!pEvent->LoadEvent(ZoneInfoSet.m_ZoneNo))
-		{
-			delete pEvent;
-			pEvent = nullptr;
-		}
+			pMap->m_nServerNo = row.ServerId;
+			pMap->m_nZoneNumber = row.ZoneId;
+			pMap->m_fInitX = (float) (row.InitX / 100.0);
+			pMap->m_fInitZ = (float) (row.InitZ / 100.0);
+			pMap->m_fInitY = (float) (row.InitY / 100.0);
+			pMap->m_bType = row.Type;
 
-		if (pEvent != nullptr)
-		{
-			if (!m_Event.PutData(pEvent->m_Zone, pEvent))
+			if (!pMap->LoadMap(file.m_hFile))
+			{
+				errormsg.Format(_T("Map Load Fail - %s\n"), szFullPath);
+				AfxMessageBox(errormsg);
+				delete pMap;
+				return;
+			}
+
+			file.Close();
+
+			m_ZoneArray.push_back(pMap);
+
+			// 스트립트를 읽어 들인다.
+			EVENT* pEvent = new EVENT;
+			if (!pEvent->LoadEvent(row.ZoneId))
 			{
 				delete pEvent;
-				pEvent = nullptr;
+				continue;
 			}
+
+			if (!m_Event.PutData(pEvent->m_Zone, pEvent))
+				delete pEvent;
 		}
+		while (recordset.next());
 
-		ZoneInfoSet.MoveNext();
+		loaded = TRUE;
+	});
 
-		file.Close();
+	if (!loader.Load_ForbidEmpty())
+	{
+		ReportTableLoadError(loader.GetError(), __func__);
+		return FALSE;
 	}
 
-	return TRUE;
+	return loaded;
+}
+
+void CEbenezerDlg::ReportTableLoadError(const recordset_loader::Error& err, const char* source)
+{
+	CString msg;
+	msg.Format(_T("%hs failed: %hs"), source, err.Message.c_str());
+	AfxMessageBox(msg);
 }
 
 BOOL CEbenezerDlg::LoadItemTable()
 {
-	CItemTableSet ItemTableSet;
-
-	if (!ItemTableSet.Open())
+	recordset_loader::STLMap loader(m_ItemtableArray);
+	if (!loader.Load_ForbidEmpty())
 	{
-		AfxMessageBox(_T("ItemTable Open Fail!"));
+		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
-	}
-
-	if (ItemTableSet.IsBOF()
-		|| ItemTableSet.IsEOF())
-	{
-		AfxMessageBox(_T("ItemTable Empty!"));
-		return FALSE;
-	}
-
-	ItemTableSet.MoveFirst();
-
-	while (!ItemTableSet.IsEOF())
-	{
-		_ITEM_TABLE* pTableItem = new _ITEM_TABLE;
-
-		pTableItem->m_iNum = ItemTableSet.m_Num;
-		strcpy(pTableItem->m_strName, CT2A(ItemTableSet.m_strName));
-		pTableItem->m_bKind = ItemTableSet.m_Kind;
-		pTableItem->m_bSlot = ItemTableSet.m_Slot;
-		pTableItem->m_bRace = ItemTableSet.m_Race;
-		pTableItem->m_bClass = ItemTableSet.m_Class;
-		pTableItem->m_sDamage = ItemTableSet.m_Damage;
-		pTableItem->m_sDelay = ItemTableSet.m_Delay;
-		pTableItem->m_sRange = ItemTableSet.m_Range;
-		pTableItem->m_sWeight = ItemTableSet.m_Weight;
-		pTableItem->m_sDuration = ItemTableSet.m_Duration;
-		pTableItem->m_iBuyPrice = ItemTableSet.m_BuyPrice;
-		pTableItem->m_iSellPrice = ItemTableSet.m_SellPrice;
-		pTableItem->m_sAc = ItemTableSet.m_Ac;
-		pTableItem->m_bCountable = ItemTableSet.m_Countable;
-		pTableItem->m_iEffect1 = ItemTableSet.m_Effect1;
-		pTableItem->m_iEffect2 = ItemTableSet.m_Effect2;
-		pTableItem->m_bReqLevel = ItemTableSet.m_ReqLevel;
-		pTableItem->m_bReqRank = ItemTableSet.m_ReqRank;
-		pTableItem->m_bReqTitle = ItemTableSet.m_ReqTitle;
-		pTableItem->m_bReqStr = ItemTableSet.m_ReqStr;
-		pTableItem->m_bReqSta = ItemTableSet.m_ReqSta;
-		pTableItem->m_bReqDex = ItemTableSet.m_ReqDex;
-		pTableItem->m_bReqIntel = ItemTableSet.m_ReqIntel;
-		pTableItem->m_bReqCha = ItemTableSet.m_ReqCha;
-		pTableItem->m_bSellingGroup = ItemTableSet.m_SellingGroup;
-		pTableItem->m_ItemType = ItemTableSet.m_ItemType;
-		pTableItem->m_sHitrate = ItemTableSet.m_Hitrate;
-		pTableItem->m_sEvarate = ItemTableSet.m_Evasionrate;
-		pTableItem->m_sDaggerAc = ItemTableSet.m_DaggerAc;
-		pTableItem->m_sSwordAc = ItemTableSet.m_SwordAc;
-		pTableItem->m_sMaceAc = ItemTableSet.m_MaceAc;
-		pTableItem->m_sAxeAc = ItemTableSet.m_AxeAc;
-		pTableItem->m_sSpearAc = ItemTableSet.m_SpearAc;
-		pTableItem->m_sBowAc = ItemTableSet.m_BowAc;
-		pTableItem->m_bFireDamage = ItemTableSet.m_FireDamage;
-		pTableItem->m_bIceDamage = ItemTableSet.m_IceDamage;
-		pTableItem->m_bLightningDamage = ItemTableSet.m_LightningDamage;
-		pTableItem->m_bPoisonDamage = ItemTableSet.m_PoisonDamage;
-		pTableItem->m_bHPDrain = ItemTableSet.m_HPDrain;
-		pTableItem->m_bMPDamage = ItemTableSet.m_MPDamage;
-		pTableItem->m_bMPDrain = ItemTableSet.m_MPDrain;
-		pTableItem->m_bMirrorDamage = ItemTableSet.m_MirrorDamage;
-		pTableItem->m_bDroprate = ItemTableSet.m_Droprate;
-		pTableItem->m_bStrB = ItemTableSet.m_StrB;
-		pTableItem->m_bStaB = ItemTableSet.m_StaB;
-		pTableItem->m_bDexB = ItemTableSet.m_DexB;
-		pTableItem->m_bIntelB = ItemTableSet.m_IntelB;
-		pTableItem->m_bChaB = ItemTableSet.m_ChaB;
-		pTableItem->m_MaxHpB = ItemTableSet.m_MaxHpB;
-		pTableItem->m_MaxMpB = ItemTableSet.m_MaxMpB;
-		pTableItem->m_bFireR = ItemTableSet.m_FireR;
-		pTableItem->m_bColdR = ItemTableSet.m_ColdR;
-		pTableItem->m_bLightningR = ItemTableSet.m_LightningR;
-		pTableItem->m_bMagicR = ItemTableSet.m_MagicR;
-		pTableItem->m_bPoisonR = ItemTableSet.m_PoisonR;
-		pTableItem->m_bCurseR = ItemTableSet.m_CurseR;
-
-		if (!m_ItemtableArray.PutData(pTableItem->m_iNum, pTableItem))
-		{
-			TRACE(_T("ItemTable PutData Fail - %d\n"), pTableItem->m_iNum);
-			delete pTableItem;
-			pTableItem = nullptr;
-		}
-
-		ItemTableSet.MoveNext();
 	}
 
 	return TRUE;
@@ -1328,52 +1244,11 @@ BOOL CEbenezerDlg::LoadItemTable()
 
 BOOL CEbenezerDlg::LoadMagicTable()
 {
-	CMagicTableSet MagicTableSet;
-
-	if (!MagicTableSet.Open())
+	recordset_loader::STLMap loader(m_MagictableArray);
+	if (!loader.Load_ForbidEmpty())
 	{
-		AfxMessageBox(_T("MagicTable Open Fail!"));
+		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
-	}
-
-	if (MagicTableSet.IsBOF()
-		|| MagicTableSet.IsEOF())
-	{
-		AfxMessageBox(_T("MagicTable Empty!"));
-		return FALSE;
-	}
-
-	MagicTableSet.MoveFirst();
-
-	while (!MagicTableSet.IsEOF())
-	{
-		_MAGIC_TABLE* pTableMagic = new _MAGIC_TABLE;
-
-		pTableMagic->iNum = MagicTableSet.m_MagicNum;
-		pTableMagic->sFlyingEffect = MagicTableSet.m_FlyingEffect;
-		pTableMagic->bMoral = MagicTableSet.m_Moral;
-		pTableMagic->bSkillLevel = MagicTableSet.m_SkillLevel;
-		pTableMagic->sSkill = MagicTableSet.m_Skill;
-		pTableMagic->sMsp = MagicTableSet.m_Msp;
-		pTableMagic->sHP = MagicTableSet.m_HP;
-		pTableMagic->bItemGroup = MagicTableSet.m_ItemGroup;
-		pTableMagic->iUseItem = MagicTableSet.m_UseItem;
-		pTableMagic->bCastTime = MagicTableSet.m_CastTime;
-		pTableMagic->bReCastTime = MagicTableSet.m_ReCastTime;
-		pTableMagic->bSuccessRate = MagicTableSet.m_SuccessRate;
-		pTableMagic->bType1 = MagicTableSet.m_Type1;
-		pTableMagic->bType2 = MagicTableSet.m_Type2;
-		pTableMagic->sRange = MagicTableSet.m_Range;
-		pTableMagic->bEtc = MagicTableSet.m_Etc;
-
-		if (!m_MagictableArray.PutData(pTableMagic->iNum, pTableMagic))
-		{
-			TRACE(_T("MagicTable PutData Fail - %d\n"), pTableMagic->iNum);
-			delete pTableMagic;
-			pTableMagic = nullptr;
-		}
-
-		MagicTableSet.MoveNext();
 	}
 
 	return TRUE;
@@ -1381,45 +1256,11 @@ BOOL CEbenezerDlg::LoadMagicTable()
 
 BOOL CEbenezerDlg::LoadMagicType1()
 {
-	CMagicType1Set MagicType1Set;
-
-	if (!MagicType1Set.Open())
+	recordset_loader::STLMap loader(m_Magictype1Array);
+	if (!loader.Load_ForbidEmpty())
 	{
-		AfxMessageBox(_T("MagicType1 Open Fail!"));
+		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
-	}
-
-	if (MagicType1Set.IsBOF()
-		|| MagicType1Set.IsEOF())
-	{
-		AfxMessageBox(_T("MagicType1 Empty!"));
-		return FALSE;
-	}
-
-	MagicType1Set.MoveFirst();
-
-	while (!MagicType1Set.IsEOF())
-	{
-		_MAGIC_TYPE1* pType1Magic = new _MAGIC_TYPE1;
-
-		pType1Magic->iNum = MagicType1Set.m_iNum;
-		pType1Magic->bHitType = MagicType1Set.m_Type;
-		pType1Magic->bDelay = MagicType1Set.m_Delay;
-		pType1Magic->bComboCount = MagicType1Set.m_ComboCount;
-		pType1Magic->bComboType = MagicType1Set.m_ComboType;
-		pType1Magic->sComboDamage = MagicType1Set.m_ComboDamage;
-		pType1Magic->sHit = MagicType1Set.m_Hit;
-		pType1Magic->sHitRate = MagicType1Set.m_HitRate;
-		pType1Magic->sRange = MagicType1Set.m_Range;
-
-		if (!m_Magictype1Array.PutData(pType1Magic->iNum, pType1Magic))
-		{
-			TRACE(_T("MagicType1 PutData Fail - %d\n"), pType1Magic->iNum);
-			delete pType1Magic;
-			pType1Magic = nullptr;
-		}
-
-		MagicType1Set.MoveNext();
 	}
 
 	return TRUE;
@@ -1427,41 +1268,11 @@ BOOL CEbenezerDlg::LoadMagicType1()
 
 BOOL CEbenezerDlg::LoadMagicType2()
 {
-	CMagicType2Set	MagicType2Set;
-
-	if (!MagicType2Set.Open())
+	recordset_loader::STLMap loader(m_Magictype2Array);
+	if (!loader.Load_ForbidEmpty())
 	{
-		AfxMessageBox(_T("MagicType2 Open Fail!"));
+		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
-	}
-
-	if (MagicType2Set.IsBOF()
-		|| MagicType2Set.IsEOF())
-	{
-		AfxMessageBox(_T("MagicType2 Empty!"));
-		return FALSE;
-	}
-
-	MagicType2Set.MoveFirst();
-
-	while (!MagicType2Set.IsEOF())
-	{
-		_MAGIC_TYPE2* pType2Magic = new _MAGIC_TYPE2;
-
-		pType2Magic->iNum = MagicType2Set.m_iNum;
-		pType2Magic->bHitType = MagicType2Set.m_HitType;
-		pType2Magic->sHitRate = MagicType2Set.m_HitRate;
-		pType2Magic->sAddDamage = MagicType2Set.m_AddDamage;
-		pType2Magic->sAddRange = MagicType2Set.m_AddRange;
-		pType2Magic->bNeedArrow = MagicType2Set.m_NeedArrow;
-
-		if (!m_Magictype2Array.PutData(pType2Magic->iNum, pType2Magic))
-		{
-			TRACE(_T("MagicType2 PutData Fail - %d\n"), pType2Magic->iNum);
-			delete pType2Magic;
-			pType2Magic = nullptr;
-		}
-		MagicType2Set.MoveNext();
 	}
 
 	return TRUE;
@@ -1469,45 +1280,11 @@ BOOL CEbenezerDlg::LoadMagicType2()
 
 BOOL CEbenezerDlg::LoadMagicType3()
 {
-	CMagicType3Set MagicType3Set;
-
-	if (!MagicType3Set.Open())
+	recordset_loader::STLMap loader(m_Magictype3Array);
+	if (!loader.Load_ForbidEmpty())
 	{
-		AfxMessageBox(_T("MagicType3 Open Fail!"));
+		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
-	}
-
-	if (MagicType3Set.IsBOF()
-		|| MagicType3Set.IsEOF())
-	{
-		AfxMessageBox(_T("MagicType3 Empty!"));
-		return FALSE;
-	}
-
-	MagicType3Set.MoveFirst();
-
-	while (!MagicType3Set.IsEOF())
-	{
-		_MAGIC_TYPE3* pType3Magic = new _MAGIC_TYPE3;
-
-		pType3Magic->iNum = MagicType3Set.m_iNum;
-		pType3Magic->bAttribute = MagicType3Set.m_Attribute;
-		pType3Magic->bDirectType = MagicType3Set.m_DirectType;
-		pType3Magic->bRadius = MagicType3Set.m_Radius;
-		pType3Magic->sAngle = MagicType3Set.m_Angle;
-		pType3Magic->sDuration = MagicType3Set.m_Duration;
-		pType3Magic->sEndDamage = MagicType3Set.m_EndDamage;
-		pType3Magic->sFirstDamage = MagicType3Set.m_FirstDamage;
-		pType3Magic->sTimeDamage = MagicType3Set.m_TimeDamage;
-
-		if (!m_Magictype3Array.PutData(pType3Magic->iNum, pType3Magic))
-		{
-			TRACE(_T("MagicType3 PutData Fail - %d\n"), pType3Magic->iNum);
-			delete pType3Magic;
-			pType3Magic = nullptr;
-		}
-
-		MagicType3Set.MoveNext();
 	}
 
 	return TRUE;
@@ -1515,96 +1292,23 @@ BOOL CEbenezerDlg::LoadMagicType3()
 
 BOOL CEbenezerDlg::LoadMagicType4()
 {
-	CMagicType4Set MagicType4Set;
-
-	if (!MagicType4Set.Open())
+	recordset_loader::STLMap loader(m_Magictype4Array);
+	if (!loader.Load_ForbidEmpty())
 	{
-		AfxMessageBox(_T("MagicType4 Open Fail!"));
+		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
 	}
 
-	if (MagicType4Set.IsBOF()
-		|| MagicType4Set.IsEOF())
-	{
-		AfxMessageBox(_T("MagicType4 Empty!"));
-		return FALSE;
-	}
-
-	MagicType4Set.MoveFirst();
-
-	while (!MagicType4Set.IsEOF())
-	{
-		_MAGIC_TYPE4* pType4Magic = new _MAGIC_TYPE4;
-
-		pType4Magic->iNum = MagicType4Set.m_iNum;
-		pType4Magic->bBuffType = MagicType4Set.m_BuffType;
-		pType4Magic->bRadius = MagicType4Set.m_Radius;
-		pType4Magic->sDuration = MagicType4Set.m_Duration;
-		pType4Magic->bAttackSpeed = MagicType4Set.m_AttackSpeed;
-		pType4Magic->bSpeed = MagicType4Set.m_Speed;
-		pType4Magic->sAC = MagicType4Set.m_AC;
-		pType4Magic->bAttack = MagicType4Set.m_Attack;
-		pType4Magic->sMaxHP = MagicType4Set.m_MaxHP;
-		pType4Magic->bHitRate = MagicType4Set.m_HitRate;
-		pType4Magic->sAvoidRate = MagicType4Set.m_AvoidRate;
-		pType4Magic->bStr = MagicType4Set.m_Str;
-		pType4Magic->bSta = MagicType4Set.m_Sta;
-		pType4Magic->bDex = MagicType4Set.m_Dex;
-		pType4Magic->bIntel = MagicType4Set.m_Intel;
-		pType4Magic->bCha = MagicType4Set.m_Cha;
-		pType4Magic->bFireR = MagicType4Set.m_FireR;
-		pType4Magic->bColdR = MagicType4Set.m_ColdR;
-		pType4Magic->bLightningR = MagicType4Set.m_LightningR;
-		pType4Magic->bMagicR = MagicType4Set.m_MagicR;
-		pType4Magic->bDiseaseR = MagicType4Set.m_DiseaseR;
-		pType4Magic->bPoisonR = MagicType4Set.m_PoisonR;
-
-		if (!m_Magictype4Array.PutData(pType4Magic->iNum, pType4Magic))
-		{
-			TRACE(_T("MagicType4 PutData Fail - %d\n"), pType4Magic->iNum);
-			delete pType4Magic;
-			pType4Magic = nullptr;
-		}
-		MagicType4Set.MoveNext();
-	}
 	return TRUE;
 }
 
 BOOL CEbenezerDlg::LoadMagicType5()
 {
-	CMagicType5Set	MagicType5Set;
-
-	if (!MagicType5Set.Open())
+	recordset_loader::STLMap loader(m_Magictype5Array);
+	if (!loader.Load_ForbidEmpty())
 	{
-		AfxMessageBox(_T("MagicType5 Open Fail!"));
+		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
-	}
-
-	if (MagicType5Set.IsBOF()
-		|| MagicType5Set.IsEOF())
-	{
-		AfxMessageBox(_T("MagicType5 Empty!"));
-		return FALSE;
-	}
-
-	MagicType5Set.MoveFirst();
-
-	while (!MagicType5Set.IsEOF())
-	{
-		_MAGIC_TYPE5* pType5Magic = new _MAGIC_TYPE5;
-
-		pType5Magic->iNum = MagicType5Set.m_iNum;
-		pType5Magic->bType = MagicType5Set.m_Type;
-		pType5Magic->bExpRecover = MagicType5Set.m_ExpRecover;
-		pType5Magic->sNeedStone = MagicType5Set.m_NeedStone;
-
-		if (!m_Magictype5Array.PutData(pType5Magic->iNum, pType5Magic))
-		{
-			TRACE(_T("MagicType5 PutData Fail - %d\n"), pType5Magic->iNum);
-			delete pType5Magic;
-			pType5Magic = nullptr;
-		}
-		MagicType5Set.MoveNext();
 	}
 
 	return TRUE;
@@ -1612,41 +1316,11 @@ BOOL CEbenezerDlg::LoadMagicType5()
 
 BOOL CEbenezerDlg::LoadMagicType8()
 {
-	CMagicType8Set	MagicType8Set;
-
-	if (!MagicType8Set.Open())
+	recordset_loader::STLMap loader(m_Magictype8Array);
+	if (!loader.Load_ForbidEmpty())
 	{
-		AfxMessageBox(_T("MagicType8 Open Fail!"));
+		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
-	}
-
-	if (MagicType8Set.IsBOF()
-		|| MagicType8Set.IsEOF())
-	{
-		AfxMessageBox(_T("MagicType8 Empty!"));
-		return FALSE;
-	}
-
-	MagicType8Set.MoveFirst();
-
-	while (!MagicType8Set.IsEOF())
-	{
-		_MAGIC_TYPE8* pType8Magic = new _MAGIC_TYPE8;
-
-		pType8Magic->iNum = MagicType8Set.m_iNum;
-		pType8Magic->bTarget = MagicType8Set.m_Target;
-		pType8Magic->sRadius = MagicType8Set.m_Radius;
-		pType8Magic->bWarpType = MagicType8Set.m_WarpType;
-		pType8Magic->sExpRecover = MagicType8Set.m_ExpRecover;
-
-		if (!m_Magictype8Array.PutData(pType8Magic->iNum, pType8Magic))
-		{
-			TRACE(_T("MagicType8 PutData Fail - %d\n"), pType8Magic->iNum);
-			delete pType8Magic;
-			pType8Magic = nullptr;
-		}
-
-		MagicType8Set.MoveNext();
 	}
 
 	return TRUE;
@@ -1654,51 +1328,11 @@ BOOL CEbenezerDlg::LoadMagicType8()
 
 BOOL CEbenezerDlg::LoadCoefficientTable()
 {
-	CCoefficientSet	CoefficientSet;
-
-	if (!CoefficientSet.Open())
+	recordset_loader::STLMap loader(m_CoefficientArray);
+	if (!loader.Load_ForbidEmpty())
 	{
-		AfxMessageBox(_T("CharacterDataTable Open Fail!"));
+		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
-	}
-
-	if (CoefficientSet.IsBOF()
-		|| CoefficientSet.IsEOF())
-	{
-		AfxMessageBox(_T("CharaterDataTable Empty!"));
-		return FALSE;
-	}
-
-	CoefficientSet.MoveFirst();
-
-	while (!CoefficientSet.IsEOF())
-	{
-		_CLASS_COEFFICIENT* p_TableCoefficient = new _CLASS_COEFFICIENT;
-
-		p_TableCoefficient->sClassNum = (short) CoefficientSet.m_sClass;
-		p_TableCoefficient->ShortSword = (float) CoefficientSet.m_ShortSword;
-		p_TableCoefficient->Sword = (float) CoefficientSet.m_Sword;
-		p_TableCoefficient->Axe = (float) CoefficientSet.m_Axe;
-		p_TableCoefficient->Club = (float) CoefficientSet.m_Club;
-		p_TableCoefficient->Spear = (float) CoefficientSet.m_Spear;
-		p_TableCoefficient->Pole = (float) CoefficientSet.m_Pole;
-		p_TableCoefficient->Staff = (float) CoefficientSet.m_Staff;
-		p_TableCoefficient->Bow = (float) CoefficientSet.m_Bow;
-		p_TableCoefficient->HP = (float) CoefficientSet.m_Hp;
-		p_TableCoefficient->MP = (float) CoefficientSet.m_Mp;
-		p_TableCoefficient->SP = (float) CoefficientSet.m_Sp;
-		p_TableCoefficient->AC = (float) CoefficientSet.m_Ac;
-		p_TableCoefficient->Hitrate = (float) CoefficientSet.m_Hitrate;
-		p_TableCoefficient->Evasionrate = (float) CoefficientSet.m_Evasionrate;
-
-		if (!m_CoefficientArray.PutData(p_TableCoefficient->sClassNum, p_TableCoefficient))
-		{
-			TRACE(_T("Coefficient PutData Fail - %d\n"), p_TableCoefficient->sClassNum);
-			delete p_TableCoefficient;
-			p_TableCoefficient = nullptr;
-		}
-
-		CoefficientSet.MoveNext();
 	}
 
 	return TRUE;
@@ -1706,35 +1340,11 @@ BOOL CEbenezerDlg::LoadCoefficientTable()
 
 BOOL CEbenezerDlg::LoadLevelUpTable()
 {
-	CLevelUpTableSet LevelUpTableSet;
-
-	if (!LevelUpTableSet.Open())
+	recordset_loader::Vector<model::LevelUp> loader(m_LevelUpArray);
+	if (!loader.Load_ForbidEmpty(true))
 	{
-		AfxMessageBox(_T("LevelUpTable Open Fail!"));
+		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
-	}
-
-	if (LevelUpTableSet.IsBOF()
-		|| LevelUpTableSet.IsEOF())
-	{
-		AfxMessageBox(_T("LevelUpTable Empty!"));
-		return FALSE;
-	}
-
-	m_LevelUpArray.reserve(MAX_LEVEL);
-
-	LevelUpTableSet.MoveFirst();
-
-	while (!LevelUpTableSet.IsEOF())
-	{
-		_LEVELUP* pTableLevelUp = new _LEVELUP;
-
-		pTableLevelUp->m_sLevel = LevelUpTableSet.m_level;
-		pTableLevelUp->m_iExp = LevelUpTableSet.m_Exp;
-
-		m_LevelUpArray.push_back(pTableLevelUp);
-
-		LevelUpTableSet.MoveNext();
 	}
 
 	return TRUE;
@@ -1760,9 +1370,13 @@ void CEbenezerDlg::GetTimeFromIni()
 	m_nBattleZoneOpenHourStart = m_Ini.GetInt("BATTLE", "START_TIME", 20);
 	m_nBattleZoneOpenHourEnd = m_Ini.GetInt("BATTLE", "END_TIME", 0);
 
-	m_Ini.GetString(_T("ODBC"), _T("GAME_DSN"), _T("KN_online"), m_strGameDSN, _countof(m_strGameDSN));
-	m_Ini.GetString(_T("ODBC"), _T("GAME_UID"), _T("knight"), m_strGameUID, _countof(m_strGameUID));
-	m_Ini.GetString(_T("ODBC"), _T("GAME_PWD"), _T("knight"), m_strGamePWD, _countof(m_strGamePWD));
+	std::string datasourceName = m_Ini.GetString("ODBC", "GAME_DSN", "KN_online");
+	std::string datasourceUser = m_Ini.GetString("ODBC", "GAME_UID", "knight");
+	std::string datasourcePass = m_Ini.GetString("ODBC", "GAME_PWD", "knight");
+
+	ConnectionManager::SetDatasourceConfig(
+		modelUtil::DbType::GAME,
+		datasourceName, datasourceUser, datasourcePass);
 
 	m_Ini.GetString("AI_SERVER", "IP", "127.0.0.1", m_AIServerIP, _countof(m_AIServerIP));
 
@@ -3464,57 +3078,11 @@ void CEbenezerDlg::Announcement(BYTE type, int nation, int chat_type)
 
 BOOL CEbenezerDlg::LoadHomeTable()
 {
-	CHomeSet HomeSet;
-
-	if (!HomeSet.Open())
+	recordset_loader::STLMap loader(m_HomeArray);
+	if (!loader.Load_ForbidEmpty())
 	{
-		AfxMessageBox(_T("Home Data Open Fail!"));
+		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
-	}
-
-	if (HomeSet.IsBOF()
-		|| HomeSet.IsEOF())
-	{
-		AfxMessageBox(_T("Home Data Empty!"));
-		return FALSE;
-	}
-
-	HomeSet.MoveFirst();
-
-	while (!HomeSet.IsEOF())
-	{
-		_HOME_INFO* pHomeInfo = new _HOME_INFO;
-
-		pHomeInfo->bNation = HomeSet.m_Nation;
-
-		pHomeInfo->KarusZoneX = HomeSet.m_KarusZoneX;
-		pHomeInfo->KarusZoneZ = HomeSet.m_KarusZoneZ;
-		pHomeInfo->KarusZoneLX = HomeSet.m_KarusZoneLX;
-		pHomeInfo->KarusZoneLZ = HomeSet.m_KarusZoneLZ;
-
-		pHomeInfo->ElmoZoneX = HomeSet.m_ElmoZoneX;
-		pHomeInfo->ElmoZoneZ = HomeSet.m_ElmoZoneZ;
-		pHomeInfo->ElmoZoneLX = HomeSet.m_ElmoZoneLX;
-		pHomeInfo->ElmoZoneLZ = HomeSet.m_ElmoZoneLZ;
-
-		pHomeInfo->FreeZoneX = HomeSet.m_FreeZoneX;
-		pHomeInfo->FreeZoneZ = HomeSet.m_FreeZoneZ;
-		pHomeInfo->FreeZoneLX = HomeSet.m_FreeZoneLX;
-		pHomeInfo->FreeZoneLZ = HomeSet.m_FreeZoneLZ;
-//
-		pHomeInfo->BattleZoneX = HomeSet.m_BattleZoneX;
-		pHomeInfo->BattleZoneZ = HomeSet.m_BattleZoneZ;
-		pHomeInfo->BattleZoneLX = HomeSet.m_BattleZoneLX;
-		pHomeInfo->BattleZoneLZ = HomeSet.m_BattleZoneLZ;
-//
-		if (!m_HomeArray.PutData(pHomeInfo->bNation, pHomeInfo))
-		{
-			TRACE(_T("Home Info PutData Fail - %d\n"), pHomeInfo->bNation);
-			delete pHomeInfo;
-			pHomeInfo = nullptr;
-		}
-
-		HomeSet.MoveNext();
 	}
 
 	return TRUE;
@@ -3522,72 +3090,76 @@ BOOL CEbenezerDlg::LoadHomeTable()
 
 BOOL CEbenezerDlg::LoadAllKnights()
 {
-	CKnightsSet	KnightsSet;
-	CString strKnightsName, strChief, strViceChief_1, strViceChief_2, strViceChief_3;
+	using ModelType = model::Knights;
 
-	if (!KnightsSet.Open())
+	recordset_loader::Base<ModelType> loader;
+	loader.SetProcessFetchCallback([this](db::ModelRecordSet<ModelType>& recordset)
 	{
-		AfxMessageBox(_T("Knights Open Fail!"));
+		do
+		{
+			ModelType row = {};
+			recordset.get_ref(row);
+
+			CKnights* pKnights = new CKnights();
+			pKnights->InitializeValue();
+
+			pKnights->m_sIndex = row.ID;
+			pKnights->m_byFlag = row.Flag;
+			pKnights->m_byNation = row.Nation;
+
+			rtrim(row.Name);
+			strcpy(pKnights->m_strName, row.Name.c_str());
+
+			rtrim(row.Chief);
+			strcpy(pKnights->m_strChief, row.Chief.c_str());
+
+			if (row.ViceChief1.has_value())
+			{
+				rtrim(*row.ViceChief1);
+				strcpy(pKnights->m_strViceChief_1, row.ViceChief1->c_str());
+			}
+
+			if (row.ViceChief2.has_value())
+			{
+				rtrim(*row.ViceChief2);
+				strcpy(pKnights->m_strViceChief_2, row.ViceChief2->c_str());
+			}
+
+			if (row.ViceChief3.has_value())
+			{
+				rtrim(*row.ViceChief3);
+				strcpy(pKnights->m_strViceChief_3, row.ViceChief3->c_str());
+			}
+
+			pKnights->m_sMembers = row.Members;
+			pKnights->m_nMoney = row.Gold;
+			pKnights->m_sAllianceKnights = row.AllianceKnights;
+			pKnights->m_sMarkVersion = row.MarkVersion;
+			pKnights->m_sCape = row.Cape;
+			pKnights->m_sDomination = row.Domination;
+			pKnights->m_nPoints = row.Points;
+			pKnights->m_byGrade = GetKnightsGrade(row.Points);
+			pKnights->m_byRanking = row.Ranking;
+
+			for (int i = 0; i < MAX_CLAN; i++)
+			{
+				pKnights->m_arKnightsUser[i].byUsed = 0;
+				strcpy(pKnights->m_arKnightsUser[i].strUserName, "");
+			}
+
+			if (!m_KnightsArray.PutData(pKnights->m_sIndex, pKnights))
+			{
+				TRACE(_T("Knights PutData Fail - %d\n"), pKnights->m_sIndex);
+				delete pKnights;
+			}
+		}
+		while (recordset.next());
+	});
+
+	if (!loader.Load_AllowEmpty())
+	{
+		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
-	}
-
-	if (KnightsSet.IsBOF()
-		|| KnightsSet.IsEOF())
-	{
-		// AfxMessageBox(_T("Knights Data Empty!"));
-		return TRUE;
-	}
-
-	KnightsSet.MoveFirst();
-
-	while (!KnightsSet.IsEOF())
-	{
-		CKnights* pKnights = new CKnights;
-		pKnights->InitializeValue();
-
-		pKnights->m_sIndex = KnightsSet.m_IDNum;
-		pKnights->m_byFlag = KnightsSet.m_Flag;
-		pKnights->m_byNation = KnightsSet.m_Nation;
-		strKnightsName = KnightsSet.m_IDName;
-		strKnightsName.TrimRight();
-		strChief = KnightsSet.m_Chief;
-		strChief.TrimRight();
-		strViceChief_1 = KnightsSet.m_ViceChief_1;
-		strViceChief_1.TrimRight();
-		strViceChief_2 = KnightsSet.m_ViceChief_2;
-		strViceChief_2.TrimRight();
-		strViceChief_3 = KnightsSet.m_ViceChief_3;
-		strViceChief_3.TrimRight();
-
-		strcpy(pKnights->m_strName, CT2A(strKnightsName));
-		pKnights->m_sMembers = KnightsSet.m_Members;
-		strcpy(pKnights->m_strChief, CT2A(strChief));
-		strcpy(pKnights->m_strViceChief_1, CT2A(strViceChief_1));
-		strcpy(pKnights->m_strViceChief_2, CT2A(strViceChief_2));
-		strcpy(pKnights->m_strViceChief_3, CT2A(strViceChief_3));
-		pKnights->m_nMoney = atoi(CT2A(KnightsSet.m_Gold));
-		pKnights->m_sAllianceKnights = KnightsSet.m_AllianceKnights;
-		pKnights->m_sMarkVersion = KnightsSet.m_MarkVersion;
-		pKnights->m_sCape = KnightsSet.m_Cape;
-		pKnights->m_sDomination = KnightsSet.m_Domination;
-		pKnights->m_nPoints = KnightsSet.m_Points;
-		pKnights->m_byGrade = GetKnightsGrade(KnightsSet.m_Points);
-		pKnights->m_byRanking = KnightsSet.m_Ranking;
-
-		for (int i = 0; i < MAX_CLAN; i++)
-		{
-			pKnights->m_arKnightsUser[i].byUsed = 0;
-			strcpy(pKnights->m_arKnightsUser[i].strUserName, "");
-		}
-
-		if (!m_KnightsArray.PutData(pKnights->m_sIndex, pKnights))
-		{
-			TRACE(_T("Knights PutData Fail - %d\n"), pKnights->m_sIndex);
-			delete pKnights;
-			pKnights = nullptr;
-		}
-
-		KnightsSet.MoveNext();
 	}
 
 	return TRUE;
@@ -3595,51 +3167,26 @@ BOOL CEbenezerDlg::LoadAllKnights()
 
 BOOL CEbenezerDlg::LoadAllKnightsUserData()
 {
-	CKnightsUserSet	KnightsSet;
-	CString strUserName;
-	int iFame = 0, iLevel = 0, iClass = 0;
+	using ModelType = model::KnightsUser;
 
-	if (!KnightsSet.Open())
+	recordset_loader::Base<ModelType> loader;
+	loader.SetProcessFetchCallback([this](db::ModelRecordSet<ModelType>& recordset)
 	{
-		AfxMessageBox(_T("KnightsUser Open Fail!"));
-		return FALSE;
-	}
-
-	if (KnightsSet.IsBOF()
-		|| KnightsSet.IsEOF())
-	{
-		// AfxMessageBox(_T("KnightsUser Data Empty!"));
-		return TRUE;
-	}
-
-	KnightsSet.MoveFirst();
-
-	while (!KnightsSet.IsEOF())
-	{
-		// sungyong ,, zone server : 카루스와 전쟁존을 합치므로 인해서,,
-	/*	if( m_nServerNo == KARUS )	{
-			if( KnightsSet.m_sIDNum < 15000 )	{
-				strUserName = KnightsSet.m_strUserID;
-				strUserName.TrimRight();
-				m_KnightsManager.AddKnightsUser( KnightsSet.m_sIDNum, (char*)(LPCTSTR) strUserName );
-			}
-		}
-		else if( m_nServerNo == ELMORAD )	{	*/
-	/*	if( m_nServerNo == ELMORAD )	{
-			if( KnightsSet.m_sIDNum >= 15000 && KnightsSet.m_sIDNum < 30000 )	{
-				strUserName = KnightsSet.m_strUserID;
-				strUserName.TrimRight();
-				m_KnightsManager.AddKnightsUser( KnightsSet.m_sIDNum, (char*)(LPCTSTR) strUserName );
-			}
-		}
-		else	*/
+		do
 		{
-			strUserName = KnightsSet.m_strUserID;
-			strUserName.TrimRight();
-			m_KnightsManager.AddKnightsUser(KnightsSet.m_sIDNum, CT2A(strUserName));
-		}
+			ModelType row = {};
+			recordset.get_ref(row);
 
-		KnightsSet.MoveNext();
+			rtrim(row.UserId);
+			m_KnightsManager.AddKnightsUser(row.KnightsId, row.UserId.c_str());
+		}
+		while (recordset.next());
+	});
+
+	if (!loader.Load_AllowEmpty())
+	{
+		ReportTableLoadError(loader.GetError(), __func__);
+		return FALSE;
 	}
 
 	return TRUE;
@@ -3957,27 +3504,25 @@ void CEbenezerDlg::Send_UDP_All(char* pBuf, int len, int group_type)
 
 BOOL CEbenezerDlg::LoadBattleTable()
 {
-	CBattleSet BattleSet;
+	using ModelType = model::Battle;
 
-	if (!BattleSet.Open())
+	recordset_loader::Base<ModelType> loader;
+	loader.SetProcessFetchCallback([this](db::ModelRecordSet<ModelType>& recordset)
 	{
-		AfxMessageBox(_T("BattleSet Data Open Fail!"));
+		do
+		{
+			ModelType row = {};
+			recordset.get_ref(row);
+
+			m_byOldVictory = row.Nation;
+		}
+		while (recordset.next());
+	});
+
+	if (!loader.Load_ForbidEmpty())
+	{
+		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
-	}
-
-	if (BattleSet.IsBOF()
-		|| BattleSet.IsEOF())
-	{
-		AfxMessageBox(_T("BattleSet Data Empty!"));
-		return FALSE;
-	}
-
-	BattleSet.MoveFirst();
-
-	while (!BattleSet.IsEOF())
-	{
-		m_byOldVictory = BattleSet.m_byNation;
-		BattleSet.MoveNext();
 	}
 
 	return TRUE;
@@ -4002,149 +3547,114 @@ void CEbenezerDlg::Send_CommandChat(char* pBuf, int len, int nation, CUser* pExc
 
 BOOL CEbenezerDlg::LoadKnightsRankTable()
 {
-	CKnightsRankSet	KRankSet;
-	int nRank = 0, nKnightsIndex = 0, nKaursRank = 0, nElmoRank = 0, nFindKarus = 0, nFindElmo = 0, send_index = 0, temp_index = 0;
-	CKnights* pKnights = nullptr;
-	CUser* pUser = nullptr;
-	CString strKnightsName;
+	using ModelType = model::KnightsRating;
 
-	std::string buff;
-
-	char send_buff[1024] = {},
-		temp_buff[1024] = {},
-		strKarusCaptainName[1024] = {},
+	char strKarusCaptainName[1024] = {},
 		strElmoCaptainName[1024] = {},
 		strKarusCaptain[5][50] = {},
 		strElmoCaptain[5][50] = {};
-	for (int i = 0; i < 5; i++)
+
+	recordset_loader::Base<ModelType> loader;
+	loader.SetProcessFetchCallback([&](db::ModelRecordSet<ModelType>& recordset)
 	{
-		memset(strKarusCaptain[i], 0, sizeof(strKarusCaptain[i]));
-		memset(strElmoCaptain[i], 0, sizeof(strElmoCaptain[i]));
-	}
+		char send_buff[1024] = {};
+		int nKarusRank = 0, nElmoRank = 0, nFindKarus = 0, nFindElmo = 0, send_index = 0;
 
-	if (!KRankSet.Open())
-	{
-		TRACE(_T("### KnightsRankTable Open Fail! ###\n"));
-		return TRUE;
-	}
-
-	if (KRankSet.IsBOF()
-		|| KRankSet.IsEOF())
-	{
-		TRACE(_T("### KnightsRankTable Empty! ###\n"));
-		return TRUE;
-	}
-
-	KRankSet.MoveFirst();
-
-	while (!KRankSet.IsEOF())
-	{
-		nRank = KRankSet.m_nRank;
-		nKnightsIndex = KRankSet.m_shIndex;
-		pKnights = m_KnightsArray.GetData(nKnightsIndex);
-		strKnightsName = KRankSet.m_strName;
-		strKnightsName.TrimRight();
-
-		if (pKnights == nullptr)
+		do
 		{
-			KRankSet.MoveNext();
-			continue;
-		}
+			ModelType row = {};
+			recordset.get_ref(row);
+		
+			CKnights* pKnights = m_KnightsArray.GetData(row.Index);
 
-		if (pKnights->m_byNation == KARUS)
-		{
-			//if (nKaursRank == 5 || nFindKarus == 1)
-			if (nKaursRank == 5)
-			{
-				KRankSet.MoveNext();
-				continue;			// 5위까지 클랜장이 없으면 대장은 없음			
-			}
+			rtrim(row.Name);
 
-			//nKaursRank++;
-
-			pUser = GetUserPtr(pKnights->m_strChief, NameType::Character);
-			if (pUser == nullptr)
-			{
-				KRankSet.MoveNext();
+			if (pKnights == nullptr)
 				continue;
-			}
 
-			if (pUser->m_pUserData->m_bZone != ZONE_BATTLE)
+			if (pKnights->m_byNation == KARUS)
 			{
-				KRankSet.MoveNext();
-				continue;
+				//if (nKarusRank == 5 || nFindKarus == 1)
+				if (nKarusRank == 5)
+					continue;			// 5위까지 클랜장이 없으면 대장은 없음			
+
+				//nKarusRank++;
+
+				CUser* pUser = GetUserPtr(pKnights->m_strChief, NameType::Character);
+				if (pUser == nullptr)
+					continue;
+
+				if (pUser->m_pUserData->m_bZone != ZONE_BATTLE)
+					continue;
+
+				if (pUser->m_pUserData->m_bKnights == row.Index)
+				{
+					pUser->m_pUserData->m_bFame = COMMAND_CAPTAIN;
+					sprintf(strKarusCaptain[nKarusRank], "[%s][%s]", row.Name.c_str(), pUser->m_pUserData->m_id);
+					nKarusRank++;
+
+					nFindKarus = 1;
+					memset(send_buff, 0, sizeof(send_buff));
+					send_index = 0;
+					SetByte(send_buff, WIZ_AUTHORITY_CHANGE, send_index);
+					SetByte(send_buff, COMMAND_AUTHORITY, send_index);
+					SetShort(send_buff, pUser->GetSocketID(), send_index);
+					SetByte(send_buff, pUser->m_pUserData->m_bFame, send_index);
+					//pUser->Send( send_buff, send_index );
+					Send_Region(send_buff, send_index, pUser->m_pUserData->m_bZone, pUser->m_RegionX, pUser->m_RegionZ);
+
+					//strcpy( m_strKarusCaptain, pUser->m_pUserData->m_id );
+					//Announcement( KARUS_CAPTAIN_NOTIFY, KARUS );
+					//TRACE(_T("Karus Captain - %hs, rank=%d, index=%d\n"), pUser->m_pUserData->m_id, row.Rank, row.Index);
+				}
 			}
-
-			if (pUser->m_pUserData->m_bKnights == nKnightsIndex)
+			else if (pKnights->m_byNation == ELMORAD)
 			{
-				pUser->m_pUserData->m_bFame = COMMAND_CAPTAIN;
-				sprintf(strKarusCaptain[nKaursRank], "[%ls][%s]", strKnightsName.GetString(), pUser->m_pUserData->m_id);
-				nKaursRank++;
+				//if (nElmoRank == 5 || nFindElmo == 1)
+				if (nElmoRank == 5)
+					continue;			// 5위까지 클랜장이 없으면 대장은 없음			
 
-				nFindKarus = 1;
-				memset(send_buff, 0, sizeof(send_buff));
-				send_index = 0;
-				SetByte(send_buff, WIZ_AUTHORITY_CHANGE, send_index);
-				SetByte(send_buff, COMMAND_AUTHORITY, send_index);
-				SetShort(send_buff, pUser->GetSocketID(), send_index);
-				SetByte(send_buff, pUser->m_pUserData->m_bFame, send_index);
-				//pUser->Send( send_buff, send_index );
-				Send_Region(send_buff, send_index, pUser->m_pUserData->m_bZone, pUser->m_RegionX, pUser->m_RegionZ);
+				//nElmoRank++;
 
-				//strcpy( m_strKarusCaptain, pUser->m_pUserData->m_id );
-				//Announcement( KARUS_CAPTAIN_NOTIFY, KARUS );
-				//TRACE(_T("Karus Captain - %hs, rank=%d, index=%d\n"), pUser->m_pUserData->m_id, nRank, nKnightsIndex);
-			}
-		}
-		else if (pKnights->m_byNation == ELMORAD)
-		{
-			//if (nElmoRank == 5 || nFindElmo == 1)
-			if (nElmoRank == 5)
-			{
-				KRankSet.MoveNext();
-				continue;			// 5위까지 클랜장이 없으면 대장은 없음			
-			}
+				CUser* pUser = GetUserPtr(pKnights->m_strChief, NameType::Character);
+				if (pUser == nullptr)
+					continue;
 
-			//nElmoRank++;
+				if (pUser->m_pUserData->m_bZone != ZONE_BATTLE)
+					continue;
 
-			pUser = GetUserPtr(pKnights->m_strChief, NameType::Character);
-			if (pUser == nullptr)
-			{
-				KRankSet.MoveNext();
-				continue;
-			}
+				if (pUser->m_pUserData->m_bKnights == row.Index)
+				{
+					pUser->m_pUserData->m_bFame = COMMAND_CAPTAIN;
+					sprintf(strElmoCaptain[nElmoRank], "[%s][%s]", row.Name.c_str(), pUser->m_pUserData->m_id);
+					nFindElmo = 1;
+					nElmoRank++;
 
-			if (pUser->m_pUserData->m_bZone != ZONE_BATTLE)
-			{
-				KRankSet.MoveNext();
-				continue;
-			}
+					memset(send_buff, 0, sizeof(send_buff));
+					send_index = 0;
+					SetByte(send_buff, WIZ_AUTHORITY_CHANGE, send_index);
+					SetByte(send_buff, COMMAND_AUTHORITY, send_index);
+					SetShort(send_buff, pUser->GetSocketID(), send_index);
+					SetByte(send_buff, pUser->m_pUserData->m_bFame, send_index);
+					//pUser->Send( send_buff, send_index );
+					Send_Region(send_buff, send_index, pUser->m_pUserData->m_bZone, pUser->m_RegionX, pUser->m_RegionZ);
 
-			if (pUser->m_pUserData->m_bKnights == nKnightsIndex)
-			{
-				pUser->m_pUserData->m_bFame = COMMAND_CAPTAIN;
-				sprintf(strElmoCaptain[nElmoRank], "[%ls][%s]", strKnightsName.GetString(), pUser->m_pUserData->m_id);
-				nFindElmo = 1;
-				nElmoRank++;
-
-				memset(send_buff, 0, sizeof(send_buff));
-				send_index = 0;
-				SetByte(send_buff, WIZ_AUTHORITY_CHANGE, send_index);
-				SetByte(send_buff, COMMAND_AUTHORITY, send_index);
-				SetShort(send_buff, pUser->GetSocketID(), send_index);
-				SetByte(send_buff, pUser->m_pUserData->m_bFame, send_index);
-				//pUser->Send( send_buff, send_index );
-				Send_Region(send_buff, send_index, pUser->m_pUserData->m_bZone, pUser->m_RegionX, pUser->m_RegionZ);
-
-				//strcpy( m_strElmoradCaptain, pUser->m_pUserData->m_id );
-				//Announcement( ELMORAD_CAPTAIN_NOTIFY, ELMORAD );
-				//TRACE(_T("Elmo Captain - %hs, rank=%d, index=%d\n"), pUser->m_pUserData->m_id, nRank, nKnightsIndex);
+					//strcpy( m_strElmoradCaptain, pUser->m_pUserData->m_id );
+					//Announcement( ELMORAD_CAPTAIN_NOTIFY, ELMORAD );
+					//TRACE(_T("Elmo Captain - %hs, rank=%d, index=%d\n"), pUser->m_pUserData->m_id, row.Rank, row.Index);
+				}
 			}
 		}
+		while (recordset.next());
+	});
 
-		KRankSet.MoveNext();
+	if (!loader.Load_AllowEmpty())
+	{
+		ReportTableLoadError(loader.GetError(), __func__);
+		return FALSE;
 	}
 
+	std::string buff;
 	::_LoadStringFromResource(IDS_KARUS_CAPTAIN, buff);
 	sprintf(strKarusCaptainName, buff.c_str(), strKarusCaptain[0], strKarusCaptain[1], strKarusCaptain[2], strKarusCaptain[3], strKarusCaptain[4]);
 
@@ -4155,8 +3665,10 @@ BOOL CEbenezerDlg::LoadKnightsRankTable()
 	//sprintf( strElmoCaptainName, "엘모라드의 지휘관은 %s, %s, %s, %s, %s 입니다", strKarusCaptain[0], strKarusCaptain[1], strKarusCaptain[2], strKarusCaptain[3], strKarusCaptain[4]);
 	TRACE(_T("LoadKnightsRankTable Success\n"));
 
-	memset(send_buff, 0, sizeof(send_buff));
-	send_index = 0;
+	char send_buff[1024] = {},
+		temp_buff[1024] = {};
+	int send_index = 0, temp_index = 0;
+
 	SetByte(send_buff, WIZ_CHAT, send_index);
 	SetByte(send_buff, WAR_SYSTEM_CHAT, send_index);
 	SetByte(send_buff, 1, send_index);
@@ -4173,7 +3685,7 @@ BOOL CEbenezerDlg::LoadKnightsRankTable()
 
 	for (int i = 0; i < MAX_USER; i++)
 	{
-		pUser = (CUser*) m_Iocport.m_SockArray[i];
+		CUser* pUser = (CUser*) m_Iocport.m_SockArray[i];
 		if (pUser == nullptr)
 			continue;
 
@@ -4266,15 +3778,4 @@ C3DMap* CEbenezerDlg::GetMapByID(int iZoneID) const
 	}
 
 	return nullptr;
-}
-
-CString CEbenezerDlg::GetGameDBConnectionString()
-{
-	CString strConnection;
-	strConnection.Format(
-		_T("ODBC;DSN=%s;UID=%s;PWD=%s"),
-		m_strGameDSN,
-		m_strGameUID,
-		m_strGamePWD);
-	return strConnection;
 }

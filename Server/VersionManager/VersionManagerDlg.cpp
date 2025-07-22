@@ -10,46 +10,70 @@
 
 #include <shared/Ini.h>
 
+#include <db-library/ConnectionManager.h>
+#include <db-library/hooks.h>
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
 
-CIOCPort CVersionManagerDlg::m_Iocport;
+// NOTE: Explicitly handled under DEBUG_NEW override
+#include <db-library/RecordSetLoader.h>
+
+import VersionManagerBinder;
+
+CIOCPort CVersionManagerDlg::IocPort;
+
+constexpr int DB_POOL_CHECK = 100;
+
+static void LoggerImpl(const std::string& message)
+{
+	CString logLine;
+	logLine.Format(_T("%hs\r\n"), message.c_str());
+	LogFileWrite(logLine);
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // CVersionManagerDlg dialog
 
-CVersionManagerDlg::CVersionManagerDlg(CWnd* pParent /*=nullptr*/)
-	: CDialog(CVersionManagerDlg::IDD, pParent),
-	m_DBProcess(this)
+CVersionManagerDlg::CVersionManagerDlg(CWnd* parent)
+	: CDialog(IDD, parent),
+	DbProcess(this)
 {
 	//{{AFX_DATA_INIT(CVersionManagerDlg)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 
-	memset(m_strFtpUrl, 0, sizeof(m_strFtpUrl));
-	memset(m_strFilePath, 0, sizeof(m_strFilePath));
-	m_nLastVersion = 0;
-	memset(m_ODBCName, 0, sizeof(m_ODBCName));
-	memset(m_ODBCLogin, 0, sizeof(m_ODBCLogin));
-	memset(m_ODBCPwd, 0, sizeof(m_ODBCPwd));
-	memset(m_TableName, 0, sizeof(m_TableName));
+	memset(_ftpUrl, 0, sizeof(_ftpUrl));
+	memset(_ftpPath, 0, sizeof(_ftpPath));
+	_lastVersion = 0;
 
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	_icon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	db::hooks::Log = &LoggerImpl;
+
+	db::ConnectionManager::DefaultConnectionTimeout = DB_PROCESS_TIMEOUT;
+	db::ConnectionManager::Create();
 }
 
-void CVersionManagerDlg::DoDataExchange(CDataExchange* pDX)
+CVersionManagerDlg::~CVersionManagerDlg()
 {
-	CDialog::DoDataExchange(pDX);
+	db::ConnectionManager::Destroy();
+}
+
+void CVersionManagerDlg::DoDataExchange(CDataExchange* data)
+{
+	CDialog::DoDataExchange(data);
 	//{{AFX_DATA_MAP(CVersionManagerDlg)
-	DDX_Control(pDX, IDC_LIST1, m_OutputList);
+	DDX_Control(data, IDC_LIST1, _outputList);
 	//}}AFX_DATA_MAP
 }
 
 BEGIN_MESSAGE_MAP(CVersionManagerDlg, CDialog)
 	//{{AFX_MSG_MAP(CVersionManagerDlg)
+	ON_WM_TIMER()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_SETTING, OnVersionSetting)
@@ -65,15 +89,15 @@ BOOL CVersionManagerDlg::OnInitDialog()
 
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
-	SetIcon(m_hIcon, TRUE);			// Set big icon
-	SetIcon(m_hIcon, FALSE);		// Set small icon
+	SetIcon(_icon, TRUE);			// Set big icon
+	SetIcon(_icon, FALSE);		// Set small icon
 	
-	m_Iocport.Init(MAX_USER, CLIENT_SOCKSIZE, 1);
+	IocPort.Init(MAX_USER, CLIENT_SOCKSIZE, 1);
 
 	for (int i = 0; i < MAX_USER; i++)
-		m_Iocport.m_SockArrayInActive[i] = new CUser(this);
+		IocPort.m_SockArrayInActive[i] = new CUser(this);
 
-	if (!m_Iocport.Listen(_LISTEN_PORT))
+	if (!IocPort.Listen(_LISTEN_PORT))
 	{
 		AfxMessageBox(_T("FAIL TO CREATE LISTEN STATE"));
 		AfxPostQuitMessage(0);
@@ -87,29 +111,25 @@ BOOL CVersionManagerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	CString strConnection;
-	strConnection.Format(_T("ODBC;DSN=%s;UID=%s;PWD=%s"), m_ODBCName, m_ODBCLogin, m_ODBCPwd);
-
-	if (!m_DBProcess.InitDatabase(strConnection))
+	if (!DbProcess.InitDatabase())
 	{
 		AfxMessageBox(_T("Database Connection Fail!!"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	if (!m_DBProcess.LoadVersionList())
+	if (!LoadVersionList())
 	{
 		AfxMessageBox(_T("Load Version List Fail!!"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	m_OutputList.AddString(strConnection);
-	CString version;
-	version.Format(_T("Latest Version : %d"), m_nLastVersion);
-	m_OutputList.AddString(version);
+	ResetOutputList();
 
-	::ResumeThread(m_Iocport.m_hAcceptThread);
+	::ResumeThread(IocPort.m_hAcceptThread);
+
+	SetTimer(DB_POOL_CHECK, 60000, nullptr);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 }
@@ -121,34 +141,43 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 
 	CIni ini(iniPath);
 
-	ini.GetString("DOWNLOAD", "URL", "127.0.0.1", m_strFtpUrl, _countof(m_strFtpUrl));
-	ini.GetString("DOWNLOAD", "PATH", "/", m_strFilePath, _countof(m_strFilePath));
+	ini.GetString("DOWNLOAD", "URL", "127.0.0.1", _ftpUrl, _countof(_ftpUrl));
+	ini.GetString("DOWNLOAD", "PATH", "/", _ftpPath, _countof(_ftpPath));
+	
+	// TODO: KN_online should be Knight_Account
+	std::string datasourceName = ini.GetString(ini::ODBC, ini::DSN, "KN_online");
+	std::string datasourceUser = ini.GetString(ini::ODBC, ini::UID, "knight");
+	std::string datasourcePass = ini.GetString(ini::ODBC, ini::PWD, "knight");
 
-	ini.GetString(_T("ODBC"), _T("DSN"), _T("KN_online"), m_ODBCName, _countof(m_ODBCName));
-	ini.GetString(_T("ODBC"), _T("UID"), _T("knight"), m_ODBCLogin, _countof(m_ODBCLogin));
-	ini.GetString(_T("ODBC"), _T("PWD"), _T("knight"), m_ODBCPwd, _countof(m_ODBCPwd));
-	ini.GetString(_T("ODBC"), _T("TABLE"), _T("VERSION"), m_TableName, _countof(m_TableName));
-	ini.GetString(_T("CONFIGURATION"), _T("DEFAULT_PATH"), _T(""), m_strDefaultPath, _countof(m_strDefaultPath));
+	db::ConnectionManager::SetDatasourceConfig(
+		modelUtil::DbType::ACCOUNT,
+		datasourceName, datasourceUser, datasourcePass);
 
-	m_nServerCount = ini.GetInt("SERVER_LIST", "COUNT", 1);
+	// TODO: Remove this - currently all models are assigned to GAME
+	db::ConnectionManager::SetDatasourceConfig(
+		modelUtil::DbType::GAME,
+		datasourceName, datasourceUser, datasourcePass);
 
-	if (strlen(m_strFtpUrl) == 0
-		|| strlen(m_strFilePath) == 0)
+	_defaultPath = ini.GetString(ini::CONFIGURATION, ini::DEFAULT_PATH, "");
+	int serverCount = ini.GetInt(ini::SERVER_LIST, ini::COUNT, 1);
+
+	if (strlen(_ftpUrl) == 0
+		|| strlen(_ftpPath) == 0)
 		return FALSE;
 
-	if (_tcslen(m_ODBCName) == 0
-		|| _tcslen(m_ODBCLogin) == 0
-		|| _tcslen(m_ODBCPwd) == 0
-		|| _tcslen(m_TableName) == 0)
+	if (datasourceName.length() == 0
+		// TODO: Should we not validate UID/Pass length?  Would that allow Windows Auth?
+		|| datasourceUser.length() == 0
+		|| datasourcePass.length() == 0)
 		return FALSE;
 
-	if (m_nServerCount <= 0)
+	if (serverCount <= 0)
 		return FALSE;
 
 	char key[20] = {};
-	m_ServerList.reserve(20);
+	ServerList.reserve(serverCount);
 
-	for (int i = 0; i < m_nServerCount; i++)
+	for (int i = 0; i < serverCount; i++)
 	{
 		_SERVER_INFO* pInfo = new _SERVER_INFO;
 
@@ -164,14 +193,14 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 		snprintf(key, sizeof(key), "USER_LIMIT_%02d", i);
 		pInfo->sUserLimit = static_cast<short>(ini.GetInt("SERVER_LIST", key, MAX_USER));
 
-		m_ServerList.push_back(pInfo);
+		ServerList.push_back(pInfo);
 	}
 
 	// Read news from INI (max 3 blocks)
 	std::stringstream ss;
 	std::string title, message;
 
-	m_News.Size = 0;
+	News.Size = 0;
 	for (int i = 0; i < MAX_NEWS_COUNT; i++)
 	{
 		snprintf(key, sizeof(key), "TITLE_%02d", i);
@@ -193,14 +222,14 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 	const std::string newsContent = ss.str();
 	if (!newsContent.empty())
 	{
-		if (newsContent.size() > sizeof(m_News.Content))
+		if (newsContent.size() > sizeof(News.Content))
 		{
 			AfxMessageBox(_T("News too long"));
 			return FALSE;
 		}
 
-		memcpy(&m_News.Content, newsContent.c_str(), newsContent.size());
-		m_News.Size = static_cast<short>(newsContent.size());
+		memcpy(&News.Content, newsContent.c_str(), newsContent.size());
+		News.Size = static_cast<short>(newsContent.size());
 	}
 
 	// Trigger a save to flush defaults to file.
@@ -209,6 +238,31 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 	return TRUE;
 }
 
+BOOL CVersionManagerDlg::LoadVersionList()
+{
+	VersionInfoList versionList;
+	if (!DbProcess.LoadVersionList(&versionList))
+		return FALSE;
+
+	_lastVersion = 0;
+
+	for (const auto& [_, pInfo] : versionList)
+	{
+		if (_lastVersion < pInfo->Number)
+			_lastVersion = pInfo->Number;
+	}
+
+	VersionList.Swap(versionList);
+	return TRUE;
+}
+
+void CVersionManagerDlg::OnTimer(UINT EventId)
+{
+	if (EventId == DB_POOL_CHECK)
+		db::ConnectionManager::ExpireUnusedPoolConnections();
+
+	CDialog::OnTimer(EventId);
+}
 // If you add a minimize button to your dialog, you will need the code below
 //  to draw the icon.  For MFC applications using the document/view model,
 //  this is automatically done for you by the framework.
@@ -230,7 +284,7 @@ void CVersionManagerDlg::OnPaint()
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
 		// Draw the icon
-		dc.DrawIcon(x, y, m_hIcon);
+		dc.DrawIcon(x, y, _icon);
 	}
 	else
 	{
@@ -242,47 +296,80 @@ void CVersionManagerDlg::OnPaint()
 //  the minimized window.
 HCURSOR CVersionManagerDlg::OnQueryDragIcon()
 {
-	return (HCURSOR) m_hIcon;
+	return (HCURSOR) _icon;
 }
 
-BOOL CVersionManagerDlg::PreTranslateMessage(MSG* pMsg)
+BOOL CVersionManagerDlg::PreTranslateMessage(MSG* msg)
 {
-	if (pMsg->message == WM_KEYDOWN)
+	if (msg->message == WM_KEYDOWN)
 	{
-		if (pMsg->wParam == VK_RETURN
-			|| pMsg->wParam == VK_ESCAPE)
+		if (msg->wParam == VK_RETURN
+			|| msg->wParam == VK_ESCAPE)
 			return TRUE;
 	}
 
-	return CDialog::PreTranslateMessage(pMsg);
+	return CDialog::PreTranslateMessage(msg);
 }
 
 BOOL CVersionManagerDlg::DestroyWindow()
 {
-	if (!m_VersionList.IsEmpty())
-		m_VersionList.DeleteAllData();
+	KillTimer(DB_POOL_CHECK);
 
-	for (_SERVER_INFO* pInfo : m_ServerList)
+	if (!VersionList.IsEmpty())
+		VersionList.DeleteAllData();
+
+	for (_SERVER_INFO* pInfo : ServerList)
 		delete pInfo;
-	m_ServerList.clear();
+	ServerList.clear();
 
 	return CDialog::DestroyWindow();
 }
 
 void CVersionManagerDlg::OnVersionSetting() 
 {
-	CSettingDlg	setdlg(m_nLastVersion, this);
-	
-	_tcscpy(setdlg.m_strDefaultPath, m_strDefaultPath);
+	CSettingDlg	setdlg(_lastVersion, this);
+
+	CString conv = _defaultPath.c_str();
+	_tcscpy_s(setdlg._defaultPath, conv);
 	if (setdlg.DoModal() != IDOK)
 		return;
-
-	_tcscpy(m_strDefaultPath, setdlg.m_strDefaultPath);
 
 	std::filesystem::path iniPath(GetProgPath().GetString());
 	iniPath /= L"Version.ini";
 
 	CIni ini(iniPath);
-	ini.SetString(_T("CONFIGURATION"), _T("DEFAULT_PATH"), m_strDefaultPath);
+	_defaultPath = ini.GetString(ini::CONFIGURATION, ini::DEFAULT_PATH, "");
 	ini.Save();
+}
+
+void CVersionManagerDlg::ReportTableLoadError(const recordset_loader::Error& err, const char* source)
+{
+	CString msg;
+	msg.Format(_T("%hs failed: %hs"), source, err.Message.c_str());
+	AfxMessageBox(msg);
+}
+
+/// \brief clears the _outputList text area and regenerates default output
+/// \see _outputList
+void CVersionManagerDlg::ResetOutputList()
+{
+	_outputList.ResetContent();
+
+	// print the ODBC connection string
+	// TODO: modelUtil::DbType::ACCOUNT;  Currently all models are assigned to GAME
+	std::string odbcString = db::ConnectionManager::GetOdbcConnectionString(modelUtil::DbType::GAME);
+	CString strConnection(CA2T(odbcString.c_str()));
+	_outputList.AddString(strConnection);
+
+	// print the current version
+	CString version;
+	version.Format(_T("Latest Version : %d"), _lastVersion);
+	_outputList.AddString(version);
+}
+
+// \brief updates the last/latest version and resets the output list
+void CVersionManagerDlg::SetLastVersion(int lastVersion)
+{
+	_lastVersion = lastVersion;
+	ResetOutputList();
 }
