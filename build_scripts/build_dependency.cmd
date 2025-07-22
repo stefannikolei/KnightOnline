@@ -116,7 +116,7 @@ IF NOT "%PROJECT_PATH%"=="" (
 	)
 
 	REM Build dependency with a full rebuild (clean + build)
-	"%MSBUILD%" "%PROJECT_PATH%" /t:Build /p:Configuration=%BUILD_CONFIG% /p:Platform=%BUILD_PLATFORM%
+	"%MSBUILD%" "%PROJECT_PATH%" /t:Rebuild /p:Configuration=%BUILD_CONFIG% /p:Platform=%BUILD_PLATFORM%
 	IF ERRORLEVEL 1 (
 		ECHO ERROR: Failed to build dependency: %DEP_NAME%
 		EXIT /B 1
