@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\spdlog\src\*.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\spdlog\include\*.h" . />
+    <ClInclude Include="..\spdlog\include\cfg\*.h" />
+    <ClInclude Include="..\spdlog\include\details\*.h" />
+    <ClInclude Include="..\spdlog\include\fmt\*.h" />
+    <ClInclude Include="..\spdlog\include\sinks\*.h" />
+  </ItemGroup>
+</Project>
