@@ -28,7 +28,7 @@
 #define CLIENT_SOCKSIZE		10
 #define MAX_PATH_LINE		100
 
-#define NOW_TEST_MODE		1
+#define NOW_TEST_MODE		0
 
 #define MAX_WEAPON_NAME_SIZE	40
 #define MAX_ITEM			28

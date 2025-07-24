@@ -3208,7 +3208,7 @@ short CUser::GetDamage(short tid, int magicid)
 		return -1;
 
 	temp_ac = pTUser->m_sTotalAc + pTUser->m_sACAmount;    // 표시   
-	temp_hit_B = (int) ((m_sTotalHit * m_bAttackAmount * 200 / 100) / (temp_ac + 240));   // 표시
+	temp_hit_B = (m_sTotalHit * m_bAttackAmount * 200 / 100) / (temp_ac + 240);   // 표시
 
 	// Skill/Arrow hit.    
 	if (magicid > 0)
@@ -3288,26 +3288,24 @@ short CUser::GetDamage(short tid, int magicid)
 			// Skill Hit.
 			if (magicid > 0)
 			{
-				damage = (short) temp_hit;
-				random = myrand(0, damage);
+				random = myrand(0, temp_hit);
 				if (pTable->Type1 == 1)
-					damage = (short) ((temp_hit + 0.3f * random) + 0.99f);
+					damage = static_cast<int16_t>((temp_hit + 0.3f * random) + 0.99f);
 				else
-					damage = (short) (((temp_hit * 0.6f) + 1.0f * random) + 0.99f);
+					damage = static_cast<int16_t>(((temp_hit * 0.6f) + 1.0f * random) + 0.99f);
 			}
 			// Normal Hit.	
 			else
 			{
-				damage = (short) temp_hit_B;
-				random = myrand(0, damage);
-				damage = (short) ((0.85f * temp_hit_B) + 0.3f * random);
+				random = myrand(0, temp_hit_B);
+				damage = static_cast<int16_t>((0.85f * temp_hit_B) + 0.3f * random);
 			}
 
 			break;
 
 		case FAIL:
+		default:
 			damage = 0;
-			break;
 	}
 
 	damage = GetMagicDamage(damage, tid);	// 2. Magical item damage....	
