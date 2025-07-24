@@ -179,9 +179,7 @@ void CPlayerMySelf::Tick()
 	////////////////////////////////////////////////////////////////////////////////
 
 	CPlayerBase* pTarget = nullptr;
-	if (m_bAttackContinous
-		&& (PSA_ATTACK == m_eState
-			|| PSA_SPELLMAGIC == m_eState))
+	if (m_bAttackContinous)
 	{
 		pTarget = TargetPointerCheck(false);
 		if(pTarget == nullptr)
