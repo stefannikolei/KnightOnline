@@ -317,12 +317,6 @@ namespace ini
 	// ZONE_INFO section
 	static constexpr char ZONE_INFO[] = "ZONE_INFO";
 	static constexpr char GROUP_INFO[] = "GROUP_INFO";
-
-	// LOGGER section
-	static constexpr char LOGGER[] = "LOGGER";
-	static constexpr char LEVEL[] = "LEVEL";
-	static constexpr char PATTERN[] = "PATTERN";
-	static constexpr char FILE[] = "FILE";
 }
 
 #endif

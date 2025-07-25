@@ -9,13 +9,10 @@
 #include "User.h"
 
 #include <shared/Ini.h>
+#include <shared/logger.h>
 
 #include <db-library/ConnectionManager.h>
 #include <spdlog/spdlog.h>
-#include <spdlog/sinks/daily_file_sink.h>
-#include <spdlog/common.h>
-
-#include "spdlog/sinks/stdout_color_sinks.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -141,15 +138,7 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 	ini.GetString(ini::DOWNLOAD, ini::PATH, "/", _ftpPath, _countof(_ftpPath));
 
 	// configure logger
-	std::string fileName = ini.GetString(ini::LOGGER, ini::FILE, "version.log");
-	auto fileLogger = std::make_shared<spdlog::sinks::daily_file_format_sink_mt>(fileName, 0, 0);
-	auto consoleLogger = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-	std::shared_ptr<spdlog::logger> appLogger = std::make_shared<spdlog::logger>(spdlog::logger("VersionManager", {fileLogger, consoleLogger}));
-	spdlog::set_default_logger(appLogger);
-	int logLevel = ini.GetInt(ini::LOGGER, ini::LEVEL, spdlog::level::info);
-	spdlog::set_level(static_cast<spdlog::level::level_enum>(logLevel));
-	std::string logPattern = ini.GetString(ini::LOGGER, ini::PATTERN, "[%H:%M:%S][%n][%7l] %v");
-	spdlog::set_pattern(logPattern);
+	SetupLogger(ini, "VersionManager");
 	
 	// TODO: KN_online should be Knight_Account
 	std::string datasourceName = ini.GetString(ini::ODBC, ini::DSN, "KN_online");
@@ -241,6 +230,8 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 
 	// Trigger a save to flush defaults to file.
 	ini.Save();
+
+	spdlog::info("Version Manager initialized");
 
 	return TRUE;
 }

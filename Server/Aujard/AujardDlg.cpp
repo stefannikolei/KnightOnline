@@ -8,10 +8,8 @@
 #include <codecvt>
 #include <process.h>
 #include <shared/Ini.h>
+#include <shared/logger.h>
 #include <db-library/ConnectionManager.h>
-
-#include <spdlog/sinks/daily_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 
 #include <spdlog/spdlog.h>
 
@@ -186,15 +184,7 @@ BOOL CAujardDlg::OnInitDialog()
 	CIni ini(iniPath);
 
 	// configure logger
-	std::string fileName = ini.GetString(ini::LOGGER, ini::FILE, "aujard.log");
-	auto fileLogger = std::make_shared<spdlog::sinks::daily_file_format_sink_mt>(fileName, 0, 0);
-	auto consoleLogger = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-	std::shared_ptr<spdlog::logger> appLogger = std::make_shared<spdlog::logger>(spdlog::logger("Aujard", {fileLogger, consoleLogger}));
-	spdlog::set_default_logger(appLogger);
-	int logLevel = ini.GetInt(ini::LOGGER, ini::LEVEL, spdlog::level::info);
-	spdlog::set_level(static_cast<spdlog::level::level_enum>(logLevel));
-	std::string logPattern = ini.GetString(ini::LOGGER, ini::PATTERN, "[%H:%M:%S][%n][%7l] %v");
-	spdlog::set_pattern(logPattern);
+	SetupLogger(ini, "Aujard");
 
 	LoggerRecvQueue.InitailizeMMF(MAX_PKTSIZE, MAX_COUNT, _T(SMQ_LOGGERSEND), FALSE);	// Dispatcher 의 Send Queue
 	LoggerSendQueue.InitailizeMMF(MAX_PKTSIZE, MAX_COUNT, _T(SMQ_LOGGERRECV), FALSE);	// Dispatcher 의 Read Queue
@@ -256,7 +246,7 @@ BOOL CAujardDlg::OnInitDialog()
 	DWORD id;
 	_readQueueThread = ::CreateThread(nullptr, 0, ReadQueueThread, this, 0, &id);
 
-	spdlog::info("Aujard start");
+	spdlog::info("Aujard initialized");
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 

@@ -218,12 +218,6 @@ namespace ini
 	static constexpr char SERVER_LIST[] = "SERVER_LIST";
 	static constexpr char COUNT[] = "COUNT";
 
-	// LOGGER section
-	static constexpr char LOGGER[] = "LOGGER";
-	static constexpr char LEVEL[] = "LEVEL";
-	static constexpr char PATTERN[] = "PATTERN";
-	static constexpr char FILE[] = "FILE";
-
 	// Download section
 	static constexpr char DOWNLOAD[] = "DOWNLOAD";
 	static constexpr char URL[] = "URL";
