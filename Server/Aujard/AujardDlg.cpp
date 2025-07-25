@@ -4,10 +4,16 @@
 #include "stdafx.h"
 #include "Aujard.h"
 #include "AujardDlg.h"
+
+#include <codecvt>
 #include <process.h>
 #include <shared/Ini.h>
 #include <db-library/ConnectionManager.h>
-#include <db-library/hooks.h>
+
+#include <spdlog/sinks/daily_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -29,8 +35,6 @@ import AujardModel;
 namespace model = aujard_model;
 
 WORD g_increase_serial = 50001;
-
-CRITICAL_SECTION g_LogFileWrite;
 
 CAujardDlg* CAujardDlg::_instance = nullptr;
 
@@ -119,13 +123,6 @@ DWORD WINAPI ReadQueueThread(LPVOID lp)
 	}
 }
 
-static void LoggerImpl(const std::string& message)
-{
-	CString logLine;
-	logLine.Format(_T("%hs\r\n"), message.c_str());
-	LogFileWrite(logLine);
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // CAujardDlg dialog
 
@@ -140,8 +137,6 @@ CAujardDlg::CAujardDlg(CWnd* parent /*=nullptr*/)
 	_sendPacketCount = 0;
 	_packetCount = 0;
 	_recvPacketCount = 0;
-
-	db::hooks::Log = &LoggerImpl;
 
 	db::ConnectionManager::DefaultConnectionTimeout = DB_PROCESS_TIMEOUT;
 	db::ConnectionManager::Create();
@@ -185,18 +180,21 @@ BOOL CAujardDlg::OnInitDialog()
 	SetIcon(_icon, TRUE);			// Set big icon
 	SetIcon(_icon, FALSE);		// Set small icon
 
-	//----------------------------------------------------------------------
-	//	Logfile initialize
-	//----------------------------------------------------------------------
-	CTime time = CTime::GetCurrentTime();
-	TCHAR strLogFile[50] = {};
-	wsprintf(strLogFile, _T("AujardLog-%04d-%02d-%02d.txt"), time.GetYear(), time.GetMonth(), time.GetDay());
-	_logFile.Open(strLogFile, CFile::modeWrite | CFile::modeCreate | CFile::modeNoTruncate | CFile::shareDenyNone);
-	_logFile.SeekToEnd();
+	std::filesystem::path iniPath(GetProgPath().GetString());
+	iniPath /= L"Aujard.ini";
 
-	_logFileDay = time.GetDay();
+	CIni ini(iniPath);
 
-	InitializeCriticalSection(&g_LogFileWrite);
+	// configure logger
+	std::string fileName = ini.GetString(ini::LOGGER, ini::FILE, "aujard.log");
+	auto fileLogger = std::make_shared<spdlog::sinks::daily_file_format_sink_mt>(fileName, 0, 0);
+	auto consoleLogger = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+	std::shared_ptr<spdlog::logger> appLogger = std::make_shared<spdlog::logger>(spdlog::logger("Aujard", {fileLogger, consoleLogger}));
+	spdlog::set_default_logger(appLogger);
+	int logLevel = ini.GetInt(ini::LOGGER, ini::LEVEL, spdlog::level::info);
+	spdlog::set_level(static_cast<spdlog::level::level_enum>(logLevel));
+	std::string logPattern = ini.GetString(ini::LOGGER, ini::PATTERN, "[%H:%M:%S][%n][%7l] %v");
+	spdlog::set_pattern(logPattern);
 
 	LoggerRecvQueue.InitailizeMMF(MAX_PKTSIZE, MAX_COUNT, _T(SMQ_LOGGERSEND), FALSE);	// Dispatcher 의 Send Queue
 	LoggerSendQueue.InitailizeMMF(MAX_PKTSIZE, MAX_COUNT, _T(SMQ_LOGGERRECV), FALSE);	// Dispatcher 의 Read Queue
@@ -207,12 +205,7 @@ BOOL CAujardDlg::OnInitDialog()
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
-
-	std::filesystem::path iniPath(GetProgPath().GetString());
-	iniPath /= L"Aujard.ini";
-
-	CIni ini(iniPath);
-
+	
 	// TODO: This should be Knight_Account
 	// TODO: This should only fetch the once.
 	// The above won't be necessary after stored procedures are replaced, so it can be replaced then.
@@ -263,11 +256,7 @@ BOOL CAujardDlg::OnInitDialog()
 	DWORD id;
 	_readQueueThread = ::CreateThread(nullptr, 0, ReadQueueThread, this, 0, &id);
 
-	CTime cur = CTime::GetCurrentTime();
-	CString starttime;
-	starttime.Format(_T("Aujard Start : %02d/%02d %02d:%02d\r\n"), cur.GetMonth(), cur.GetDay(), cur.GetHour(), cur.GetMinute());
-	_logFile.Write(starttime, starttime.GetLength());
-
+	spdlog::info("Aujard start");
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -321,12 +310,7 @@ BOOL CAujardDlg::DestroyWindow()
 
 	if (!ItemArray.IsEmpty())
 		ItemArray.DeleteAllData();
-
-	if (_logFile.m_hFile != CFile::hFileNull)
-		_logFile.Close();
-
-	DeleteCriticalSection(&g_LogFileWrite);
-
+	
 	_instance = nullptr;
 
 	return CDialog::DestroyWindow();
@@ -345,6 +329,7 @@ BOOL CAujardDlg::InitSharedMemory()
 	}
 
 	CString logstr = _T("Shared Memory Load Success!!");
+	spdlog::info("Shared Memory Load Success!!");
 	OutputList.AddString(logstr);
 
 	_sharedMemoryFile = (char*) MapViewOfFile(_sharedMemoryHandle, FILE_MAP_WRITE, 0, 0, 0);
@@ -386,7 +371,8 @@ BOOL CAujardDlg::LoadItemTable()
 /// \brief loads and sends data after a character is selected
 void CAujardDlg::SelectCharacter(char* buffer)
 {
-	int index = 0, userId = -1, sendIndex = 0, idLen1 = 0, idLen2 = 0, tempUserId = -1, count = 0, packetIndex = 0;
+	int index = 0, userId = -1, sendIndex = 0, idLen1 = 0, idLen2 = 0, tempUserId = -1,
+		retryCount = 0, packetIndex = 0, maxRetry = 50;
 	BYTE init = 0x01;
 	char sendBuff[256] = {},
 		accountId[MAX_ID_SIZE + 1] = {},
@@ -402,13 +388,9 @@ void CAujardDlg::SelectCharacter(char* buffer)
 	init = GetByte(buffer, index);
 	packetIndex = GetDWORD(buffer, index);
 
-	CTime t = CTime::GetCurrentTime();
-	char logStr[256];
-	memset(logStr, 0x00, 256);
-	sprintf(logStr, "SelectCharacter : acctId=%s, charId=%s, index=%d, pid : %d, front : %d\r\n", accountId, charId, packetIndex, _getpid(), LoggerRecvQueue.GetFrontPointer());
-	WriteLogFile(logStr);
-	//m_LogFile.Write(logstr, strlen(logstr));
-
+	spdlog::debug("SelectCharacter: acctId={}, charId={}, index={}, pid={}, front={}",
+		accountId, charId, packetIndex, _getpid(), LoggerRecvQueue.GetFrontPointer());
+	
 	_recvPacketCount++;		// packet count
 
 	if (userId < 0
@@ -444,8 +426,8 @@ void CAujardDlg::SelectCharacter(char* buffer)
 
 	if (strcpy_s(user->m_Accountid, accountId))
 	{
-		LogFileWrite(std::format("SelectCharacter(): failed to write accountId(len: {}, val: {}) to user->m_Accountid",
-			std::strlen(accountId), accountId));
+		spdlog::error("SelectCharacter(): failed to write accountId(len: {}, val: {}) to user->m_Accountid",
+			std::strlen(accountId), accountId);
 		// it didn't fail here before and we don't currently return anything upstream
 		// if this exposes any problems we'll have to decide how to handle it then
 	}
@@ -455,7 +437,7 @@ void CAujardDlg::SelectCharacter(char* buffer)
 	SetByte(sendBuff, 0x01, sendIndex);
 	SetByte(sendBuff, init, sendIndex);
 
-	_packetCount++;		// packet count
+	_packetCount++;	
 
 	do
 	{
@@ -465,12 +447,15 @@ void CAujardDlg::SelectCharacter(char* buffer)
 			break;
 		}
 
-		count++;
+		retryCount++;
 	}
-	while (count < 50);
+	while (retryCount < maxRetry);
 
-	if (count >= 50)
+	if (retryCount >= maxRetry)
+	{
 		OutputList.AddString(_T("Packet Drop: WIZ_SEL_CHAR"));
+		spdlog::error("Packet Drop: WIZ_SEL_CHAR");
+	}
 
 	return;
 
@@ -523,7 +508,10 @@ void CAujardDlg::UserLogOut(char* buffer)
 	while (retryCount < maxRetry);
 
 	if (retryCount >= maxRetry)
+	{
 		OutputList.AddString(_T("Packet Drop: WIZ_LOGOUT"));
+		spdlog::error("Packet Drop: WIZ_LOGOUT");
+	}
 }
 
 /// \brief handles user logout functions
@@ -539,7 +527,7 @@ bool CAujardDlg::HandleUserLogout(int userId, BYTE saveType, bool forceLogout)
 	_USER_DATA* pUser = _dbAgent.UserData[userId];
 	if (pUser == nullptr || std::strlen(pUser->m_id) == 0)
 	{
-		LogFileWrite(std::format("Invalid logout: UserData[{}] is not in use\r\n", userId));
+		spdlog::error("Invalid logout: UserData[{}] is not in use", userId);
 		return false;
 	}
 
@@ -556,15 +544,13 @@ bool CAujardDlg::HandleUserLogout(int userId, BYTE saveType, bool forceLogout)
 	bool success = userdataSuccess && logoutResult;
 	if (!success)
 	{
-		LogFileWrite(std::format("Invalid Logout: {}, {} (UserData: {}, Logout: {}) \r\n",
-			pUser->m_Accountid, pUser->m_id, userdataSuccess, logoutResult));
+		spdlog::error("Invalid Logout: {}, {} (UserData: {}, Logout: {})",
+			pUser->m_Accountid, pUser->m_id, userdataSuccess, logoutResult);
 		return false;
 	}
 
-#if defined(_DEBUG)
-	LogFileWrite(std::format("Logout: {}, {} (UserData: {}, Logout: {})\r\n",
-		pUser->m_Accountid, pUser->m_id, userdataSuccess, logoutResult));
-#endif
+	spdlog::debug("Logout: {}, {} (UserData: {}, Logout: {})",
+	pUser->m_Accountid, pUser->m_id, userdataSuccess, logoutResult);
 
 	// reset the object stored in UserData[userId] before returning
 	// this will reset data like accountId/charId, so logging must
@@ -584,7 +570,6 @@ bool CAujardDlg::HandleUserUpdate(int userId, const _USER_DATA& user, BYTE saveT
 	DWORD sleepTime = 10;
 	int updateWarehouseResult = 0, updateUserResult = 0,
 		retryCount = 0, maxRetry = 10;
-	char logStr[256] = {};
 
 	// attempt updates
 	updateUserResult = _dbAgent.UpdateUser(user.m_id, userId, saveType);
@@ -597,8 +582,8 @@ bool CAujardDlg::HandleUserUpdate(int userId, const _USER_DATA& user, BYTE saveT
 	{
 		if (retryCount >= maxRetry)
 		{
-			sprintf(logStr, "UserData Save Error: %s, %s (W:%d,U:%d) \r\n", user.m_Accountid, user.m_id, updateWarehouseResult, updateUserResult);
-			LogFileWrite(logStr);
+			spdlog::error("UserData Save Error: %s, %s (W:%d,U:%d)",
+				user.m_Accountid, user.m_id, updateWarehouseResult, updateUserResult);
 			break;
 		}
 		// only retry the calls that fail - they're both updating using UserData[userId]->dwTime, so they should sync fine
@@ -622,13 +607,13 @@ bool CAujardDlg::HandleUserUpdate(int userId, const _USER_DATA& user, BYTE saveT
 		{
 			if (!updateWarehouseResult)
 			{
-				sprintf(logStr, "Warehouse Save Check Error: %s, %s (W:%d) \r\n", user.m_Accountid, user.m_id, updateWarehouseResult);
-				LogFileWrite(logStr);
+				spdlog::error("Warehouse Save Check Error: %s, %s (W:%d)",
+					user.m_Accountid, user.m_id, updateWarehouseResult);
 			}
 			if (!updateUserResult)
 			{
-				sprintf(logStr, "UserData Save Check Error: %s, %s (W:%d) \r\n", user.m_Accountid, user.m_id, updateUserResult);
-				LogFileWrite(logStr);
+				spdlog::error("UserData Save Check Error: %s, %s (W:%d)",
+					user.m_Accountid, user.m_id, updateUserResult);
 			}
 			break;
 		}
@@ -683,14 +668,18 @@ void CAujardDlg::AccountLogIn(char* buffer)
 	while (retryCount < maxRetry);
 
 	if (retryCount >= maxRetry)
+	{
 		OutputList.AddString(_T("Packet Drop: WIZ_LOGIN"));
+		spdlog::error("Packet Drop: WIZ_LOGIN");
+	}
 }
 
 /// \brief handles a WIZ_SEL_NATION request to a selected game server
 /// \see WIZ_SEL_NATION
 void CAujardDlg::SelectNation(char* buffer)
 {
-	int index = 0, userId = -1, accountIdLen = 0, sendIndex = 0, retryCount = 0;
+	int index = 0, userId = -1, accountIdLen = 0, sendIndex = 0,
+		retryCount = 0, maxRetry = 50;
 	int nation = -1;
 	char accountId[MAX_ID_SIZE + 1] = {},
 		password[MAX_PW_SIZE + 1] = {},
@@ -718,10 +707,13 @@ void CAujardDlg::SelectNation(char* buffer)
 
 		retryCount++;
 	}
-	while (retryCount < 50);
+	while (retryCount < maxRetry);
 
-	if (retryCount >= 50)
+	if (retryCount >= maxRetry)
+	{
 		OutputList.AddString(_T("Packet Drop: WIZ_SEL_NATION"));
+		spdlog::error("Packet Drop: WIZ_SEL_NATION");
+	}
 }
 
 /// \brief handles a WIZ_NEW_CHAR request
@@ -767,7 +759,10 @@ void CAujardDlg::CreateNewChar(char* buffer)
 	while (retryCount < maxRetry);
 
 	if (retryCount >= maxRetry)
+	{
 		OutputList.AddString(_T("Packet Drop: WIZ_NEW_CHAR"));
+		spdlog::error("Packet Drop: WIZ_NEW_CHAR");
+	}
 }
 
 /// \brief handles a WIZ_DEL_CHAR request
@@ -795,7 +790,7 @@ void CAujardDlg::DeleteChar(char* buffer)
 	// Not implemented.  Allow result to default to 0.
 	//result = _dbAgent.DeleteChar(charindex, accountid, charid, socno);
 
-	TRACE(_T("*** DeleteChar == charid=%hs, socno=%hs ***\n"), charId, socNo);
+	spdlog::trace("*** DeleteChar == charId={}, socNo={} ***\n", charId, socNo);
 
 	SetByte(sendBuff, WIZ_DEL_CHAR, sendIndex);
 	SetShort(sendBuff, userId, sendIndex);
@@ -815,7 +810,10 @@ void CAujardDlg::DeleteChar(char* buffer)
 	while (retryCount < maxRetry);
 
 	if (retryCount >= maxRetry)
+	{
 		OutputList.AddString(_T("Packet Drop: WIZ_DEL_CHAR"));
+		spdlog::error("Packet Drop: WIZ_DEL_CHAR");
+	}
 }
 
 /// \brief handles a WIZ_ALLCHAR_INFO_REQ request
@@ -858,7 +856,10 @@ void CAujardDlg::AllCharInfoReq(char* buffer)
 	while (retryCount < maxRetry);
 
 	if (retryCount >= maxRetry)
+	{
 		OutputList.AddString(_T("Packet Drop: WIZ_ALLCHAR_INFO_REQ"));
+		spdlog::error("Packet Drop: WIZ_ALLCHAR_INFO_REQ");
+	}
 }
 
 BOOL CAujardDlg::PreTranslateMessage(MSG* msg)
@@ -877,7 +878,10 @@ BOOL CAujardDlg::PreTranslateMessage(MSG* msg)
 void CAujardDlg::OnOK()
 {
 	if (AfxMessageBox(_T("Do you really want to quit?"), MB_YESNO) == IDYES)
+	{
+		spdlog::debug("User closing application");
 		CDialog::OnOK();
+	}
 }
 
 void CAujardDlg::OnTimer(UINT EventId)
@@ -929,27 +933,25 @@ void CAujardDlg::AllSaveRoutine()
 	// log the disconnect
 	msgStr.Format(_T("Ebenezer disconnected: %04d/%02d/%02d %02d:%02d"), cur.GetYear(), cur.GetMonth(), cur.GetDay(), cur.GetHour(), cur.GetMinute());
 	OutputList.AddString(msgStr);
-	TRACE(_T("Dead Time : %04d/%02d/%02d %02d:%02d\n"), cur.GetYear(), cur.GetMonth(), cur.GetDay(), cur.GetHour(), cur.GetMinute());
+	spdlog::error("Ebenezer disconnected. Saving users...");
 	
 	for (int userId = 0; userId < static_cast<int>(_dbAgent.UserData.size()); userId++)
 	{
 		_USER_DATA* pUser = _dbAgent.UserData[userId];
 		if (pUser == nullptr || strlen(pUser->m_id) == 0)
 		{
-#if defined(_DEBUG)
-			TRACE(_T("GameServer Dead!! - %hs Skipped\n"), pUser->m_id);
-#endif
+			spdlog::debug("userId skipped for invalid data: {}", userId);
 			continue;
 		}
 
 		if (HandleUserLogout(userId, UPDATE_ALL_SAVE, true))
 		{
-			TRACE(_T("GameServer Dead!! - %hs Saved\n"), pUser->m_id);
+			spdlog::debug("Character saved: {}", pUser->m_id);
 		}
 		else
 		{
 			allUsersSaved = false;
-			TRACE(_T("GameServer Dead!! - %hs Not Saved\n"), pUser->m_id);
+			spdlog::error("Failed to save character: {}", pUser->m_id);
 		}
 		Sleep(sleepTime);
 	}
@@ -957,11 +959,13 @@ void CAujardDlg::AllSaveRoutine()
 	{
 		msgStr.Format(_T("All UserData saved: %04d/%02d/%02d %02d:%02d"), cur.GetYear(), cur.GetMonth(), cur.GetDay(), cur.GetHour(), cur.GetMinute());
 		OutputList.AddString(msgStr);
+		spdlog::info("Ebenezer disconnect: all users saved successfully");
 	}
 	else
 	{
 		msgStr.Format(_T("Not all UserData saved: %04d/%02d/%02d %02d:%02d"), cur.GetYear(), cur.GetMonth(), cur.GetDay(), cur.GetHour(), cur.GetMinute());
 		OutputList.AddString(msgStr);
+		spdlog::error("Ebenezer disconnect: not all users saved");
 	}
 }
 
@@ -982,7 +986,7 @@ void CAujardDlg::ConCurrentUserCount()
 		t_count++;
 	}
 
-	TRACE(_T("*** ConCurrentUserCount : server=%d, zone=%d, usercount=%d ***\n"), _serverId, _zoneId, t_count);
+	spdlog::trace("*** ConCurrentUserCount : server=%d, zone=%d, usercount=%d ***\n", _serverId, _zoneId, t_count);
 
 	_dbAgent.UpdateConCurrentUserCount(_serverId, _zoneId, t_count);
 }
@@ -1015,8 +1019,8 @@ void CAujardDlg::UserDataSave(char* buffer)
 	bool userdataSuccess = HandleUserUpdate(userId, *pUser, UPDATE_PACKET_SAVE);
 	if (!userdataSuccess)
 	{
-		LogFileWrite(std::format("UserDataSave failed for UserData[{}] accountId({}) charId({})\r\n",
-			userId, accountId, charId));
+		spdlog::error("UserDataSave failed for UserData[{}] accountId({}) charId({})",
+			userId, accountId, charId);
 	}
 }
 
@@ -1096,7 +1100,7 @@ void CAujardDlg::KnightsPacket(char* buffer)
 			break;
 
 		default:
-			LogFileWrite(std::format("Invalid WIZ_KNIGHTS_PROCESS command code received: {}\r\n", command));
+			spdlog::error("Invalid WIZ_KNIGHTS_PROCESS command code received: {}", command);
 	}
 }
 
@@ -1126,7 +1130,7 @@ void CAujardDlg::CreateKnights(char* buffer)
 
 	result = _dbAgent.CreateKnights(knightsId, nation, knightsName, chiefName, community);
 
-	TRACE(_T("CreateKnights - nid=%d, index=%d, result=%d \n"), userId, knightsId, result);
+	spdlog::trace("CreateKnights - userId={}, knightsId={}, result={}", userId, knightsId, result);
 
 	SetByte(sendBuff, KNIGHTS_CREATE, sendIndex);
 	SetShort(sendBuff, userId, sendIndex);
@@ -1149,7 +1153,10 @@ void CAujardDlg::CreateKnights(char* buffer)
 	while (retryCount < maxRetry);
 
 	if (retryCount >= maxRetry)
+	{
 		OutputList.AddString(_T("Packet Drop: KNIGHTS_CREATE"));
+		spdlog::error("Packet Drop: KNIGHTS_CREATE");
+	}
 }
 
 /// \brief attempts to add a character to a knights clan
@@ -1174,7 +1181,8 @@ void CAujardDlg::JoinKnights(char* buffer)
 
 	result = _dbAgent.UpdateKnights(KNIGHTS_JOIN, pUser->m_id, knightsId, 0);
 
-	TRACE(_T("JoinKnights - nid=%d, name=%hs, index=%d, result=%d \n"), userId, pUser->m_id, knightsId, result);
+	spdlog::trace("JoinKnights - userId={}, charId={}, knightsId={}, result={}",
+		userId, pUser->m_id, knightsId, result);
 
 	SetByte(sendBuff, KNIGHTS_JOIN, sendIndex);
 	SetShort(sendBuff, userId, sendIndex);
@@ -1191,7 +1199,10 @@ void CAujardDlg::JoinKnights(char* buffer)
 	while (retryCount < maxRetry);
 
 	if (retryCount >= maxRetry)
+	{
 		OutputList.AddString(_T("Packet Drop: KNIGHTS_JOIN"));
+		spdlog::error("Packet Drop: KNIGHTS_JOIN");
+	}
 }
 
 /// \brief attempt to remove a character from a knights clan
@@ -1215,7 +1226,8 @@ void CAujardDlg::WithdrawKnights(char* buffer)
 		return;
 
 	result = _dbAgent.UpdateKnights(KNIGHTS_WITHDRAW, pUser->m_id, knightsId, 0);
-	TRACE(_T("WithDrawKnights - nid=%d, index=%d, result=%d \n"), userId, knightsId, result);
+	spdlog::trace("WithDrawKnights - userId={}, knightsId={}, result={}",
+		userId, knightsId, result);
 
 	SetByte(sendBuff, KNIGHTS_WITHDRAW, sendIndex);
 	SetShort(sendBuff, userId, sendIndex);
@@ -1232,7 +1244,10 @@ void CAujardDlg::WithdrawKnights(char* buffer)
 	while (retryCount < maxRetry);
 
 	if (retryCount >= maxRetry)
+	{
 		OutputList.AddString(_T("Packet Drop: KNIGHTS_WITHDRAW"));
+		spdlog::error("Packet Drop: KNIGHTS_WITHDRAW");
+	}
 }
 
 /// \brief attempts to modify a knights character
@@ -1263,7 +1278,8 @@ void CAujardDlg::ModifyKnightsMember(char* buffer, BYTE command)
 	}	*/
 
 	result = _dbAgent.UpdateKnights(command, charId, knightsId, removeFlag);
-	TRACE(_T("ModifyKnights - command=%d, nid=%d, index=%d, result=%d \n"), command, userId, knightsId, result);
+	spdlog::trace("ModifyKnights - command={}, userId={}, knightsId={}, result={}",
+		command, userId, knightsId, result);
 
 	//SetByte( send_buff, WIZ_KNIGHTS_PROCESS, send_index );
 	SetByte(send_buff, command, sendIndex);
@@ -1313,7 +1329,10 @@ void CAujardDlg::ModifyKnightsMember(char* buffer, BYTE command)
 			cmdStr = _T("ModifyKnightsMember");
 		}
 		std::wstring errMsg = std::format(_T("Packet Drop: {}"), cmdStr);
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+		std::string errMsgA = converter.to_bytes(errMsg);
 		OutputList.AddString(errMsg.c_str());
+		spdlog::error(errMsgA);
 	}
 }
 
@@ -1333,7 +1352,8 @@ void CAujardDlg::DestroyKnights(char* buffer)
 		return;
 
 	result = _dbAgent.DeleteKnights(knightsId);
-	TRACE(_T("DestroyKnights - userId=%d, knightsId=%d, result=%d \n"), userId, knightsId, result);
+	spdlog::trace("DestroyKnights - userId={}, knightsId={}, result={}",
+	userId, knightsId, result);
 
 	SetByte(sendBuff, KNIGHTS_DESTROY, sendIndex);
 	SetShort(sendBuff, userId, sendIndex);
@@ -1350,7 +1370,10 @@ void CAujardDlg::DestroyKnights(char* buffer)
 	while (retryCount < maxRetry);
 
 	if (retryCount >= maxRetry)
+	{
 		OutputList.AddString(_T("Packet Drop: KNIGHTS_DESTROY"));
+		spdlog::error("Packet Drop: KNIGHTS_DESTROY");
+	}
 }
 
 /// \brief attempts to return a list of all knights members
@@ -1394,7 +1417,10 @@ void CAujardDlg::AllKnightsMember(char* buffer)
 	while (retryCount < maxRetry);
 
 	if (retryCount >= maxRetry)
+	{
 		OutputList.AddString(_T("Packet Drop: KNIGHTS_MEMBER_REQ"));
+		spdlog::error("Packet Drop: KNIGHTS_MEMBER_REQ");
+	}
 }
 
 /// \brief attempts to retrieve metadata for a knights clan
@@ -1416,7 +1442,7 @@ void CAujardDlg::KnightsList(char* buffer)
 
 	SetByte(sendBuff, KNIGHTS_LIST_REQ, sendIndex);
 	SetShort(sendBuff, userId, sendIndex);
-	SetByte(sendBuff, 0x00, sendIndex);							// Success
+	SetByte(sendBuff, 0x00, sendIndex);
 	SetString(sendBuff, dbBuff, dbIndex, sendIndex);
 
 	do
@@ -1429,7 +1455,10 @@ void CAujardDlg::KnightsList(char* buffer)
 	while (retry < maxRetry);
 
 	if (retry >= maxRetry)
+	{
 		OutputList.AddString(_T("Packet Drop: KNIGHTS_LIST_REQ"));
+		spdlog::error("Packet Drop: KNIGHTS_LIST_REQ");
+	}
 }
 
 /// \brief handles WIZ_LOGIN_INFO requests, updating CURRENTUSER for a user
@@ -1473,12 +1502,12 @@ void CAujardDlg::SetLogInInfo(char* buffer)
 		while (retryCount < maxRetry);
 
 		if (retryCount >= maxRetry)
+		{
 			OutputList.AddString(_T("Packet Drop: WIZ_LOGIN_INFO"));
-
-		char logstr[256] = {};
-		sprintf(logstr, "LoginINFO Insert Fail : %s, %s, %d\r\n", accountId, charId, init);
-		WriteLogFile(logstr);
-		//m_LogFile.Write(logstr, strlen(logstr));
+			spdlog::error("Packet Drop: WIZ_LOGIN_INFO");
+			spdlog::error("SetLoginInfo failed: accountId={}, charId={}, init={}",
+			accountId, charId, init);
+		}
 	}
 }
 
@@ -1498,11 +1527,8 @@ void CAujardDlg::UserKickOut(char* buffer)
 /// \brief writes a packet summary line to the log file
 void CAujardDlg::WritePacketLog()
 {
-	CTime t = CTime::GetCurrentTime();
-	char logStr[256] = {};
-	sprintf(logStr, "* Packet Count : recv=%d, send=%d, realsend=%d , time = %02d:%02d\r\n", _recvPacketCount, _packetCount, _sendPacketCount, t.GetHour(), t.GetMinute());
-	WriteLogFile(logStr);
-	//m_LogFile.Write(logstr, strlen(logstr));
+	spdlog::info("Packet Count: recv={}, send={}, realsend={}",
+		_recvPacketCount, _packetCount, _sendPacketCount);
 }
 
 /// \brief checks for users who have not saved their data in AUTOSAVE_DELTA milliseconds
@@ -1539,37 +1565,6 @@ void CAujardDlg::SaveUserData()
 	}
 }
 
-/// \brief Writes a string to the AujardLog-DATE.txt log
-/// \todo: refactor out for LogFileWrite in Define.h or other universal logger solution
-void CAujardDlg::WriteLogFile(char* data)
-{
-	CTime cur = CTime::GetCurrentTime();
-	char strLog[1024] = {};
-	int nDay = cur.GetDay();
-
-	if (_logFileDay != nDay)
-	{
-		if (_logFile.m_hFile != CFile::hFileNull)
-			_logFile.Close();
-
-		CString filename;
-		filename.Format(_T("AujardLog-%d-%d-%d.txt"), cur.GetYear(), cur.GetMonth(), cur.GetDay());
-		_logFile.Open(filename, CFile::modeWrite | CFile::modeCreate | CFile::modeNoTruncate | CFile::shareDenyNone);
-		_logFile.SeekToEnd();
-		_logFileDay = nDay;
-	}
-
-	sprintf(strLog, "%d-%d-%d %d:%d, %s\r\n", cur.GetYear(), cur.GetMonth(), cur.GetDay(), cur.GetHour(), cur.GetMinute(), data);
-	int nLen = strlen(strLog);
-	if (nLen >= 1024)
-	{
-		TRACE(_T("### WriteLogFile Fail : length = %d ###\n"), nLen);
-		return;
-	}
-
-	_logFile.Write(strLog, nLen);
-}
-
 /// \brief handles WIZ_BATTLE_EVENT requests
 /// \details contains which nation won the war and which charId killed the commander
 /// \see WIZ_BATTLE_EVENT
@@ -1585,7 +1580,8 @@ void CAujardDlg::BattleEventResult(char* data)
 		&& charIdLen < MAX_ID_SIZE + 1)
 	{
 		GetString(charId, data, charIdLen, index);
-		TRACE(_T("--> BattleEventResult : The user who killed the enemy commander is %hs, _type=%d, nation=%d \n"), charId, _type, result);
+		spdlog::info("BattleEventResult : The user who killed the enemy commander is {}, _type={}, nation={}",
+			charId, _type, result);
 		_dbAgent.UpdateBattleEvent(charId, result);
 	}
 }
@@ -1632,7 +1628,10 @@ void CAujardDlg::CouponEvent(char* data)
 		while (count < 50);
 
 		if (count >= 50)
-			OutputList.AddString(_T("CouponEvent Packet Drop!!!"));
+		{
+			OutputList.AddString(_T("Packet Drop: DB_COUPON_EVENT"));
+			spdlog::error("Packet Drop: DB_COUPON_EVENT");
+		}
 	}
 	else if (nType == UPDATE_COUPON_EVENT)
 	{

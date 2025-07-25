@@ -4,7 +4,8 @@
     <PreferredToolArchitecture>Win32</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>..\spdlog;$(IncludePath)</IncludePath>
+    <IncludePath>..\spdlog\include;$(IncludePath)</IncludePath>
+    <ExternalIncludePath>..\spdlog\include;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -52,11 +53,12 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_NONSTDC_NO_WARNINGS;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(DependencyDir)\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_NONSTDC_NO_WARNINGS;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -127,11 +129,11 @@
     <ClCompile Include="..\spdlog\src\*.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\spdlog\include\*.h" />
-    <ClInclude Include="..\spdlog\include\cfg\*.h" />
-    <ClInclude Include="..\spdlog\include\details\*.h" />
-    <ClInclude Include="..\spdlog\include\fmt\*.h" />
-    <ClInclude Include="..\spdlog\include\sinks\*.h" />
+    <ClInclude Include="..\spdlog\include\spdlog\*.h" />
+    <ClInclude Include="..\spdlog\include\spdlog\cfg\*.h" />
+    <ClInclude Include="..\spdlog\include\spdlog\details\*.h" />
+    <ClInclude Include="..\spdlog\include\spdlog\fmt\*.h" />
+    <ClInclude Include="..\spdlog\include\spdlog\sinks\*.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

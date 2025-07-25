@@ -47,10 +47,6 @@ public:
     /// \see WIZ_BATTLE_EVENT
 	void BattleEventResult(char* data);
 
-	/// \brief Writes a string to the AujardLog-DATE.txt log
-	/// \todo: refactor out for LogFileWrite in Define.h or other logger solution
-	void WriteLogFile(char* data);
-
 	/// \brief checks for users who have not saved their data in AUTOSAVE_DELTA milliseconds
 	/// and performs a UserDataSave() for them.
 	/// \note this is currently disabled in OnTimer()
@@ -180,7 +176,6 @@ protected:
 	static CAujardDlg*	_instance;
 
 	CDBAgent			_dbAgent;
-	CFile				_logFile;
 
 	HANDLE				_readQueueThread;
 	HANDLE				_sharedMemoryHandle;
@@ -192,7 +187,6 @@ protected:
 	int					_packetCount;		// packet의 수를 체크
 	int					_sendPacketCount;	// packet의 수를 체크
 	int					_recvPacketCount;	// packet의 수를 체크
-	int					_logFileDay;
 
 	HICON				_icon;
 

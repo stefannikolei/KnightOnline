@@ -7,6 +7,7 @@
 #include "IOCPSocket2.h"
 #include "Define.h"
 #include <algorithm>
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -61,8 +62,7 @@ DWORD WINAPI AcceptThread(LPVOID lp)
 				if (pSocket == nullptr)
 				{
 					TRACE("Socket Array has Broken...\n");
-					_stprintf(logstr, _T("Socket Array has Broken...[sid:%d]\r\n"), sid);
-					LogFileWrite(logstr);
+					spdlog::info("Socket Array has Broken...[sid:{}]", sid);
 //					pIocport->PutOldSid( sid );				// Invalid sid must forbidden to use
 					continue;
 				}

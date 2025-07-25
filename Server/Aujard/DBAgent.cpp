@@ -17,6 +17,7 @@
 
 #include <format>
 #include <nanodbc/nanodbc.h>
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -99,13 +100,13 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 	_USER_DATA* user =  UserData[userId];
 	if (user == nullptr)
 	{
-		LogFileWrite(std::format("LoadUserData(): UserData[{}] not found for charId={}\r\n", userId, charId));
+		spdlog::error("LoadUserData(): UserData[{}] not found for charId={}", userId, charId);
 		return false;
 	}
 
 	if (user->m_bLogout)
 	{
-		LogFileWrite(std::format("LoadUserData(): logout error: charId={}, logout={} \r\n", charId, user->m_bLogout));
+		spdlog::error("LoadUserData(): logout error: charId={}, logout={}", charId, user->m_bLogout);
 		return false;
 	}
 
@@ -210,8 +211,8 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 	// data successfully loaded from the database, copy to UserData record
 	if (strcpy_s(user->m_id, charId))
 	{
-		LogFileWrite(std::format("LoadUserData(): failed to write charId(len: {}, val: {}) to user->m_id\r\n",
-			std::strlen(charId), charId));
+		spdlog::error("LoadUserData(): failed to write charId(len: {}, val: {}) to user->m_id",
+			std::strlen(charId), charId);
 		return false;
 	}
 
@@ -249,11 +250,9 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 	user->m_iMannerPoint = MannerPoint;
 	user->m_iLoyaltyMonthly = LoyaltyMonthly;
 
-#ifdef _DEBUG
-	CTime t = CTime::GetCurrentTime();
-	LogFileWrite(std::format("[LoadUserData {:02}-{:02}-{:02}]: name={}, nation={}, zone={}, level={}, exp={}, money={}\r\n",
-		t.GetHour(), t.GetMinute(), t.GetSecond(), charId, Nation, Zone, Level, Exp, Gold));
-#endif	
+	spdlog::debug("LoadUserData: name={}, nation={}, zone={}, level={}, exp={}, money={}",
+		charId, Nation, Zone, Level, Exp, Gold);
+	
 
 	for (int i = 0; i < 9; i++)
 		user->m_bstrSkill[i] = skills.read<uint8_t>();
@@ -296,11 +295,8 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 				user->m_sItemArray[i].sCount = count;
 			}
 
-#ifdef _DEBUG
-			TRACE(_T("%hs : %d slot (%d : %I64d)\n"), user->m_id, i, user->m_sItemArray[i].nNum, user->m_sItemArray[i].nSerialNum);
-			LogFileWrite(std::format("{} : {} slot ({} : {})\r\n",
-				user->m_id, i, user->m_sItemArray[i].nNum, user->m_sItemArray[i].nSerialNum));
-#endif
+			spdlog::debug("{} : {} slot ({} : {})",
+				user->m_id, i, user->m_sItemArray[i].nNum, user->m_sItemArray[i].nSerialNum);
 		}
 		else
 		{
@@ -313,7 +309,7 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 
 			if (itemId > 0)
 			{
-				LogFileWrite(std::format("Item Drop : charId={}, itemId={}\r\n", charId, itemId));
+				spdlog::error("Item Drop : charId={}, itemId={}", charId, itemId);
 			}
 		}
 	}
@@ -465,7 +461,7 @@ bool CDBAgent::UpdateUser(const char* charId, int userId, int updateType)
 		if (item.nNum > 0)
 		{
 			if (_main->ItemArray.GetData(item.nNum) == nullptr)
-				TRACE(_T("Item Drop Saved({}) : %d (%hs)\n"), i, item.nNum, user->m_id);
+				spdlog::debug("Item Drop Saved({}) : {} ({})", i, item.nNum, user->m_id);
 		}
 
 		items
@@ -506,7 +502,7 @@ bool CDBAgent::UpdateUser(const char* charId, int userId, int updateType)
 		// affected_rows will be -1 if unavailable should be 1 if available
 		if (result->affected_rows() == 0)
 		{
-			LogFileWrite(std::format("UpdateUser(): No rows affected for charId={}\r\n", charId));
+			spdlog::error("UpdateUser(): No rows affected for charId={}", charId);
 			return false;
 		}
 	}
@@ -707,7 +703,7 @@ bool CDBAgent::GetAllCharID(const char* accountId, char* charId1_, char* charId2
 		if (result == nullptr
 			|| !result->next())
 		{
-			LogFileWrite(std::format("GetAllCharID(): No rows selected for accountId={}\r\n", accountId));
+			spdlog::error("GetAllCharID(): No rows selected for accountId={}", accountId);
 			return false;
 		}
 
@@ -728,22 +724,22 @@ bool CDBAgent::GetAllCharID(const char* accountId, char* charId1_, char* charId2
 
 	if (strcpy_s(charId1_, MAX_ID_SIZE + 1, charId1.c_str()))
 	{
-		LogFileWrite(std::format("GetAllCharID(): failed to write charId1(len: {}, val: {}) to charId1\r\n",
-			charId1.length(), charId1));
+		spdlog::error("GetAllCharID(): failed to write charId1(len: {}, val: {}) to charId1",
+			charId1.length(), charId1);
 		return false;
 	}
 
 	if (strcpy_s(charId2_, MAX_ID_SIZE + 1, charId2.c_str()))
 	{
-		LogFileWrite(std::format("GetAllCharID(): failed to write charId2(len: {}, val: {}) to charId2\r\n",
-			charId2.length(), charId2));
+		spdlog::error("GetAllCharID(): failed to write charId2(len: {}, val: {}) to charId2",
+			charId2.length(), charId2);
 		return false;
 	}
 
 	if (strcpy_s(charId3_, MAX_ID_SIZE + 1, charId3.c_str()))
 	{
-		LogFileWrite(std::format("GetAllCharID(): failed to write charId3(len: {}, val: {}) to charId3\r\n",
-			charId3.length(), charId3));
+		spdlog::error("GetAllCharID(): failed to write charId3(len: {}, val: {}) to charId3",
+			charId3.length(), charId3);
 		return false;
 	}
 
@@ -770,8 +766,8 @@ int CDBAgent::CreateKnights(int knightsId, int nation, char* name, char* chief, 
 
 	if (retCode == 6)
 	{
-		LogFileWrite(std::format("CreateKnights(): database error creating knights (knightsId={}, nation={}, name={}, chief={}, flag={}\r\n",
-			knightsId, nation, name, chief, flag));
+		spdlog::error("CreateKnights(): database error creating knights (knightsId={}, nation={}, name={}, chief={}, flag={}",
+			knightsId, nation, name, chief, flag);
 	}
 
 	return retCode;
@@ -878,7 +874,7 @@ int CDBAgent::LoadKnightsAllMembers(int knightsId, int start, char* buffOut, int
 
 	if (rowCount == 0)
 	{
-		LogFileWrite(std::format("LoadKnightsAllMembers(): No rows selected for knightsId={}\r\n", knightsId));
+		spdlog::error("LoadKnightsAllMembers(): No rows selected for knightsId={}", knightsId);
 	}
 
 	// clamp result so that start doesn't send rowCount negative
@@ -924,7 +920,7 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 	if (user == nullptr
 		|| strlen(user->m_id) == 0)
 	{
-		LogFileWrite(std::format("LoadWarehouseData(): called for inactive userId={}\r\n", userId));
+		spdlog::error("LoadWarehouseData(): called for inactive userId={}", userId);
 		return false;
 	}
 	
@@ -949,7 +945,7 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 
 		if (!recordSet.next())
 		{
-			LogFileWrite(std::format("LoadWarehouseData(): No rows selected for accountId={}\r\n", accountId));
+			spdlog::error("LoadWarehouseData(): No rows selected for accountId={}", accountId);
 			return false;
 		}
 
@@ -990,7 +986,8 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 
 			user->m_sWarehouseArray[i].sCount = count;
 			user->m_sWarehouseArray[i].nSerialNum = serialNumber;
-			TRACE(_T("%hs : %d ware slot (%d : %I64d)\n"), user->m_id, i, user->m_sWarehouseArray[i].nNum, user->m_sWarehouseArray[i].nSerialNum);
+			spdlog::trace("{}: {} ware slot ({} : {})",
+				user->m_id, i, user->m_sWarehouseArray[i].nNum, user->m_sWarehouseArray[i].nSerialNum);
 		}
 		else
 		{
@@ -1000,8 +997,8 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 
 			if (itemId > 0)
 			{
-				LogFileWrite(std::format("LoadWarehouseData(): item dropped itemId={} accountId={}\r\n",
-					itemId, accountId));
+				spdlog::error("LoadWarehouseData(): item dropped itemId={} accountId={}",
+					itemId, accountId);
 			}
 		}
 	}
@@ -1020,15 +1017,15 @@ bool CDBAgent::UpdateWarehouseData(const char* accountId, int userId, int update
 	if (pUser == nullptr
 		|| strlen(accountId) == 0)
 	{
-		LogFileWrite(std::format("UpdateWarehouseData(): called with inactive userId={} accountId={}\r\n",
-					userId, accountId));
+		spdlog::error("UpdateWarehouseData(): called with inactive userId={} accountId={}",
+					userId, accountId);
 		return false;
 	}
 
 	if (_strnicmp(pUser->m_Accountid, accountId, MAX_ID_SIZE) != 0)
 	{
-		LogFileWrite(std::format("UpdateWarehouseData(): accountId mismatch user.accountId={} accountId={}\r\n",
-					pUser->m_Accountid, accountId));
+		spdlog::error("UpdateWarehouseData(): accountId mismatch user.accountId={} accountId={}",
+					pUser->m_Accountid, accountId);
 		return false;
 	}
 
@@ -1071,7 +1068,7 @@ bool CDBAgent::UpdateWarehouseData(const char* accountId, int userId, int update
 		// affected_rows will be -1 if unavailable should be 1 if available
 		if (result->affected_rows() == 0)
 		{
-			LogFileWrite(std::format("UpdateWarehouseData(): No rows affected for accountId={}\r\n", accountId));
+			spdlog::error("UpdateWarehouseData(): No rows affected for accountId={}", accountId);
 			return false;
 		}
 	}
@@ -1111,15 +1108,15 @@ bool CDBAgent::LoadKnightsInfo(int knightsId, char* buffOut, int& buffIndex)
 
 		if (!recordSet.next())
 		{
-			LogFileWrite(std::format("LoadKnightsInfo(): No rows selected for knightsId={}\r\n", knightsId));
+			spdlog::error("LoadKnightsInfo(): No rows selected for knightsId={}", knightsId);
 			return false;
 		}
 
 		model::Knights knights = recordSet.get();
 		if (knights.Name.length() > MAX_ID_SIZE)
 		{
-			LogFileWrite(std::format("LoadKnightsInfo(): knights.Name(len: {}, val: {}) exceeds length\r\n",
-				knights.Name.length(), knights.Name));
+			spdlog::error("LoadKnightsInfo(): knights.Name(len: {}, val: {}) exceeds length",
+				knights.Name.length(), knights.Name);
 			return false;
 		}
 
@@ -1163,8 +1160,8 @@ bool CDBAgent::SetLogInInfo(const char* accountId, const char* charId, const cha
 	}
 	else
 	{
-		LogFileWrite(std::format("SetLogInInfo(): invalid init code specified (init: {}) for accountId={}\r\n",
-			init, accountId));
+		spdlog::error("SetLogInInfo(): invalid init code specified (init: {}) for accountId={}",
+			init, accountId);
 		return false;
 	}
 
@@ -1181,7 +1178,7 @@ bool CDBAgent::SetLogInInfo(const char* accountId, const char* charId, const cha
 		// affected_rows will be -1 if unavailable should be 1 if available
 		if (result.affected_rows() == 0)
 		{
-			LogFileWrite(std::format("SetLogInInfo(): No rows affected for accountId={}\r\n", accountId));
+			spdlog::error("SetLogInInfo(): No rows affected for accountId={}", accountId);
 			return false;
 		}
 	}
@@ -1217,7 +1214,7 @@ bool CDBAgent::AccountLogout(const char* accountId, int logoutCode)
 		// affected_rows will be -1 if unavailable should be 1 if available
 		if (result->affected_rows() == 0)
 		{
-			LogFileWrite(std::format("AccountLogout(): No rows affected for accountId={}\r\n", accountId));
+			spdlog::error("AccountLogout(): No rows affected for accountId={}", accountId);
 			return false;
 		}
 	}
@@ -1229,7 +1226,7 @@ bool CDBAgent::AccountLogout(const char* accountId, int logoutCode)
 
 	if (ret1 != 1)
 	{
-		LogFileWrite(std::format("AccountLogout(): ret1 not updated by proc for accountId={}\r\n", accountId));
+		spdlog::debug("AccountLogout(): ret1 not updated by proc for accountId={}", accountId);
 		//return false;
 	}
 
@@ -1272,7 +1269,7 @@ bool CDBAgent::CheckUserData(const char* accountId, const char* charId, int chec
 
 		if (!result.next())
 		{
-			LogFileWrite(std::format("CheckUserData(): No rows affected for accountId={} charId={}\r\n", accountId, charId));
+			spdlog::error("CheckUserData(): No rows affected for accountId={} charId={}", accountId, charId);
 			return false;
 		}
 
@@ -1288,9 +1285,9 @@ bool CDBAgent::CheckUserData(const char* accountId, const char* charId, int chec
 	if (dbTime != userUpdateTime
 		|| dbData != compareData)
 	{
-		LogFileWrite(std::format("CheckUserData(): data mismatch dbTime(expected: {}, actual: {}) dbData(expected: {}, actual: {})\r\n",
+		spdlog::error("CheckUserData(): data mismatch dbTime(expected: {}, actual: {}) dbData(expected: {}, actual: {})\r\n",
 			userUpdateTime, dbTime,
-			compareData, dbData));
+			compareData, dbData);
 		return false;
 	}
 
@@ -1358,6 +1355,7 @@ void CDBAgent::LoadKnightsAllList(int nation)
 				if (retryCount >= maxRetry)
 				{
 					_main->OutputList.AddString(_T("Packet Drop: KNIGHTS_ALLLIST_REQ"));
+					spdlog::error("Packet Drop: KNIGHTS_ALLLIST_REQ");
 					return;
 				}
 
@@ -1395,6 +1393,7 @@ void CDBAgent::LoadKnightsAllList(int nation)
 		if (retryCount >= maxRetry)
 		{
 			_main->OutputList.AddString(_T("Packet Drop: KNIGHTS_ALLLIST_REQ"));
+			spdlog::error("Packet Drop: KNIGHTS_ALLLIST_REQ");
 		}
 	}
 }
@@ -1423,7 +1422,7 @@ bool CDBAgent::UpdateBattleEvent(const char* charId, int nation)
 		// affected_rows will be -1 if unavailable should be 1 if available
 		if (result.affected_rows() == 0)
 		{
-			LogFileWrite("UpdateBattleEvent(): No rows affected");
+			spdlog::error("UpdateBattleEvent(): No rows affected");
 			return false;
 		}
 	}

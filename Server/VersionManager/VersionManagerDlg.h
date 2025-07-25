@@ -82,7 +82,6 @@ protected:
 	//}}AFX_VIRTUAL
 
 // Implementation
-protected:
 	HICON			_icon;
 
 	char			_ftpUrl[256];

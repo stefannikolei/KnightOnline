@@ -303,39 +303,6 @@ inline CString GetProgPath()
 	return Path;
 }
 
-inline void LogFileWrite(LPCTSTR logstr)
-{
-	CString LogFileName;
-	LogFileName.Format(_T("%s\\Aujard.log"), GetProgPath().GetString());
-
-	CFile file;
-	if (!file.Open(LogFileName, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite))
-		return;
-
-	file.SeekToEnd();
-
-#if defined(_UNICODE)
-	const std::string utf8 = WideToUtf8(logstr, wcslen(logstr));
-	file.Write(utf8.c_str(), static_cast<int>(utf8.size()));
-#if defined(_DEBUG)
-	std::cout << "LogFileWrite: " << utf8 << std::endl;
-#endif
-#else
-	file.Write(logstr, strlen(logstr));
-#if defined(_DEBUG)
-	std::cout << "LogFileWrite: " << logstr << std::endl;
-#endif
-#endif
-
-	file.Close();
-}
-
-inline void LogFileWrite(const std::string& logStr)
-{
-	CString clog(CA2T(logStr.c_str()));
-	LogFileWrite(clog);
-}
-
 namespace ini
 {
 	// ODBC Config Section
@@ -350,6 +317,12 @@ namespace ini
 	// ZONE_INFO section
 	static constexpr char ZONE_INFO[] = "ZONE_INFO";
 	static constexpr char GROUP_INFO[] = "GROUP_INFO";
+
+	// LOGGER section
+	static constexpr char LOGGER[] = "LOGGER";
+	static constexpr char LEVEL[] = "LEVEL";
+	static constexpr char PATTERN[] = "PATTERN";
+	static constexpr char FILE[] = "FILE";
 }
 
 #endif

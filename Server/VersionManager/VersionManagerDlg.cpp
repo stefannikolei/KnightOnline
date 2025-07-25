@@ -11,7 +11,11 @@
 #include <shared/Ini.h>
 
 #include <db-library/ConnectionManager.h>
-#include <db-library/hooks.h>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/daily_file_sink.h>
+#include <spdlog/common.h>
+
+#include "spdlog/sinks/stdout_color_sinks.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -27,13 +31,6 @@ import VersionManagerBinder;
 CIOCPort CVersionManagerDlg::IocPort;
 
 constexpr int DB_POOL_CHECK = 100;
-
-static void LoggerImpl(const std::string& message)
-{
-	CString logLine;
-	logLine.Format(_T("%hs\r\n"), message.c_str());
-	LogFileWrite(logLine);
-}
 
 /////////////////////////////////////////////////////////////////////////////
 // CVersionManagerDlg dialog
@@ -51,8 +48,6 @@ CVersionManagerDlg::CVersionManagerDlg(CWnd* parent)
 	_lastVersion = 0;
 
 	_icon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-
-	db::hooks::Log = &LoggerImpl;
 
 	db::ConnectionManager::DefaultConnectionTimeout = DB_PROCESS_TIMEOUT;
 	db::ConnectionManager::Create();
@@ -141,8 +136,20 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 
 	CIni ini(iniPath);
 
-	ini.GetString("DOWNLOAD", "URL", "127.0.0.1", _ftpUrl, _countof(_ftpUrl));
-	ini.GetString("DOWNLOAD", "PATH", "/", _ftpPath, _countof(_ftpPath));
+	// ftp config
+	ini.GetString(ini::DOWNLOAD, ini::URL, "127.0.0.1", _ftpUrl, _countof(_ftpUrl));
+	ini.GetString(ini::DOWNLOAD, ini::PATH, "/", _ftpPath, _countof(_ftpPath));
+
+	// configure logger
+	std::string fileName = ini.GetString(ini::LOGGER, ini::FILE, "version.log");
+	auto fileLogger = std::make_shared<spdlog::sinks::daily_file_format_sink_mt>(fileName, 0, 0);
+	auto consoleLogger = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+	std::shared_ptr<spdlog::logger> appLogger = std::make_shared<spdlog::logger>(spdlog::logger("VersionManager", {fileLogger, consoleLogger}));
+	spdlog::set_default_logger(appLogger);
+	int logLevel = ini.GetInt(ini::LOGGER, ini::LEVEL, spdlog::level::info);
+	spdlog::set_level(static_cast<spdlog::level::level_enum>(logLevel));
+	std::string logPattern = ini.GetString(ini::LOGGER, ini::PATTERN, "[%H:%M:%S][%n][%7l] %v");
+	spdlog::set_pattern(logPattern);
 	
 	// TODO: KN_online should be Knight_Account
 	std::string datasourceName = ini.GetString(ini::ODBC, ini::DSN, "KN_online");
@@ -182,16 +189,16 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 		_SERVER_INFO* pInfo = new _SERVER_INFO;
 
 		snprintf(key, sizeof(key), "SERVER_%02d", i);
-		ini.GetString("SERVER_LIST", key, "127.0.0.1", pInfo->strServerIP, _countof(pInfo->strServerIP));
+		ini.GetString(ini::SERVER_LIST, key, "127.0.0.1", pInfo->strServerIP, _countof(pInfo->strServerIP));
 
 		snprintf(key, sizeof(key), "NAME_%02d", i);
-		ini.GetString("SERVER_LIST", key, "TEST|Server 1", pInfo->strServerName, _countof(pInfo->strServerName));
+		ini.GetString(ini::SERVER_LIST, key, "TEST|Server 1", pInfo->strServerName, _countof(pInfo->strServerName));
 
 		snprintf(key, sizeof(key), "ID_%02d", i);
-		pInfo->sServerID = static_cast<short>(ini.GetInt("SERVER_LIST", key, 1));
+		pInfo->sServerID = static_cast<short>(ini.GetInt(ini::SERVER_LIST, key, 1));
 
 		snprintf(key, sizeof(key), "USER_LIMIT_%02d", i);
-		pInfo->sUserLimit = static_cast<short>(ini.GetInt("SERVER_LIST", key, MAX_USER));
+		pInfo->sUserLimit = static_cast<short>(ini.GetInt(ini::SERVER_LIST, key, MAX_USER));
 
 		ServerList.push_back(pInfo);
 	}
