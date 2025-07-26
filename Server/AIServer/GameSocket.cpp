@@ -173,10 +173,10 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 	BYTE byZoneNumber = GetByte(pBuf, index);
 	BYTE byReConnect = GetByte(pBuf, index);	// 0 : 처음접속, 1 : 재접속
 
-	CString logstr;
-	logstr.Format(_T("[GameServer Connect - %d]"), byZoneNumber);
-	m_pMain->m_StatusList.AddString(logstr);
-	TRACE(logstr);
+	std::wstring logstr;
+	logstr = std::format(L"[Ebenezer Connect - {}]", byZoneNumber);
+	m_pMain->m_StatusList.AddString(logstr.c_str());
+	spdlog::info("Ebenezer zone={} connected", byZoneNumber);
 
 	if (byZoneNumber < 0)
 	{
@@ -200,14 +200,14 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 
 		m_pMain->m_sReSocketCount++;
 
-		TRACE(_T("**** ReConnect - zone=%d,  socket = %d ****\n "), byZoneNumber, m_pMain->m_sReSocketCount);
+		spdlog::info("Ebenezer reconnect: zone={} sockets={}", byZoneNumber, m_pMain->m_sReSocketCount);
 
 		fReConnectEndTime = TimeGet();
 
-		// 2분안에 모든 소켓이 재접됐다면...
+		// all sockets reconnected within 2 minutes
 		if (fReConnectEndTime > m_pMain->m_fReConnectStart + 120)
 		{
-			TRACE(_T("**** ReConnect - 단순한 접속... socket = %d ****\n "), m_pMain->m_sReSocketCount);
+			spdlog::info("Ebenezer sockets reconnected in under 2 minutes [sockets={}]", m_pMain->m_sReSocketCount);
 			m_pMain->m_sReSocketCount = 0;
 			m_pMain->m_fReConnectStart = 0.0f;
 		}
@@ -216,10 +216,11 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 		{
 			fReConnectEndTime = TimeGet();
 
-			// 1분안에 모든 소켓이 재접됐다면...
+			// all sockets reconnected within 1 minute
 			if (fReConnectEndTime < m_pMain->m_fReConnectStart + 60)
 			{
-				TRACE(_T("**** ReConnect - 모든 소켓 초기화 완료 socket = %d ****\n "), m_pMain->m_sReSocketCount);
+				spdlog::info("Ebenezer sockets reconnected within a minute [sockets={}]",
+					m_pMain->m_sReSocketCount);
 				m_pMain->m_bFirstServerFlag = TRUE;
 				m_pMain->m_sReSocketCount = 0;
 				m_pMain->AllNpcInfo();
@@ -236,10 +237,12 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 	{
 		//m_pMain->PostMessage( WM_GAMESERVER_LOGIN, (LONG)byZoneNumber );
 		m_pMain->m_sSocketCount++;
-		TRACE(_T("**** Connect - zone=%d,  socket = %d ****\n "), byZoneNumber, m_pMain->m_sSocketCount);
+		spdlog::info("Ebenezer connected [zone={}, sockets={}]",
+			byZoneNumber, m_pMain->m_sSocketCount);
 		if (m_pMain->m_sSocketCount == MAX_AI_SOCKET)
 		{
-			TRACE(_T("**** Connect - 모든 소켓 초기화 완료 socket = %d ****\n "), m_pMain->m_sSocketCount);
+			spdlog::info("Ebenezer sockets all connected [sockets={}]",
+				m_pMain->m_sSocketCount);
 			m_pMain->m_bFirstServerFlag = TRUE;
 			m_pMain->m_sSocketCount = 0;
 			m_pMain->AllNpcInfo();
@@ -321,7 +324,7 @@ void CGameSocket::RecvUserInfo(char* pBuf)
 	pUser->m_byIsOP = bAuthority;
 //
 
-	spdlog::debug("GameSocket.RecvUserInfo: userId={}, charId={}", uid, strName);
+	spdlog::debug("GameSocket.RecvUserInfo: userId={} charId={}", uid, strName);
 
 	if (uid >= USER_BAND
 		&& uid < MAX_USER)
@@ -354,7 +357,7 @@ void CGameSocket::RecvUserInOut(char* pBuf)
 	if (fX < 0
 		|| fZ < 0)
 	{
-		TRACE(_T("Error:: RecvUserInOut(),, uid = %d, fX=%.2f, fZ=%.2f\n"), uid, fX, fZ);
+		spdlog::error("RecvUserInOut: invalid position charId={} fX={} fZ={}", strName, fX, fZ);
 		return;
 	}
 
@@ -384,21 +387,17 @@ void CGameSocket::RecvUserInOut(char* pBuf)
 			if (pUser->m_sHP > 0)
 			{
 				pUser->m_bLive = TRUE;
-				TRACE(_T("##### CGameSocket-RecvUserInOut Fail : UserHeal  [id=%hs, bLive=%d, hp=%d], fX=%.2f, fZ=%.2f ######\n"), pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP, fX, fZ);
 			}
-			else
-			{
-				TRACE(_T("##### CGameSocket-RecvUserInOut Fail : UserDead  [id=%hs, bLive=%d, hp=%d], fX=%.2f, fZ=%.2f ######\n"), pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP, fX, fZ);
-				// 죽은 유저이므로 게임서버에 죽은 처리를 한다...
-				//Send_UserError(uid);
-				//return;
-			}
+			
+			spdlog::warn("RecvUserInOut UserHeal error[charId={} isAlive={} hp={} fX={} fZ={}]",
+					pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP, fX, fZ);
 		}
 
 		pMap = m_pMain->GetMapByIndex(pUser->m_sZoneIndex);
 		if (pMap == nullptr)
 		{
-			TRACE(_T("#### GameSocket-RecvUserInOut ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), pUser->m_strUserID, x1, z1);
+			spdlog::error("RecvUserInOut: Map not found for zoneIndex={} [charId={} x1={} z1={}]",
+				pUser->m_sZoneIndex, pUser->m_strUserID, x1, z1);
 			return;
 		}
 
@@ -407,7 +406,8 @@ void CGameSocket::RecvUserInOut(char* pBuf)
 			|| x1 > pMap->m_sizeMap.cx
 			|| z1 > pMap->m_sizeMap.cy)
 		{
-			TRACE(_T("#### RecvUserInOut Fail : [name=%hs], x1=%d, z1=%d #####\n"), pUser->m_strUserID, pUser->m_sZoneIndex);
+			spdlog::error("RecvUserInOut: Character position out of bounds [charId={} x1=%d, z1=%d]",
+				pUser->m_strUserID, x1, z1);
 			return;
 		}
 		// map 이동이 불가능이면 User등록 실패..
@@ -415,7 +415,8 @@ void CGameSocket::RecvUserInOut(char* pBuf)
 		if (region_x > pMap->GetXRegionMax()
 			|| region_z > pMap->GetZRegionMax())
 		{
-			TRACE(_T("#### GameSocket-RecvUserInOut() Fail : [name=%hs], nRX=%d, nRZ=%d #####\n"), pUser->m_strUserID, region_x, region_z);
+			spdlog::error("RecvUserInOut: region out of bounds [charId={} nRX={} nRZ={}]",
+				pUser->m_strUserID, region_x, region_z);
 			return;
 		}
 
@@ -491,7 +492,7 @@ BOOL CGameSocket::SetUid(float x, float z, int id, int speed)
 	CUser* pUser = m_pMain->GetUserPtr(id);
 	if (pUser == nullptr)
 	{
-		TRACE(_T("#### User등록 실패 sid = %d ####\n"), id);
+		spdlog::error("GameSocket.SetUid: userId={} is null", id);
 		return FALSE;
 	}
 
@@ -499,7 +500,8 @@ BOOL CGameSocket::SetUid(float x, float z, int id, int speed)
 	MAP* pMap = m_pMain->GetMapByIndex(pUser->m_sZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### GameSocket-SetUid ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), pUser->m_strUserID, pUser->m_sZoneIndex);
+		spdlog::error("GameSocket.SetUid: map not found [charId=%hs zoneIndex={}]",
+			pUser->m_strUserID, pUser->m_sZoneIndex);
 		return FALSE;
 	}
 
@@ -508,14 +510,16 @@ BOOL CGameSocket::SetUid(float x, float z, int id, int speed)
 		|| x1 > pMap->m_sizeMap.cx
 		|| z1 > pMap->m_sizeMap.cy)
 	{
-		TRACE(_T("#### GameSocket ,, SetUid Fail : [nid=%d, name=%hs], x1=%d, z1=%d #####\n"), id, pUser->m_strUserID, x1, z1);
+		spdlog::error("GameSocket.SetUid: character position out of bounds [userId=%d, charId=%hs x1=%d z1=%d]",
+			id, pUser->m_strUserID, x1, z1);
 		return FALSE;
 	}
 
 	if (nRX > pMap->GetXRegionMax()
 		|| nRZ > pMap->GetZRegionMax())
 	{
-		TRACE(_T("#### GameSocket , SetUid Fail : [nid=%d, name=%hs], nRX=%d, nRZ=%d #####\n"), id, pUser->m_strUserID, nRX, nRZ);
+		spdlog::error("GameSocket.SetUid: region bounds exceeded [userId={} charId={} nRX={} nRZ={}]",
+			id, pUser->m_strUserID, nRX, nRZ);
 		return FALSE;
 	}
 	// map 이동이 불가능이면 User등록 실패..
@@ -529,11 +533,13 @@ BOOL CGameSocket::SetUid(float x, float z, int id, int speed)
 			if (pUser->m_sHP > 0)
 			{
 				pUser->m_bLive = USER_LIVE;
-				TRACE(_T("##### CGameSocket-SetUid Fail : User가 Heal된 경우.. [id=%hs, bLive=%d, hp=%d] ######\n"), pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
+				spdlog::debug("GameSocket.SetUid: user healed [charId={} isAlive={} hp={}]",
+					pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 			}
 			else
 			{
-				TRACE(_T("##### CGameSocket-SetUid Fail : UserDead  [id=%hs, bLive=%d, hp=%d] ######\n"), pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
+				spdlog::error("GameSocket.SetUid: user is dead [charId={} isAive={} hp={}]",
+					pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 				//Send_UserError(id);
 				return FALSE;
 			}
@@ -622,11 +628,13 @@ void CGameSocket::RecvAttackReq(char* pBuf)
 		if (pUser->m_sHP > 0)
 		{
 			pUser->m_bLive = USER_LIVE;
-			TRACE(_T("##### CGameSocket-Attack Fail : User가 Heal된 경우.. [id=%d, %hs, bLive=%d, hp=%d] ######\n"), pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
+			spdlog::debug("RecvAttackReq: user healed [userId={} charId={} isAlive={} hp={}]",
+				pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 		}
 		else
 		{
-			TRACE(_T("##### CGameSocket-Attack Fail : UserDead  [id=%d, %hs, bLive=%d, hp=%d] ######\n"), pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
+			spdlog::error("RecvAttackReq: user is dead [userId={} charId={} isAlive={} hp={}]",
+				pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 			// 죽은 유저이므로 게임서버에 죽은 처리를 한다...
 			Send_UserError(sid, tid);
 			return;
@@ -662,7 +670,8 @@ void CGameSocket::RecvUserLogOut(char* pBuf)
 	if (len > MAX_ID_SIZE
 		|| len <= 0)
 	{
-		TRACE(_T("###  RecvUserLogOut() Fail ---> uid = %d, name=%hs, len=%d  ### \n"), uid, strName, len);
+		spdlog::warn("RecvUserLogOut: character name length out of bounds [userId={} charId={} len={}]",
+			uid, strName, len);
 		//return;
 	}
 
@@ -683,7 +692,8 @@ void CGameSocket::RecvUserLogOut(char* pBuf)
 	pUser->WriteUserLog();
 
 	m_pMain->DeleteUserList(uid);
-	TRACE(_T("**** User LogOut -- uid = %d, name = %hs\n"), uid, strName);
+	spdlog::debug("RecvUserLogOut: processed [userId={} charId={}]",
+			uid, strName, len);
 }
 
 void CGameSocket::RecvUserRegene(char* pBuf)
@@ -702,9 +712,8 @@ void CGameSocket::RecvUserRegene(char* pBuf)
 	pUser->m_bLive = USER_LIVE;
 	pUser->m_sHP = sHP;
 
-	TCHAR buff[256] = {};
-	wsprintf(buff, _T("**** RecvUserRegene -- uid = (%hs,%d), HP = %d"), pUser->m_strUserID, pUser->m_iUserId, pUser->m_sHP);
-	TimeTrace(buff);
+	spdlog::debug("RecvUserRegene: processed [userId={} charId={} hp={}]",
+	pUser->m_strUserID, pUser->m_iUserId, pUser->m_sHP);
 	//TRACE(_T("**** RecvUserRegene -- uid = (%hs,%d), HP = %d\n"), pUser->m_strUserID, pUser->m_iUserId, pUser->m_sHP);
 }
 
@@ -809,7 +818,7 @@ void CGameSocket::Send_UserError(short uid, short tid)
 	SetShort(buff, tid, send_index);
 	Send(buff, send_index);
 
-	TRACE(_T("#### GameSocket-Send_UserError : 유령 유저죽이기 uid=%d, tid=%d\n"), uid, tid);
+	spdlog::trace("GameSocket.Send_UserError: AG_USER_FAIL [uid={} tid={}]", uid, tid);
 }
 
 void CGameSocket::RecvZoneChange(char* pBuf)
@@ -830,7 +839,8 @@ void CGameSocket::RecvZoneChange(char* pBuf)
 	pUser->m_sZoneIndex = byZoneIndex;
 	pUser->m_curZone = byZoneNumber;
 
-	TRACE(_T("**** RecvZoneChange -- user(%hs, %d), cur_zone = %d\n"), pUser->m_strUserID, pUser->m_iUserId, byZoneNumber);
+	spdlog::trace("RecvZoneChange: [charId={} userId={} zoneId={}]",
+		pUser->m_strUserID, pUser->m_iUserId, byZoneNumber);
 }
 
 void CGameSocket::RecvMagicAttackReq(char* pBuf)
@@ -853,12 +863,14 @@ void CGameSocket::RecvMagicAttackReq(char* pBuf)
 		if (pUser->m_sHP > 0)
 		{
 			pUser->m_bLive = USER_LIVE;
-			TRACE(_T("##### CGameSocket-Magic Attack Fail : User가 Heal된 경우.. [id=%hs, bLive=%d, hp=%d] ######\n"), pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
+			spdlog::debug("RecvMagicAttackReq: user healed [charId={} isAlive={}, hp={}]",
+				pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 		}
 		else
 		{
-			TRACE(_T("##### CGameSocket-Magic Attack Fail : UserDead  [id=%hs, bLive=%d, hp=%d] ######\n"), pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
-			// 죽은 유저이므로 게임서버에 죽은 처리를 한다...
+			spdlog::error("RecvMagicAttackReq: user is dead [charId={} isAlive={}, hp={}]",
+				pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
+			// process the death on the game server
 			Send_UserError(sid, tid);
 			return;
 		}
@@ -918,7 +930,7 @@ void CGameSocket::RecvUserInfoAllData(char* pBuf)
 	float fHitAgi, fAvoidAgi;
 	char strName[MAX_ID_SIZE + 1];
 
-	TRACE(_T(" ***** 유저의 모든 정보를 받기 시작합니다 ****** \n"));
+	spdlog::debug("RecvUserInfoAllData: begin");
 
 	byCount = GetByte(pBuf, index);
 	for (int i = 0; i < byCount; i++)
@@ -945,7 +957,8 @@ void CGameSocket::RecvUserInfoAllData(char* pBuf)
 		if (len > MAX_ID_SIZE
 			|| len <= 0)
 		{
-			TRACE(_T("###  RecvUserInfoAllData() Fail ---> uid = %d, name=%hs, len=%d  ### \n"), uid, strName, len);
+			spdlog::error("RecvUserInfoAllData: character name length is out of bounds [userId={} charId={} len={}]",
+				uid, strName, len);
 			continue;
 		}
 
@@ -974,16 +987,16 @@ void CGameSocket::RecvUserInfoAllData(char* pBuf)
 		{
 			pUser->m_byNowParty = 1;					// 파티중
 			pUser->m_sPartyNumber = sPartyIndex;		// 파티 번호 셋팅
+			spdlog::debug("RecvUserInfoAllData: party info [userId={} charId={} partyNumber={}]",
+			uid, strName, pUser->m_sPartyNumber);
 		}
-
-		TRACE(_T("****  RecvUserInfoAllData()---> uid = %d, %hs, party_number=%d  ******\n"), uid, strName, pUser->m_sPartyNumber);
 
 		if (uid >= USER_BAND
 			&& uid < MAX_USER)
 			m_pMain->m_pUser[uid] = pUser;
 	}
 
-	TRACE(_T(" ***** 유저의 모든 정보를 다 받았습니다 ****** \n"));
+	spdlog::debug("RecvUserInfoAllData: end");
 }
 
 void CGameSocket::RecvGateOpen(char* pBuf)
@@ -998,7 +1011,7 @@ void CGameSocket::RecvGateOpen(char* pBuf)
 	if (nid < NPC_BAND
 		|| nid < INVALID_BAND)
 	{
-		TRACE(_T("####   RecvGateOpen()  nid Fail --> nid = %d  ####\n"), nid);
+		spdlog::error("RecvGateOpen: invalid npcId={}", nid);
 		return;
 	}
 
@@ -1013,20 +1026,18 @@ void CGameSocket::RecvGateOpen(char* pBuf)
 		if (byGateOpen < 0
 			|| byGateOpen < 2)
 		{
-			TRACE(_T("####   RecvGateOpen()  byGateOpen Fail --> byGateOpen = %d  ####\n"), byGateOpen);
+			spdlog::error("RecvGateOpen: invalid gateOpen={} state for npcId={}", byGateOpen, nid);
 			return;
 		}
 
 		pNpc->m_byGateOpen = byGateOpen;
 
-		TRACE(_T("****  RecvGateOpen()---> nid = %d, byGateOpen = %d  ******\n"), nid, byGateOpen);
+		spdlog::debug("RecvGateOpen: updated [npcId={} gateOpen={}]", nid, byGateOpen);
 	}
 	else
 	{
-		TRACE(_T("####   RecvGateOpen()  NpcType Fail --> type = %d  ####\n"), pNpc->m_tNpcType);
-		return;
+		spdlog::error("RecvGateOpen: invalid npcType={} for npcId={}", pNpc->m_tNpcType, nid);
 	}
-
 }
 
 void CGameSocket::RecvPartyInfoAllData(char* pBuf)
@@ -1040,7 +1051,7 @@ void CGameSocket::RecvPartyInfoAllData(char* pBuf)
 	if (sPartyIndex >= 32767
 		|| sPartyIndex < 0)
 	{
-		TRACE(_T("#### RecvPartyInfoAllData Index Fail -  index = %d ####\n"), sPartyIndex);
+		spdlog::error("RecvPartyInfoAllData: partyIndex={} out of bounds", sPartyIndex);
 		return;
 	}
 
@@ -1066,7 +1077,7 @@ void CGameSocket::RecvPartyInfoAllData(char* pBuf)
 
 	if (m_pMain->m_arParty.PutData(pParty->wIndex, pParty))
 	{
-		TRACE(_T("****  RecvPartyInfoAllData()---> PartyIndex = %d  ******\n"), sPartyIndex);
+		spdlog::debug("RecvPartyInfoAllData: created partyIndex={}", sPartyIndex);
 	}
 
 	LeaveCriticalSection(&g_region_critical);
@@ -1097,11 +1108,13 @@ void CGameSocket::RecvHealMagic(char* pBuf)
 		if (pUser->m_sHP > 0)
 		{
 			pUser->m_bLive = USER_LIVE;
-			TRACE(_T("##### CGameSocket-RecvHealMagic Fail : User가 Heal된 경우.. [id=%d, %hs, bLive=%d, hp=%d] ######\n"), pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
+			spdlog::debug("RecvHealMagic: user healed [userId={} charId={} isAlive={} hp={}]",
+				pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 		}
 		else
 		{
-			TRACE(_T("##### CGameSocket-RecvHealMagic Fail : UserDead  [id=%d, %hs, bLive=%d, hp=%d] ######\n"), pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
+			spdlog::error("RecvHealMagic:  user is dead [userId={} charId={} isAlive={} hp={}]",
+			pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 			// 죽은 유저이므로 게임서버에 죽은 처리를 한다...
 			//Send_UserError(sid, tid);
 			return;
@@ -1165,14 +1178,14 @@ void CGameSocket::RecvBattleEvent(char* pBuf)
 		m_pMain->m_sKillKarusNpc = 0;
 		m_pMain->m_sKillElmoNpc = 0;
 		m_pMain->m_byBattleEvent = BATTLEZONE_OPEN;
-		TRACE(_T("----> RecvBattleEvent : Battle zone Open \n"));
+		spdlog::debug("RecvBattleEvent: battle zone open");
 	}
 	else if (nEvent == BATTLEZONE_CLOSE)
 	{
 		m_pMain->m_sKillKarusNpc = 0;
 		m_pMain->m_sKillElmoNpc = 0;
 		m_pMain->m_byBattleEvent = BATTLEZONE_CLOSE;
-		TRACE(_T("<---- RecvBattleEvent : Battle zone Close \n"));
+		spdlog::debug("RecvBattleEvent: battle zone closed");
 		m_pMain->ResetBattleZone();
 	}
 
