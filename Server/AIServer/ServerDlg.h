@@ -159,9 +159,6 @@ public:
 	// class 객체
 	CNpcItem				m_NpcItem;
 
-	CFile					m_UserLogFile;
-	CFile					m_ItemLogFile;
-
 	// 전역 객체 변수
 	//BOOL			m_bNpcExit;
 	long			m_TotalNPC;			// DB에있는 총 수

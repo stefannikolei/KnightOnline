@@ -6,6 +6,8 @@
 #include "Region.h"
 #include "Party.h"
 #include "extern.h"
+#include <shared/logger.h>
+#include <spdlog/spdlog.h>
 
 //BOOL g_bDebug = TRUE;
 
@@ -6349,7 +6351,6 @@ void CNpc::GiveNpcHaveItem(CIOCPort* pIOCP)
 	int iPer = 0, iMakeItemCode = 0, iMoney = 0;
 	int iRandom;
 	int nCount = 1, i = 0;
-	CString string;
 
 /*	if( m_byMoneyType == 1 )	{
 		SetByte(pBuf, AG_NPC_EVENT_ITEM, index);
@@ -6449,10 +6450,7 @@ void CNpc::GiveNpcHaveItem(CIOCPort* pIOCP)
 		if (m_GiveItemList[i].sSid != TYPE_MONEY_SID)
 		{
 			//sprintf( logfile, "%d\r\n", m_GiveItemList[i].sSid);
-			string.Format(_T("%d\r\n"), m_GiveItemList[i].sSid);
-			EnterCriticalSection(&g_LogFileWrite);
-			m_pMain->m_ItemLogFile.Write(string, string.GetLength());
-			LeaveCriticalSection(&g_LogFileWrite);
+			spdlog::get(logger::AIServerItem)->info(m_GiveItemList[i].sSid);
 			//LogFileWrite( logfile );
 		}
 		//TRACE(_T("Npc-GiveNpcHaveItem() : [nid - %d,%hs,  giveme=%d, count=%d, num=%d], list=%d, count=%d\n"), m_sNid+NPC_BAND, m_strName, m_sMaxDamageUserid, nCount, i, m_GiveItemList[i].sSid, m_GiveItemList[i].count);

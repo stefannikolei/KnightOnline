@@ -9,6 +9,8 @@
 #include "define.h"
 #include "Region.h"
 #include "GameSocket.h"
+#include <spdlog/spdlog.h>
+#include <shared/logger.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -1090,19 +1092,17 @@ void CUser::HealAreaCheck(int rx, int rz)
 
 void CUser::WriteUserLog()
 {
-	CString string;
-
 	for (const _USERLOG* pUserLog : m_UserLogList)
 	{
 		if (pUserLog->byFlag == USER_LOGIN)
-			string.Format(_T("%d-%d-%d %d:%d, %s, %d, %hs\r\n"), pUserLog->t.GetYear(), pUserLog->t.GetMonth(), pUserLog->t.GetDay(), pUserLog->t.GetHour(), pUserLog->t.GetMinute(), _T("LogIn"), pUserLog->byLevel, pUserLog->strUserID);
+			spdlog::get(logger::AIServerUser)->info("Login: level={}, charId={}",
+				pUserLog->byLevel, pUserLog->strUserID);
 		else if (pUserLog->byFlag == USER_LOGOUT)
-			string.Format(_T("%d-%d-%d %d:%d, %s, %d, %hs\r\n"), pUserLog->t.GetYear(), pUserLog->t.GetMonth(), pUserLog->t.GetDay(), pUserLog->t.GetHour(), pUserLog->t.GetMinute(), _T("LogOut"), pUserLog->byLevel, pUserLog->strUserID);
+			spdlog::get(logger::AIServerUser)->info("Logout: level={}, charId={}",
+				pUserLog->byLevel, pUserLog->strUserID);
 		else if (pUserLog->byFlag == USER_LEVEL_UP)
-			string.Format(_T("%d-%d-%d %d:%d, %s, %d, %hs\r\n"), pUserLog->t.GetYear(), pUserLog->t.GetMonth(), pUserLog->t.GetDay(), pUserLog->t.GetHour(), pUserLog->t.GetMinute(), _T("LevelUp"), pUserLog->byLevel, pUserLog->strUserID);
-		EnterCriticalSection(&g_LogFileWrite);
-		m_pMain->m_UserLogFile.Write(string, string.GetLength());
-		LeaveCriticalSection(&g_LogFileWrite);
+			spdlog::get(logger::AIServerUser)->info("LevelUp: level={}, charId={}",
+				pUserLog->byLevel, pUserLog->strUserID);
 	}
 
 	InitUserLog();

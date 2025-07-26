@@ -16,6 +16,8 @@
 #include <shared/crc32.h>
 #include <shared/lzf.h>
 
+#include <spdlog/spdlog.h>
+
 #ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -57,12 +59,7 @@ void CGameSocket::Initialize()
 
 void CGameSocket::CloseProcess()
 {
-	CString logstr;
-	CTime time = CTime::GetCurrentTime();
-	logstr.Format(_T("*** CloseProcess - socketID=%d ... sSid = %d ***  %d-%d-%d, %d:%d]\r\n"), m_Sid, m_sSocketID, time.GetYear(), time.GetMonth(), time.GetDay(), time.GetHour(), time.GetMinute());
-	LogFileWrite(logstr);
-
-	TRACE(_T("*** CloseProcess - socketID=%d ... sSid = %d *** \n"), m_Sid, m_sSocketID);
+	spdlog::info("GameSocket.CloseProcess: socketId={} sSid={}", m_sSocketID, m_Sid);
 	m_pMain->DeleteAllUserList(m_sSocketID);
 	Initialize();
 	CIOCPSocket2::CloseProcess();
@@ -272,11 +269,7 @@ void CGameSocket::RecvUserInfo(char* pBuf)
 	if (sLength > MAX_ID_SIZE
 		|| sLength <= 0)
 	{
-		CTime cur = CTime::GetCurrentTime();
-		CString logstr;
-		logstr.Format(_T("RecvUserInfo() Fail : %d월 %d일 %d시 %d분 - uid=%d, name=%hs\r\n"), cur.GetMonth(), cur.GetDay(), cur.GetHour(), cur.GetMinute(), uid, strName);
-		LogFileWrite(logstr);
-		TRACE(_T("###  RecvUserInfo() Fail ---> uid = %d, name=%hs  ### \n"), uid, strName);
+		spdlog::error("CGameSocket.RecvUserInfo: charId len={} overflow for userId={}", sLength, uid);
 		return;
 	}
 
@@ -328,7 +321,7 @@ void CGameSocket::RecvUserInfo(char* pBuf)
 	pUser->m_byIsOP = bAuthority;
 //
 
-	TRACE(_T("****  RecvUserInfo()---> uid = %d, name=%hs, leng=%d  ******\n"), uid, strName, sLength);
+	spdlog::debug("GameSocket.RecvUserInfo: userId={}, charId={}", uid, strName);
 
 	if (uid >= USER_BAND
 		&& uid < MAX_USER)

@@ -184,7 +184,7 @@ BOOL CAujardDlg::OnInitDialog()
 	CIni ini(iniPath);
 
 	// configure logger
-	SetupLogger(ini, "Aujard");
+	SetupLogger(ini, logger::Aujard);
 
 	LoggerRecvQueue.InitailizeMMF(MAX_PKTSIZE, MAX_COUNT, _T(SMQ_LOGGERSEND), FALSE);	// Dispatcher 의 Send Queue
 	LoggerSendQueue.InitailizeMMF(MAX_PKTSIZE, MAX_COUNT, _T(SMQ_LOGGERRECV), FALSE);	// Dispatcher 의 Read Queue

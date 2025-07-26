@@ -7,6 +7,7 @@
 #include "IOCPSocket2.h"
 #include "GameSocket.h"			// sungyong 2002.05.22
 #include "Define.h"
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -60,9 +61,7 @@ DWORD WINAPI AcceptThread(LPVOID lp)
 				pSocket = pIocport->GetIOCPSocket(sid);
 				if (pSocket == nullptr)
 				{
-					TRACE(_T("Socket Array has Broken...\n"));
-					sprintf(logstr, "Socket Array has Broken...[sid:%d]\r\n", sid);
-					LogFileWrite(logstr);
+					spdlog::error("AcceptThread: null socket [socketId:{}]", sid);
 //					pIocport->PutOldSid(sid);				// Invalid sid must forbidden to use
 					continue;
 				}
