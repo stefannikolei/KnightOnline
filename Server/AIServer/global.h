@@ -28,4 +28,3 @@ void	CheckMaxValue(DWORD& dest, DWORD add);
 void	CheckMaxValue(int& dest, int add);
 void	CheckMaxValue(short& dest, short add);
 BOOL	CheckMaxValueReturn(DWORD& dest, DWORD add);
-void	TimeTrace(const TCHAR* pMsg);

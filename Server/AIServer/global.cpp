@@ -255,14 +255,3 @@ BOOL CheckMaxValueReturn(DWORD& dest, DWORD add)
 	else
 		return FALSE;//dest = _MAX_DWORD;
 }
-
-void TimeTrace(const TCHAR* pMsg)
-{
-#if defined(_UNICODE)
-	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-	std::string msg = converter.to_bytes(pMsg);
-	spdlog::trace(msg);
-#else
-	spdlog::trace(pMsg);
-#endif
-}

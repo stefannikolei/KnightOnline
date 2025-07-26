@@ -326,12 +326,8 @@ void CUser::Dead(int tid, int nDamage)
 	int sid = -1, targid = -1;
 	BYTE type, result;
 	char buff[256] = {};
-
-	CString logstr;
-	logstr.Format(_T("*** User Dead = %d, %hs ***"), m_iUserId, m_strUserID);
-	TimeTrace(logstr);
-	//TRACE(_T("*** User Dead = %d, %hs ********\n"), m_iUserId, m_strUserID);
 	memset(buff, 0, sizeof(buff));
+	spdlog::debug("User::Dead: userId={} charId={}", m_iUserId, m_strUserID);
 
 	float rx = 0.0f, ry = 0.0f, rz = 0.0f;
 
