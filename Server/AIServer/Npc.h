@@ -129,7 +129,11 @@ public:
 	short		m_ItemUserLevel;		// 죽을때 매직 이상 아이템를 떨구기위해 참조해야하는 유저의레벨
 
 	int		m_TotalDamage;	// 총 누적된 대미지양
-	_ExpUserList m_DamagedUserList[NPC_HAVE_USER_LIST]; // 나에게 타격치를 준 유저정보를 리스트로 관리한다.(경험치 분배)
+
+	/// \brief List of user information that has dealt damage to the npc.
+	/// Used for experience point distribution
+	_ExpUserList m_DamagedUserList[NPC_HAVE_USER_LIST];
+	
 	short   m_sMaxDamageUserid;		// 나에게 최고의 데미지를 준 유저의 아이디 저장..
 
 	_PathList m_PathList;			// Npc의 패스 리스트 
@@ -257,7 +261,8 @@ public:
 	int			m_iHP;				// 현재 HP
 	short		m_sMP;				// 현재 MP
 
-	float   m_fSecForMetor;		// 초당 갈 수 있는 거리..
+	/// \brief Distance that can be traveled per second
+	float   m_fSecForMetor;
 
 	//----------------------------------------------------------------
 	//	MONSTER AI에 관련된 변수들
@@ -325,7 +330,9 @@ public:
 	float m_fBattlePos_x;
 	float m_fBattlePos_z;
 
-	float m_fSecForRealMoveMetor;		// 초당 갈 수 있는 거리..(실제 클라이언트에 보내주는 거리)
+	/// \brief Distance that can be traveled per second (actual distance sent to the client)
+	float m_fSecForRealMoveMetor;
+	
 	BYTE m_byDirection;					// NPC의 방향
 
 	BOOL m_bPathFlag;					// 패스 파인드 실행여부 체크 변수..
@@ -376,10 +383,9 @@ public:
 	void  FindFriendRegion(int x, int z, MAP* pMap, _TargetHealer* pHealer, int type = 0);
 	//void  FindFriendRegion(int x, int z, MAP* pMap, int type=0);
 	BOOL IsCloseTarget(CUser* pUser, int nRange);
-	void ToTargetMove(CIOCPort* pIOCP, CUser* pUser);
 	int SendDead(CIOCPort* pIOCP, int type = 1);			// Npc Dead
 	void SendExpToUserList();								// User 경험치 분배..
-	BOOL SetDamage(int nAttackType, int nDamage, const char* id, int uid, CIOCPort* pIOCP);	// Npc의 데미지 계산..
+	BOOL SetDamage(int nAttackType, int nDamage, const char* sourceName, int uid, CIOCPort* pIOCP);	// Npc의 데미지 계산..
 	BOOL SetHMagicDamage(int nDamage, CIOCPort* pIOCP);	// Npc의 데미지 계산..
 	int GetDefense();										// Npc의 방어값..
 	void ChangeTarget(int nAttackType, CUser* pUser, CIOCPort* pIOCP);
@@ -439,7 +445,7 @@ public:
 
 	void Dead(CIOCPort* pIOCP, int iDeadType = 0);
 	BOOL FindEnemy();
-	BOOL CheckFindEnermy();
+	BOOL CheckFindEnemy();
 	int FindEnemyRegion();
 	float FindEnemyExpand(int nRX, int nRZ, float fCompDis, int nType);
 	int GetMyField();
@@ -472,7 +478,7 @@ public:
 	int  GetWeaponItemCodeNumber(int item_type);
 	void DurationMagic_4(CIOCPort* pIOCP, float currenttime);
 	void DurationMagic_3(CIOCPort* pIOCP, float currenttime);
-	void ChangeMonsterInfomation(int iChangeType);
+	void ChangeMonsterInfo(int iChangeType);
 	int  GetPartyExp(int party_level, int man, int nNpcExp);
 	void ChangeAbility(int iChangeType);
 	BOOL Teleport(CIOCPort* pIOCP);

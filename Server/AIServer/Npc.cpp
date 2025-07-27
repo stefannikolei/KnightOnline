@@ -72,21 +72,23 @@ inline BOOL CNpc::SetUid(float x, float z, int id)
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-SetUid ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
+		spdlog::error("Npc::SetUid: map not found [zoneIndex={} npcId={} npcName={}]",
+			m_strName, m_sSid, m_ZoneIndex);
 		return FALSE;
 	}
 
 	int x1 = (int) x / TILE_SIZE;
 	int z1 = (int) z / TILE_SIZE;
 	int nRX = (int) x / VIEW_DIST;
-	int nRY = (int) z / VIEW_DIST;
+	int nRZ = (int) z / VIEW_DIST;
 
 	if (x1 < 0
 		|| z1 < 0
 		|| x1 > pMap->m_sizeMap.cx
 		|| z1 > pMap->m_sizeMap.cy)
 	{
-		TRACE(_T("#### SetUid Fail : [nid=%d, sid=%d], x1=%d, z1=%d #####\n"), m_sNid + NPC_BAND, m_sSid, x1, z1);
+		spdlog::error("Npc::SetUid: out of map bounds [serial={} npcId={} x={} z={}]",
+			m_sNid + NPC_BAND, m_sSid, x1, z1);
 		return FALSE;
 	}
 
@@ -94,21 +96,22 @@ inline BOOL CNpc::SetUid(float x, float z, int id)
 	// 작업 : 이 부분을 나중에 수정 처리....
 	// if(pMap->m_pMap[x1][z1].m_sEvent == 0) return FALSE;
 	if (nRX > pMap->GetXRegionMax()
-		|| nRY > pMap->GetZRegionMax()
+		|| nRZ > pMap->GetZRegionMax()
 		|| nRX < 0
-		|| nRY < 0)
+		|| nRZ < 0)
 	{
-		TRACE(_T("#### SetUid Fail : [nid=%d, sid=%d], nRX=%d, nRZ=%d #####\n"), m_sNid + NPC_BAND, m_sSid, nRX, nRY);
+		spdlog::error("Npc::SetUid: out of region bounds [serial={} npcId={} x={} z={}]",
+			m_sNid + NPC_BAND, m_sSid, nRX, nRZ);
 		return FALSE;
 	}
 
 	if (m_iRegion_X != nRX
-		|| m_iRegion_Z != nRY)
+		|| m_iRegion_Z != nRZ)
 	{
 		int nOld_RX = m_iRegion_X;
 		int nOld_RZ = m_iRegion_Z;
 		m_iRegion_X = nRX;
-		m_iRegion_Z = nRY;
+		m_iRegion_Z = nRZ;
 
 		//TRACE(_T("++ Npc-SetUid RegionAdd : [nid=%d, name=%hs], x=%.2f, z=%.2f, nRX=%d, nRZ=%d \n"), m_sNid+NPC_BAND, m_strName,x,z, nRX, nRY);
 		// 새로운 region으로 npc이동 - npc의 정보 추가..
@@ -351,7 +354,8 @@ void CNpc::Init()
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-Init ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
+		spdlog::error("Npc::Init: map not found [zoneIndex={} npcId={} npcName={}]",
+					m_strName, m_sSid, m_ZoneIndex);
 		return;
 	}
 
@@ -427,7 +431,7 @@ void CNpc::NpcLive(CIOCPort* pIOCP)
 	if (m_byChangeType == 1)
 	{
 		m_byChangeType = 2;
-		ChangeMonsterInfomation(1);
+		ChangeMonsterInfo(1);
 	}
 
 	if (SetLive(pIOCP))
@@ -475,7 +479,8 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 		if (m_fPrevX < 0
 			|| m_fPrevZ < 0)
 		{
-			TRACE(_T("### Npc-NpcTracing  Fail : nid=(%d, %hs), x=%.2f, z=%.2f\n"), m_sNid + NPC_BAND, m_strName, m_fPrevX, m_fPrevZ);
+			spdlog::error("Npc::NpcTracing: previous coordinates invalid [serial={} npcName={} prevX={} prevZ={}]",
+				m_sNid + NPC_BAND, m_strName, m_fPrevX, m_fPrevZ);
 		}
 		else
 		{
@@ -547,7 +552,8 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 	{
 		if (!ResetPath())// && !m_tNpcTraceType)
 		{
-			TRACE(_T("##### NpcTracing Fail : 패스파인드 실패 , NPC_STANDING으로 ######\n"));
+			spdlog::error("Npc::NpcTracing: pathfinding failed, set state to NPC_STANDING [serial={} npcId={} npcName={}]",
+				m_sNid + NPC_BAND, m_sSid, m_strName);
 			InitTarget();
 			NpcMoveEnd(pIOCP);	// 이동 끝..
 			m_NpcState = NPC_STANDING;
@@ -567,7 +573,8 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 			m_NpcState = NPC_STANDING;
 			m_Delay = m_sStandTime;
 			m_fDelayTime = TimeGet();
-			TRACE(_T("### NpcTracing Fail : StepMove 실패, %hs, %d ### \n"), m_strName, m_sNid + NPC_BAND);
+			spdlog::error("Npc::NpcTracing: StepMove failed [serial={} npcId={} npcName={}]",
+				m_sNid + NPC_BAND, m_sSid, m_strName);
 			return;
 		}
 	}
@@ -579,7 +586,8 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 			m_NpcState = NPC_STANDING;
 			m_Delay = m_sStandTime;
 			m_fDelayTime = TimeGet();
-			TRACE(_T("### NpcTracing Fail : StepNoPathMove 실패, %hs, %d ### \n"), m_strName, m_sNid + NPC_BAND);
+			spdlog::error("Npc::NpcTracing: StepNoPathMove failed [serial={} npcId={} npcName={}]",
+				m_sNid + NPC_BAND, m_sSid, m_strName);
 			return;
 		}
 	}
@@ -729,7 +737,8 @@ void CNpc::NpcMoving(CIOCPort* pIOCP)
 		if (m_fPrevX < 0
 			|| m_fPrevZ < 0)
 		{
-			TRACE(_T("### Npc-Moving Fail : nid=(%d, %hs), x=%.2f, z=%.2f\n"), m_sNid + NPC_BAND, m_strName, m_fPrevX, m_fPrevZ);
+			spdlog::error("Npc::NpcMoving: previous coordinates invalid [serial={} npcName={} prevX={} prevZ={}]",
+				m_sNid + NPC_BAND, m_strName, m_fPrevX, m_fPrevZ);
 		}
 		else
 		{
@@ -767,7 +776,8 @@ void CNpc::NpcMoving(CIOCPort* pIOCP)
 		if (m_fCurX < 0
 			|| m_fCurZ < 0)
 		{
-			TRACE(_T("Npc-NpcMoving-2 : nid=(%d, %hs), x=%.2f, z=%.2f\n"), m_sNid + NPC_BAND, m_strName, m_fCurX, m_fCurZ);
+			spdlog::error("Npc::NpcMoving: coordinates invalid [serial={} npcId={} npcName={} x={} z={}]",
+				m_sNid + NPC_BAND, m_sSid, m_strName, m_fCurX, m_fCurZ);
 		}
 
 		int rx = m_fCurX / VIEW_DIST;
@@ -864,7 +874,8 @@ void CNpc::NpcStanding()
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("### NpcStanding Zone Index Error : nid=%d, name=%hs, zoneindex=%d, pMap == NULL ###\n"), m_sNid + NPC_BAND, m_strName, m_ZoneIndex);
+		spdlog::error("Npc::NpcStanding: map not found [zoneIndex={} npcId={} npcName={}]",
+					m_strName, m_sSid, m_ZoneIndex);
 		return;
 	}
 
@@ -969,7 +980,8 @@ void CNpc::NpcBack(CIOCPort* pIOCP)
 		if (m_fPrevX < 0
 			|| m_fPrevZ < 0)
 		{
-			TRACE(_T("### Npc-NpcBack Fail-1 : nid=(%d, %hs), x=%.2f, z=%.2f\n"), m_sNid + NPC_BAND, m_strName, m_fPrevX, m_fPrevZ);
+			spdlog::error("Npc::NpcBack: previous coordinates invalid [serial={} npcName={} prevX={} prevZ={}]",
+				m_sNid + NPC_BAND, m_strName, m_fPrevX, m_fPrevZ);
 		}
 		else
 		{
@@ -987,7 +999,8 @@ void CNpc::NpcBack(CIOCPort* pIOCP)
 		if (m_fCurX < 0
 			|| m_fCurZ < 0)
 		{
-			TRACE(_T("Npc-NpcBack-2 : nid=(%d, %hs), x=%.2f, z=%.2f\n"), m_sNid + NPC_BAND, m_strName, m_fCurX, m_fCurZ);
+			spdlog::error("Npc::NpcBack: coordinates invalid [serial={} npcId={} npcName={} x={} z={}]",
+				m_sNid + NPC_BAND, m_sSid, m_strName, m_fCurX, m_fCurZ);
 		}
 
 		memset(pBuf, 0, sizeof(pBuf));
@@ -1087,7 +1100,7 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 
 	CNpc* pNpc = nullptr;
 
-	/* Event Monster가 다시 살아날 경우에는 Event Monster를 죽인다 이벤트 스레드에서도 포인터를 NULL */
+	/* If the Event Monster respawns, kill it and null the pointer in the event thread. */
 	if (m_lEventNpc == 1
 		&& !m_bFirstLive)
 	{
@@ -1101,7 +1114,8 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 					m_pMain->m_arEventNpcThread[0]->m_ThreadInfo.m_byNpcUsed[i] = 0;
 					m_lEventNpc = 0;
 					m_pMain->m_arEventNpcThread[0]->m_ThreadInfo.pNpc[i] = nullptr;
-					TRACE(_T("소환 몬스터 포인터 반환 ,, thread index=%d, nid=%d\n"), i, m_sNid + NPC_BAND);
+					spdlog::debug("Npc::SetLive: returning summoned monster pointer [threadIndex={} serial={} npcId={} npcName={}]",
+						i, m_sNid + NPC_BAND, m_sSid, m_strName);
 					return TRUE;
 				}
 			}
@@ -1113,7 +1127,8 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-SetLive ZoneIndex Fail : [nid=%d,sid=%d,name=%hs], th_num=%d, zoneindex=%d, pMap == NULL #####\n"), m_sNid + NPC_BAND, m_sSid, m_strName, m_sThreadNumber, m_ZoneIndex);
+		spdlog::error("Npc::SetLive: map not found [zoneIndex={} npcId={} npcName={}]",
+					m_strName, m_sSid, m_ZoneIndex);
 		return FALSE;
 	}
 
@@ -1128,7 +1143,8 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 	if (m_fCurX < 0
 		|| m_fCurZ < 0)
 	{
-		TRACE(_T("Npc-SetLive-1 : nid=(%d, %hs), x=%.2f, z=%.2f\n"), m_sNid + NPC_BAND, m_strName, m_fCurX, m_fCurZ);
+		spdlog::error("Npc::SetLive: coordinates invalid [serial={} npcId={} npcName={} x={} z={}]",
+			m_sNid + NPC_BAND, m_sSid, m_strName, m_fCurX, m_fCurZ);
 	}
 
 	int dest_x = (int) m_nInitX / TILE_SIZE;
@@ -1150,10 +1166,11 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 		int nTileX = 0;
 		int nTileZ = 0;
 		int nRandom = 0;
+		uint16_t retryCount = 0;
+		uint16_t maxRetry = 500;
 
 		while (1)
 		{
-			i++;
 			nRandom = abs(m_nInitMinX - m_nInitMaxX);
 			if (nRandom <= 1)
 			{
@@ -1191,21 +1208,23 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 			if (nTileX < 0
 				|| nTileZ < 0)
 			{
-				TRACE(_T("#### Npc-SetLive() Fail : nTileX=%d, nTileZ=%d #####\n"), nTileX, nTileZ);
+				spdlog::error("Npc::SetLive: tile coordinates invalid [serial={} npcId={} npcName={} tileX={} tileZ={}]",
+					m_sNid + NPC_BAND, m_sSid, m_strName, nTileX, nTileZ);
 				return FALSE;
 			}
 
 			if (pMap->m_pMap[nTileX][nTileZ].m_sEvent <= 0)
 			{
-				if (i >= 500)
+				if (retryCount >= maxRetry)
 				{
 					m_nInitX = m_fPrevX = m_fCurX;
 					m_nInitY = m_fPrevY = m_fCurY;
 					m_nInitZ = m_fPrevZ = m_fCurZ;
-					TRACE(_T("### fail : sid = %d, nid = %d, zone=%d, loop = %d 나 설자리가 이상해... 고쳐줘... x = %d, y = %d\n"), m_sSid, m_sNid + NPC_BAND, m_sCurZone, i, nX, nZ);
+					spdlog::error("Npc::SetLive: failed to spawn NPC, max retries exceeded [npcId={} serial={} zoneId={} retryCount={} x={} z={}]",
+						m_sSid, m_sNid + NPC_BAND, m_sCurZone, retryCount, nX, nZ);
 					return FALSE;
-
 				}
+				retryCount++;
 				continue;
 			}
 
@@ -1214,7 +1233,8 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 
 			if (m_fCurX < 0 || m_fCurZ < 0)
 			{
-				TRACE(_T("Npc-SetLive-2 : nid=(%d, %hs), x=%.2f, z=%.2f\n"), m_sNid + NPC_BAND, m_strName, m_fCurX, m_fCurZ);
+				spdlog::error("Npc::SetLive: post-move coordinates invalid [serial={} npcId={} npcName={} x={} z={}]",
+					m_sNid + NPC_BAND, m_sSid, m_strName, m_fCurX, m_fCurZ);
 			}
 
 			break;
@@ -1242,9 +1262,9 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 		if (m_pMain->m_TotalNPC == m_pMain->m_CurrentNPC)
 		{
 			CString logstr;
-			logstr.Format(_T("Monster All Init Success - %d"), m_pMain->m_CurrentNPC);
+			logstr.Format(_T("All NPCs initialized: %d"), m_pMain->m_CurrentNPC);
 			m_pMain->m_StatusList.AddString(logstr);
-			TRACE(_T("Npc - SerLive : GameServerAcceptThread, cur = %d\n"), m_pMain->m_CurrentNPC);
+			spdlog::info("Npc::SetLive: All NPCs initialized [count={}]", m_pMain->m_CurrentNPC);
 			m_pMain->GameServerAcceptThread();				// 게임서버 Accept
 		}
 		//TRACE(_T("Npc - SerLive : CurrentNpc = %d\n"), m_pMain->m_CurrentNPC);
@@ -1282,9 +1302,8 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 
 	SetUid(m_fCurX, m_fCurZ, m_sNid + NPC_BAND);
 	m_byDeadType = 0;
-	CTime t = CTime::GetCurrentTime();
-	TRACE(_T("NPC Init(nid=%d, sid=%d, th_num=%d, name=%hs) - %.2f %.2f, gate = %d, m_byDeadType=%d, time=%d:%d-%d\n"), m_sNid + NPC_BAND, m_sSid, m_sThreadNumber, m_strName, m_fCurX, m_fCurZ, m_byGateOpen, m_byDeadType, t.GetHour(), t.GetMinute(), t.GetSecond());
-
+	spdlog::trace("Npc::SetLive: NPC initialized [serial={} npcId={} threadNumber={} npcName={} x={} z={} gateOpen={} deadType={}]",
+		m_sNid + NPC_BAND, m_sSid, m_sThreadNumber, m_strName, m_fCurX, m_fCurZ, m_byGateOpen, m_byDeadType);
 	// 유저에게 NPC 정보전송...
 	int modify_index = 0;
 	char modify_send[2048] = {};
@@ -1321,8 +1340,6 @@ BOOL CNpc::RandomMove()
 	if (pMap == nullptr)
 		return FALSE;
 
-	int max_xx = pMap->m_sizeMap.cx;
-	int max_zz = pMap->m_sizeMap.cy;
 	int x = 0, y = 0;
 
 	__Vector3 vStart, vEnd, vNewPos;
@@ -1397,13 +1414,14 @@ BOOL CNpc::RandomMove()
 			m_sPathCount--;
 			nPathCount = GetNearPathPoint();
 
-			// 이동할 수 없는 너무 먼거리로 npc가 이동되었을 경우,, npc를 죽이고, 다시 살리던지..
-			// npc를 초기위치로 워프 시키든지.. 한다..
+			// If the NPC moves to a location that is unreachable,
+			// force it to return to the beginning of its path.
 			if (nPathCount == -1)
 			{
-				TRACE(_T("##### RandomMove Fail : [nid = %d, sid=%d], path = %d/%d, 이동할 수 있는 거리에서 너무 멀어졌당,, 어케해 #####\n"), m_sNid + NPC_BAND, m_sSid, m_sPathCount, m_sMaxPathCount);
-
-				// 무조건 0번 위치 방향으로 40m 이동하게 처리하장.. 
+				spdlog::debug("Npc::RandomMove: unreachable path point, returning to beginning of path. [serial={} npcId={} pathCount={} maxPathCount={}]",
+					m_sNid + NPC_BAND, m_sSid, m_sPathCount, m_sMaxPathCount);
+				
+				// Force the NPC to move 40 meters towards the beginning of its path
 				vStart.Set(m_fCurX, m_fCurY, m_fCurZ);
 				fDestX = (float) m_PathList.pPattenPos[0].x + m_fBattlePos_x;
 				fDestZ = (float) m_PathList.pPattenPos[0].z + m_fBattlePos_z;
@@ -1455,12 +1473,14 @@ BOOL CNpc::RandomMove()
 			m_sPathCount--;
 			nPathCount = GetNearPathPoint();
 
-			// 이동할 수 없는 너무 먼거리로 npc가 이동되었을 경우,, npc를 죽이고, 다시 살리던지..
-			// npc를 초기위치로 워프 시키든지.. 한다..
+			// If the NPC moves to a location that is unreachable,
+			// force it to return to the beginning of its path.
 			if (nPathCount == -1)
 			{
-				// 무조건 0번 위치 방향으로 40m 이동하게 처리하장.. 
-				TRACE(_T("##### RandomMove Fail : [nid = %d, sid=%d], path = %d/%d, 이동할 수 있는 거리에서 너무 멀어졌당,, 어케해 #####\n"), m_sNid + NPC_BAND, m_sSid, m_sPathCount, m_sMaxPathCount);
+				spdlog::debug("Npc::RandomMove: unreachable path point, returning to beginning of path. [serial={} npcId={} pathCount={} maxPathCount={}]",
+					m_sNid + NPC_BAND, m_sSid, m_sPathCount, m_sMaxPathCount);
+
+				// Force the NPC to move 40 meters towards the beginning of its path
 				vStart.Set(m_fCurX, m_fCurY, m_fCurZ);
 				fDestX = (float) m_PathList.pPattenPos[0].x + m_fBattlePos_x;
 				fDestZ = (float) m_PathList.pPattenPos[0].z + m_fBattlePos_z;
@@ -1495,25 +1515,22 @@ BOOL CNpc::RandomMove()
 	vStart.Set(m_fCurX, 0, m_fCurZ);
 	vEnd.Set(fDestX, 0, fDestZ);
 
-	if (m_fCurX < 0
-		|| m_fCurZ < 0
-		|| fDestX < 0
-		|| fDestZ < 0)
+	int mapMaxX = (pMap->m_sizeMap.cx-1) * pMap->m_fUnitDist;
+	int mapMaxZ = (pMap->m_sizeMap.cy-1) * pMap->m_fUnitDist;
+	if (!pMap->IsValidPosition(m_fCurX, m_fCurZ))
 	{
-		TRACE(_T("##### RandomMove Fail : value is negative.. [nid = %d, name=%hs], cur_x=%.2f, z=%.2f, dest_x=%.2f, dest_z=%.2f#####\n"), m_sNid + NPC_BAND, m_strName, m_fCurX, m_fCurZ, fDestX, fDestZ);
+		spdlog::error("Npc::RandomMove: coordinates invalid [serial={} npcName={} x={} z={} destX={} destZ={} mapBounds=[x:{} z:{}]]",
+				m_sNid + NPC_BAND, m_strName, m_fCurX, m_fCurZ, fDestX, fDestZ, mapMaxX, mapMaxZ);
 		return FALSE;
 	}
 
-	int mapWidth = (max_xx - 1) * pMap->m_fUnitDist;
-
-	if (m_fCurX > mapWidth
-		|| m_fCurZ > mapWidth
-		|| fDestX > mapWidth
-		|| fDestZ > mapWidth)
+	if (!pMap->IsValidPosition(fDestX, fDestZ))
 	{
-		TRACE(_T("##### RandomMove Fail : value is overflow .. [nid = %d, name=%hs], cur_x=%.2f, z=%.2f, dest_x=%.2f, dest_z=%.2f#####\n"), m_sNid + NPC_BAND, m_strName, m_fCurX, m_fCurZ, fDestX, fDestZ);
+		spdlog::error("Npc::RandomMove: destination coordinates invalid [serial={} npcName={} x={} z={} destX={} destZ={} mapBounds=[x:{} z:{}]]",
+				m_sNid + NPC_BAND, m_strName, m_fCurX, m_fCurZ, fDestX, fDestZ, mapMaxX, mapMaxZ);
 		return FALSE;
 	}
+	
 
 	// 작업할것 :	 던젼 몬스터의 경우 일정영역을 벗어나지 못하도록 체크하는 루틴 	
 	if (m_tNpcType == NPC_DUNGEON_MONSTER)
@@ -1535,7 +1552,8 @@ BOOL CNpc::RandomMove()
 				m_sPathCount = 0;
 		}
 
-		TRACE(_T("##### RandomMove Fail : NPC_MAX_MOVE_RANGE overflow  .. [nid = %d, name=%hs], cur_x=%.2f, z=%.2f, dest_x=%.2f, dest_z=%.2f, fDis=%.2f#####\n"), m_sNid + NPC_BAND, m_strName, m_fCurX, m_fCurZ, fDestX, fDestZ, fDis);
+		spdlog::error("Npc::RandomMove: tried to move further than max move distance [serial={} npcId={} npcName={} distance={}]",
+			m_sNid + NPC_BAND, m_sSid, m_strName, fDis);
 		return FALSE;
 	}
 
@@ -1567,12 +1585,12 @@ BOOL CNpc::RandomMove()
 		min_z = 0;
 
 	int max_x = (int) (m_fCurX + fTempRange) / TILE_SIZE;
-	if (max_x >= max_xx)
-		max_x = max_xx - 1;
+	if (max_x >= pMap->m_sizeMap.cx)
+		max_x = pMap->m_sizeMap.cx-1;
 
 	int max_z = (int) (m_fCurZ + fTempRange) / TILE_SIZE;
-	if (min_z >= max_zz)
-		min_z = max_zz - 1;
+	if (min_z >= pMap->m_sizeMap.cy)
+		min_z = pMap->m_sizeMap.cy-1;
 
 	CPoint start, end;
 	start.x = (int) (m_fCurX / TILE_SIZE) - min_x;
@@ -1624,7 +1642,8 @@ BOOL CNpc::RandomBackMove()
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-RandomBackMove ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
+		spdlog::error("Npc::RandomBackMove: map not found [zoneIndex={} npcId={} npcName={}]",
+		m_ZoneIndex, m_sSid, m_strName);
 		return FALSE;
 	}
 
@@ -1908,7 +1927,8 @@ int CNpc::PathFind(CPoint start, CPoint end, float fDistance)
 		m_iAniFrameIndex = 1;
 		m_pPoint[0].fXPos = m_fEndPoint_X;
 		m_pPoint[0].fZPos = m_fEndPoint_Y;
-		TRACE(_T("같은 영역안에서 조금 움직임.... x=%.2f, z=%.2f\n"), m_pPoint[0].fXPos, m_pPoint[0].fZPos);
+		spdlog::trace("Npc::PathFind: minimal movement.... [serial={} npcId={} npcName={} x={} z={}]",
+			m_sNid + NPC_BAND, m_sSid, m_strName,m_pPoint[0].fXPos, m_pPoint[0].fZPos);
 		return 1;
 	}
 
@@ -2030,7 +2050,8 @@ void CNpc::Dead(CIOCPort* pIOCP, int iDeadType)
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-Dead ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
+		spdlog::error("Npc::Dead: map not found [zoneIndex={} npcId={} npcName={}]",
+			m_strName, m_sSid, m_ZoneIndex);
 		return;
 	}
 
@@ -2044,7 +2065,8 @@ void CNpc::Dead(CIOCPort* pIOCP, int iDeadType)
 	if (m_iRegion_X > pMap->GetXRegionMax()
 		|| m_iRegion_Z > pMap->GetZRegionMax())
 	{
-		TRACE(_T("#### Npc-Dead() Fail : [nid=%d, sid=%d], nRX=%d, nRZ=%d #####\n"), m_sNid + NPC_BAND, m_sSid, m_iRegion_X, m_iRegion_Z);
+		spdlog::error("Npc::Dead: out of region bounds [serial={} npcId={} x={} z={}]",
+			m_sNid + NPC_BAND, m_sSid, m_iRegion_X, m_iRegion_Z);
 		return;
 	}
 
@@ -2081,7 +2103,8 @@ void CNpc::Dead(CIOCPort* pIOCP, int iDeadType)
 			if (m_byDungeonFamily < 0
 				|| m_byDungeonFamily >= MAX_DUNGEON_BOSS_MONSTER)
 			{
-				TRACE(_T("#### Npc-Dead() m_byDungeonFamily Fail : [nid=%d, name=%hs], m_byDungeonFamily=%d #####\n"), m_sNid + NPC_BAND, m_strName, m_byDungeonFamily);
+				spdlog::error("Npc::Dead: dungeonFamily out of range [serial={} npcId={} npcName={} dungeonFamily={}]",
+					m_sNid + NPC_BAND, m_sSid, m_strName, m_byDungeonFamily);
 				return;
 			}
 //			pMap->m_arDungeonBossMonster[m_byDungeonFamily] = 0;
@@ -2122,7 +2145,8 @@ BOOL CNpc::FindEnemy()
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-FindEnemy ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
+		spdlog::error("Npc::FindEnemy: map not found [zoneIndex={} npcId={} npcName={}]",
+			m_strName, m_sSid, m_ZoneIndex);
 		return FALSE;
 	}
 
@@ -2480,7 +2504,8 @@ float CNpc::FindEnemyExpand(int nRX, int nRZ, float fCompDis, int nType)
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-FindEnemyExpand ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strName, m_ZoneIndex);
+		spdlog::error("Npc::FindEnemyExpand: map not found [zoneIndex={} npcId={} npcName={}]",
+					m_strName, m_sSid, m_ZoneIndex);
 		return 0.0f;
 	}
 
@@ -2742,7 +2767,8 @@ BOOL CNpc::IsMovable(float x, float z)
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-IsMovable ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
+		spdlog::error("Npc::IsMovable: map not found [zoneIndex={} npcId={} npcName={}]",
+					m_strName, m_sSid, m_ZoneIndex);
 		return FALSE;
 	}
 
@@ -2809,7 +2835,8 @@ BOOL CNpc::StepMove(int nStep, CIOCPort* pIOCP)
 	{
 		m_fPrevX = m_fEndPoint_X;
 		m_fPrevZ = m_fEndPoint_Y;
-		TRACE(_T("##### Step Move Fail : [nid = %d,%hs] m_iAniFrameCount=%d/%d ######\n"), m_sNid + NPC_BAND, m_strName, m_iAniFrameCount, m_iAniFrameIndex);
+		spdlog::error("Npc::StepMove: aniFrameCount out of bounds [serial={} npcId={} npcName={} frameCount={} frameIndex={}]",
+			m_sNid + NPC_BAND, m_sSid, m_strName, m_iAniFrameCount, m_iAniFrameIndex);
 		SetUid(m_fPrevX, m_fPrevZ, m_sNid + NPC_BAND);
 		return FALSE;
 	}
@@ -2868,7 +2895,8 @@ BOOL CNpc::StepMove(int nStep, CIOCPort* pIOCP)
 
 	if (m_fSecForRealMoveMetor > m_fSecForMetor + 1)
 	{
-		TRACE(_T("#### move fail : [nid = %d], m_fSecForMetor = %.2f\n"), m_sNid + NPC_BAND, m_fSecForRealMoveMetor);
+		spdlog::error("Npc::StepMove: exceeding max speed [serial={} npcId={} npcName={} meterPerSecond={}]",
+			m_sNid + NPC_BAND, m_sSid, m_strName, m_fSecForRealMoveMetor);
 	}
 
 	if (m_sStepCount == 0)
@@ -2884,7 +2912,8 @@ BOOL CNpc::StepMove(int nStep, CIOCPort* pIOCP)
 		if (m_fCurX < 0
 			|| m_fCurZ < 0)
 		{
-			TRACE(_T("Npc-StepMove : nid=(%d, %hs), x=%.2f, z=%.2f\n"), m_sNid + NPC_BAND, m_strName, m_fCurX, m_fCurZ);
+			spdlog::error("Npc::StepMove: coordinates invalid [serial={} npcId={} npcName={} x={} z={}]",
+				m_sNid + NPC_BAND, m_sSid, m_strName, m_fCurX, m_fCurZ);
 		}
 
 		if (!SetUid(m_fCurX, m_fCurZ, m_sNid + NPC_BAND))
@@ -2918,7 +2947,8 @@ BOOL CNpc::StepNoPathMove(int nStep)
 	if (m_sStepCount < 0
 		|| m_sStepCount >= m_iAniFrameIndex)
 	{
-		TRACE(_T("#### IsNoPtahfind Fail : nid=%d,%hs, count=%d/%d ####\n"), m_sNid + NPC_BAND, m_strName, m_sStepCount, m_iAniFrameIndex);
+		spdlog::error("Npc::StepNoPathMove: stepCount out of bounds [serial={} npcId={} npcName={} stepCount={} frameIndex={}]",
+			m_sNid + NPC_BAND, m_sSid, m_strName, m_sStepCount, m_iAniFrameIndex);
 		return FALSE;
 	}
 
@@ -2930,7 +2960,8 @@ BOOL CNpc::StepNoPathMove(int nStep)
 	if (m_fPrevX == -1
 		|| m_fPrevZ == -1)
 	{
-		TRACE(_T("##### StepNoPath Fail : nid=%d,%hs, x=%.2f, z=%.2f #####\n"), m_sNid + NPC_BAND, m_strName, m_fPrevX, m_fPrevZ);
+		spdlog::error("Npc::StepNoPathMove: previous coordinates invalid [serial={} npcId={} npcName={} prevX={} prevZ={}]",
+			m_sNid + NPC_BAND, m_sSid, m_strName, m_fPrevX, m_fPrevZ);
 		return FALSE;
 	}
 
@@ -2941,7 +2972,8 @@ BOOL CNpc::StepNoPathMove(int nStep)
 		if (fOldCurX < 0
 			|| fOldCurZ < 0)
 		{
-			TRACE(_T("#### Npc-StepNoPathMove Fail : nid=(%d, %hs), x=%.2f, z=%.2f\n"), m_sNid + NPC_BAND, m_strName, fOldCurX, fOldCurZ);
+			spdlog::error("Npc::StepNoPathMove: old previous coordinates invalid [serial={} npcId={} npcName={} oldCurX={} oldCurZ={}]",
+				m_sNid + NPC_BAND, m_sSid, m_strName, fOldCurX, fOldCurZ);
 			return FALSE;
 		}
 		else
@@ -3122,9 +3154,9 @@ int CNpc::GetTargetPath(int option)
 
 	// 추격할때는 뛰는 속도로 맞추어준다...
 	m_fSecForMetor = m_fSpeed_2;
-	CUser* pUser = nullptr;
-	CNpc* pNpc = nullptr;
-	float iTempRange = 0.0f;
+	CUser* targetUser = nullptr;
+	CNpc* npcTarget = nullptr;
+	float chaseRange = 0.0f;
 	__Vector3 vUser, vNpc, vDistance, vEnd22;
 	float fDis = 0.0f;
 	float fDegree = 0.0f, fTargetDistance = 0.0f;
@@ -3141,22 +3173,22 @@ int CNpc::GetTargetPath(int option)
 	if (m_Target.id >= USER_BAND
 		&& m_Target.id < NPC_BAND)
 	{
-		pUser = m_pMain->GetUserPtr(m_Target.id - USER_BAND);
-		if (pUser == nullptr)
+		targetUser = m_pMain->GetUserPtr(m_Target.id - USER_BAND);
+		if (targetUser == nullptr)
 		{
 			InitTarget();
 			return -1;
 		}
 
-		if (pUser->m_sHP <= 0
+		if (targetUser->m_sHP <= 0
 			/*|| pUser->m_state != STATE_GAMESTARTED*/
-			|| !pUser->m_bLive)
+			|| !targetUser->m_bLive)
 		{
 			InitTarget();
 			return -1;
 		}
 
-		if (pUser->m_curZone != m_sCurZone)
+		if (targetUser->m_curZone != m_sCurZone)
 		{
 			InitTarget();
 			return -1;
@@ -3166,83 +3198,84 @@ int CNpc::GetTargetPath(int option)
 		if (option == 1)
 		{
 			vNpc.Set(m_fCurX, m_fCurY, m_fCurZ);
-			vUser.Set(pUser->m_curx, pUser->m_cury, pUser->m_curz);
+			vUser.Set(targetUser->m_curx, targetUser->m_cury, targetUser->m_curz);
 			fDis = GetDistance(vNpc, vUser);
 
 			// 너무 거리가 멀어서,, 추적이 안되게..
 			if (fDis >= NPC_MAX_MOVE_RANGE)
 				return -1;
 
-			iTempRange = fDis + 10;
+			chaseRange = fDis + 10;
 		}
 		else
 		{
 			// 일시적으로 보정한다.
-			iTempRange = (float) m_bySearchRange;
+			chaseRange = (float) m_bySearchRange;
 
 			// 공격받은 상태면 찾을 범위 증가.
-			if (IsDamagedUserList(pUser))
-				iTempRange = (float) m_byTracingRange;
+			if (IsDamagedUserList(targetUser))
+				chaseRange = (float) m_byTracingRange;
 			else
-				iTempRange += 2;
+				chaseRange += 2;
 		}
 	}
 	// Target 이 mon 인 경우
 	else if (m_Target.id >= NPC_BAND
 		&& m_Target.id < INVALID_BAND)
 	{
-		pNpc = m_pMain->m_arNpc.GetData(m_Target.id - NPC_BAND);
-		if (pNpc == nullptr)
+		npcTarget = m_pMain->m_arNpc.GetData(m_Target.id - NPC_BAND);
+		if (npcTarget == nullptr)
 		{
 			InitTarget();
 			return FALSE;
 		}
 
-		if (pNpc->m_iHP <= 0
-			|| pNpc->m_NpcState == NPC_DEAD)
+		if (npcTarget->m_iHP <= 0
+			|| npcTarget->m_NpcState == NPC_DEAD)
 		{
 			InitTarget();
 			return -1;
 		}
 
-		iTempRange = (float) m_byTracingRange;				// 일시적으로 보정한다.
+		chaseRange = (float) m_byTracingRange;				// 일시적으로 보정한다.
 	}
 
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-GetTargetPath ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
+		spdlog::error("Npc::GetTargetPath: map not found [zoneIndex={} npcId={} npcName={}]",
+		m_strName, m_sSid, m_ZoneIndex);
 		return -1;
 	}
 
 	int max_xx = pMap->m_sizeMap.cx;
 	int max_zz = pMap->m_sizeMap.cy;
 
-	int min_x = (int) (m_fCurX - iTempRange) / TILE_SIZE;
+	int min_x = (int) (m_fCurX - chaseRange) / TILE_SIZE;
 	if (min_x < 0)
 		min_x = 0;
 
-	int min_z = (int) (m_fCurZ - iTempRange) / TILE_SIZE;
+	int min_z = (int) (m_fCurZ - chaseRange) / TILE_SIZE;
 	if (min_z < 0)
 		min_z = 0;
 
-	int max_x = (int) (m_fCurX + iTempRange) / TILE_SIZE;
+	int max_x = (int) (m_fCurX + chaseRange) / TILE_SIZE;
 	if (max_x >= max_xx)
 		max_x = max_xx - 1;
 
-	int max_z = (int) (m_fCurZ + iTempRange) / TILE_SIZE;
+	int max_z = (int) (m_fCurZ + chaseRange) / TILE_SIZE;
 	if (min_z >= max_zz)
 		min_z = max_zz - 1;
 
 	// Target 이 User 인 경우
-	if (m_Target.id >= USER_BAND
-		&& m_Target.id < NPC_BAND)
+	if (targetUser != nullptr)
 	{
-		// 목표점이 Search Range를 벗어나지 않는지 검사
+		// Check if user is within search range
 		CRect r(min_x, min_z, max_x + 1, max_z + 1);
-		if (r.PtInRect(CPoint((int) pUser->m_curx / TILE_SIZE, (int) pUser->m_curz / TILE_SIZE)) == FALSE)
+		if (r.PtInRect(CPoint((int) targetUser->m_curx / TILE_SIZE, (int) targetUser->m_curz / TILE_SIZE)) == FALSE)
 		{
-			TRACE(_T("### Npc-GetTargetPath() User Fail return -1: [nid=%d] t_Name=%hs, AttackPos=%d ###\n"), m_sNid + NPC_BAND, pUser->m_strUserID, m_byAttackPos);
+			spdlog::debug("Npc::GetTargetPath: user outside of search range [serial={} npcId={} npcName={} charId={} attackPos={}]",
+				m_sNid + NPC_BAND, m_sSid, m_strName, targetUser->m_strUserID, m_byAttackPos);
 			return -1;
 		}
 
@@ -3250,11 +3283,11 @@ int CNpc::GetTargetPath(int option)
 		m_fStartPoint_Y = m_fCurZ;
 
 		vNpc.Set(m_fCurX, m_fCurY, m_fCurZ);
-		vUser.Set(pUser->m_curx, pUser->m_cury, pUser->m_curz);
+		vUser.Set(targetUser->m_curx, targetUser->m_cury, targetUser->m_curz);
 
 		// 여기에서 유저의 어느 방향으로 공격할것인지를 판단...(셋팅)
 		// 이 부분에서 Npc의 공격점을 알아와서 공격하도록 한다,,
-		IsSurround(pUser);	//둘러 쌓여 있으면 무시한다.(원거리, 근거리 무시)
+		IsSurround(targetUser);	//둘러 쌓여 있으면 무시한다.(원거리, 근거리 무시)
 
 		//vEnd22 = CalcAdaptivePosition(vNpc, vUser, 2.0+m_fBulk);
 
@@ -3280,14 +3313,16 @@ int CNpc::GetTargetPath(int option)
 		}
 	}
 	// Target 이 mon 인 경우
-	else if (m_Target.id >= NPC_BAND
-		&& m_Target.id < INVALID_BAND)
+	else if (npcTarget != nullptr)
 	{
-		// 목표점이 Search Range를 벗어나지 않는지 검사
+		// check if target is in search range
 		CRect r(min_x, min_z, max_x + 1, max_z + 1);
-		if (!r.PtInRect( { (int) pNpc->m_fCurX / TILE_SIZE, (int) pNpc->m_fCurZ / TILE_SIZE }))
+		if (!r.PtInRect( { (int) npcTarget->m_fCurX / TILE_SIZE, (int) npcTarget->m_fCurZ / TILE_SIZE }))
 		{
-			TRACE(_T("### Npc-GetTargetPath() Npc Fail return -1: [nid=%d] t_Name=%hs, AttackPos=%d ###\n"), m_sNid + NPC_BAND, pNpc->m_strName, m_byAttackPos);
+			spdlog::debug("Npc::GetTargetPath: target outside of search range [serial={} npcId={} npcName={} targetSerial={} targetId={} targetName={} attackPos={}]",
+				m_sNid + NPC_BAND, m_sSid, m_strName,
+				npcTarget->m_sNid + NPC_BAND, npcTarget->m_sSid, npcTarget->m_strName,
+				m_byAttackPos);
 			return -1;
 		}
 
@@ -3295,7 +3330,7 @@ int CNpc::GetTargetPath(int option)
 		m_fStartPoint_Y = m_fCurZ;
 
 		vNpc.Set(m_fCurX, m_fCurY, m_fCurZ);
-		vUser.Set(pNpc->m_fCurX, pNpc->m_fCurY, pNpc->m_fCurZ);
+		vUser.Set(npcTarget->m_fCurX, npcTarget->m_fCurY, npcTarget->m_fCurZ);
 
 		vEnd22 = CalcAdaptivePosition(vNpc, vUser, 2.0f + m_fBulk);
 		m_fEndPoint_X = vEnd22.x;
@@ -3316,9 +3351,10 @@ int CNpc::GetTargetPath(int option)
 		return TRUE;
 	}
 
-	if ((int) fDis > iTempRange)
+	if ((int) fDis > chaseRange)
 	{
-		TRACE(_T("Npc-GetTargetPath() searchrange over Fail return -1: [nid=%d,%hs]\n"), m_sNid + NPC_BAND, m_strName);
+		spdlog::debug("Npc::GetTargetPath: target outside of chase range [serial={} npcId={} npcName={} destDist={} chaseRange={}]",
+			m_sNid + NPC_BAND, m_sSid, m_strName, fDis, chaseRange);
 		return -1;
 	}
 
@@ -4006,7 +4042,8 @@ void CNpc::MoveAttack(CIOCPort* pIOCP)
 	if (m_fCurX < 0
 		|| m_fCurZ < 0)
 	{
-		TRACE(_T("Npc-MoveAttack : nid=(%d, %hs), x=%.2f, z=%.2f\n"), m_sNid + NPC_BAND, m_strName, m_fCurX, m_fCurZ);
+		spdlog::error("Npc::MoveAttack: coordinates invalid [serial={} npcId={} npcName={} x={} z={}]",
+			m_sNid + NPC_BAND, m_sSid, m_strName, m_fCurX, m_fCurZ);
 	}
 
 	// 이동공격.. 
@@ -4206,10 +4243,11 @@ BOOL CNpc::ResetPath()
 
 	int nValue = GetTargetPath();
 
-	// 타겟이 없어지거나,, 멀어졌음으로...
+	// Target has been lost or ran away.
 	if (nValue == -1)
 	{
-		TRACE(_T("Npc-ResetPath Fail - target_x = %.2f, z=%.2f, value=%d\n"), m_Target.x, m_Target.z, nValue);
+		spdlog::debug("Npc::ResetPath: target lost [serial={} npcId={} npcName={} targetX={} targetZ={}]",
+			m_sNid + NPC_BAND, m_sSid, m_strName, m_Target.x, m_Target.z);
 		return FALSE;
 	}
 
@@ -4380,7 +4418,8 @@ int CNpc::GetFinalDamage(CUser* pUser, int type)
 
 	if (damage > nMaxDamage)
 	{
-		TRACE(_T("#### Npc-GetFinalDamage Fail : nid=%d, result=%d, damage=%d, maxdamage=%d\n"), m_sNid + NPC_BAND, result, damage, nMaxDamage);
+		spdlog::trace("Npc::GetFinalDamage: damage exceeded maximum, clamped to max. [serial={} npcId={} npcName={} damage={} maxDamage={}]",
+			m_sNid + NPC_BAND, m_sSid, m_strName, damage, nMaxDamage);
 		damage = nMaxDamage;
 	}
 
@@ -4678,11 +4717,6 @@ void CNpc::ChangeNTarget(CNpc* pNpc, CIOCPort* pIOCP)
 	}
 }
 
-void CNpc::ToTargetMove(CIOCPort* pIOCP, CUser* pUser)
-{
-	TRACE(_T("### ToTargetMove() 유저 길찾기 실패 ### \n"));
-}
-
 //	NPC 의 방어력을 얻어온다.
 int CNpc::GetDefense()
 {
@@ -4690,7 +4724,7 @@ int CNpc::GetDefense()
 }
 
 //	Damage 계산, 만약 m_iHP 가 0 이하이면 사망처리
-BOOL CNpc::SetDamage(int nAttackType, int nDamage, const char* id, int uid, CIOCPort* pIOCP)
+BOOL CNpc::SetDamage(int nAttackType, int nDamage, const char* sourceName, int uid, CIOCPort* pIOCP)
 {
 	int i = 0, len = 0;
 	int userDamage = 0;
@@ -4710,7 +4744,8 @@ BOOL CNpc::SetDamage(int nAttackType, int nDamage, const char* id, int uid, CIOC
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-Setdamage ZoneIndex Fail : [name=%d,%hs], zoneindex=%d, pMap == NULL #####\n"), m_sNid + NPC_BAND, m_strName, m_ZoneIndex);
+		spdlog::error("Npc::SetDamage: map not found [zoneIndex={} npcId={} npcName={}]",
+					m_strName, m_sSid, m_ZoneIndex);
 		return TRUE;
 	}
 
@@ -4747,7 +4782,7 @@ BOOL CNpc::SetDamage(int nAttackType, int nDamage, const char* id, int uid, CIOC
 	{
 		if (m_DamagedUserList[i].iUid == uid)
 		{
-			if (_stricmp("**duration**", id) == 0)
+			if (_stricmp("**duration**", sourceName) == 0)
 			{
 				bFlag = TRUE;
 				strcpy(strDurationID, pUser->m_strUserID);
@@ -4757,7 +4792,7 @@ BOOL CNpc::SetDamage(int nAttackType, int nDamage, const char* id, int uid, CIOC
 					goto go_result;
 				}
 			}
-			else if (_stricmp(m_DamagedUserList[i].strUserID, id) == 0)
+			else if (_stricmp(m_DamagedUserList[i].strUserID, sourceName) == 0)
 			{
 				m_DamagedUserList[i].nDamage += userDamage;
 				goto go_result;
@@ -4765,18 +4800,19 @@ BOOL CNpc::SetDamage(int nAttackType, int nDamage, const char* id, int uid, CIOC
 		}
 	}
 
-	// 인원 제한이 최종 대미지에 영향을 미치나?
+	// Does the player limit affect the final damage? || 인원 제한이 최종 대미지에 영향을 미치나?
 	for (i = 0; i < NPC_HAVE_USER_LIST; i++)
 	{
 		if (m_DamagedUserList[i].iUid == -1)
 		{
 			if (m_DamagedUserList[i].nDamage <= 0)
 			{
-				len = strlen(id);
+				len = strlen(sourceName);
 				if (len > MAX_ID_SIZE
 					|| len <= 0)
 				{
-					TRACE(_T("###  Npc SerDamage Fail ---> uid = %d, name=%hs, len=%d, id=%hs  ### \n"), m_sNid + NPC_BAND, m_strName, len, id);
+					spdlog::error("Npc::SetDamage: sourceName length out of bounds [serial={} npcId={} npcName={} len={} sourceName={}]",
+						m_sNid + NPC_BAND, m_sSid, m_strName, len, sourceName);
 					continue;
 				}
 
@@ -4786,10 +4822,10 @@ BOOL CNpc::SetDamage(int nAttackType, int nDamage, const char* id, int uid, CIOC
 				}
 				else
 				{
-					if (_stricmp("**duration**", id) == 0)
+					if (_stricmp("**duration**", sourceName) == 0)
 						strcpy(m_DamagedUserList[i].strUserID, pUser->m_strUserID);
 					else
-						strcpy(m_DamagedUserList[i].strUserID, id);
+						strcpy(m_DamagedUserList[i].strUserID, sourceName);
 				}
 				m_DamagedUserList[i].iUid = uid;
 				m_DamagedUserList[i].nDamage = userDamage;
@@ -4879,8 +4915,8 @@ BOOL CNpc::SetHMagicDamage(int nDamage, CIOCPort* pIOCP)
 	else if (m_iHP > m_iMaxHP)
 		m_iHP = m_iMaxHP;
 
-	TRACE(_T("Npc - SetHMagicDamage(), nid=%d,%hs, oldHP=%d -> curHP=%d\n"), m_sNid + NPC_BAND, m_strName, oldHP, m_iHP);
-
+	spdlog::trace("Npc::SetHMagicDamage: [serial={} npcId={} npcName={} oldHp={} newHp={}]",
+		m_sNid + NPC_BAND, m_sSid, m_strName, oldHP, m_iHP);
 	SetByte(buff, AG_USER_SET_HP, send_index);
 	SetShort(buff, m_sNid + NPC_BAND, send_index);
 	SetDWORD(buff, m_iHP, send_index);
@@ -4895,7 +4931,8 @@ void CNpc::SendExpToUserList()
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-SendExpToUserList() ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
+		spdlog::error("Npc::SendExpToUserList: map not found [zoneIndex={} npcId={} npcName={}]",
+			m_strName, m_sSid, m_ZoneIndex);
 		return;
 	}
 
@@ -5230,7 +5267,8 @@ void CNpc::SendExpToUserList()
 				SetByte(send_buff, strlen(strMaxDamageUser), send_index);
 				SetString(send_buff, strMaxDamageUser, strlen(strMaxDamageUser), send_index);
 				m_pMain->Send(send_buff, send_index, m_sCurZone);
-				TRACE(_T("@@@ MaxDamageUser - %hs @@@\n"), strMaxDamageUser);
+				spdlog::info("Npc::SendExpToUserList: maxDamageUser={} [serial={} npcId={} npcName={}]",
+					strMaxDamageUser, m_sNid + NPC_BAND, m_sSid, m_strName);
 
 				memset(send_buff, 0, sizeof(send_buff));
 				send_index = 0;
@@ -5243,7 +5281,8 @@ void CNpc::SendExpToUserList()
 					SetByte(send_buff, strlen(strMaxDamageUser), send_index);
 					SetString(send_buff, strMaxDamageUser, strlen(strMaxDamageUser), send_index);
 					m_pMain->Send(send_buff, send_index, m_sCurZone);
-					TRACE(_T("@@@ Karus Victory - %d, %d @@@\n"), m_pMain->m_sKillKarusNpc, pMap->m_sKarusRoom);
+					spdlog::info("Npc::SendExpToUserList: Karus Victory [killKarusNpc={} karusRoom={}]",
+					m_pMain->m_sKillKarusNpc, pMap->m_sKarusRoom);
 				}
 				else if (m_pMain->m_sKillElmoNpc == pMap->m_sElmoradRoom)
 				{
@@ -5253,7 +5292,8 @@ void CNpc::SendExpToUserList()
 					SetByte(send_buff, strlen(strMaxDamageUser), send_index);
 					SetString(send_buff, strMaxDamageUser, strlen(strMaxDamageUser), send_index);
 					m_pMain->Send(send_buff, send_index, m_sCurZone);
-					TRACE(_T("@@@ Elmorad Victory - %d, %d @@@\n"), m_pMain->m_sKillElmoNpc, pMap->m_sElmoradRoom);
+					spdlog::info("Npc::SendExpToUserList: Elmorad Victory [killElmoNpc={} elmoradRoom={}]",
+					m_pMain->m_sKillElmoNpc, pMap->m_sElmoradRoom);
 				}
 			}
 		}
@@ -5317,7 +5357,8 @@ int CNpc::FindFriend(int type)
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-FindFriend ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
+		spdlog::error("Npc::FindFriend: map not found [zoneIndex={} npcId={} npcName={}]",
+			m_strName, m_sSid, m_ZoneIndex);
 		return 0;
 	}
 
@@ -5395,7 +5436,8 @@ void CNpc::FindFriendRegion(int x, int z, MAP* pMap, _TargetHealer* pHealer, int
 		|| x > pMap->GetXRegionMax()
 		|| z > pMap->GetZRegionMax())
 	{
-		TRACE(_T("#### Npc-FindFriendRegion() Fail : [nid=%d, sid=%d], nRX=%d, nRZ=%d #####\n"), m_sNid + NPC_BAND, m_sSid, x, z);
+		spdlog::error("Npc::FindFriendRegion: out of region bounds [serial={} npcId={} x={} z={}]",
+			m_sNid + NPC_BAND, m_sSid, x, z);
 		return;
 	}
 
@@ -5768,8 +5810,8 @@ void CNpc::SendAll(CIOCPort* pIOCP, const char* pBuf, int nLength)
 
 void CNpc::NpcTrace(const std::string& msg)
 {
-	spdlog::trace("NPCTrace: {} [serial={} npcName={} x={} z={}]",
-		msg, m_sNid + NPC_BAND, m_strName, m_fCurX, m_fCurZ);
+	spdlog::trace("NPCTrace: {} [serial={} npcId={} npcName={} x={} z={}]",
+		msg, m_sNid + NPC_BAND, m_sSid, m_strName, m_fCurX, m_fCurZ);
 }
 
 void CNpc::NpcMoveEnd(CIOCPort* pIOCP)
@@ -5813,7 +5855,8 @@ BOOL CNpc::GetUserInView()
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-GetUserInView ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
+		spdlog::error("Npc::GetUserInView: map not found [zoneIndex={} npcId={} npcName={}]",
+			m_strName, m_sSid, m_ZoneIndex);
 		return FALSE;
 	}
 
@@ -5860,7 +5903,8 @@ BOOL CNpc::GetUserInViewRange(int x, int z)
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-GetUserInViewRange ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
+		spdlog::error("Npc::GetUserInViewRange: map not found [zoneIndex={} npcId={} npcName={}]",
+			m_strName, m_sSid, m_ZoneIndex);
 		return FALSE;
 	}
 
@@ -5869,7 +5913,8 @@ BOOL CNpc::GetUserInViewRange(int x, int z)
 		|| x > pMap->GetXRegionMax()
 		|| z > pMap->GetZRegionMax())
 	{
-		TRACE(_T("#### Npc-GetUserInViewRange() Fail : [nid=%d, sid=%d], x1=%d, z1=%d #####\n"), m_sNid + NPC_BAND, m_sSid, x, z);
+		spdlog::error("Npc::GetUserInViewRange: out of map bounds [serial={} npcId={} x={} z={}]",
+        			m_sNid + NPC_BAND, m_sSid, x, z);
 		return FALSE;
 	}
 
@@ -6162,7 +6207,8 @@ BOOL CNpc::IsPathFindCheck(float fDistance)
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-IsPathFindCheck ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
+		spdlog::error("Npc::IsPathFindCheck: map not found [zoneIndex={} npcId={} npcName={}]",
+			m_strName, m_sSid, m_ZoneIndex);
 		return FALSE;
 	}
 
@@ -6267,7 +6313,8 @@ void CNpc::IsNoPathFind(float fDistance)
 	if (fDis > NPC_MAX_MOVE_RANGE)
 	{
 		ClearPathFindData();
-		TRACE(_T("#### Npc-IsNoPathFind Fail : NPC_MAX_MOVE_RANGE overflow  .. [nid = %d, name=%hs], cur_x=%.2f, z=%.2f, dest_x=%.2f, dest_z=%.2f, fDis=%.2f#####\n"), m_sNid + NPC_BAND, m_strName, m_fStartPoint_X, m_fStartPoint_Y, m_fEndPoint_X, m_fEndPoint_Y, fDis);
+		spdlog::error("Npc::IsNoPathFind: tried to move further than max move distance [serial={} npcId={} npcName={} distance={}]",
+			m_sNid + NPC_BAND, m_sSid, m_strName, fDis);
 		return;
 	}
 
@@ -6275,7 +6322,8 @@ void CNpc::IsNoPathFind(float fDistance)
 	if (pMap == nullptr)
 	{
 		ClearPathFindData();
-		TRACE(_T("#### Npc-IsNoPathFind ZoneIndex Fail : [nid=%d, name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_sNid + NPC_BAND, m_strName, m_ZoneIndex);
+		spdlog::error("Npc::IsNoPathFind: map not found [zoneIndex={} npcId={} npcName={}]",
+			m_strName, m_sSid, m_ZoneIndex);
 		return;
 	}
 
@@ -6293,7 +6341,8 @@ void CNpc::IsNoPathFind(float fDistance)
 				|| count >= MAX_PATH_LINE)
 			{
 				ClearPathFindData();
-				TRACE(_T("#### Npc-IsNoPathFind index overflow Fail 1 :  count=%d ####\n"), count);
+				spdlog::error("Npc::IsNoPathFind: invalid pathCount [serial={} npcId={} npcName={} pathCount={}]",
+					m_sNid + NPC_BAND, m_sSid, m_strName, count);
 				return;
 			}
 
@@ -6308,7 +6357,8 @@ void CNpc::IsNoPathFind(float fDistance)
 				|| count >= MAX_PATH_LINE)
 			{
 				ClearPathFindData();
-				TRACE(_T("#### Npc-IsNoPathFind index overflow Fail 2 :  count=%d ####\n"), count);
+				spdlog::error("Npc::IsNoPathFind: invalid pathCount [serial={} npcId={} npcName={} pathCount={}]",
+					m_sNid + NPC_BAND, m_sSid, m_strName, count);
 				return;
 			}
 
@@ -6325,7 +6375,8 @@ void CNpc::IsNoPathFind(float fDistance)
 		|| count >= MAX_PATH_LINE)
 	{
 		ClearPathFindData();
-		TRACE(_T("#### IsNoPtahfind Fail : nid=%d,%hs, count=%d ####\n"), m_sNid + NPC_BAND, m_strName, count);
+		spdlog::error("Npc::IsNoPathFind: invalid pathCount [serial={} npcId={} npcName={} pathCount={}]",
+							m_sNid + NPC_BAND, m_sSid, m_strName, count);
 		return;
 	}
 
@@ -6615,7 +6666,7 @@ BOOL CNpc::IsInExpRange(CUser* pUser)
 	return FALSE;
 }
 
-BOOL CNpc::CheckFindEnermy()
+BOOL CNpc::CheckFindEnemy()
 {
 	// 경비병은 몬스터도 공격하므로 제외
 	if (m_tNpcType == NPC_GUARD
@@ -6628,7 +6679,8 @@ BOOL CNpc::CheckFindEnermy()
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-CheckFindEnermy ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_strName, m_ZoneIndex);
+		spdlog::error("Npc::CheckFindEnemy: map not found [zoneIndex={} npcId={} npcName={}]",
+			m_strName, m_sSid, m_ZoneIndex);
 		return FALSE;
 	}
 
@@ -6637,7 +6689,8 @@ BOOL CNpc::CheckFindEnermy()
 		|| m_iRegion_X < 0
 		|| m_iRegion_Z < 0)
 	{
-		TRACE(_T("#### CheckFindEnermy Fail : [nid=%d, sid=%d], nRX=%d, nRZ=%d #####\n"), m_sNid + NPC_BAND, m_sSid, m_iRegion_X, m_iRegion_Z);
+		spdlog::error("Npc::CheckFindEnemy: out of region bounds [serial={} npcId={} x={} z={}]",
+			m_sNid + NPC_BAND, m_sSid, m_iRegion_X, m_iRegion_Z);
 		return FALSE;
 	}
 
@@ -7052,7 +7105,8 @@ void CNpc::DurationMagic_4(CIOCPort* pIOCP, float currenttime)
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### Npc-DurationMagic_4() ZoneIndex Fail : [nid=%d, name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_sNid + NPC_BAND, m_strName, m_ZoneIndex);
+		spdlog::error("Npc::DurationMagic_4: map not found [zoneIndex={} npcId={} npcName={}]",
+			m_strName, m_sSid, m_ZoneIndex);
 		return;
 	}
 
@@ -7063,7 +7117,8 @@ void CNpc::DurationMagic_4(CIOCPort* pIOCP, float currenttime)
 		if (m_byDungeonFamily < 0
 			|| m_byDungeonFamily > pMap->m_arRoomEventArray.GetSize() + 1)
 		{
-			TRACE(_T("#### Npc-DurationMagic_4() m_byDungeonFamily Fail : [nid=%d, name=%hs], m_byDungeonFamily=%d #####\n"), m_sNid + NPC_BAND, m_strName, m_byDungeonFamily);
+			spdlog::error("Npc::DurationMagic_4: dungeonFamily out of range [serial={} npcId={} npcName={} dungeonFamily={}]",
+				m_sNid + NPC_BAND, m_sSid, m_strName, m_byDungeonFamily);
 			//return;
 		}
 		else
@@ -7071,7 +7126,8 @@ void CNpc::DurationMagic_4(CIOCPort* pIOCP, float currenttime)
 			pRoom = pMap->m_arRoomEventArray.GetData(m_byDungeonFamily);
 			if (pRoom == nullptr)
 			{
-				TRACE(_T("#### Npc-DurationMagic_4() room Fail : [nid=%d, name=%hs], m_byDungeonFamily=%d #####\n"), m_sNid + NPC_BAND, m_strName, m_byDungeonFamily);
+				spdlog::error("Npc::DurationMagic_4: RoomEvent not found for dungeonFamily [serial={} npcId={} npcName={} dungeonFamily={}]",
+					m_sNid + NPC_BAND, m_sSid, m_strName, m_byDungeonFamily);
 			}
 			else
 			{
@@ -7126,7 +7182,7 @@ void CNpc::DurationMagic_4(CIOCPort* pIOCP, float currenttime)
 }
 
 // 변화되는 몬스터의 정보를 바꾸어준다...
-void CNpc::ChangeMonsterInfomation(int iChangeType)
+void CNpc::ChangeMonsterInfo(int iChangeType)
 {
 	// sungyong test
 	//m_sChangeSid = 500;		m_byChangeType = 2;
@@ -7153,7 +7209,8 @@ void CNpc::ChangeMonsterInfomation(int iChangeType)
 
 		if (pNpcTable == nullptr)
 		{
-			TRACE(_T("##### ChangeMonsterInfomation Sid Fail -- Sid = %d #####\n"), m_sChangeSid);
+			spdlog::error("Npc::ChangeMonsterInfo: changeNpcId not found [serial={} npcId={} npcName={} changeNpcId={}]",
+				m_sNid + NPC_BAND, m_sSid, m_strName, m_sChangeSid);
 		}
 	}
 	else if (m_byInitMoveType >= 100)
@@ -7167,7 +7224,8 @@ void CNpc::ChangeMonsterInfomation(int iChangeType)
 
 		if (pNpcTable == nullptr)
 		{
-			TRACE(_T("##### ChangeMonsterInfomation Sid Fail -- Sid = %d #####\n"), m_sChangeSid);
+			spdlog::error("Npc::ChangeMonsterInfo: changeNpcId not found [serial={} npcId={} npcName={} changeNpcId={}]",
+				m_sNid + NPC_BAND, m_sSid, m_strName, m_sChangeSid);
 		}
 	}
 
@@ -7509,7 +7567,8 @@ void CNpc::ChangeAbility(int iChangeType)
 	if (m_byInitMoveType >= 0
 		&& m_byInitMoveType < 100)
 	{
-		TRACE(_T("##### ChangeAbility Fail -- nid = %d, name=%hs #####\n"), m_sNid + NPC_BAND, m_strName);
+		spdlog::error("Npc::ChangeAbility: invalid initMoveType [serial={} npcId={} npcName={} initMoveType={}]",
+			m_sNid + NPC_BAND, m_sSid, m_strName, m_byInitMoveType);
 		return;
 	}
 	else if (m_byInitMoveType >= 100)
@@ -7517,7 +7576,8 @@ void CNpc::ChangeAbility(int iChangeType)
 		pNpcTable = m_pMain->m_arNpcTable.GetData(m_sSid);
 		if (pNpcTable == nullptr)
 		{
-			TRACE(_T("##### ChangeAbility Sid Fail -- nid=%d, Sid = %d, name=%hs #####\n"), m_sNid + NPC_BAND, m_sChangeSid, m_strName);
+			spdlog::error("Npc::ChangeAbility: invalid npcId [serial={} npcId={} npcName={}]",
+				m_sNid + NPC_BAND, m_sSid, m_strName);
 			return;
 		}
 	}
@@ -7581,7 +7641,7 @@ void CNpc::ChangeAbility(int iChangeType)
 
 BOOL CNpc::Teleport(CIOCPort* pIOCP)
 {
-	int send_index = 0, i = 0;
+	int send_index = 0, retryCount = 0, maxRetry = 500;
 	char buff[256] = {};
 	int nX = 0, nZ = 0, nTileX = 0, nTileZ = 0;
 
@@ -7591,7 +7651,7 @@ BOOL CNpc::Teleport(CIOCPort* pIOCP)
 
 	while (1)
 	{
-		i++;
+		retryCount++;
 		nX = myrand(0, 10);
 		nX = myrand(0, 10);
 		nX = (int) m_fCurX + nX;
@@ -7608,15 +7668,17 @@ BOOL CNpc::Teleport(CIOCPort* pIOCP)
 		if (nTileX < 0
 			|| nTileZ < 0)
 		{
-			TRACE(_T("#### Npc-SetLive() Fail : nTileX=%d, nTileZ=%d #####\n"), nTileX, nTileZ);
+			spdlog::error("Npc::Teleport: tile coordinates invalid [serial={} npcId={} npcName={} tileX={} tileZ={}]",
+				m_sNid + NPC_BAND, m_sSid, m_strName, nTileX, nTileZ);
 			return FALSE;
 		}
 
 		if (pMap->m_pMap[nTileX][nTileZ].m_sEvent <= 0)
 		{
-			if (i >= 500)
+			if (retryCount >= maxRetry)
 			{
-				TRACE(_T("### Teleport fail : sid = %d, nid = %d, zone=%d, loop = %d 나 이동자리가 이상해... 고쳐줘... x = %d, y = %d\n"), m_sSid, m_sNid + NPC_BAND, m_sCurZone, i, nX, nZ);
+				spdlog::error("Npc::Teleport: max retries exceeded [npcId={} serial={} zoneId={} retryCount={} x={} z={}]",
+					m_sSid, m_sNid + NPC_BAND, m_sCurZone, retryCount, nX, nZ);
 				return FALSE;
 			}
 

@@ -920,3 +920,16 @@ void MAP::InitializeRoom()
 		m_byInitRoomCount = 0;
 	}
 }
+
+/// \brief Checks if a position is valid for the map
+bool MAP::IsValidPosition(float x, float z) const
+{
+	int mapMaxX = (m_sizeMap.cx-1) * m_fUnitDist;
+	int mapMaxZ = (m_sizeMap.cy-1) * m_fUnitDist;
+	if (x < 0 || x > mapMaxX
+		|| z < 0 || z > mapMaxZ)
+	{
+		return false;
+	}
+	return true;
+}
