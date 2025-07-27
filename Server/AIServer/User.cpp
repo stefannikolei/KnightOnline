@@ -233,7 +233,8 @@ void CUser::SendAll(const char* pBuf, int nLength)
 	if (m_iUserId < 0
 		|| m_iUserId >= MAX_USER)
 	{
-		TRACE(_T("#### User SendAll Fail : point fail ,, nid=%d, name=%hs ####\n"), m_iUserId, m_strUserID);
+		spdlog::error("User::SendAll: userId out of bounds [userId={} charId={}]",
+			m_iUserId, m_strUserID);
 		return;
 	}
 
@@ -301,7 +302,8 @@ void CUser::Dead(int tid, int nDamage)
 	MAP* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### CUser-Dead() Fail : [nid=%d, name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_iUserId, m_strUserID, m_sZoneIndex);
+		spdlog::error("User::Dead: map not found [userId={} charId={} zoneId={}]",
+			m_iUserId, m_strUserID, m_sZoneIndex);
 		return;
 	}
 
@@ -311,7 +313,8 @@ void CUser::Dead(int tid, int nDamage)
 		|| m_sRegionX > pMap->GetXRegionMax()
 		|| m_sRegionZ > pMap->GetZRegionMax())
 	{
-		TRACE(_T("#### CUser-Dead() Fail : [nid=%d, name=%hs], x1=%d, z1=%d #####\n"), m_iUserId, m_strUserID, m_sRegionX, m_sRegionZ);
+		spdlog::error("User::Dead: out of region bounds [userId={} charId={} x={} z={}]",
+		m_iUserId, m_strUserID, m_sRegionX, m_sRegionZ);
 		return;
 	}
 
@@ -980,7 +983,8 @@ void CUser::HealMagic()
 	MAP* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### CUser--HealMagic ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strUserID, m_sZoneIndex);
+		spdlog::error("User::HealMagic: map not found [userId={} charId={} zoneId={}]",
+			m_iUserId, m_strUserID, m_sZoneIndex);
 		return;
 	}
 
@@ -1018,7 +1022,8 @@ void CUser::HealAreaCheck(int rx, int rz)
 	MAP* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### CUser--HealAreaCheck ZoneIndex Fail : [name=%hs], zoneindex=%d #####\n"), m_strUserID, m_sZoneIndex);
+		spdlog::error("User::HealAreaCheck: map not found [userId={} charId={} zoneId={}]",
+			m_iUserId, m_strUserID, m_sZoneIndex);
 		return;
 	}
 
@@ -1028,14 +1033,16 @@ void CUser::HealAreaCheck(int rx, int rz)
 		|| rx > pMap->GetXRegionMax()
 		|| rz > pMap->GetZRegionMax())
 	{
-		TRACE(_T("#### CUser-HealAreaCheck() Fail : [nid=%d, name=%hs], nRX=%d, nRZ=%d #####\n"), m_iUserId, m_strUserID, rx, rz);
+		spdlog::error("User::HealAreaCheck: out of region bounds [userId={} charId={} x={} z={}]",
+			m_iUserId, m_strUserID, m_sRegionX, m_sRegionZ);
 		return;
 	}
-
-	float fRadius = 10.0f;				// 30m
+	
+	// 30m
+	float fRadius = 10.0f;
 
 	__Vector3 vStart, vEnd;
-	CNpc* pNpc = nullptr;      // Pointer initialization!
+	CNpc* pNpc = nullptr;
 	float fDis = 0.0f;
 	vStart.Set(m_curx, (float) 0, m_curz);
 	char send_buff[256] = {};

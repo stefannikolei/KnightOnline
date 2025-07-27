@@ -283,8 +283,21 @@ public:
 									// 6:일정시간이 지난 후에 행동하는 몬스터,,
 									// 100:죽었을때 데미지를 많이 입힌 유저를 기록해 주세여
 	BYTE	m_byTrapNumber;			// 던젼에서 트랩의 번호,,
-	BYTE	m_byChangeType;			// 0:정상상태, 1:변하기 위한 준비, 2:다른몬스터로 변함, 3:몬스터의 출현, 100:몬스터의 죽음
-	BYTE	m_byRegenType;			// 0:정상적으로 리젠이 됨.. , 1:한번 죽으면 리젠이 안되는 특수 몸, 2:리젠이 안됨
+
+	/// \brief change state, one of:
+	/// 0: normal state
+	/// 1: preparing to change
+	/// 2: changed into different monster
+	/// 3: spawned
+	/// 4: dead
+	BYTE	m_byChangeType;
+
+	/// \brief Respawn type, one of:
+	/// 0: normal respawn
+	/// 1: special monster, does not respawn after death
+	/// 2: does not respawn
+	BYTE	m_byRegenType;
+	
 	BYTE    m_byDeadType;			// 0:살아 있는 경우, 100:전쟁이벤트중 죽은 경우
 	short   m_sChangeSid;			// 변하는 몬스터의 Sid번호..
 	short   m_sControlSid;			// 조정하는 몬스터의 Sid번호..

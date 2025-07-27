@@ -1406,7 +1406,7 @@ void CServerDlg::CheckAliveTest()
 			++m_sErrorSocketCount;
 			if (m_sErrorSocketCount == 10)
 			{
-				spdlog::info("CheckAliveTest: all sockets are closed");
+				spdlog::debug("CheckAliveTest: all ebenezer sockets are connected");
 			}
 			count++;
 		}
