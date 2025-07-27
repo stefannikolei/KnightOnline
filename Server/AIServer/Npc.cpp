@@ -15,7 +15,6 @@ int surround_x[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
 int surround_z[8] = { 0, -1, -1, -1, 0, 1, 1, 1 };
 
 int test_id = 1056;
-int cur_test = 0;	// 1 = test중 , 0이면 정상
 
 constexpr int MAX_MAXWEAPON_CLASSES		= _countof(model::MakeWeapon::Class);
 constexpr int MAX_ITEM_GRADECODE_GRADES	= _countof(model::MakeItemGradeCode::Grade);
@@ -450,8 +449,7 @@ void CNpc::NpcLive(CIOCPort* pIOCP)
 //
 void CNpc::NpcFighting(CIOCPort* pIOCP)
 {
-	if (cur_test)
-		NpcTrace(_T("NpcFighting()"));
+	NpcTrace("NpcFighting()");
 
 	if (m_iHP <= 0)
 	{
@@ -486,8 +484,7 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 		}
 	}
 
-	if (cur_test)
-		NpcTrace(_T("NpcTracing()"));
+	NpcTrace("NpcTracing()");
 
 	// 고정 경비병은 추적이 되지 않도록한다.
 	if (m_tNpcType == NPC_DOOR
@@ -641,8 +638,7 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 
 void CNpc::NpcAttacking(CIOCPort* pIOCP)
 {
-	if (cur_test)
-		NpcTrace(_T("NpcAttacking()"));
+	NpcTrace("NpcAttacking()");
 
 	if (m_iHP <= 0)
 	{
@@ -716,8 +712,7 @@ void CNpc::NpcAttacking(CIOCPort* pIOCP)
 //
 void CNpc::NpcMoving(CIOCPort* pIOCP)
 {
-	if (cur_test)
-		NpcTrace(_T("NpcMoving()"));
+	NpcTrace("NpcMoving()");
 
 	char pBuf[1024] = {};
 	int index = 0;
@@ -854,8 +849,7 @@ void CNpc::NpcMoving(CIOCPort* pIOCP)
 //
 void CNpc::NpcStanding()
 {
-	if (cur_test)
-		NpcTrace(_T("NpcStanding()"));
+	NpcTrace("NpcStanding()");
 
 	char send_buff[128];
 	int send_index = 0;
@@ -5772,13 +5766,10 @@ void CNpc::SendAll(CIOCPort* pIOCP, const char* pBuf, int nLength)
 }
 // ~sungyong 2002.05.22
 
-void CNpc::NpcTrace(const TCHAR* pMsg)
+void CNpc::NpcTrace(const std::string& msg)
 {
-	//if(g_bDebug == FALSE) return;
-
-	CString szMsg;
-	szMsg.Format(_T("%s : uid = %d, name = %hs, xpos = %f, zpos = %f\n"), pMsg, m_sNid + NPC_BAND, m_strName, m_fCurX, m_fCurZ);
-	TRACE(szMsg);
+	spdlog::trace("NPCTrace: {} [serial={} npcName={} x={} z={}]",
+		msg, m_sNid + NPC_BAND, m_strName, m_fCurX, m_fCurZ);
 }
 
 void CNpc::NpcMoveEnd(CIOCPort* pIOCP)
@@ -7248,8 +7239,7 @@ void CNpc::DurationMagic_3(CIOCPort* pIOCP, float currenttime)
 //
 void CNpc::NpcSleeping(CIOCPort* pIOCP)
 {
-	if (cur_test)
-		NpcTrace(_T("NpcSleeping()"));
+	NpcTrace("NpcSleeping()");
 
 	// sungyong test~
 	/*
@@ -7281,8 +7271,7 @@ void CNpc::NpcSleeping(CIOCPort* pIOCP)
 // 몬스터가 기절상태로..........
 void CNpc::NpcFainting(CIOCPort* pIOCP, float currenttime)
 {
-	if (cur_test)
-		NpcTrace(_T("NpcFainting()"));
+	NpcTrace("NpcFainting()");
 
 	// 2초동안 기절해 있다가,,  standing상태로....
 	if (currenttime > (m_fFaintingTime + FAINTING_TIME))
@@ -7298,8 +7287,7 @@ void CNpc::NpcFainting(CIOCPort* pIOCP, float currenttime)
 // 몬스터가 치료상태로..........
 void CNpc::NpcHealing(CIOCPort* pIOCP)
 {
-	if (cur_test)
-		NpcTrace(_T("NpcHealing()"));
+	NpcTrace("NpcHealing()");
 
 	if (m_tNpcType != NPC_HEALER)
 	{
