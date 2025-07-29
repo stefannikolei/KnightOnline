@@ -36,6 +36,11 @@ void SetupLogger(CIni& ini, const std::string& name)
 		SetupExtraLogger(ini, logger::AIServerItem, ini::ITEM_LOG_FILE, threadPool);
 		SetupExtraLogger(ini, logger::AIServerUser, ini::USER_LOG_FILE, threadPool);
 	}
+	else if (name == logger::Ebenezer)
+	{
+		SetupExtraLogger(ini, logger::EbenezerEvent, ini::EVENT_LOG_FILE, threadPool);
+		SetupExtraLogger(ini, logger::EbenezerRegion, ini::REGION_LOG_FILE, threadPool);
+	}
 
 	// set default logger level and pattern
 	// we default to debug level logging

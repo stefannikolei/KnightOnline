@@ -71,7 +71,6 @@ public:
 
 	C3DMap* GetMapByID(int iZoneID) const;
 	C3DMap* GetMapByIndex(int iZoneIndex) const;
-	void WriteEventLog(char* pBuf);
 	void FlySanta();
 	void BattleZoneCurrentUsers();
 	BOOL LoadKnightsRankTable();
@@ -122,7 +121,7 @@ public:
 	void SetGameTime();
 	void UpdateWeather();
 	void UpdateGameTime();
-	void GetTimeFromIni();
+	void LoadConfig();
 	void Send_NearRegion(char* pBuf, int len, int zone, int region_x, int region_z, float curx, float curz, CUser* pExceptUser = nullptr);
 	void Send_FilterUnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int z, float ref_x, float ref_z, CUser* pExceptUser = nullptr);
 	void Send_UnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int z, CUser* pExceptUser = nullptr, bool bDirect = true);
@@ -257,10 +256,6 @@ public:
 	ServerArray			m_ServerArray;
 	ServerArray			m_ServerGroupArray;
 	CUdpSocket*			m_pUdpSocket;
-
-	CFile				m_RegionLogFile;
-	CFile				m_LogFile;
-	CFile				m_EvnetLogFile;
 
 // Dialog Data
 	//{{AFX_DATA(CEbenezerDlg)

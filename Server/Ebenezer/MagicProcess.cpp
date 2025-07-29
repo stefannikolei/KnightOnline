@@ -5,12 +5,15 @@
 #include "stdafx.h"
 #include "ebenezer.h"
 #include "MagicProcess.h"
+
 #include "EbenezerDlg.h"
 #include "User.h"
 #include "Npc.h"
 #include "GameDefine.h"
 
 #include <shared/packets.h>
+#include <shared/logger.h>
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -1470,14 +1473,13 @@ void CMagicProcess::ExecuteType3(int magicid, int sid, int tid, int data1, int d
 					// Killed by another player.
 					if (!bFlag)
 					{
-					   // 눈싸움전쟁존에서 눈싸움중이라면 공격은 눈을 던지는 것만 가능하도록,,,
+						// make it so that the only possible attack is throwing a snowball
 						if (m_pSrcUser->m_pUserData->m_bZone == ZONE_SNOW_BATTLE
 							&& m_pMain->m_byBattleOpen == SNOW_BATTLE)
 						{
 							m_pSrcUser->GoldGain(SNOW_EVENT_MONEY);	// 10000노아를 주는 부분,,,,,
-
-							sprintf(strLogData, "%s -> %s userdead", m_pSrcUser->m_pUserData->m_id, pTUser->m_pUserData->m_id);
-							m_pMain->WriteEventLog(strLogData);
+							spdlog::get(logger::EbenezerEvent)->info("{} killed {}",
+								m_pSrcUser->m_pUserData->m_id, pTUser->m_pUserData->m_id);
 
 							if (m_pSrcUser->m_pUserData->m_bZone == ZONE_SNOW_BATTLE
 								&& m_pMain->m_byBattleOpen == SNOW_BATTLE)

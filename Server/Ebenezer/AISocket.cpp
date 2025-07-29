@@ -14,6 +14,8 @@
 #include <shared/crc32.h>
 #include <shared/lzf.h>
 #include <shared/packets.h>
+#include <shared/logger.h>
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -140,11 +142,8 @@ void CAISocket::Parsing(int len, char* pData)
 
 void CAISocket::CloseProcess()
 {
-	CString logstr;
-	CTime time = CTime::GetCurrentTime();
-	logstr.Format(_T("*** CloseProcess - socketID=%d...  ***  %d-%d-%d, %d:%d]\r\n"), m_Sid, time.GetYear(), time.GetMonth(), time.GetDay(), time.GetHour(), time.GetMinute());
-	LogFileWrite(logstr);
-
+	spdlog::debug("AISocket::CloseProcess: closing socketID={}", m_Sid);
+	
 	Initialize();
 
 	CIOCPSocket2::CloseProcess();
@@ -663,18 +662,15 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 
 				pUser->m_bResHpType = USER_DEAD;
 
-#if defined(_DEBUG)
-				{
-					TCHAR buff[256] = {};
-					_stprintf(buff, _T("*** User Dead, id=%hs, result=%d, AI_HP=%d, GM_HP=%d, x=%d, z=%d"), pUser->m_pUserData->m_id, result, nHP, pUser->m_pUserData->m_sHp, (int) pUser->m_pUserData->m_curx, (int) pUser->m_pUserData->m_curz);
-					TimeTrace(buff);
-				}
-#endif
-
+				spdlog::debug("AISocket::RecvNpcAttack: user is dead [charId={} result={} AI_HP={} GM_HP={} x={} z={}]",
+					pUser->m_pUserData->m_id, result, nHP, pUser->m_pUserData->m_sHp,
+					static_cast<int32_t>(pUser->m_pUserData->m_curx), static_cast<int32_t>(pUser->m_pUserData->m_curz));
+				
 				memset(pOutBuf, 0, sizeof(pOutBuf));
 				send_index = 0;
 
 				// 지휘권한이 있는 유저가 죽는다면,, 지휘 권한 박탈
+				// If the user with command authority dies, revoke their command authority.
 				if (pUser->m_pUserData->m_bFame == COMMAND_CAPTAIN)
 				{
 					pUser->m_pUserData->m_bFame = CHIEF;
@@ -686,12 +682,11 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 					// sungyong tw
 					pUser->Send(pOutBuf, send_index);
 					// ~sungyong tw
-					TRACE(_T("---> AISocket->RecvNpcAttack() Dead Captain Deprive - %hs\n"), pUser->m_pUserData->m_id);
+					spdlog::debug("AISocket::RecvNpcAttack: Dead Captain Deprive [charId={}]", pUser->m_pUserData->m_id);
 					if (pUser->m_pUserData->m_bNation == KARUS)
 						m_pMain->Announcement(KARUS_CAPTAIN_DEPRIVE_NOTIFY, KARUS);
 					else if (pUser->m_pUserData->m_bNation == ELMORAD)
 						m_pMain->Announcement(ELMORAD_CAPTAIN_DEPRIVE_NOTIFY, ELMORAD);
-
 				}
 
 				// 경비병에게 죽는 경우라면..
@@ -857,8 +852,8 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 
 	BYTE		Mode;						// 01(INFO_MODIFY)	: NPC 정보 변경
 											// 02(INFO_DELETE)	: NPC 정보 삭제
-	short		nid;						// NPC index
-	short		sid;						// NPC index
+	short		npcSerial;						// NPC index
+	short		npcId;						// NPC index
 	short		sPid;						// NPC Picture Number
 	short		sSize = 100;				// NPC Size
 	int			iWeapon_1;					// 오른손 무기
@@ -885,8 +880,8 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 	BYTE		byObjectType;				// 보통 : 0, 특수 : 1
 
 	Mode = GetByte(pBuf, index);
-	nid = GetShort(pBuf, index);
-	sid = GetShort(pBuf, index);
+	npcSerial = GetShort(pBuf, index);
+	npcId = GetShort(pBuf, index);
 	sPid = GetShort(pBuf, index);
 	sSize = GetShort(pBuf, index);
 	iWeapon_1 = GetDWORD(pBuf, index);
@@ -915,30 +910,25 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 	sHitRate = GetShort(pBuf, index);
 	byObjectType = GetByte(pBuf, index);
 
-	CNpc* pNpc = m_pMain->m_arNpcArray.GetData(nid);
+	CNpc* pNpc = m_pMain->m_arNpcArray.GetData(npcSerial);
 	if (pNpc == nullptr)
 		return;
 
 	pNpc->m_NpcState = NPC_DEAD;
-
-	char strLog[256];
-
+	
 	// 살아 있는데 또 정보를 받는 경우
 	if (pNpc->m_NpcState == NPC_LIVE)
 	{
-		memset(strLog, 0, sizeof(strLog));
-		CTime t = CTime::GetCurrentTime();
-		sprintf(strLog, "## time(%d:%d-%d) npc regen check(%d) : nid=%d, name=%s, x=%d, z=%d, rx=%d, rz=%d ## \r\n", t.GetHour(), t.GetMinute(), t.GetSecond(), pNpc->m_NpcState, nid, szName, (int) pNpc->m_fCurX, (int) pNpc->m_fCurZ, pNpc->m_sRegion_X, pNpc->m_sRegion_Z);
-		EnterCriticalSection(&g_LogFile_critical);
-		m_pMain->m_RegionLogFile.Write(strLog, strlen(strLog));
-		LeaveCriticalSection(&g_LogFile_critical);
-		TRACE(strLog);
+		spdlog::get(logger::EbenezerRegion)->info("AISocket::RecvNpcInfo: npc regen check [state={} serial={} npcId={} npcName={} x={} z={} regionX={} regionZ={}]",
+			pNpc->m_NpcState, npcSerial, npcId, szName,
+			static_cast<int32_t>(pNpc->m_fCurX), static_cast<int32_t>(pNpc->m_fCurZ),
+			pNpc->m_sRegion_X, pNpc->m_sRegion_Z);
 	}
 
 	pNpc->m_NpcState = NPC_LIVE;
 
-	pNpc->m_sNid = nid;
-	pNpc->m_sSid = sid;
+	pNpc->m_sNid = npcSerial;
+	pNpc->m_sSid = npcId;
 	pNpc->m_sPid = sPid;
 	pNpc->m_sSize = sSize;
 	pNpc->m_iWeapon_1 = iWeapon_1;
@@ -994,7 +984,7 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 
 	SetByte(pOutBuf, WIZ_NPC_INOUT, send_index);
 	SetByte(pOutBuf, NPC_IN, send_index);
-	SetShort(pOutBuf, nid, send_index);
+	SetShort(pOutBuf, npcSerial, send_index);
 	SetShort(pOutBuf, sPid, send_index);
 	SetByte(pOutBuf, tNpcKind, send_index);
 	SetDWORD(pOutBuf, iSellingGroup, send_index);

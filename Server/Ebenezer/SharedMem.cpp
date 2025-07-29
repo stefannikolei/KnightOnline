@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "SharedMem.h"
 #include <process.h>
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -58,9 +59,7 @@ BOOL CSharedMemQueue::InitailizeMMF(DWORD dwOffsetsize, int maxcount, LPCTSTR lp
 
 	if (m_hMMFile == nullptr)
 	{
-		TCHAR logstr[256] = {};
-		_tcscpy(logstr, _T("Shared Memory Open Fail!!\r\n"));
-		LogFileWrite(logstr);
+		spdlog::error("SharedMem::InitializeMMF: failed to open shared memory");
 		return FALSE;
 	}
 
@@ -94,9 +93,7 @@ int CSharedMemQueue::PutData(char* pBuf, int size)
 
 	if (size > static_cast<int>(m_wOffset))
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("DataSize Over.. - %d bytes\r\n"), size);
-		LogFileWrite(logstr);
+		spdlog::error("SharedMem::PutData: data size overflow: {} bytes", size);
 		return SMQ_PKTSIZEOVER;
 	}
 
@@ -184,13 +181,10 @@ int CSharedMemQueue::GetData(char* pBuf)
 			temp_front = (m_pHeader->Front + 1) % m_nMaxCount;
 			m_pHeader->Front = temp_front;
 			m_pHeader->nCount--;
-
-			TCHAR logstr[256] = {};
-			_stprintf(logstr, _T("SMQ EMPTY Block Find - F:%d, R:%d\n"), m_pHeader->Front, m_pHeader->Rear);
-			LogFileWrite(logstr);
-			TRACE(logstr);
+			spdlog::error("SharedMem::GetData: SMQ EMPTY Block Find - F:{}, R:{}",
+				m_pHeader->Front, m_pHeader->Rear);
 		}
-
+		
 		return SMQ_EMPTY;
 	}
 

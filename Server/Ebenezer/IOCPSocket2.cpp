@@ -571,11 +571,7 @@ BOOL CIOCPSocket2::Accept(SOCKET listensocket, struct sockaddr* addr, int* len)
 	if (m_Socket == INVALID_SOCKET)
 	{
 		int err = WSAGetLastError();
-		TRACE(_T("Socket Accepting Fail - %d\n"), err);
-
-		TCHAR logstr[1024] = {};
-		_stprintf(logstr, _T("Socket Accepting Fail - %d\r\n"), err);
-		LogFileWrite(logstr);
+		spdlog::error("IOCPSocket2::Accept:: winsock error={}", err);
 		return FALSE;
 	}
 

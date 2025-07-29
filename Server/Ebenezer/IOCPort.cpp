@@ -7,6 +7,7 @@
 #include "IOCPSocket2.h"
 #include "Define.h"
 #include <algorithm>
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -27,7 +28,7 @@ DWORD WINAPI AcceptThread(LPVOID lp)
 
 	WSANETWORKEVENTS	network_event;
 	DWORD				wait_return;
-	int					sid;
+	int					socketId;
 	CIOCPSocket2*		pSocket = nullptr;
 	char				logstr[1024] = {};
 
@@ -39,11 +40,7 @@ DWORD WINAPI AcceptThread(LPVOID lp)
 		wait_return = WaitForSingleObject(pIocport->m_hListenEvent, INFINITE);
 		if (wait_return == WAIT_FAILED)
 		{
-			TRACE(_T("Wait failed Error %d\n"), GetLastError());
-
-			TCHAR logstr[1024] = {};
-			_stprintf(logstr, _T("Wait failed Error %d\r\n"), GetLastError());
-			LogFileWrite(logstr);
+			spdlog::error("IOCPort::AcceptThread: wait failed, error code {}", GetLastError());
 			return 1;
 		}
 
@@ -54,42 +51,29 @@ DWORD WINAPI AcceptThread(LPVOID lp)
 			if (network_event.iErrorCode[FD_ACCEPT_BIT] == 0)
 			{
 				EnterCriticalSection(&g_critical);
-				sid = pIocport->GetNewSid();
+				socketId = pIocport->GetNewSid();
 				LeaveCriticalSection(&g_critical);
-				if (sid < 0)
+				if (socketId < 0)
 				{
-					TRACE(_T("Accepting User Socket Fail - New Uid is -1\n"));
-
-					TCHAR logstr[1024] = {};
-					_stprintf(logstr,_T( "Accepting User Socket Fail - New Uid is -1\r\n"));
-					LogFileWrite(logstr);
+					spdlog::error("IOCPort::AcceptThread: invalid socketId={}", socketId);
 					continue;
 				}
 
-				pSocket = pIocport->GetIOCPSocket(sid);
+				pSocket = pIocport->GetIOCPSocket(socketId);
 				if (pSocket == nullptr)
 				{
-					TRACE(_T("Socket Array has Broken...\n"));
-
-					TCHAR logstr[1024] = {};
-					_stprintf(logstr, _T("Socket Array has Broken...\r\n"));
-					LogFileWrite(logstr);
-//					pIocport->PutOldSid( sid );				// Invalid sid must forbidden to use
+					spdlog::error("IOCPort::AcceptThread: invalid socketId={}", socketId);
 					continue;
 				}
 
 				len = sizeof(addr);
 				if (!pSocket->Accept(pIocport->m_ListenSocket, (sockaddr*) &addr, &len))
 				{
-					TRACE(_T("Accept Fail %d\n"), sid);
-
-					TCHAR logstr[1024] = {};
-					_stprintf(logstr, _T("Accept Fail %d\r\n"), sid);
-					LogFileWrite(logstr);
+					spdlog::error("IOCPort::AcceptThread: accept failed socketId={}", socketId);
 
 					EnterCriticalSection(&g_critical);
-					pIocport->RidIOCPSocket(sid, pSocket);
-					pIocport->PutOldSid(sid);
+					pIocport->RidIOCPSocket(socketId, pSocket);
+					pIocport->PutOldSid(socketId);
 					LeaveCriticalSection(&g_critical);
 					continue;
 				}
@@ -98,16 +82,12 @@ DWORD WINAPI AcceptThread(LPVOID lp)
 
 				if (!pIocport->Associate(pSocket, pIocport->m_hServerIOCPort))
 				{
-					TRACE(_T("Socket Associate Fail\n"));
-
-					TCHAR logstr[1024] = {};
-					_stprintf(logstr, _T("Socket Associate Fail\r\n"));
-					LogFileWrite(logstr);
-
+					spdlog::error("IOCPort::AcceptThread: could not associate socketId={}", socketId);
+					
 					EnterCriticalSection(&g_critical);
 					pSocket->CloseProcess();
-					pIocport->RidIOCPSocket(sid, pSocket);
-					pIocport->PutOldSid(sid);
+					pIocport->RidIOCPSocket(socketId, pSocket);
+					pIocport->PutOldSid(socketId);
 					LeaveCriticalSection(&g_critical);
 					continue;
 				}
@@ -117,7 +97,7 @@ DWORD WINAPI AcceptThread(LPVOID lp)
 				// ~
 				pSocket->Receive();
 
-				TRACE(_T("Success Accepting...%d\n"), sid);
+				spdlog::debug("IOCPort::AcceptThread: accepted socketId={}", socketId);
 			}
 		}
 	}

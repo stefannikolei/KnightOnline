@@ -9,6 +9,7 @@
 #include "Map.h"
 
 #include <shared/packets.h>
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -783,8 +784,8 @@ fail_return:
 void CUser::SelCharToAgent(char* pBuf)
 {
 	int index = 0, idlen1 = 0, idlen2 = 0, send_index = 0, retvalue = 0, zone = 0;
-	char userid[MAX_ID_SIZE + 1] = {},
-		accountid[MAX_ID_SIZE + 1] = {},
+	char charId[MAX_ID_SIZE + 1] = {},
+		accountId[MAX_ID_SIZE + 1] = {},
 		send_buff[256] = {};
 	CUser* pUser = nullptr;
 	C3DMap* pMap = nullptr;
@@ -797,20 +798,20 @@ void CUser::SelCharToAgent(char* pBuf)
 		|| idlen1 <= 0)
 		goto fail_return;
 
-	GetString(accountid, pBuf, idlen1, index);
+	GetString(accountId, pBuf, idlen1, index);
 
 	idlen2 = GetShort(pBuf, index);
 	if (idlen2 > MAX_ID_SIZE
 		|| idlen2 <= 0)
 		goto fail_return;
 
-	GetString(userid, pBuf, idlen2, index);
+	GetString(charId, pBuf, idlen2, index);
 	bInit = GetByte(pBuf, index);
 	zone = GetByte(pBuf, index);
 
-	if (_strnicmp(accountid, m_strAccountID, MAX_ID_SIZE) != 0)
+	if (_strnicmp(accountId, m_strAccountID, MAX_ID_SIZE) != 0)
 	{
-		pUser = m_pMain->GetUserPtr(accountid, NameType::Account);
+		pUser = m_pMain->GetUserPtr(accountId, NameType::Account);
 		if (pUser != nullptr
 			&& pUser->m_Sid != m_Sid)
 		{
@@ -818,10 +819,10 @@ void CUser::SelCharToAgent(char* pBuf)
 			goto fail_return;
 		}
 
-		strcpy(m_strAccountID, accountid);	// 존이동 한 경우는 로그인 프로시져가 없으므로...
+		strcpy(m_strAccountID, accountId);	// 존이동 한 경우는 로그인 프로시져가 없으므로...
 	}
 
-	pUser = m_pMain->GetUserPtr(userid, NameType::Character);
+	pUser = m_pMain->GetUserPtr(charId, NameType::Character);
 	if (pUser != nullptr
 		&& pUser->m_Sid != m_Sid)
 	{
@@ -860,7 +861,7 @@ void CUser::SelCharToAgent(char* pBuf)
 		SetByte(send_buff, zone, send_index);
 		SetByte(send_buff, m_pMain->m_byOldVictory, send_index);
 		Send(send_buff, send_index);
-		TRACE(_T("--> SelCharToAgent server change : userid=%hs, ip=%hs, binit=%d\n"), userid, pInfo->strServerIP, bInit);
+		TRACE(_T("--> SelCharToAgent server change : userid=%hs, ip=%hs, binit=%d\n"), charId, pInfo->strServerIP, bInit);
 		return;
 	}
 
@@ -869,16 +870,14 @@ void CUser::SelCharToAgent(char* pBuf)
 	SetShort(send_buff, strlen(m_strAccountID), send_index);
 	SetString(send_buff, m_strAccountID, strlen(m_strAccountID), send_index);
 	SetShort(send_buff, idlen2, send_index);
-	SetString(send_buff, userid, idlen2, send_index);
+	SetString(send_buff, charId, idlen2, send_index);
 	SetByte(send_buff, bInit, send_index);
 	SetDWORD(send_buff, m_pMain->m_iPacketCount, send_index);
 
 	{
-		char logfile[256] = {};
-		sprintf(logfile, "[SelCharToAgent : %d:%d:%d] - acname=%s, name=%s, count=%d, TH: %lu, Rear : %d\r\n", t.GetHour(), t.GetMinute(), t.GetSecond(), m_strAccountID, userid, m_pMain->m_iPacketCount, ::GetCurrentThreadId(), m_pMain->m_LoggerSendQueue.GetRearPointer());
-		EnterCriticalSection(&g_LogFile_critical);
-		m_pMain->m_LogFile.Write(logfile, strlen(logfile));
-		LeaveCriticalSection(&g_LogFile_critical);
+		spdlog::debug("User::SelCharToAgent: accountId={} charId={} packetCount={} threadId={} rearPtr={}",
+			m_strAccountID, charId, m_pMain->m_iPacketCount, GetCurrentThreadId(),
+			m_pMain->m_LoggerSendQueue.GetRearPointer());
 	}
 
 	m_pMain->m_iPacketCount++;
@@ -1199,13 +1198,9 @@ void CUser::LogOut()
 	int index = 0, idlen = 0, idindex = 0, send_index = 0, count = 0;
 	CUser* pUser = nullptr;
 	char send_buff[256] = {};
-
-	CTime t = CTime::GetCurrentTime();
-	char logfile[256] = {};
-	sprintf(logfile, "[%s : %s Logout : %d:%d:%d]\r\n", m_pUserData->m_Accountid, m_pUserData->m_id, t.GetHour(), t.GetMinute(), t.GetSecond());
-	EnterCriticalSection(&g_LogFile_critical);
-	m_pMain->m_LogFile.Write(logfile, strlen(logfile));
-	LeaveCriticalSection(&g_LogFile_critical);
+	
+	spdlog::debug("User::LogOut: accountId={} charId={}",
+		m_pUserData->m_Accountid, m_pUserData->m_id);
 
 	pUser = m_pMain->GetUserPtr(m_pUserData->m_Accountid, NameType::Account);
 	if (pUser != nullptr
@@ -1677,12 +1672,10 @@ void CUser::Attack(char* pBuf)
 			{
 				pTUser->Send(send_buff, send_index);
 				memset(send_buff, 0, sizeof(send_buff));
-
-#if defined(_DEBUG)
-				TCHAR logstr[256] = {};
-				_stprintf(logstr, _T("*** User Attack Dead, id=%hs, result=%d, type=%d, HP=%d"), pTUser->m_pUserData->m_id, result, pTUser->m_bResHpType, pTUser->m_pUserData->m_sHp);
-				TimeTrace(logstr);
-#endif
+				
+				spdlog::debug("User::Attack: user attack dead [charId={} result={} resHpType={} Hp={}]",
+					pTUser->m_pUserData->m_id, result, pTUser->m_bResHpType,
+					pTUser->m_pUserData->m_sHp);
 			}
 		}
 	}
@@ -2487,14 +2480,11 @@ void CUser::ZoneChange(int zone, float x, float z)
 			return;
 
 		UserDataSaveToAgent();
-
-		CTime t = CTime::GetCurrentTime();
-		char logfile[256] = {};
-		sprintf(logfile, "[ZoneChange : %d-%d-%d] - sid=%d, acname=%s, name=%s, zone=%d, x=%d, z=%d \r\n", t.GetHour(), t.GetMinute(), t.GetSecond(), m_Sid, m_strAccountID, m_pUserData->m_id, zone, (int) x, (int) z);
-		EnterCriticalSection(&g_LogFile_critical);
-		m_pMain->m_LogFile.Write(logfile, strlen(logfile));
-		LeaveCriticalSection(&g_LogFile_critical);
-
+		
+		spdlog::debug("User::ZoneChange: [userId={} accountId={} charId={} zoneId={} x={} z={}]",
+		m_Sid, m_strAccountID, m_pUserData->m_id, zone,
+			static_cast<int32_t>(x), static_cast<int32_t>(z));
+		
 		m_pUserData->m_bLogout = 2;	// server change flag
 
 		SetByte(send_buff, WIZ_SERVER_CHANGE, send_index);
@@ -5475,13 +5465,12 @@ void CUser::SpeedHackUser()
 {
 	if (strlen(m_pUserData->m_id) == 0)
 		return;
-
-	TCHAR logstr[256] = {};
-	_stprintf(logstr, _T("%hs Speed Hack Used\r\n"), m_pUserData->m_id);
-	LogFileWrite(logstr);
-
+	
 	if (m_pUserData->m_bAuthority != AUTHORITY_MANAGER)
+	{
+		spdlog::warn("User::SpeedHackUser: speed hack detected, banning charId={}", m_pUserData->m_id);
 		m_pUserData->m_bAuthority = AUTHORITY_BLOCK_USER;
+	}
 
 	Close();
 }
@@ -8201,10 +8190,7 @@ void CUser::SpeedHackTime(char* pBuf)
 
 		if ((client_gap - server_gap) > 10.0f)
 		{
-			TCHAR logstr[256] = {};
-			_stprintf(logstr, _T("%hs SpeedHack User Checked By Server Time\r\n"), m_pUserData->m_id);
-			LogFileWrite(logstr);
-
+			spdlog::debug("User::SpeedHackTime: speed hack check performed on charId={}", m_pUserData->m_id);
 			Close();
 		}
 		else if (client_gap - server_gap < 0.0f)
@@ -8670,22 +8656,20 @@ void CUser::ReportBug(char* pBuf)
 	// Beep(3000, 200);	// Let's hear a beep from the speaker.
 
 	int index = 0, chatlen = 0, send_index = 0;
-	char chatstr[1024] = {};
-	TCHAR logstr[1024] = {};
+	char chatMsg[1024] = {};
 
 	chatlen = GetShort(pBuf, index);
 	if (chatlen > 512
 		|| chatlen <= 0)
 		return;
 
-	GetString(chatstr, pBuf, chatlen, index);
+	GetString(chatMsg, pBuf, chatlen, index);
 
 //	TRACE( " Short : %d   String : %hs  \n ", chatlen, chatstr);
 	if (strlen(m_pUserData->m_id) == 0)
 		return;
 
-	_stprintf(logstr, _T("%hs -> ERROR : %hs\r\n"), m_pUserData->m_id, chatstr);
-	LogFileWrite(logstr);
+	spdlog::info("User::ReportBug: [charId={} chatMsg={}]", m_pUserData->m_id, chatMsg);
 }
 
 void CUser::Home()
@@ -10944,9 +10928,8 @@ void CUser::SetLogInInfoToDB(BYTE bInit)
 	pInfo = m_pMain->m_ServerArray.GetData(m_pMain->m_nServerNo);
 	if (pInfo == nullptr)
 	{
-		CString logstr;
-		logstr.Format(_T("%d Server Info Invalid User Closed...\r\n"), m_pMain->m_nServerNo);
-		LogFileWrite(logstr);
+		spdlog::error("User::SetLogInInfoToDB: invalid serverId={}, closing user",
+			m_pMain->m_nServerNo);
 		Close();
 		return;
 	}
