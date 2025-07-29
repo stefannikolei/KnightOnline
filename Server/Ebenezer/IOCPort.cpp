@@ -591,7 +591,7 @@ void CIOCPort::CreateAcceptThread()
 {
 	DWORD id;
 
-	m_hAcceptThread = ::CreateThread(nullptr, 0, AcceptThread, this, CREATE_SUSPENDED, &id);
+	m_hAcceptThread = CreateThread(nullptr, 0, AcceptThread, this, CREATE_SUSPENDED, &id);
 
 	::SetThreadPriority(m_hAcceptThread, THREAD_PRIORITY_ABOVE_NORMAL);
 }

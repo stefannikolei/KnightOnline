@@ -174,7 +174,7 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 	BYTE byReConnect = GetByte(pBuf, index);	// 0 : 처음접속, 1 : 재접속
 
 	std::wstring logstr;
-	logstr = std::format(L"[Ebenezer Connect - {}]", byZoneNumber);
+	logstr = std::format(L"[Ebenezer zone connected: {}]", byZoneNumber);
 	m_pMain->m_StatusList.AddString(logstr.c_str());
 	spdlog::info("Ebenezer zone={} connected", byZoneNumber);
 
