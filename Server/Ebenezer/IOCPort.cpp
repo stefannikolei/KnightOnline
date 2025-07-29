@@ -139,33 +139,43 @@ DWORD WINAPI ReceiveWorkerThread(LPVOID lp)
 				switch (pOvl->Offset)
 				{
 					case OVL_RECEIVE:
-						EnterCriticalSection(&g_critical);
+						
 						if (nbytes == 0)
 						{
-							TRACE(_T("User Closed By 0 byte Notify...%d\n"), WorkIndex);
+							spdlog::debug("IOCPort::ReceiveWorkerThread: closed by 0 byte notify");
+
+							EnterCriticalSection(&g_critical);
+							
 							pSocket->CloseProcess();
 							pIocport->RidIOCPSocket(pSocket->GetSocketID(), pSocket);
 							pIocport->PutOldSid(pSocket->GetSocketID());
+							
 							LeaveCriticalSection(&g_critical);
+							
 							break;
 						}
 
+						EnterCriticalSection(&g_critical);
+					
 						pSocket->m_nPending = 0;
 						pSocket->m_nWouldblock = 0;
-
 						pSocket->ReceivedData((int) nbytes);
 						pSocket->Receive();
+					
 						LeaveCriticalSection(&g_critical);
 						break;
 
 					case OVL_SEND:
+						EnterCriticalSection(&g_critical);
 						pSocket->m_nPending = 0;
 						pSocket->m_nWouldblock = 0;
+						LeaveCriticalSection(&g_critical);
 						break;
 
 					case OVL_CLOSE:
+						spdlog::debug("IOCPort::ReceiveWorkerThread: closed by Close()");
+
 						EnterCriticalSection(&g_critical);
-						TRACE(_T("User Closed By Close()...%d\n"), WorkIndex);
 
 						pSocket->CloseProcess();
 						pIocport->RidIOCPSocket(pSocket->GetSocketID(), pSocket);
@@ -194,12 +204,14 @@ DWORD WINAPI ReceiveWorkerThread(LPVOID lp)
 
 				if (pOvl != nullptr)
 				{
-					TRACE(_T("User Closed By Abnormal Termination...%d\n"), WorkIndex);
+					spdlog::debug("IOCPort::ReceiveWorkerThread: abnormal termination [workIndex={}]",
+						WorkIndex);
 				}
 				else
 				{
 					DWORD ioError = GetLastError();
-					TRACE(_T("User Closed By IOCP Error[%d] - %d \n"), ioError, WorkIndex);
+					spdlog::debug("IOCPort::ReceiveWorkerThread: IOCP termination [err={} workIndex={}]",
+						ioError, WorkIndex);
 				}
 			}
 		}
@@ -242,35 +254,40 @@ DWORD WINAPI ClientWorkerThread(LPVOID lp)
 				switch (pOvl->Offset)
 				{
 					case OVL_RECEIVE:
-						EnterCriticalSection(&g_critical);
 						if (nbytes == 0)
 						{
-							TRACE(_T("AISocket Closed By 0 Byte Notify\n"));
+							spdlog::debug("IOCPort::ClientWorkerThread: close by 0 byte notify");
+
+							EnterCriticalSection(&g_critical);
+
 							pSocket->CloseProcess();
 							pIocport->RidIOCPSocket(pSocket->GetSocketID(), pSocket);
 	//						pIocport->PutOldSid( pSocket->GetSocketID() );		// 클라이언트 소켓은 Sid 관리하지 않음
+
 							LeaveCriticalSection(&g_critical);
 							break;
 						}
 
+						EnterCriticalSection(&g_critical);
+					
 						pSocket->m_nPending = 0;
 						pSocket->m_nWouldblock = 0;
-
 						pSocket->ReceivedData((int) nbytes);
 						pSocket->Receive();
 
 						LeaveCriticalSection(&g_critical);
+					
 						break;
-
 					case OVL_SEND:
 						pSocket->m_nPending = 0;
 						pSocket->m_nWouldblock = 0;
 						break;
 
 					case OVL_CLOSE:
+						spdlog::debug("IOCPort::ClientWorkerThread: closed by Close()");
+					
 						EnterCriticalSection(&g_critical);
-
-						TRACE(_T("AISocket Closed By Close()\n"));
+					
 						pSocket->CloseProcess();
 						pIocport->RidIOCPSocket(pSocket->GetSocketID(), pSocket);
 	//					pIocport->PutOldSid( pSocket->GetSocketID() );
@@ -279,25 +296,23 @@ DWORD WINAPI ClientWorkerThread(LPVOID lp)
 						break;
 				}
 			}
-			else
+			else if (pOvl != nullptr)
 			{
-				if (pOvl != nullptr)
-				{
-					if (WorkIndex > (DWORD) pIocport->m_ClientSockSize)
-						continue;
+				if (WorkIndex > (DWORD) pIocport->m_ClientSockSize)
+					continue;
 
-					pSocket = pIocport->m_ClientSockArray[WorkIndex];
-					if (pSocket == nullptr)
-						continue;
+				pSocket = pIocport->m_ClientSockArray[WorkIndex];
+				if (pSocket == nullptr)
+					continue;
 
-					EnterCriticalSection(&g_critical);
+				spdlog::debug("IOCPort::ClientWorkerThread: abnormal termination");
+				
+				EnterCriticalSection(&g_critical);
+				
+				pSocket->CloseProcess();
+				pIocport->RidIOCPSocket(pSocket->GetSocketID(), pSocket);
 
-					TRACE(_T("AISocket Closed By Abnormal Termination\n"));
-					pSocket->CloseProcess();
-					pIocport->RidIOCPSocket(pSocket->GetSocketID(), pSocket);
-
-					LeaveCriticalSection(&g_critical);
-				}
+				LeaveCriticalSection(&g_critical);
 			}
 		}
 	}
@@ -343,7 +358,7 @@ DWORD WINAPI SendWorkerThread(LPVOID lp)
 
 								int len = 0;
 								memset(pBuff, 0x00, REGION_BUFF_SIZE);
-								pSocket->RegioinPacketClear(pBuff, len);
+								pSocket->RegionPacketClear(pBuff, len);
 								if (len < 500)
 								{
 									pSocket->Send(pBuff, len);
@@ -469,7 +484,7 @@ BOOL CIOCPort::Listen(int port)
 	m_ListenSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (m_ListenSocket < 0)
 	{
-		TRACE(_T("Can't open stream socket\n"));
+		spdlog::error("CIOCPort::Listen: failed to open socket");
 		return FALSE;
 	}
 
@@ -497,7 +512,7 @@ BOOL CIOCPort::Listen(int port)
 
 	if (bind(m_ListenSocket, (sockaddr*) &addr, sizeof(addr)) < 0)
 	{
-		TRACE(_T("Can't bind local address\n"));
+		spdlog::error("CIOCPort::Listen: failed to bind local address");
 		return FALSE;
 	}
 
@@ -510,7 +525,9 @@ BOOL CIOCPort::Listen(int port)
 	err = getsockopt(m_ListenSocket, SOL_SOCKET, SO_RCVBUF, (char*) &socklen, &len);
 	if (err == SOCKET_ERROR)
 	{
-		TRACE(_T("FAIL : Set Socket RecvBuf of port(%d) as %d\n"), port, socklen);
+		int socketErr = WSAGetLastError();
+		spdlog::error("CIOCPort::Listen: recvBuffer getsockopt failed on port={} winsock error={} socketLen={}",
+			port, socketErr, socklen);
 		return FALSE;
 	}
 
@@ -521,7 +538,9 @@ BOOL CIOCPort::Listen(int port)
 
 	if (err == SOCKET_ERROR)
 	{
-		TRACE(_T("FAIL: Set Socket SendBuf of port(%d) as %d\n"), port, socklen);
+		int socketErr = WSAGetLastError();
+		spdlog::error("CIOCPort::Listen: sendBuffer getsockopt failed on port={} winsock error={} socketLen={}",
+			port, socketErr, socklen);
 		return FALSE;
 	}
 
@@ -530,14 +549,14 @@ BOOL CIOCPort::Listen(int port)
 	m_hListenEvent = WSACreateEvent();
 	if (m_hListenEvent == WSA_INVALID_EVENT)
 	{
-		err = WSAGetLastError();
-		TRACE(_T("Listen Event Create Fail!! %d \n"), err);
+		int socketErr = WSAGetLastError();
+		spdlog::error("CIOCPort::Listen: CreateEvent winsock error={}", socketErr);
 		return FALSE;
 	}
 
 	WSAEventSelect(m_ListenSocket, m_hListenEvent, FD_ACCEPT);
 
-	TRACE(_T("Port (%05d) initialzed\n"), port);
+	spdlog::info("CIOCPort::Listen: initialized port={:05}", port);
 
 	CreateAcceptThread();
 
@@ -548,7 +567,7 @@ BOOL CIOCPort::Associate(CIOCPSocket2* pIocpSock, HANDLE hPort)
 {
 	if (hPort == nullptr)
 	{
-		TRACE(_T("ERROR : No Completion Port\n"));
+		spdlog::error("CIOCPort::Associate: received null port");
 		return FALSE;
 	}
 
@@ -561,7 +580,7 @@ int CIOCPort::GetNewSid()
 {
 	if (m_SidList.empty())
 	{
-		TRACE(_T("SID List Is Empty !!\n"));
+		spdlog::error("CIOCPort::GetNewSid: socketId list is empty");
 		return -1;
 	}
 
@@ -576,7 +595,7 @@ void CIOCPort::PutOldSid(int sid)
 	if (sid < 0
 		|| sid >= m_SocketArraySize)
 	{
-		TRACE(_T("recycle sid invalid value : %d\n"), sid);
+		spdlog::error("CIOCPort::PutOldSid: out of range socketId={}", sid);
 		return;
 	}
 
@@ -687,14 +706,14 @@ CIOCPSocket2* CIOCPort::GetIOCPSocket(int index)
 {
 	if (index >= m_SocketArraySize)
 	{
-		TRACE(_T("InActiveSocket Array Overflow[%d]\n"), index);
+		spdlog::error("CIOCPort::GetIOCPSocket: socketArray overflow index={}", index);
 		return nullptr;
 	}
 
 	CIOCPSocket2* pIOCPSock = m_SockArrayInActive[index];
 	if (pIOCPSock == nullptr)
 	{
-		TRACE(_T("InActiveSocket Array Invalid[%d]\n"), index);
+		spdlog::error("CIOCPort::GetIOCPSocket: null socket index={}", index);
 		return nullptr;
 	}
 
@@ -712,7 +731,7 @@ void CIOCPort::RidIOCPSocket(int index, CIOCPSocket2* pSock)
 		|| (pSock->GetSockType() == TYPE_ACCEPT && index >= m_SocketArraySize)
 		|| (pSock->GetSockType() == TYPE_CONNECT && index >= m_ClientSockSize))
 	{
-		TRACE(_T("Invalid Sock index - RidIOCPSocket\n"));
+		spdlog::error("CIOCPort::RidIOCPSocket: invalid index={} for type={}", index, pSock->GetSockType());
 		return;
 	}
 

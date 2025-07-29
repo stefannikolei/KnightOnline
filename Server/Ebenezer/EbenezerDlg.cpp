@@ -138,7 +138,8 @@ DWORD WINAPI ReadQueueThread(LPVOID lp)
 				if (pUser != nullptr
 					&& strlen(pUser->m_pUserData->m_id) != 0)
 				{
-					TRACE(_T("Logout Strange...%hs\n"), pUser->m_pUserData->m_id);
+					spdlog::debug("EbenezerDlg::ReadQueueThread: WIZ_LOGOUT [charId={}]",
+						pUser->m_pUserData->m_id);
 					pUser->Close();
 				}
 				break;

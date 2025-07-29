@@ -160,7 +160,7 @@ int CIOCPSocket2::Send(char* pBuf, long length, int dwFlag)
 		}
 		else
 		{
-			spdlog::error("CIOCPSocket2::Send: socketId={} winsock error = {}",
+			spdlog::error("CIOCPSocket2::Send: socketId={} winsock error={}",
 				m_Sid, last_err);
 			m_nSocketErr++;
 			goto close_routine;
@@ -230,7 +230,7 @@ int CIOCPSocket2::Receive()
 		}
 		else
 		{
-			spdlog::error("CIOCPSocket2::Receive: socketId={} winsock error = {}",
+			spdlog::error("CIOCPSocket2::Receive: socketId={} winsock error={}",
 				m_Sid, last_err);
 
 			m_nSocketErr++;
@@ -408,7 +408,7 @@ void CIOCPSocket2::Close()
 	{
 		int errValue = GetLastError();
 		spdlog::error("CIOCPSocket2::Close: socketId={} PostQueuedCompletionStatus error={}",
-				m_Sid, errValue);
+			m_Sid, errValue);
 	}
 }
 
@@ -440,7 +440,7 @@ BOOL CIOCPSocket2::Accept(SOCKET listensocket, sockaddr* addr, int* len)
 	{
 		int err = WSAGetLastError();
 		spdlog::error("CIOCPSocket2::Accept: socketId={} winsock error={}",
-				m_Sid, err);
+			m_Sid, err);
 		return FALSE;
 	}
 
