@@ -38,7 +38,7 @@ $projectXml = @"
   <Import Project="..\..\props\platform_root.props" />
   <PropertyGroup Label="UserMacros">
     <DependencyName>$DependencyName</DependencyName>
-    <LocalDependencyDir>LocalDependencyDir</LocalDependencyDir>
+    <LocalDependencyDir>$LocalDependencyDir</LocalDependencyDir>
     <RealProjectPath>$RealProjectPath</RealProjectPath>
   </PropertyGroup>
   <Import Project="`$(PropsDir)fetch_wrapper.props" />
