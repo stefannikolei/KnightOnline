@@ -174,13 +174,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "db-library", "deps\db-libra
 		{057C1ABC-6137-37A9-9935-8CF811D7CEDA} = {057C1ABC-6137-37A9-9935-8CF811D7CEDA}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fetch-spdlog", "deps\fetch-and-build-wrappers\fetch-spdlog.vcxproj", "{10898C84-AF45-F0B0-5144-EA801DF15503}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spdlog", "deps\spdlog-msvc\spdlog.vcxproj", "{0888A97F-4754-7968-1176-1349CFDD6018}"
-	ProjectSection(ProjectDependencies) = postProject
-		{10898C84-AF45-F0B0-5144-EA801DF15503} = {10898C84-AF45-F0B0-5144-EA801DF15503}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -301,10 +294,6 @@ Global
 		{3F38FD98-5C7E-97C7-70A9-FDA7E34A0CFC}.Debug|Win32.Build.0 = Debug|Win32
 		{3F38FD98-5C7E-97C7-70A9-FDA7E34A0CFC}.Release|Win32.ActiveCfg = Release|Win32
 		{3F38FD98-5C7E-97C7-70A9-FDA7E34A0CFC}.Release|Win32.Build.0 = Release|Win32
-		{10898C84-AF45-F0B0-5144-EA801DF15503}.Debug|Win32.ActiveCfg = Debug|Win32
-		{10898C84-AF45-F0B0-5144-EA801DF15503}.Debug|Win32.Build.0 = Debug|Win32
-		{10898C84-AF45-F0B0-5144-EA801DF15503}.Release|Win32.ActiveCfg = Release|Win32
-		{10898C84-AF45-F0B0-5144-EA801DF15503}.Release|Win32.Build.0 = Release|Win32
 		{057C1ABC-6137-37A9-9935-8CF811D7CEDA}.Debug|Win32.ActiveCfg = Debug|Win32
 		{057C1ABC-6137-37A9-9935-8CF811D7CEDA}.Debug|Win32.Build.0 = Debug|Win32
 		{057C1ABC-6137-37A9-9935-8CF811D7CEDA}.Release|Win32.ActiveCfg = Release|Win32
