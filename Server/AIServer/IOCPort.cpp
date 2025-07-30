@@ -761,7 +761,7 @@ void CIOCPort::CreateSendThread()
 	// ensure we aren't wiping out a valid completion port
 	ASSERT(m_hSendIOCP == INVALID_HANDLE_VALUE);
 
-	m_hSendIOCP = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
+	m_hSendIOCP = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
 	if (m_hSendIOCP == nullptr)
 		return;
 

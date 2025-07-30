@@ -731,7 +731,8 @@ void CIOCPort::RidIOCPSocket(int index, CIOCPSocket2* pSock)
 		|| (pSock->GetSockType() == TYPE_ACCEPT && index >= m_SocketArraySize)
 		|| (pSock->GetSockType() == TYPE_CONNECT && index >= m_ClientSockSize))
 	{
-		spdlog::error("CIOCPort::RidIOCPSocket: invalid index={} for type={}", index, pSock->GetSockType());
+		spdlog::error("CIOCPort::RidIOCPSocket: invalid index={} for type={}",
+			index, pSock->GetSockType());
 		return;
 	}
 

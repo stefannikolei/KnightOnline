@@ -219,7 +219,8 @@ void CUser::Parsing(int len, char* pData)
 
 	BYTE command = GetByte(pData, index);
 
-	TRACE(_T("%d: id=%hs - %02X (%d)\n"), GetSocketID(), m_pUserData->m_id, command, len);
+	spdlog::debug("User::Parsing: userId={} charId={} command={:02X} len={}",
+		GetSocketID(), m_pUserData->m_id, command, len);
 
 	switch (command)
 	{
@@ -783,7 +784,7 @@ fail_return:
 
 void CUser::SelCharToAgent(char* pBuf)
 {
-	int index = 0, idlen1 = 0, idlen2 = 0, send_index = 0, retvalue = 0, zone = 0;
+	int index = 0, idlen1 = 0, idlen2 = 0, send_index = 0, retvalue = 0, zoneId = 0;
 	char charId[MAX_ID_SIZE + 1] = {},
 		accountId[MAX_ID_SIZE + 1] = {},
 		send_buff[256] = {};
@@ -807,7 +808,7 @@ void CUser::SelCharToAgent(char* pBuf)
 
 	GetString(charId, pBuf, idlen2, index);
 	bInit = GetByte(pBuf, index);
-	zone = GetByte(pBuf, index);
+	zoneId = GetByte(pBuf, index);
 
 	if (_strnicmp(accountId, m_strAccountID, MAX_ID_SIZE) != 0)
 	{
@@ -831,16 +832,16 @@ void CUser::SelCharToAgent(char* pBuf)
 	}
 
 	// 음냥,, 여기서 존을 비교,,,
-	if (zone <= 0)
+	if (zoneId <= 0)
 	{
-		TRACE(_T("### SelCharToAgent zone Fail : zone=%d\n"), zone);
+		spdlog::error("User::SelCharToAgent: invalid zoneId={}", zoneId);
 		goto fail_return;
 	}
 
-	pMap = m_pMain->GetMapByID(zone);
+	pMap = m_pMain->GetMapByID(zoneId);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("### SelCharToAgent map load Fail : zone=%d\n"), zone);
+		spdlog::error("User::SelCharToAgent: no map found for zoneId={}", zoneId);
 		goto fail_return;
 	}
 
@@ -849,7 +850,8 @@ void CUser::SelCharToAgent(char* pBuf)
 		pInfo = m_pMain->m_ServerArray.GetData(pMap->m_nServerNo);
 		if (pInfo == nullptr)
 		{
-			TRACE(_T("### SelCharToAgent server info Fail : server=%d\n"), pMap->m_nServerNo);
+			spdlog::error("User::SelCharToAgent: serverId={} not registered [zoneId={}]",
+				pMap->m_nServerNo, zoneId);
 			goto fail_return;
 		}
 
@@ -858,10 +860,11 @@ void CUser::SelCharToAgent(char* pBuf)
 		SetString(send_buff, pInfo->strServerIP, strlen(pInfo->strServerIP), send_index);
 		SetShort(send_buff, pInfo->sPort, send_index);
 		SetByte(send_buff, bInit, send_index);
-		SetByte(send_buff, zone, send_index);
+		SetByte(send_buff, zoneId, send_index);
 		SetByte(send_buff, m_pMain->m_byOldVictory, send_index);
 		Send(send_buff, send_index);
-		TRACE(_T("--> SelCharToAgent server change : userid=%hs, ip=%hs, binit=%d\n"), charId, pInfo->strServerIP, bInit);
+		spdlog::error("User::SelCharToAgent: server change [charId={} ip={} init={}]",
+			charId, pInfo->strServerIP, bInit);
 		return;
 	}
 
@@ -1206,7 +1209,8 @@ void CUser::LogOut()
 	if (pUser != nullptr
 		&& pUser->m_Sid != m_Sid)
 	{
-		TRACE(_T("%hs : %hs Logout: Sid 가 다른 경우...\n"), m_pUserData->m_Accountid, m_pUserData->m_id);
+		spdlog::error("User::LogOut: got a pointer to a duplicate user socket [accountId={} charId={}]",
+			m_pUserData->m_Accountid, m_pUserData->m_id);
 		return;
 	}
 
@@ -1309,7 +1313,9 @@ void CUser::MoveProcess(char* pBuf)
 		|| m_pUserData->m_sHp == 0)
 	{
 		if (speed != 0)
-			TRACE(_T("### MoveProcess Fail : name=%hs(%d), m_bResHpType=%d, hp=%d, speed=%d, x=%d, z=%d ###\n"), m_pUserData->m_id, m_Sid, m_bResHpType, m_pUserData->m_sHp, speed, (int) m_pUserData->m_curx, (int) m_pUserData->m_curz);
+			spdlog::error("User::MoveProcess: dead user is moving [charId={} socketId={} resHpType={} hp={} speed={} x={} z={}",
+				m_pUserData->m_id, m_Sid, m_bResHpType, m_pUserData->m_sHp, speed,
+				static_cast<int32_t>(m_pUserData->m_curx), static_cast<int32_t>(m_pUserData->m_curz));
 	}
 
 	if (speed != 0)
@@ -1474,7 +1480,8 @@ void CUser::Attack(char* pBuf)
 	if (m_bResHpType == USER_DEAD
 		|| m_pUserData->m_sHp == 0)
 	{
-		TRACE(_T("### Attack Fail : name=%hs(%d), m_bResHpType=%d, hp=%d###\n"), m_pUserData->m_id, m_Sid, m_bResHpType, m_pUserData->m_sHp);
+		spdlog::error("User::Attack: dead user cannot attack [charId={} resHpType={} hp={}]",
+			m_pUserData->m_id, m_Sid, m_bResHpType, m_pUserData->m_sHp);
 		return;
 	}
 
@@ -2382,14 +2389,16 @@ void CUser::ZoneChange(int zone, float x, float z)
 				if (m_pUserData->m_bNation == KARUS
 					&& !m_pMain->m_byElmoradOpenFlag)
 				{
-					TRACE(_T("#### ZoneChange Fail ,,, id=%hs, nation=%d, flag=%d\n"), m_pUserData->m_id, m_pUserData->m_bNation, m_pMain->m_byElmoradOpenFlag);
+					spdlog::error("User::ZoneChange: zone not open for invasion [charId={} nation={} enemyNationOpen={}]",
+						m_pUserData->m_id, m_pUserData->m_bNation, m_pMain->m_byElmoradOpenFlag);
 					return;
 				}
 				
 				if (m_pUserData->m_bNation == ELMORAD
 					&& !m_pMain->m_byKarusOpenFlag)
 				{
-					TRACE(_T("#### ZoneChange Fail ,,, id=%hs, nation=%d, flag=%d\n"), m_pUserData->m_id, m_pUserData->m_bNation, m_pMain->m_byKarusOpenFlag);
+					spdlog::error("User::ZoneChange: zone not open for invasion [charId={} nation={} enemyNationOpen={}]",
+						m_pUserData->m_id, m_pUserData->m_bNation, m_pMain->m_byKarusOpenFlag);
 					return;
 				}
 			}
@@ -2482,7 +2491,7 @@ void CUser::ZoneChange(int zone, float x, float z)
 		UserDataSaveToAgent();
 		
 		spdlog::debug("User::ZoneChange: [userId={} accountId={} charId={} zoneId={} x={} z={}]",
-		m_Sid, m_strAccountID, m_pUserData->m_id, zone,
+			m_Sid, m_strAccountID, m_pUserData->m_id, zone,
 			static_cast<int32_t>(x), static_cast<int32_t>(z));
 		
 		m_pUserData->m_bLogout = 2;	// server change flag
@@ -4723,7 +4732,9 @@ void CUser::ItemTrade(char* pBuf)
 	if (m_bResHpType == USER_DEAD
 		|| m_pUserData->m_sHp == 0)
 	{
-		TRACE(_T("### ItemTrade Fail : name=%hs(%d), m_bResHpType=%d, hp=%d, x=%d, z=%d ###\n"), m_pUserData->m_id, m_Sid, m_bResHpType, m_pUserData->m_sHp, (int) m_pUserData->m_curx, (int) m_pUserData->m_curz);
+		spdlog::error("User::ItemTrade: dead user cannot trade [charId={} socketId={} resHpType={} hp={} x={} z={}]",
+			m_pUserData->m_id, m_Sid, m_bResHpType, m_pUserData->m_sHp,
+			static_cast<int32_t>(m_pUserData->m_curx), static_cast<int32_t>(m_pUserData->m_curz));
 		result = 0x01;
 		goto fail_return;
 	}
@@ -6063,7 +6074,10 @@ void CUser::ExchangeReq(char* pBuf)
 	if (m_bResHpType == USER_DEAD
 		|| m_pUserData->m_sHp == 0)
 	{
-		TRACE(_T("### ExchangeProcess Fail : name=%hs(%d), m_bResHpType=%d, hp=%d, x=%d, z=%d ###\n"), m_pUserData->m_id, m_Sid, m_bResHpType, m_pUserData->m_sHp, (int) m_pUserData->m_curx, (int) m_pUserData->m_curz);
+		spdlog::error("User::ExchangeReq: dead user cannot exchange [charId={} socketId={} resHpType={} hp={} x={} z={}]",
+			m_pUserData->m_id, m_Sid, m_bResHpType, m_pUserData->m_sHp,
+			static_cast<int32_t>(m_pUserData->m_curx), static_cast<int32_t>(m_pUserData->m_curz));
+
 		goto fail_return;
 	}
 
@@ -8311,7 +8325,9 @@ void CUser::WarehouseProcess(char* pBuf)
 	if (m_bResHpType == USER_DEAD
 		|| m_pUserData->m_sHp == 0)
 	{
-		TRACE(_T("### WarehouseProcess Fail : name=%hs(%d), m_bResHpType=%d, hp=%d, x=%d, z=%d ###\n"), m_pUserData->m_id, m_Sid, m_bResHpType, m_pUserData->m_sHp, (int) m_pUserData->m_curx, (int) m_pUserData->m_curz);
+		spdlog::error("User::WarehouseProcess: dead user cannot use warehouse [charId={} socketId={} resHpType={} hp={} x={} z={}]",
+			m_pUserData->m_id, m_Sid, m_bResHpType, m_pUserData->m_sHp,
+			static_cast<int32_t>(m_pUserData->m_curx), static_cast<int32_t>(m_pUserData->m_curz));
 		return;
 	}
 
@@ -12130,7 +12146,8 @@ void CUser::KickOutZoneUser(BOOL home)
 		_REGENE_EVENT* pRegene = pMap->GetRegeneEvent(regene_event);
 		if (pRegene == nullptr)
 		{
-			TRACE(_T("### KickOutZoneUser Fail - user=%hs, regene_event=%d, zoneindex=%d\n"), m_pUserData->m_id, regene_event, zoneindex);
+			spdlog::error("User::KickOutZoneUser: no regene event found [charId={} regeneEventId={} zoneIndex={}]",
+				m_pUserData->m_id, regene_event, zoneindex);
 			KickOutZoneUser();
 			return;
 		}
@@ -12428,29 +12445,30 @@ BOOL CUser::ExistComEvent(int eventid)
 
 void CUser::RecvDeleteChar(char* pBuf)
 {
-	int nResult = 0, nLen = 0, index = 0, send_index = 0, char_index = 0, nKnights = 0;
-	char strCharID[MAX_ID_SIZE + 1] = {};
+	int nResult = 0, nLen = 0, index = 0, send_index = 0, char_index = 0, knightsId = 0;
+	char charId[MAX_ID_SIZE + 1] = {};
 	char send_buff[256] = {};
 
 	nResult = GetByte(pBuf, index);
 	char_index = GetByte(pBuf, index);
-	nKnights = GetShort(pBuf, index);
+	knightsId = GetShort(pBuf, index);
 	nLen = GetShort(pBuf, index);
-	GetString(strCharID, pBuf, nLen, index);
+	GetString(charId, pBuf, nLen, index);
 
 	if (nResult == 1
-		&& nKnights != 0)
+		&& knightsId != 0)
 	{
-		m_pMain->m_KnightsManager.RemoveKnightsUser(nKnights, strCharID);
-		TRACE(_T("RecvDeleteChar ==> name=%hs, knights=%d\n"), strCharID, nKnights);
+		m_pMain->m_KnightsManager.RemoveKnightsUser(knightsId, charId);
+		spdlog::debug("User::RecvDeleteChar: removed [charId={} knightsId={}]",
+			charId, knightsId);
 
 		memset(send_buff, 0, sizeof(send_buff));
 		send_index = 0;
 		SetByte(send_buff, UDP_KNIGHTS_PROCESS, send_index);
 		SetByte(send_buff, KNIGHTS_WITHDRAW, send_index);
-		SetShort(send_buff, nKnights, send_index);
+		SetShort(send_buff, knightsId, send_index);
 		SetShort(send_buff, nLen, send_index);
-		SetString(send_buff, strCharID, nLen, send_index);
+		SetString(send_buff, charId, nLen, send_index);
 
 		if (m_pMain->m_nServerGroup == 0)
 			m_pMain->Send_UDP_All(send_buff, send_index);
@@ -12546,7 +12564,8 @@ void CUser::GameStart(
 		SendNotice();
 		SendTimeStatus();
 
-		TRACE("GAMESTART - loading: %s..%d\n", m_pUserData->m_id, m_Sid);
+		spdlog::debug("User::GameStart: loading [charId={} socketId={}]",
+			m_pUserData->m_id, m_Sid);
 
 		SetByte(send_buff, WIZ_GAMESTART, send_index);
 		Send(send_buff, send_index);
@@ -12559,7 +12578,8 @@ void CUser::GameStart(
 
 		m_State = STATE_GAMESTART;
 
-		TRACE("GAMESTART - ingame: %s..%d\n", m_pUserData->m_id, m_Sid);
+		spdlog::debug("User::GameStart: in game [charId={} socketId={}]",
+			m_pUserData->m_id, m_Sid);
 
 		UserInOut(USER_REGENE);
 

@@ -5808,7 +5808,7 @@ void CNpc::SendAll(CIOCPort* pIOCP, const char* pBuf, int nLength)
 }
 // ~sungyong 2002.05.22
 
-void CNpc::NpcTrace(const std::string& msg)
+void CNpc::NpcTrace(std::string_view msg)
 {
 	spdlog::trace("NPCTrace: {} [serial={} npcId={} npcName={} x={} z={}]",
 		msg, m_sNid + NPC_BAND, m_sSid, m_strName, m_fCurX, m_fCurZ);

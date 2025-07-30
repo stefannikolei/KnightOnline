@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "SharedMem.h"
+
+#include <codecvt>
 #include <process.h>
 #include <spdlog/spdlog.h>
 
@@ -67,8 +69,14 @@ BOOL CSharedMemQueue::InitailizeMMF(DWORD dwOffsetsize, int maxcount, LPCTSTR lp
 	if (m_lpMMFile == nullptr)
 		return FALSE;
 
-	TRACE(_T("%s Address : %x\n"), lpname, m_lpMMFile);
-
+	if (lpname != nullptr)
+	{
+		std::wstring lpStr = lpname;
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+		std::string lpStrA = converter.to_bytes(lpStr);
+		spdlog::trace("SharedMem::InitializeMMF: {} Address : {}\n", lpStrA, m_lpMMFile);
+	}
+	
 	m_bMMFCreate	= bCreate;
 	m_pHeader		= (_SMQ_HEADER*) m_lpMMFile;
 	m_lReference	= (LONG) (m_lpMMFile + sizeof(_SMQ_HEADER));		// 초기 위치 셋팅

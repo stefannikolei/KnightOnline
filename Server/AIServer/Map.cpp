@@ -698,7 +698,7 @@ BOOL MAP::LoadRoomEvent(int zone_number)
 
 cancel_event_load:
 	CString str;
-	str.Format(_T("이벤트 정보 읽기 실패(%d)(%d)"), zone_number, event_num);
+	str.Format(_T("LoadRoomEvent Failed [zoneId=%d eventId=%d]"), zone_number, event_num);
 	AfxMessageBox(str);
 	in.Close();
 	pFile.Close();

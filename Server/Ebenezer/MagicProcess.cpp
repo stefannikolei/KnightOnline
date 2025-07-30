@@ -131,7 +131,9 @@ void CMagicProcess::MagicPacket(char* pBuf, int len)
 		if (pUser->m_bResHpType == USER_DEAD
 			|| pUser->m_pUserData->m_sHp == 0)
 		{
-			TRACE(_T("### Magic&Skill Fail : name=%hs(%d), m_bResHpType=%d, hp=%d###\n"), pUser->m_pUserData->m_id, pUser->GetSocketID(), pUser->m_bResHpType, pUser->m_pUserData->m_sHp);
+			spdlog::error("MagicProcess::MagicPacket: user is dead [charId={} userId={} resHpType={} hp={}]",
+				pUser->m_pUserData->m_id, pUser->GetSocketID(),
+				pUser->m_bResHpType, pUser->m_pUserData->m_sHp);
 			return;
 		}
 	}

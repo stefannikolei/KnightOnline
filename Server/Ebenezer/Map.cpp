@@ -167,7 +167,8 @@ void C3DMap::LoadObjectEvent(HANDLE hFile)
 
 		if (!m_ObjectEventArray.PutData(pEvent->sIndex, pEvent))
 		{
-			TRACE(_T("Object Event PutData Fail - %d\n"), pEvent->sIndex);
+			spdlog::error("MAP::LoadObjectEvent: ObjectEventArray put failed [eventId={} zoneId={}]",
+				pEvent->sIndex, m_nZoneNumber);
 			delete pEvent;
 			pEvent = nullptr;
 		}
@@ -214,7 +215,8 @@ void C3DMap::LoadRegeneEvent(HANDLE hFile)
 
 		if (!m_ObjectRegeneArray.PutData(pEvent->sRegenePoint, pEvent))
 		{
-			TRACE(_T("Regene Event PutData Fail - %d\n"), pEvent->sRegenePoint);
+			spdlog::error("MAP::LoadObjectEvent: RegenPoint put failed [regenPoint={} zoneId={}]",
+				pEvent->sRegenePoint, m_nZoneNumber);
 			delete pEvent;
 			pEvent = nullptr;
 		}
@@ -245,7 +247,8 @@ void C3DMap::LoadWarpList(HANDLE hFile)
 
 		if (!m_WarpArray.PutData(pWarp->sWarpID, pWarp))
 		{
-			TRACE(_T("Warp list PutData Fail - %d\n"), pWarp->sWarpID);
+			spdlog::error("MAP::LoadObjectEvent: WarpArray put failed [warpId={} zoneId={}]",
+				pWarp->sWarpID, m_nZoneNumber);
 			delete pWarp;
 			pWarp = nullptr;
 		}
@@ -546,7 +549,8 @@ BOOL C3DMap::CheckEvent(float x, float z, CUser* pUser)
 		{
 			if (m_pMain->m_sKarusCount > MAX_BATTLE_ZONE_USERS)
 			{
-				TRACE(_T("### BattleZone karus full users = %d, name=%hs \n"), m_pMain->m_sKarusCount, pUser->m_pUserData->m_id);
+				spdlog::error("MAP::CheckEvent: BattleZone: karus full users [users={} charId={}]",
+					m_pMain->m_sKarusCount, pUser->m_pUserData->m_id);
 				return FALSE;
 			}
 		}
@@ -555,7 +559,8 @@ BOOL C3DMap::CheckEvent(float x, float z, CUser* pUser)
 		{
 			if (m_pMain->m_sElmoradCount > MAX_BATTLE_ZONE_USERS)
 			{
-				TRACE(_T("### BattleZone elmorad full users = %d, name=%hs \n"), m_pMain->m_sElmoradCount, pUser->m_pUserData->m_id);
+				spdlog::error("MAP::CheckEvent: BattleZone: elmorad full users [users={} charId={}]",
+					m_pMain->m_sElmoradCount, pUser->m_pUserData->m_id);
 				return FALSE;
 			}
 		}
@@ -595,7 +600,8 @@ BOOL C3DMap::LoadEvent()
 
 			if (!m_EventArray.PutData(pEvent->m_sIndex, pEvent))
 			{
-				TRACE(_T("Event PutData Fail - %d\n"), pEvent->m_sIndex);
+				spdlog::error("MAP::LoadEvent: EventArray put failed [eventId={} zoneId={}]",
+					pEvent->m_sIndex, m_nZoneNumber);
 				delete pEvent;
 			}
 		}
