@@ -54,7 +54,7 @@ BOOL CIOCPSocket2::Create(UINT nSocketPort, int nSocketType, long lEvent, const 
 	{
 		ret = WSAGetLastError();
 		// see https://learn.microsoft.com/en-us/windows/win32/winsock/windows-sockets-error-codes-2
-		spdlog::error("CIOCPSocket2::Create: Winsock error {}", ret);
+		spdlog::error("IOCPSocket2::Create: Winsock error {}", ret);
 		return FALSE;
 	}
 
@@ -62,7 +62,7 @@ BOOL CIOCPSocket2::Create(UINT nSocketPort, int nSocketType, long lEvent, const 
 	if (m_hSockEvent == WSA_INVALID_EVENT)
 	{
 		ret = WSAGetLastError();
-		spdlog::error("CIOCPSocket2::Create: CreateEvent winsock error {}", ret);
+		spdlog::error("IOCPSocket2::Create: CreateEvent winsock error {}", ret);
 		return FALSE;
 	}
 
@@ -97,7 +97,7 @@ BOOL CIOCPSocket2::Connect(CIOCPort* pIocp, const char* lpszHostAddress, UINT nH
 	if (result == SOCKET_ERROR)
 	{
 		int err = WSAGetLastError();
-		spdlog::error("CIOCPSocket2::Connect: Winsock error {}", err);
+		spdlog::error("IOCPSocket2::Connect: Winsock error {}", err);
 		closesocket(m_Socket);
 		return FALSE;
 	}
@@ -114,7 +114,7 @@ BOOL CIOCPSocket2::Connect(CIOCPort* pIocp, const char* lpszHostAddress, UINT nH
 
 	if (!m_pIOCPort->Associate(this, m_pIOCPort->m_hClientIOCPort))
 	{
-		spdlog::error("CIOCPSocket2::Connect: failed to associate");
+		spdlog::error("IOCPSocket2::Connect: failed to associate");
 		return FALSE;
 	}
 
@@ -192,7 +192,7 @@ int CIOCPSocket2::Send(char* pBuf, long length, int dwFlag)
 		int last_err = WSAGetLastError();
 		if (last_err == WSA_IO_PENDING)
 		{
-			spdlog::error("CIOCPSocket2::Send: socketId={} IO_PENDING", m_Sid);
+			spdlog::debug("IOCPSocket2::Send: socketId={} IO_PENDING", m_Sid);
 			m_nPending++;
 			if (m_nPending > 3)
 				goto close_routine;
@@ -201,7 +201,7 @@ int CIOCPSocket2::Send(char* pBuf, long length, int dwFlag)
 		}
 		else if (last_err == WSAEWOULDBLOCK)
 		{
-			spdlog::error("CIOCPSocket2::Send: socketId={} WOULDBLOCK", m_Sid);
+			spdlog::debug("IOCPSocket2::Send: socketId={} WOULDBLOCK", m_Sid);
 
 			m_nWouldblock++;
 			if (m_nWouldblock > 3)
@@ -211,7 +211,7 @@ int CIOCPSocket2::Send(char* pBuf, long length, int dwFlag)
 		}
 		else
 		{
-			spdlog::error("CIOCPSocket2::Send: socketId={} winsock error={}",
+			spdlog::error("IOCPSocket2::Send: socketId={} winsock error={}",
 				m_Sid, last_err);
 			m_nSocketErr++;
 			goto close_routine;
@@ -272,7 +272,7 @@ int CIOCPSocket2::Receive()
 		}
 		else if (last_err == WSAEWOULDBLOCK)
 		{
-			spdlog::error("CIOCPSocket2::Receive: socketId={} WOULDBLOCK", m_Sid);
+			spdlog::debug("IOCPSocket2::Receive: socketId={} WOULDBLOCK", m_Sid);
 
 			m_nWouldblock++;
 			if (m_nWouldblock > 3)
@@ -282,7 +282,7 @@ int CIOCPSocket2::Receive()
 		}
 		else
 		{
-			spdlog::error("CIOCPSocket2::Receive: socketId={} winsock error={}",
+			spdlog::error("IOCPSocket2::Receive: socketId={} winsock error={}",
 				m_Sid, last_err);
 
 			m_nSocketErr++;
@@ -346,7 +346,7 @@ BOOL CIOCPSocket2::PullOutCore(char*& data, int& length)
 	if (tmp_buffer[0] != PACKET_START1
 		&& tmp_buffer[1] != PACKET_START2)
 	{
-		spdlog::error("{}: PullOutCore() - failed to detect header ({:X}, {:X})",
+		spdlog::error("IOCPSocket2::PullOutCore: {}: failed to detect header ({:2X}, {:2X})",
 			m_Sid, tmp_buffer[0], tmp_buffer[1]);
 			
 		Close();
@@ -367,7 +367,7 @@ BOOL CIOCPSocket2::PullOutCore(char*& data, int& length)
 
 	if (length < 0)
 	{
-		spdlog::error("{}: PullOutCore() - invalid length ({})",
+		spdlog::error("IOCPSocket2::PullOutCore: {}: invalid length ({})",
 			m_Sid, length);
 
 		Close();
@@ -376,7 +376,7 @@ BOOL CIOCPSocket2::PullOutCore(char*& data, int& length)
 
 	if (length > buffer_len)
 	{
-		spdlog::error("{}: PullOutCore() - reported length ({}) is not in buffer ({}) - waiting for now",
+		spdlog::debug("IOCPSocket2::PullOutCore: {}: reported length ({}) is not in buffer ({}) - waiting for now",
 			m_Sid, length, buffer_len);
 		return FALSE; // wait for more data
 	}
@@ -389,7 +389,7 @@ BOOL CIOCPSocket2::PullOutCore(char*& data, int& length)
 	// We expect a 2 byte tail after the end position.
 	if ((ePos + 2) > buffer_len)
 	{
-		spdlog::error("{}: PullOutCore() - tail not in buffer - waiting for now",
+		spdlog::debug("IOCPSocket2::PullOutCore: {}: tail not in buffer - waiting for now",
 			m_Sid);
 		return FALSE; // wait for more data
 	}
@@ -397,7 +397,7 @@ BOOL CIOCPSocket2::PullOutCore(char*& data, int& length)
 	if (tmp_buffer[ePos] != PACKET_END1
 		|| tmp_buffer[ePos + 1] != PACKET_END2)
 	{
-		spdlog::error("{}: PullOutCore() - failed to detect tail ({:X}, {:X})",
+		spdlog::error("IOCPSocket2::PullOutCore: {}: failed to detect tail ({:2X}, {:2X})",
 			m_Sid, tmp_buffer[ePos], tmp_buffer[ePos+1]);
 
 		Close();
@@ -412,7 +412,7 @@ BOOL CIOCPSocket2::PullOutCore(char*& data, int& length)
 		// We should also expect at least 1 byte for its data in addition to this.
 		if (length <= 8)
 		{
-			spdlog::error("{}: PullOutCore() - Insufficient packet length [{}] for a decrypted packet",
+			spdlog::error("IOCPSocket2::PullOutCore: {}: Insufficient packet length [{}] for a decrypted packet",
 				m_Sid, length);
 			Close();
 			return FALSE;
@@ -423,7 +423,7 @@ BOOL CIOCPSocket2::PullOutCore(char*& data, int& length)
 		int decrypted_len = jct.JvDecryptionWithCRC32(length, &tmp_buffer[sPos + 2], &decryption_buffer[0]);
 		if (decrypted_len < 0)
 		{
-			spdlog::error("{}: PullOutCore() - Failed decryption",
+			spdlog::error("IOCPSocket2::PullOutCore: {}: Failed decryption",
 				m_Sid);
 			Close();
 			return FALSE;
@@ -437,7 +437,7 @@ BOOL CIOCPSocket2::PullOutCore(char*& data, int& length)
 		if (recv_packet != 0
 			&& m_Rec_val > recv_packet)
 		{
-			spdlog::error("{}: PullOutCore() - recv_packet error... len={}, recv_packet={}, prev={}",
+			spdlog::error("IOCPSocket2::PullOutCore: {}: recv_packet error... len={}, recv_packet={}, prev={}",
 				m_Sid,
 				length,
 				recv_packet,
@@ -454,7 +454,7 @@ BOOL CIOCPSocket2::PullOutCore(char*& data, int& length)
 		length = decrypted_len - index;
 		if (length <= 0)
 		{
-			spdlog::error("{}: PullOutCore() - decrypted packet length too small... len={}",
+			spdlog::error("IOCPSocket2::PullOutCore: {}: decrypted packet length too small... len={}",
 				m_Sid,
 				length);
 
@@ -517,7 +517,7 @@ void CIOCPSocket2::Close()
 	if (retValue == 0)
 	{
 		int errValue = GetLastError();
-		spdlog::error("CIOCPSocket2::Close: socketId={} PostQueuedCompletionStatus error={}",
+		spdlog::error("IOCPSocket2::Close: socketId={} PostQueuedCompletionStatus error={}",
 			m_Sid, errValue);
 	}
 }
@@ -553,7 +553,7 @@ BOOL CIOCPSocket2::Accept(SOCKET listensocket, struct sockaddr* addr, int* len)
 	if (m_Socket == INVALID_SOCKET)
 	{
 		int err = WSAGetLastError();
-		spdlog::error("CIOCPSocket2::Accept: socketId={} winsock error={}",
+		spdlog::error("IOCPSocket2::Accept: socketId={} winsock error={}",
 			m_Sid, err);
 		return FALSE;
 	}
@@ -591,7 +591,7 @@ void CIOCPSocket2::SendCompressingPacket(const char* pData, int len)
 	if (len <= 0
 		|| len >= 49152)
 	{
-		spdlog::error("CIOCPSocket2::SendCompressingPacket: message length out of bounds [len={}]",
+		spdlog::error("IOCPSocket2::SendCompressingPacket: message length out of bounds [len={}]",
 			len);
 		return;
 	}
@@ -604,7 +604,7 @@ void CIOCPSocket2::SendCompressingPacket(const char* pData, int len)
 	if (out_len == 0
 		|| out_len > sizeof(pBuff))
 	{
-		spdlog::error("CIOCPSocket2::SendCompressingPacket: compression failed [out_len={} pBuffSize={}]",
+		spdlog::error("IOCPSocket2::SendCompressingPacket: compression failed [out_len={} pBuffSize={}]",
 			out_len, sizeof(pBuff));
 		Send((char*) pData, len);
 		return;
@@ -693,7 +693,7 @@ void CIOCPSocket2::RegionPacketClear(char* GetBuf, int& len)
 
 	if (count > 29)
 	{
-		spdlog::error("CIOCPSocket2::RegionPacketClear: count exceeds 29 [count{}]",
+		spdlog::error("IOCPSocket2::RegionPacketClear: count exceeds 29 [count{}]",
 			count);
 	}
 }

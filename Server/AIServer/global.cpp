@@ -1,10 +1,7 @@
 ﻿#include "stdafx.h"
 #include "global.h"
 
-#include <codecvt>
 #include <shared/StringConversion.h>
-
-#include <spdlog/spdlog.h>
 
 BOOL CheckGetVarString(int nLength, char* tBuf, const char* sBuf, int nSize, int& index)
 {

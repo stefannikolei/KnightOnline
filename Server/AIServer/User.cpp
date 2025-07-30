@@ -314,7 +314,7 @@ void CUser::Dead(int tid, int nDamage)
 		|| m_sRegionZ > pMap->GetZRegionMax())
 	{
 		spdlog::error("User::Dead: out of region bounds [userId={} charId={} x={} z={}]",
-		m_iUserId, m_strUserID, m_sRegionX, m_sRegionZ);
+			m_iUserId, m_strUserID, m_sRegionX, m_sRegionZ);
 		return;
 	}
 

@@ -243,10 +243,8 @@ void CUdpSocket::ServerChat(char* pBuf)
 		return;
 
 	GetString(chatstr, pBuf, chatlen, index);
-
-	CString logstr;
-	logstr.Format(_T("%hs"), chatstr);
-	m_pMain->m_StatusList.AddString(logstr);
+	
+	m_pMain->AddOutputMessage(chatstr);
 }
 
 void CUdpSocket::RecvBattleEvent(char* pBuf)
@@ -350,7 +348,7 @@ void CUdpSocket::RecvBattleEvent(char* pBuf)
 				sprintf(chatstr, buff.c_str(), strMaxUserName);
 			}
 
-			sprintf(finalstr, "## announcement: %s ##", chatstr);
+			sprintf(finalstr, "#### NOTICE : %s ####", chatstr);
 			SetByte(send_buff, WIZ_CHAT, send_index);
 			SetByte(send_buff, WAR_SYSTEM_CHAT, send_index);
 			SetByte(send_buff, 1, send_index);
@@ -488,7 +486,6 @@ void CUdpSocket::RecvJoinKnights(char* pBuf, BYTE command)
 
 	if (command == KNIGHTS_JOIN)
 	{
-		// TODO: Check this against 1299 ebenezer
 		sprintf(finalstr, "#### %s has joined. ####", charId);
 		// 클랜정보에 추가
 		m_pMain->m_KnightsManager.AddKnightsUser(knightsId, charId);
@@ -501,7 +498,7 @@ void CUdpSocket::RecvJoinKnights(char* pBuf, BYTE command)
 	{
 		// 클랜정보에 추가
 		m_pMain->m_KnightsManager.RemoveKnightsUser(knightsId, charId);
-		sprintf(finalstr, "#### %s has withdrawn. ####", charId);
+		sprintf(finalstr, "#### %s has left. ####", charId);
 		spdlog::debug("UdpSocket::RecvJoinKnights: charId={} left knightsId={}",
 			charId, knightsId);
 	}
@@ -542,7 +539,7 @@ void CUdpSocket::RecvModifyFame(char* pBuf, BYTE command)
 			{
 				pTUser->m_pUserData->m_bKnights = 0;
 				pTUser->m_pUserData->m_bFame = 0;
-				sprintf(finalstr, "#### %s님이 추방되셨습니다. ####", pTUser->m_pUserData->m_id);
+				sprintf(finalstr, "#### %s has been banned. ####", pTUser->m_pUserData->m_id);
 				m_pMain->m_KnightsManager.RemoveKnightsUser(knightsindex, pTUser->m_pUserData->m_id);
 			}
 			else
@@ -570,7 +567,7 @@ void CUdpSocket::RecvModifyFame(char* pBuf, BYTE command)
 			{
 				pTUser->m_pUserData->m_bFame = CHIEF;
 				m_pMain->m_KnightsManager.ModifyKnightsUser(knightsindex, pTUser->m_pUserData->m_id);
-				sprintf(finalstr, "#### %s님이 단장으로 임명되셨습니다. ####", pTUser->m_pUserData->m_id);
+				sprintf(finalstr, "#### %s has been appointed as a leader. ####", pTUser->m_pUserData->m_id);
 			}
 			break;
 
@@ -579,7 +576,7 @@ void CUdpSocket::RecvModifyFame(char* pBuf, BYTE command)
 			{
 				pTUser->m_pUserData->m_bFame = VICECHIEF;
 				m_pMain->m_KnightsManager.ModifyKnightsUser(knightsindex, pTUser->m_pUserData->m_id);
-				sprintf(finalstr, "#### %s님이 부단장으로 임명되셨습니다. ####", pTUser->m_pUserData->m_id);
+				sprintf(finalstr, "#### %s has been appointed as a co-leader. ####", pTUser->m_pUserData->m_id);
 			}
 			break;
 
@@ -663,9 +660,9 @@ void CUdpSocket::RecvDestroyKnights(char* pBuf)
 
 	// 클랜이나 기사단이 파괴된 메시지를 보내고 유저 데이타를 초기화
 	if (flag == CLAN_TYPE)
-		sprintf(finalstr, "#### %s clan has been disbanded. ####", pKnights->m_strName);
+		sprintf(finalstr, "#### the clan %s has disbanded ####", pKnights->m_strName);
 	else if (flag == KNIGHTS_TYPE)
-		sprintf(finalstr, "#### %s knights have been disbanded. ####", pKnights->m_strName);
+		sprintf(finalstr, "#### the knights %s has disbanded ####", pKnights->m_strName);
 
 	memset(send_buff, 0x00, 128);		send_index = 0;
 	SetByte(send_buff, WIZ_CHAT, send_index);

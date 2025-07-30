@@ -12,7 +12,7 @@
 /// \brief Sets up spdlog from an ini file using standardized server settings
 /// \param ini server application's ini file (already loaded)
 /// \param name application name (VersionManager, Aujard, AIServer, Ebenezer)
-void SetupLogger(CIni& ini, const std::string& name)
+void logger::SetupLogger(CIni& ini, const std::string& name)
 {
 	// setup file logger
 	std::string defaultLogPath = std::format("logs/{}.log", name);
@@ -23,23 +23,23 @@ void SetupLogger(CIni& ini, const std::string& name)
 	auto consoleLogger = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 
 	// setup multi-sink async logger as default (combines file+console logger)
-	spdlog::init_thread_pool(8192, 1);
+	spdlog::init_thread_pool(messageQueueSize, threadPoolSize);
 	std::vector<spdlog::sink_ptr> sinks{fileLogger, consoleLogger};
-	std::shared_ptr<spdlog::details::thread_pool> threadPool = spdlog::thread_pool();
+	auto threadPool = spdlog::thread_pool();
 	std::shared_ptr<spdlog::async_logger> appLogger = std::make_shared<spdlog::async_logger>(
 		name, sinks.begin(), sinks.end(), threadPool, spdlog::async_overflow_policy::block);
 	spdlog::set_default_logger(appLogger);
 
 	// add any extra loggers
-	if (name == logger::AIServer)
+	if (name == AIServer)
 	{
-		SetupExtraLogger(ini, logger::AIServerItem, ini::ITEM_LOG_FILE, threadPool);
-		SetupExtraLogger(ini, logger::AIServerUser, ini::USER_LOG_FILE, threadPool);
+		SetupExtraLogger(ini, AIServerItem, ini::ITEM_LOG_FILE, threadPool);
+		SetupExtraLogger(ini, AIServerUser, ini::USER_LOG_FILE, threadPool);
 	}
-	else if (name == logger::Ebenezer)
+	else if (name == Ebenezer)
 	{
-		SetupExtraLogger(ini, logger::EbenezerEvent, ini::EVENT_LOG_FILE, threadPool);
-		SetupExtraLogger(ini, logger::EbenezerRegion, ini::REGION_LOG_FILE, threadPool);
+		SetupExtraLogger(ini, EbenezerEvent, ini::EVENT_LOG_FILE, threadPool);
+		SetupExtraLogger(ini, EbenezerRegion, ini::REGION_LOG_FILE, threadPool);
 	}
 
 	// set default logger level and pattern
@@ -56,7 +56,7 @@ void SetupLogger(CIni& ini, const std::string& name)
 	spdlog::info("{} logger configured", name);
 }
 
-void SetupExtraLogger(CIni& ini, const std::string& appName,
+void logger::SetupExtraLogger(CIni& ini, const std::string& appName,
 	const std::string& logFileConfigProp,
 	std::shared_ptr<spdlog::details::thread_pool> threadPool)
 {

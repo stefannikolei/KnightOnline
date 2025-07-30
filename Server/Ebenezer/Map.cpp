@@ -167,7 +167,7 @@ void C3DMap::LoadObjectEvent(HANDLE hFile)
 
 		if (!m_ObjectEventArray.PutData(pEvent->sIndex, pEvent))
 		{
-			spdlog::error("MAP::LoadObjectEvent: ObjectEventArray put failed [eventId={} zoneId={}]",
+			spdlog::error("Map::LoadObjectEvent: ObjectEventArray put failed [eventId={} zoneId={}]",
 				pEvent->sIndex, m_nZoneNumber);
 			delete pEvent;
 			pEvent = nullptr;
@@ -215,7 +215,7 @@ void C3DMap::LoadRegeneEvent(HANDLE hFile)
 
 		if (!m_ObjectRegeneArray.PutData(pEvent->sRegenePoint, pEvent))
 		{
-			spdlog::error("MAP::LoadObjectEvent: RegenPoint put failed [regenPoint={} zoneId={}]",
+			spdlog::error("Map::LoadObjectEvent: RegenPoint put failed [regenPoint={} zoneId={}]",
 				pEvent->sRegenePoint, m_nZoneNumber);
 			delete pEvent;
 			pEvent = nullptr;
@@ -247,7 +247,7 @@ void C3DMap::LoadWarpList(HANDLE hFile)
 
 		if (!m_WarpArray.PutData(pWarp->sWarpID, pWarp))
 		{
-			spdlog::error("MAP::LoadObjectEvent: WarpArray put failed [warpId={} zoneId={}]",
+			spdlog::error("Map::LoadObjectEvent: WarpArray put failed [warpId={} zoneId={}]",
 				pWarp->sWarpID, m_nZoneNumber);
 			delete pWarp;
 			pWarp = nullptr;
@@ -549,7 +549,7 @@ BOOL C3DMap::CheckEvent(float x, float z, CUser* pUser)
 		{
 			if (m_pMain->m_sKarusCount > MAX_BATTLE_ZONE_USERS)
 			{
-				spdlog::error("MAP::CheckEvent: BattleZone: karus full users [users={} charId={}]",
+				spdlog::error("Map::CheckEvent: BattleZone: karus full users [users={} charId={}]",
 					m_pMain->m_sKarusCount, pUser->m_pUserData->m_id);
 				return FALSE;
 			}
@@ -559,7 +559,7 @@ BOOL C3DMap::CheckEvent(float x, float z, CUser* pUser)
 		{
 			if (m_pMain->m_sElmoradCount > MAX_BATTLE_ZONE_USERS)
 			{
-				spdlog::error("MAP::CheckEvent: BattleZone: elmorad full users [users={} charId={}]",
+				spdlog::error("Map::CheckEvent: BattleZone: elmorad full users [users={} charId={}]",
 					m_pMain->m_sElmoradCount, pUser->m_pUserData->m_id);
 				return FALSE;
 			}
@@ -600,7 +600,7 @@ BOOL C3DMap::LoadEvent()
 
 			if (!m_EventArray.PutData(pEvent->m_sIndex, pEvent))
 			{
-				spdlog::error("MAP::LoadEvent: EventArray put failed [eventId={} zoneId={}]",
+				spdlog::error("Map::LoadEvent: EventArray put failed [eventId={} zoneId={}]",
 					pEvent->m_sIndex, m_nZoneNumber);
 				delete pEvent;
 			}

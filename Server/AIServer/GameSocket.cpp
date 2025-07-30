@@ -59,7 +59,7 @@ void CGameSocket::Initialize()
 
 void CGameSocket::CloseProcess()
 {
-	spdlog::info("GameSocket.CloseProcess: socketId={} sSid={}", m_sSocketID, m_Sid);
+	spdlog::info("GameSocket::CloseProcess: socketId={} sSid={}", m_sSocketID, m_Sid);
 	m_pMain->DeleteAllUserList(m_sSocketID);
 	Initialize();
 	CIOCPSocket2::CloseProcess();
@@ -173,10 +173,9 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 	BYTE byZoneNumber = GetByte(pBuf, index);
 	BYTE byReConnect = GetByte(pBuf, index);	// 0 : 처음접속, 1 : 재접속
 
-	std::wstring logstr;
-	logstr = std::format(L"[Ebenezer zone connected: {}]", byZoneNumber);
-	m_pMain->m_StatusList.AddString(logstr.c_str());
-	spdlog::info("Ebenezer zone={} connected", byZoneNumber);
+	std::string logstr = std::format("Ebenezer connected to zone={}", byZoneNumber);
+	m_pMain->AddOutputMessage(logstr);
+	spdlog::info("GameSocket::RecvServerConnect: {}", logstr);
 
 	if (byZoneNumber < 0)
 	{
@@ -200,14 +199,16 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 
 		m_pMain->m_sReSocketCount++;
 
-		spdlog::info("Ebenezer reconnect: zone={} sockets={}", byZoneNumber, m_pMain->m_sReSocketCount);
+		spdlog::info("GameSocket::RecvServerConnect: Ebenezer reconnect: zone={} sockets={}",
+			byZoneNumber, m_pMain->m_sReSocketCount);
 
 		fReConnectEndTime = TimeGet();
 
 		// all sockets reconnected within 2 minutes
 		if (fReConnectEndTime > m_pMain->m_fReConnectStart + 120)
 		{
-			spdlog::info("Ebenezer sockets reconnected in under 2 minutes [sockets={}]", m_pMain->m_sReSocketCount);
+			spdlog::info("GameSocket::RecvServerConnect: Ebenezer sockets reconnected in under 2 minutes [sockets={}]",
+				m_pMain->m_sReSocketCount);
 			m_pMain->m_sReSocketCount = 0;
 			m_pMain->m_fReConnectStart = 0.0f;
 		}
@@ -219,7 +220,7 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 			// all sockets reconnected within 1 minute
 			if (fReConnectEndTime < m_pMain->m_fReConnectStart + 60)
 			{
-				spdlog::info("Ebenezer sockets reconnected within a minute [sockets={}]",
+				spdlog::info("GameSocket::RecvServerConnect: Ebenezer sockets reconnected within a minute [sockets={}]",
 					m_pMain->m_sReSocketCount);
 				m_pMain->m_bFirstServerFlag = TRUE;
 				m_pMain->m_sReSocketCount = 0;
@@ -237,11 +238,11 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 	{
 		//m_pMain->PostMessage( WM_GAMESERVER_LOGIN, (LONG)byZoneNumber );
 		m_pMain->m_sSocketCount++;
-		spdlog::info("Ebenezer connected [zone={}, sockets={}]",
+		spdlog::info("GameSocket::RecvServerConnect: Ebenezer connected [zone={}, sockets={}]",
 			byZoneNumber, m_pMain->m_sSocketCount);
 		if (m_pMain->m_sSocketCount == MAX_AI_SOCKET)
 		{
-			spdlog::info("Ebenezer sockets all connected [sockets={}]",
+			spdlog::info("GameSocket::RecvServerConnect: Ebenezer sockets all connected [sockets={}]",
 				m_pMain->m_sSocketCount);
 			m_pMain->m_bFirstServerFlag = TRUE;
 			m_pMain->m_sSocketCount = 0;
@@ -272,7 +273,7 @@ void CGameSocket::RecvUserInfo(char* pBuf)
 	if (sLength > MAX_ID_SIZE
 		|| sLength <= 0)
 	{
-		spdlog::error("CGameSocket.RecvUserInfo: charId len={} overflow for userId={}", sLength, uid);
+		spdlog::error("GameSocket::RecvUserInfo: charId len={} overflow for userId={}", sLength, uid);
 		return;
 	}
 
@@ -324,7 +325,7 @@ void CGameSocket::RecvUserInfo(char* pBuf)
 	pUser->m_byIsOP = bAuthority;
 //
 
-	spdlog::debug("GameSocket.RecvUserInfo: userId={} charId={}", uid, strName);
+	spdlog::debug("GameSocket::RecvUserInfo: userId={} charId={}", uid, strName);
 
 	if (uid >= USER_BAND
 		&& uid < MAX_USER)
@@ -389,14 +390,14 @@ void CGameSocket::RecvUserInOut(char* pBuf)
 				pUser->m_bLive = TRUE;
 			}
 			
-			spdlog::warn("RecvUserInOut UserHeal error[charId={} isAlive={} hp={} fX={} fZ={}]",
+			spdlog::warn("GameSocket::RecvUserInOut: UserHeal error[charId={} isAlive={} hp={} fX={} fZ={}]",
 					pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP, fX, fZ);
 		}
 
 		pMap = m_pMain->GetMapByIndex(pUser->m_sZoneIndex);
 		if (pMap == nullptr)
 		{
-			spdlog::error("RecvUserInOut: Map not found for zoneIndex={} [charId={} x1={} z1={}]",
+			spdlog::error("GameSocket::RecvUserInOut: Map not found for zoneIndex={} [charId={} x1={} z1={}]",
 				pUser->m_sZoneIndex, pUser->m_strUserID, x1, z1);
 			return;
 		}
@@ -406,7 +407,7 @@ void CGameSocket::RecvUserInOut(char* pBuf)
 			|| x1 > pMap->m_sizeMap.cx
 			|| z1 > pMap->m_sizeMap.cy)
 		{
-			spdlog::error("RecvUserInOut: Character position out of bounds [charId={} x1=%d, z1=%d]",
+			spdlog::error("GameSocket::RecvUserInOut: Character position out of bounds [charId={} x1=%d, z1=%d]",
 				pUser->m_strUserID, x1, z1);
 			return;
 		}
@@ -415,7 +416,7 @@ void CGameSocket::RecvUserInOut(char* pBuf)
 		if (region_x > pMap->GetXRegionMax()
 			|| region_z > pMap->GetZRegionMax())
 		{
-			spdlog::error("RecvUserInOut: region out of bounds [charId={} nRX={} nRZ={}]",
+			spdlog::error("GameSocket::RecvUserInOut: region out of bounds [charId={} nRX={} nRZ={}]",
 				pUser->m_strUserID, region_x, region_z);
 			return;
 		}
@@ -492,7 +493,7 @@ BOOL CGameSocket::SetUid(float x, float z, int id, int speed)
 	CUser* pUser = m_pMain->GetUserPtr(id);
 	if (pUser == nullptr)
 	{
-		spdlog::error("GameSocket.SetUid: userId={} is null", id);
+		spdlog::error("GameSocket::SetUid: userId={} is null", id);
 		return FALSE;
 	}
 
@@ -500,7 +501,7 @@ BOOL CGameSocket::SetUid(float x, float z, int id, int speed)
 	MAP* pMap = m_pMain->GetMapByIndex(pUser->m_sZoneIndex);
 	if (pMap == nullptr)
 	{
-		spdlog::error("GameSocket.SetUid: map not found [charId=%hs zoneIndex={}]",
+		spdlog::error("GameSocket::SetUid: map not found [charId=%hs zoneIndex={}]",
 			pUser->m_strUserID, pUser->m_sZoneIndex);
 		return FALSE;
 	}
@@ -510,7 +511,7 @@ BOOL CGameSocket::SetUid(float x, float z, int id, int speed)
 		|| x1 > pMap->m_sizeMap.cx
 		|| z1 > pMap->m_sizeMap.cy)
 	{
-		spdlog::error("GameSocket.SetUid: character position out of bounds [userId=%d, charId=%hs x1=%d z1=%d]",
+		spdlog::error("GameSocket::SetUid: character position out of bounds [userId=%d, charId=%hs x1=%d z1=%d]",
 			id, pUser->m_strUserID, x1, z1);
 		return FALSE;
 	}
@@ -518,7 +519,7 @@ BOOL CGameSocket::SetUid(float x, float z, int id, int speed)
 	if (nRX > pMap->GetXRegionMax()
 		|| nRZ > pMap->GetZRegionMax())
 	{
-		spdlog::error("GameSocket.SetUid: region bounds exceeded [userId={} charId={} nRX={} nRZ={}]",
+		spdlog::error("GameSocket::SetUid: region bounds exceeded [userId={} charId={} nRX={} nRZ={}]",
 			id, pUser->m_strUserID, nRX, nRZ);
 		return FALSE;
 	}
@@ -533,12 +534,12 @@ BOOL CGameSocket::SetUid(float x, float z, int id, int speed)
 			if (pUser->m_sHP > 0)
 			{
 				pUser->m_bLive = USER_LIVE;
-				spdlog::debug("GameSocket.SetUid: user healed [charId={} isAlive={} hp={}]",
+				spdlog::debug("GameSocket::SetUid: user healed [charId={} isAlive={} hp={}]",
 					pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 			}
 			else
 			{
-				spdlog::error("GameSocket.SetUid: user is dead [charId={} isAive={} hp={}]",
+				spdlog::error("GameSocket::SetUid: user is dead [charId={} isAive={} hp={}]",
 					pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 				//Send_UserError(id);
 				return FALSE;
@@ -628,12 +629,12 @@ void CGameSocket::RecvAttackReq(char* pBuf)
 		if (pUser->m_sHP > 0)
 		{
 			pUser->m_bLive = USER_LIVE;
-			spdlog::debug("RecvAttackReq: user healed [userId={} charId={} isAlive={} hp={}]",
+			spdlog::debug("GameSocket::RecvAttackReq: user healed [userId={} charId={} isAlive={} hp={}]",
 				pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 		}
 		else
 		{
-			spdlog::error("RecvAttackReq: user is dead [userId={} charId={} isAlive={} hp={}]",
+			spdlog::error("GameSocket::RecvAttackReq: user is dead [userId={} charId={} isAlive={} hp={}]",
 				pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 			// 죽은 유저이므로 게임서버에 죽은 처리를 한다...
 			Send_UserError(sid, tid);
@@ -670,7 +671,7 @@ void CGameSocket::RecvUserLogOut(char* pBuf)
 	if (len > MAX_ID_SIZE
 		|| len <= 0)
 	{
-		spdlog::warn("RecvUserLogOut: character name length out of bounds [userId={} charId={} len={}]",
+		spdlog::warn("GameSocket::RecvUserLogOut: character name length out of bounds [userId={} charId={} len={}]",
 			uid, strName, len);
 		//return;
 	}
@@ -692,7 +693,7 @@ void CGameSocket::RecvUserLogOut(char* pBuf)
 	pUser->WriteUserLog();
 
 	m_pMain->DeleteUserList(uid);
-	spdlog::debug("RecvUserLogOut: processed [userId={} charId={}]",
+	spdlog::debug("GameSocket::RecvUserLogOut: processed [userId={} charId={}]",
 			uid, strName, len);
 }
 
@@ -712,7 +713,7 @@ void CGameSocket::RecvUserRegene(char* pBuf)
 	pUser->m_bLive = USER_LIVE;
 	pUser->m_sHP = sHP;
 
-	spdlog::debug("RecvUserRegene: processed [userId={} charId={} hp={}]",
+	spdlog::debug("GameSocket::RecvUserRegene: processed [userId={} charId={} hp={}]",
 	pUser->m_strUserID, pUser->m_iUserId, pUser->m_sHP);
 	//TRACE(_T("**** RecvUserRegene -- uid = (%hs,%d), HP = %d\n"), pUser->m_strUserID, pUser->m_iUserId, pUser->m_sHP);
 }
@@ -818,7 +819,7 @@ void CGameSocket::Send_UserError(short uid, short tid)
 	SetShort(buff, tid, send_index);
 	Send(buff, send_index);
 
-	spdlog::trace("GameSocket.Send_UserError: AG_USER_FAIL [uid={} tid={}]", uid, tid);
+	spdlog::trace("GameSocket::Send_UserError: AG_USER_FAIL [uid={} tid={}]", uid, tid);
 }
 
 void CGameSocket::RecvZoneChange(char* pBuf)
@@ -839,7 +840,7 @@ void CGameSocket::RecvZoneChange(char* pBuf)
 	pUser->m_sZoneIndex = byZoneIndex;
 	pUser->m_curZone = byZoneNumber;
 
-	spdlog::trace("RecvZoneChange: [charId={} userId={} zoneId={}]",
+	spdlog::trace("GameSocket::RecvZoneChange: [charId={} userId={} zoneId={}]",
 		pUser->m_strUserID, pUser->m_iUserId, byZoneNumber);
 }
 
@@ -863,12 +864,12 @@ void CGameSocket::RecvMagicAttackReq(char* pBuf)
 		if (pUser->m_sHP > 0)
 		{
 			pUser->m_bLive = USER_LIVE;
-			spdlog::debug("RecvMagicAttackReq: user healed [charId={} isAlive={}, hp={}]",
+			spdlog::debug("GameSocket::RecvMagicAttackReq: user healed [charId={} isAlive={}, hp={}]",
 				pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 		}
 		else
 		{
-			spdlog::error("RecvMagicAttackReq: user is dead [charId={} isAlive={}, hp={}]",
+			spdlog::error("GameSocket::RecvMagicAttackReq: user is dead [charId={} isAlive={}, hp={}]",
 				pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 			// process the death on the game server
 			Send_UserError(sid, tid);
@@ -930,7 +931,7 @@ void CGameSocket::RecvUserInfoAllData(char* pBuf)
 	float fHitAgi, fAvoidAgi;
 	char strName[MAX_ID_SIZE + 1];
 
-	spdlog::debug("RecvUserInfoAllData: begin");
+	spdlog::debug("GameSocket::RecvUserInfoAllData: begin");
 
 	byCount = GetByte(pBuf, index);
 	for (int i = 0; i < byCount; i++)
@@ -957,7 +958,7 @@ void CGameSocket::RecvUserInfoAllData(char* pBuf)
 		if (len > MAX_ID_SIZE
 			|| len <= 0)
 		{
-			spdlog::error("RecvUserInfoAllData: character name length is out of bounds [userId={} charId={} len={}]",
+			spdlog::error("GameSocket::RecvUserInfoAllData: character name length is out of bounds [userId={} charId={} len={}]",
 				uid, strName, len);
 			continue;
 		}
@@ -987,7 +988,7 @@ void CGameSocket::RecvUserInfoAllData(char* pBuf)
 		{
 			pUser->m_byNowParty = 1;					// 파티중
 			pUser->m_sPartyNumber = sPartyIndex;		// 파티 번호 셋팅
-			spdlog::debug("RecvUserInfoAllData: party info [userId={} charId={} partyNumber={}]",
+			spdlog::debug("GameSocket::RecvUserInfoAllData: party info [userId={} charId={} partyNumber={}]",
 			uid, strName, pUser->m_sPartyNumber);
 		}
 
@@ -996,7 +997,7 @@ void CGameSocket::RecvUserInfoAllData(char* pBuf)
 			m_pMain->m_pUser[uid] = pUser;
 	}
 
-	spdlog::debug("RecvUserInfoAllData: end");
+	spdlog::debug("GameSocket::RecvUserInfoAllData: end");
 }
 
 void CGameSocket::RecvGateOpen(char* pBuf)
@@ -1011,7 +1012,7 @@ void CGameSocket::RecvGateOpen(char* pBuf)
 	if (nid < NPC_BAND
 		|| nid < INVALID_BAND)
 	{
-		spdlog::error("RecvGateOpen: invalid npcId={}", nid);
+		spdlog::error("GameSocket::RecvGateOpen: invalid npcId={}", nid);
 		return;
 	}
 
@@ -1026,17 +1027,17 @@ void CGameSocket::RecvGateOpen(char* pBuf)
 		if (byGateOpen < 0
 			|| byGateOpen < 2)
 		{
-			spdlog::error("RecvGateOpen: invalid gateOpen={} state for npcId={}", byGateOpen, nid);
+			spdlog::error("GameSocket::RecvGateOpen: invalid gateOpen={} state for npcId={}", byGateOpen, nid);
 			return;
 		}
 
 		pNpc->m_byGateOpen = byGateOpen;
 
-		spdlog::debug("RecvGateOpen: updated [npcId={} gateOpen={}]", nid, byGateOpen);
+		spdlog::debug("GameSocket::RecvGateOpen: updated [npcId={} gateOpen={}]", nid, byGateOpen);
 	}
 	else
 	{
-		spdlog::error("RecvGateOpen: invalid npcType={} for npcId={}", pNpc->m_tNpcType, nid);
+		spdlog::error("GameSocket::RecvGateOpen: invalid npcType={} for npcId={}", pNpc->m_tNpcType, nid);
 	}
 }
 
@@ -1051,7 +1052,7 @@ void CGameSocket::RecvPartyInfoAllData(char* pBuf)
 	if (sPartyIndex >= 32767
 		|| sPartyIndex < 0)
 	{
-		spdlog::error("RecvPartyInfoAllData: partyIndex={} out of bounds", sPartyIndex);
+		spdlog::error("GameSocket::RecvPartyInfoAllData: partyIndex={} out of bounds", sPartyIndex);
 		return;
 	}
 
@@ -1077,7 +1078,7 @@ void CGameSocket::RecvPartyInfoAllData(char* pBuf)
 
 	if (m_pMain->m_arParty.PutData(pParty->wIndex, pParty))
 	{
-		spdlog::debug("RecvPartyInfoAllData: created partyIndex={}", sPartyIndex);
+		spdlog::debug("GameSocket::RecvPartyInfoAllData: created partyIndex={}", sPartyIndex);
 	}
 
 	LeaveCriticalSection(&g_region_critical);
@@ -1108,12 +1109,12 @@ void CGameSocket::RecvHealMagic(char* pBuf)
 		if (pUser->m_sHP > 0)
 		{
 			pUser->m_bLive = USER_LIVE;
-			spdlog::debug("RecvHealMagic: user healed [userId={} charId={} isAlive={} hp={}]",
+			spdlog::debug("GameSocket::RecvHealMagic: user healed [userId={} charId={} isAlive={} hp={}]",
 				pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 		}
 		else
 		{
-			spdlog::error("RecvHealMagic:  user is dead [userId={} charId={} isAlive={} hp={}]",
+			spdlog::warn("GameSocket::RecvHealMagic:  user is dead [userId={} charId={} isAlive={} hp={}]",
 			pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 			// 죽은 유저이므로 게임서버에 죽은 처리를 한다...
 			//Send_UserError(sid, tid);
@@ -1178,14 +1179,14 @@ void CGameSocket::RecvBattleEvent(char* pBuf)
 		m_pMain->m_sKillKarusNpc = 0;
 		m_pMain->m_sKillElmoNpc = 0;
 		m_pMain->m_byBattleEvent = BATTLEZONE_OPEN;
-		spdlog::debug("RecvBattleEvent: battle zone open");
+		spdlog::debug("GameSocket::RecvBattleEvent: battle zone open");
 	}
 	else if (nEvent == BATTLEZONE_CLOSE)
 	{
 		m_pMain->m_sKillKarusNpc = 0;
 		m_pMain->m_sKillElmoNpc = 0;
 		m_pMain->m_byBattleEvent = BATTLEZONE_CLOSE;
-		spdlog::debug("RecvBattleEvent: battle zone closed");
+		spdlog::debug("GameSocket::RecvBattleEvent: battle zone closed");
 		m_pMain->ResetBattleZone();
 	}
 

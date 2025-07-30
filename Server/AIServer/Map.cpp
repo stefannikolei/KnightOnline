@@ -331,7 +331,7 @@ void MAP::RegionNpcAdd(int rx, int rz, int nid)
 	if (!region->m_RegionNpcArray.PutData(nid, pInt))
 	{
 		delete pInt;
-		spdlog::error("MAP::RegionNpcAdd: RegionNpcArray put failed [x={} z={} npcId={}]", rx, rz, nid);
+		spdlog::error("Map::RegionNpcAdd: RegionNpcArray put failed [x={} z={} npcId={}]", rx, rz, nid);
 	}
 
 	int nSize = m_ppRegion[rx][rz].m_RegionNpcArray.GetSize();
@@ -399,7 +399,7 @@ void MAP::LoadMapTile(HANDLE hFile)
 		//	m_pMap[j][i].m_dwType = 0;
 		}
 	}
-	spdlog::trace("MAP::LoadMapTile: move count={}", count);
+	spdlog::trace("Map::LoadMapTile: move count={}", count);
 
 /*	FILE* stream = fopen("c:\\move1.txt", "w");
 
@@ -498,7 +498,7 @@ void MAP::LoadObjectEvent(HANDLE hFile)
 
 		if (!m_ObjectEventArray.PutData(pEvent->sIndex, pEvent))
 		{
-			spdlog::error("MAP::LoadObjectEvent: ObjectEventArray put failed [eventId={} zoneId={}]",
+			spdlog::error("Map::LoadObjectEvent: ObjectEventArray put failed [eventId={} zoneId={}]",
 				pEvent->sIndex, m_nZoneNumber);
 			delete pEvent;
 			pEvent = nullptr;
@@ -579,7 +579,7 @@ BOOL MAP::LoadRoomEvent(int zone_number)
 
 				if (m_arRoomEventArray.GetData(event_num) != nullptr)
 				{
-					spdlog::error("MAP::LoadRoomEvent: Duplicate event definition [eventId={} zoneId={}]",
+					spdlog::error("Map::LoadRoomEvent: Duplicate event definition [eventId={} zoneId={}]",
 						event_num, m_nZoneNumber);
 					goto cancel_event_load;
 				}
@@ -786,7 +786,7 @@ int MAP::IsRoomCheck(float fx, float fz)
 				pRoom->m_byStatus = 2;	// 진행중 상태로 방상태 변환
 				pRoom->m_fDelayTime = TimeGet();
 				room_number = i;
-				spdlog::trace("MAP::IsRoomCheck: [roomEventId={} zoneId={} x={} z={}]",
+				spdlog::trace("Map::IsRoomCheck: [roomEventId={} zoneId={} x={} z={}]",
 					i, m_nZoneNumber, nX, nZ);
 				//wsprintf(notify, "** 알림 : [%d Zone][%d] 방에 들어오신것을 환영합니다 **", m_nZoneNumber, pRoom->m_sRoomNumber);
 				//m_pMain->SendSystemMsg( notify, m_nZoneNumber, PUBLIC_CHAT, SEND_ALL);
@@ -811,7 +811,7 @@ CRoomEvent* MAP::SetRoomEvent(int number)
 	CRoomEvent* pEvent = m_arRoomEventArray.GetData(number);
 	if (pEvent != nullptr)
 	{
-		spdlog::error("MAP::SetRoomEvent: RoomEvent duplicate definition [roomEventId={} zoneId={}]",
+		spdlog::error("Map::SetRoomEvent: RoomEvent duplicate definition [roomEventId={} zoneId={}]",
 			number, m_nZoneNumber);
 		return nullptr;
 	}
@@ -844,7 +844,7 @@ BOOL MAP::IsRoomStatusCheck()
 		pRoom = m_arRoomEventArray.GetData(i);
 		if (pRoom == nullptr)
 		{
-			spdlog::warn("MAP::IsRoomStatusCheck: RoomEvent null [roomEventId={} zoneId={}",
+			spdlog::warn("Map::IsRoomStatusCheck: RoomEvent null [roomEventId={} zoneId={}",
 				i, m_nZoneNumber);
 			continue;
 			//return nullptr;
@@ -862,7 +862,7 @@ BOOL MAP::IsRoomStatusCheck()
 				if (nTotalRoom == nClearRoom)
 				{
 					m_byRoomStatus = 2;
-					spdlog::trace("MAP::IsRoomStatusCheck: all rooms cleared [zoneId={} roomType={} roomStatus={}]",
+					spdlog::trace("Map::IsRoomStatusCheck: all rooms cleared [zoneId={} roomType={} roomStatus={}]",
 						m_nZoneNumber, m_byRoomType, m_byRoomStatus);
 					return TRUE;
 				}
@@ -880,7 +880,7 @@ BOOL MAP::IsRoomStatusCheck()
 				if (nTotalRoom == nClearRoom)
 				{
 					m_byRoomStatus = 3;
-					spdlog::trace("MAP::IsRoomStatusCheck: room initialized [zoneId={} roomType={} roomStatus={}]",
+					spdlog::trace("Map::IsRoomStatusCheck: room initialized [zoneId={} roomType={} roomStatus={}]",
 						m_nZoneNumber, m_byRoomType, m_byRoomStatus);
 					return TRUE;
 				}
@@ -891,7 +891,7 @@ BOOL MAP::IsRoomStatusCheck()
 		{
 			m_byRoomStatus = 1;
 			m_byInitRoomCount = 0;
-			spdlog::trace("MAP::IsRoomStatusCheck: room restarted [zoneId={} roomType={} roomStatus={}]",
+			spdlog::trace("Map::IsRoomStatusCheck: room restarted [zoneId={} roomType={} roomStatus={}]",
 						m_nZoneNumber, m_byRoomType, m_byRoomStatus);
 			return TRUE;
 		}
@@ -910,7 +910,7 @@ void MAP::InitializeRoom()
 		pRoom = m_arRoomEventArray.GetData(i);
 		if (pRoom == nullptr)
 		{
-			spdlog::error("MAP::InitializeRoom: RoomEvent null [roomEventId={} zoneId={}]",
+			spdlog::error("Map::InitializeRoom: RoomEvent null [roomEventId={} zoneId={}]",
 				i, m_nZoneNumber);
 			continue;
 		}

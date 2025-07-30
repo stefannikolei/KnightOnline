@@ -9,14 +9,31 @@ namespace spdlog::details
 	class thread_pool;
 }
 
-/// \brief Sets up spdlog from an ini file using standardized server settings
-/// \param ini server application's ini file (already loaded)
-/// \param name application name (VersionManager, Aujard, AIServer, Ebenezer)
-void SetupLogger(CIni& ini, const std::string& name);
+namespace logger
+{
+	/// \brief Sets up spdlog from an ini file using standardized server settings
+	/// \param ini server application's ini file (already loaded)
+	/// \param name application name (VersionManager, Aujard, AIServer, Ebenezer)
+	void SetupLogger(CIni& ini, const std::string& name);
 
-void SetupExtraLogger(CIni& ini, const std::string& appName,
-	const std::string& logFileConfigProp,
-	std::shared_ptr<spdlog::details::thread_pool> threadPool);
+	void SetupExtraLogger(CIni& ini, const std::string& appName,
+		const std::string& logFileConfigProp,
+		std::shared_ptr<spdlog::details::thread_pool> threadPool);
+
+	// setup defaults
+	static constexpr uint16_t messageQueueSize = 8196;
+	static constexpr uint8_t threadPoolSize = 1;
+	
+	// application names used by our loggers
+	static constexpr char AIServer[] = "AIServer";
+	static constexpr char AIServerItem[] = "AIServerItem";
+	static constexpr char AIServerUser[] = "AIServerUser";
+	static constexpr char Ebenezer[] = "Ebenezer";
+	static constexpr char EbenezerEvent[] = "EbenezerEvent";
+	static constexpr char EbenezerRegion[] = "EbenezerRegion";
+	static constexpr char Aujard[] = "Aujard";
+	static constexpr char VersionManager[] = "VersionManager";
+}
 
 namespace ini
 {
@@ -32,17 +49,4 @@ namespace ini
 
 	/// \brief default logger line prefix ([12:59:59][AppName][  level] log line...)
 	static constexpr char DEFAULT_LOG_PATTERN[] = "[%H:%M:%S][%n][%7l] %v";
-}
-
-/// \brief contains the application names used by our loggers
-namespace logger
-{
-	static constexpr char AIServer[] = "AIServer";
-	static constexpr char AIServerItem[] = "AIServerItem";
-	static constexpr char AIServerUser[] = "AIServerUser";
-	static constexpr char Ebenezer[] = "Ebenezer";
-	static constexpr char EbenezerEvent[] = "EbenezerEvent";
-	static constexpr char EbenezerRegion[] = "EbenezerRegion";
-	static constexpr char Aujard[] = "Aujard";
-	static constexpr char VersionManager[] = "VersionManager";
 }

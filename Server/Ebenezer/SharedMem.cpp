@@ -5,8 +5,8 @@
 #include "stdafx.h"
 #include "SharedMem.h"
 
-#include <codecvt>
 #include <process.h>
+#include <shared/StringConversion.h>
 #include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
@@ -72,9 +72,8 @@ BOOL CSharedMemQueue::InitailizeMMF(DWORD dwOffsetsize, int maxcount, LPCTSTR lp
 	if (lpname != nullptr)
 	{
 		std::wstring lpStr = lpname;
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-		std::string lpStrA = converter.to_bytes(lpStr);
-		spdlog::trace("SharedMem::InitializeMMF: {} Address : {}\n", lpStrA, m_lpMMFile);
+		std::string lpStrA = WideToUtf8(lpStr);
+		spdlog::trace("SharedMem::InitializeMMF: {} Address : {}", lpStrA, m_lpMMFile);
 	}
 	
 	m_bMMFCreate	= bCreate;

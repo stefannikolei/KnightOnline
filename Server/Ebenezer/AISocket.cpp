@@ -160,7 +160,7 @@ void CAISocket::LoginProcess(char* pBuf)
 	BYTE byReConnect = GetByte(pBuf, index);
 	
 	// zone 틀리면 에러 
-	if (zone == -1)
+	if (zone == 0xff)
 	{
 		AfxMessageBox(_T("AI Server Version Fail!!"));
 	}
@@ -168,7 +168,7 @@ void CAISocket::LoginProcess(char* pBuf)
 	else
 	{
 		std::wstring logstr = std::format(L"AIServer zone connected: {}", zone);
-		m_pMain->m_StatusList.AddString(logstr.c_str());
+		m_pMain->AddOutputMessage(logstr);
 		spdlog::info("AISocket::LoginProcess: AIServer zone={} connected", zone);
 
 		if (byReConnect == 0)
@@ -243,14 +243,14 @@ void CAISocket::RecvServerInfo(char* pBuf)
 	{
 		short sTotalMonster = GetShort(pBuf, index);
 		std::wstring logStr = std::format(L"NPC info received for zoneId {}", byZone);
-		m_pMain->m_StatusList.AddString(logStr.c_str());
+		m_pMain->AddOutputMessage(logStr);
 		//Sleep(100);
 
 		m_pMain->m_sZoneCount++;
 		
 		if (m_pMain->m_sZoneCount == size)
 		{
-			m_pMain->m_StatusList.AddString(_T("NPC info received for all zones"));
+			m_pMain->AddOutputMessage(_T("NPC info received for all zones"));
 			if (!m_pMain->m_bFirstServerFlag)
 			{
 				m_pMain->UserAcceptThread();
@@ -1068,7 +1068,7 @@ void CAISocket::RecvUserExp(char* pBuf)
 	short sLoyalty = GetShort(pBuf, index);
 
 	CUser* pUser = (CUser*) m_pMain->m_Iocport.m_SockArray[userId];
-	if (pUser == nullptr || pUser->m_pUserData == nullptr)
+	if (pUser == nullptr)
 	{
 		spdlog::error("AISocket::RecvUserExp: attempting to grant exp or loyalty to invalid user [userId={}]",
 			userId, pUser->m_pUserData->m_id, sExp, sLoyalty);
@@ -1531,7 +1531,7 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 				{
 					std::wstring logStr = std::format(L"WIZ_BATTLE_EVENT send fail [retValue={} type={}]",
 						retvalue, nType);
-					m_pMain->m_StatusList.AddString(logStr.c_str());
+					m_pMain->AddOutputMessage(logStr);
 					spdlog::error("AISocket::RecvBattleEvent: WIZ_BATTLE_EVENT send fail [retValue={} type={}]",
 						retvalue, nType);
 				}

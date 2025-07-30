@@ -62,7 +62,7 @@ bool CDBAgent::InitDatabase()
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.InitDatabase(gameConn)");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::InitDatabase(gameConn)");
 		return false;
 	}
 
@@ -74,7 +74,7 @@ bool CDBAgent::InitDatabase()
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.InitDatabase(accountConn)");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::InitDatabase(accountConn)");
 		return false;
 	}
 
@@ -100,13 +100,15 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 	_USER_DATA* user =  UserData[userId];
 	if (user == nullptr)
 	{
-		spdlog::error("LoadUserData(): UserData[{}] not found for charId={}", userId, charId);
+		spdlog::error("DBAgent::LoadUserData: UserData[{}] not found for charId={}",
+			userId, charId);
 		return false;
 	}
 
 	if (user->m_bLogout)
 	{
-		spdlog::error("LoadUserData(): logout error: charId={}, logout={}", charId, user->m_bLogout);
+		spdlog::error("DBAgent::LoadUserData: logout error: charId={}, logout={}",
+			charId, user->m_bLogout);
 		return false;
 	}
 
@@ -130,12 +132,12 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 		auto result = weak_result.lock();
 		if (result == nullptr)
 		{
-			throw db::ApplicationError("expected result set");
+			throw db::ApplicationError("DBAgent::LoadUserData: expected result set");
 		}
 
 		if (!result->next())
 		{
-			throw db::ApplicationError("expected row in result set");
+			throw db::ApplicationError("DBAgent::LoadUserData: expected row in result set");
 		}
 
 		// THIS IS WHERE THE FUN STARTS
@@ -204,14 +206,14 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.LoadUserData()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::LoadUserData()");
 		return false;
 	}
 	
 	// data successfully loaded from the database, copy to UserData record
 	if (strcpy_s(user->m_id, charId))
 	{
-		spdlog::error("LoadUserData(): failed to write charId(len: {}, val: {}) to user->m_id",
+		spdlog::error("DBAgent::LoadUserData(): failed to write charId(len: {}, val: {}) to user->m_id",
 			std::strlen(charId), charId);
 		return false;
 	}
@@ -250,7 +252,7 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 	user->m_iMannerPoint = MannerPoint;
 	user->m_iLoyaltyMonthly = LoyaltyMonthly;
 
-	spdlog::debug("LoadUserData: name={}, nation={}, zone={}, level={}, exp={}, money={}",
+	spdlog::debug("DBAgent::LoadUserData: name={}, nation={}, zone={}, level={}, exp={}, money={}",
 		charId, Nation, Zone, Level, Exp, Gold);
 	
 
@@ -295,7 +297,7 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 				user->m_sItemArray[i].sCount = count;
 			}
 
-			spdlog::debug("{} : {} slot ({} : {})",
+			spdlog::debug("DBAgent::LoadUserData: {} : {} slot ({} : {})",
 				user->m_id, i, user->m_sItemArray[i].nNum, user->m_sItemArray[i].nSerialNum);
 		}
 		else
@@ -309,7 +311,7 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 
 			if (itemId > 0)
 			{
-				spdlog::error("Item Drop : charId={}, itemId={}", charId, itemId);
+				spdlog::error("DBAgent::LoadUserData: Item Drop [charId={} itemId={}]", charId, itemId);
 			}
 		}
 	}
@@ -461,7 +463,7 @@ bool CDBAgent::UpdateUser(const char* charId, int userId, int updateType)
 		if (item.nNum > 0)
 		{
 			if (_main->ItemArray.GetData(item.nNum) == nullptr)
-				spdlog::debug("Item Drop Saved({}) : {} ({})", i, item.nNum, user->m_id);
+				spdlog::debug("DBAgent::UpdateUser: Item Drop Saved({}) : {} ({})", i, item.nNum, user->m_id);
 		}
 
 		items
@@ -496,19 +498,19 @@ bool CDBAgent::UpdateUser(const char* charId, int userId, int updateType)
 		auto result = weak_result.lock();
 		if (result == nullptr)
 		{
-			throw db::ApplicationError("expected result set");
+			throw db::ApplicationError("DBAgent::UpdateUser: expected result set");
 		}
 
 		// affected_rows will be -1 if unavailable should be 1 if available
 		if (result->affected_rows() == 0)
 		{
-			spdlog::error("UpdateUser(): No rows affected for charId={}", charId);
+			spdlog::error("DBAgent::UpdateUser: No rows affected for charId={}", charId);
 			return false;
 		}
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.LoadUserData()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::UpdateUser()");
 		return false;
 	}
 	
@@ -529,7 +531,7 @@ int CDBAgent::AccountLogInReq(char* accountId, char* password)
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.AccountLogInReq()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::AccountLogInReq()");
 		return false;
 	}
 	
@@ -551,7 +553,7 @@ bool CDBAgent::NationSelect(char* accountId, int nation)
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.NationSelect()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::NationSelect()");
 		return false;
 	}
 
@@ -581,7 +583,7 @@ int CDBAgent::CreateNewChar(char* accountId, int index, char* charId, int race, 
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.CreateNewChar()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::CreateNewChar()");
 		return -1;
 	}
 
@@ -622,12 +624,12 @@ bool CDBAgent::LoadCharInfo(char* charId_, char* buff, int& buffIndex)
 			// so at this point we're only requesting character names that we expect to exist.
 			if (result == nullptr)
 			{
-				throw db::ApplicationError("expected result set");
+				throw db::ApplicationError("DBAgent::LoadCharInfo: expected result set");
 			}
 
 			if (!result->next())
 			{
-				throw db::ApplicationError("expected row in result set");
+				throw db::ApplicationError("DBAgent::LoadCharInfo: expected row in result set");
 			}
 
 			Race = result->get<uint8_t>(0);
@@ -645,7 +647,7 @@ bool CDBAgent::LoadCharInfo(char* charId_, char* buff, int& buffIndex)
 		}
 		catch (const nanodbc::database_error& dbErr)
 		{
-			db::utils::LogDatabaseError(dbErr, "DBProcess.LoadCharInfo()");
+			db::utils::LogDatabaseError(dbErr, "DBAgent::LoadCharInfo()");
 			return false;
 		}
 	}
@@ -703,7 +705,7 @@ bool CDBAgent::GetAllCharID(const char* accountId, char* charId1_, char* charId2
 		if (result == nullptr
 			|| !result->next())
 		{
-			spdlog::error("GetAllCharID(): No rows selected for accountId={}", accountId);
+			spdlog::error("DBAgent::GetAllCharID: No rows selected for accountId={}", accountId);
 			return false;
 		}
 
@@ -718,27 +720,27 @@ bool CDBAgent::GetAllCharID(const char* accountId, char* charId1_, char* charId2
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.GetAllCharID()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::GetAllCharID()");
 		return false;
 	}
 
 	if (strcpy_s(charId1_, MAX_ID_SIZE + 1, charId1.c_str()))
 	{
-		spdlog::error("GetAllCharID(): failed to write charId1(len: {}, val: {}) to charId1",
+		spdlog::error("DBAgent::GetAllCharID: failed to write charId1(len: {}, val: {}) to charId1_",
 			charId1.length(), charId1);
 		return false;
 	}
 
 	if (strcpy_s(charId2_, MAX_ID_SIZE + 1, charId2.c_str()))
 	{
-		spdlog::error("GetAllCharID(): failed to write charId2(len: {}, val: {}) to charId2",
+		spdlog::error("DBAgent::GetAllCharID: failed to write charId2(len: {}, val: {}) to charId2_",
 			charId2.length(), charId2);
 		return false;
 	}
 
 	if (strcpy_s(charId3_, MAX_ID_SIZE + 1, charId3.c_str()))
 	{
-		spdlog::error("GetAllCharID(): failed to write charId3(len: {}, val: {}) to charId3",
+		spdlog::error("DBAgent::GetAllCharID: failed to write charId3(len: {}, val: {}) to charId3_",
 			charId3.length(), charId3);
 		return false;
 	}
@@ -760,13 +762,13 @@ int CDBAgent::CreateKnights(int knightsId, int nation, char* name, char* chief, 
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.CreateKnights()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::CreateKnights()");
 		retCode = 6;
 	}
 
 	if (retCode == 6)
 	{
-		spdlog::error("CreateKnights(): database error creating knights (knightsId={}, nation={}, name={}, chief={}, flag={}",
+		spdlog::error("DBAgent::CreateKnights: database error creating knights (knightsId={}, nation={}, name={}, chief={}, flag={}",
 			knightsId, nation, name, chief, flag);
 	}
 
@@ -787,7 +789,7 @@ int CDBAgent::UpdateKnights(int type, char* charId, int knightsId, int dominatio
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.UpdateKnights()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::UpdateKnights()");
 		return 2;
 	}
 
@@ -808,7 +810,7 @@ int CDBAgent::DeleteKnights(int knightsId)
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.DeleteKnights()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::DeleteKnights()");
 		return 7;
 	}
 
@@ -868,13 +870,13 @@ int CDBAgent::LoadKnightsAllMembers(int knightsId, int start, char* buffOut, int
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.LoadKnightsAllMembers()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::LoadKnightsAllMembers()");
 		return 0;
 	}
 
 	if (rowCount == 0)
 	{
-		spdlog::error("LoadKnightsAllMembers(): No rows selected for knightsId={}", knightsId);
+		spdlog::error("DBAgent::LoadKnightsAllMembers: No rows selected for knightsId={}", knightsId);
 	}
 
 	// clamp result so that start doesn't send rowCount negative
@@ -893,7 +895,7 @@ bool CDBAgent::UpdateConCurrentUserCount(int serverId, int zoneId, int userCount
 		auto conn = db::ConnectionManager::CreatePoolConnection(modelUtil::DbType::ACCOUNT, DB_PROCESS_TIMEOUT);
 		if (conn == nullptr)
 		{
-			throw db::ApplicationError("failed to allocate pool connection");
+			throw db::ApplicationError("DBAgent::UpdateConCurrentUserCount: failed to allocate pool connection");
 		}
 
 		nanodbc::statement stmt = conn->CreateStatement(updateQuery);
@@ -903,7 +905,7 @@ bool CDBAgent::UpdateConCurrentUserCount(int serverId, int zoneId, int userCount
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.UpdateConCurrentUserCount()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::UpdateConCurrentUserCount()");
 		return false;
 	}
 
@@ -920,7 +922,7 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 	if (user == nullptr
 		|| strlen(user->m_id) == 0)
 	{
-		spdlog::error("LoadWarehouseData(): called for inactive userId={}", userId);
+		spdlog::error("DBAgent::LoadWarehouseData: called for inactive userId={}", userId);
 		return false;
 	}
 	
@@ -937,7 +939,7 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 		auto stmt = recordSet.prepare(sql);
 		if (stmt == nullptr)
 		{
-			throw db::ApplicationError("statement could not be allocated");
+			throw db::ApplicationError("DBAgent::LoadWarehouseData: statement could not be allocated");
 		}
 
 		stmt->bind(0, accountId);
@@ -945,7 +947,7 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 
 		if (!recordSet.next())
 		{
-			spdlog::error("LoadWarehouseData(): No rows selected for accountId={}", accountId);
+			spdlog::error("DBAgent::LoadWarehouseData: No rows selected for accountId={}", accountId);
 			return false;
 		}
 
@@ -960,7 +962,7 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.LoadWarehouseData()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::LoadWarehouseData()");
 		return false;
 	}
 
@@ -986,7 +988,7 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 
 			user->m_sWarehouseArray[i].sCount = count;
 			user->m_sWarehouseArray[i].nSerialNum = serialNumber;
-			spdlog::trace("{}: {} ware slot ({} : {})",
+			spdlog::trace("DBAgent::LoadWarehouseData: {}: {} ware slot ({} : {})",
 				user->m_id, i, user->m_sWarehouseArray[i].nNum, user->m_sWarehouseArray[i].nSerialNum);
 		}
 		else
@@ -997,7 +999,7 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 
 			if (itemId > 0)
 			{
-				spdlog::error("LoadWarehouseData(): item dropped itemId={} accountId={}",
+				spdlog::error("DBAgent::LoadWarehouseData: item dropped itemId={} accountId={}",
 					itemId, accountId);
 			}
 		}
@@ -1017,14 +1019,14 @@ bool CDBAgent::UpdateWarehouseData(const char* accountId, int userId, int update
 	if (pUser == nullptr
 		|| strlen(accountId) == 0)
 	{
-		spdlog::error("UpdateWarehouseData(): called with inactive userId={} accountId={}",
+		spdlog::error("DBAgent::UpdateWarehouseData: called with inactive userId={} accountId={}",
 					userId, accountId);
 		return false;
 	}
 
 	if (_strnicmp(pUser->m_Accountid, accountId, MAX_ID_SIZE) != 0)
 	{
-		spdlog::error("UpdateWarehouseData(): accountId mismatch user.accountId={} accountId={}",
+		spdlog::error("DBAgent::UpdateWarehouseData: accountId mismatch user.accountId={} accountId={}",
 					pUser->m_Accountid, accountId);
 		return false;
 	}
@@ -1062,19 +1064,19 @@ bool CDBAgent::UpdateWarehouseData(const char* accountId, int userId, int update
 		auto result = weak_result.lock();
 		if (result == nullptr)
 		{
-			throw db::ApplicationError("expected result set");
+			throw db::ApplicationError("DBAgent::UpdateWarehouseData: expected result set");
 		}
 
 		// affected_rows will be -1 if unavailable should be 1 if available
 		if (result->affected_rows() == 0)
 		{
-			spdlog::error("UpdateWarehouseData(): No rows affected for accountId={}", accountId);
+			spdlog::error("DBAgent::UpdateWarehouseData: No rows affected for accountId={}", accountId);
 			return false;
 		}
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.UpdateWarehouseData()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::UpdateWarehouseData()");
 		return false;
 	}
 
@@ -1100,7 +1102,7 @@ bool CDBAgent::LoadKnightsInfo(int knightsId, char* buffOut, int& buffIndex)
 		auto stmt = recordSet.prepare(sql);
 		if (stmt == nullptr)
 		{
-			throw db::ApplicationError("statement could not be allocated");
+			throw db::ApplicationError("DBAgent::LoadKnightsInfo: statement could not be allocated");
 		}
 
 		stmt->bind(0, &knightsId);
@@ -1108,14 +1110,14 @@ bool CDBAgent::LoadKnightsInfo(int knightsId, char* buffOut, int& buffIndex)
 
 		if (!recordSet.next())
 		{
-			spdlog::error("LoadKnightsInfo(): No rows selected for knightsId={}", knightsId);
+			spdlog::error("DBAgent::LoadKnightsInfo: No rows selected for knightsId={}", knightsId);
 			return false;
 		}
 
 		model::Knights knights = recordSet.get();
 		if (knights.Name.length() > MAX_ID_SIZE)
 		{
-			spdlog::error("LoadKnightsInfo(): knights.Name(len: {}, val: {}) exceeds length",
+			spdlog::error("DBAgent::LoadKnightsInfo: knights.Name(len: {}, val: {}) exceeds length",
 				knights.Name.length(), knights.Name);
 			return false;
 		}
@@ -1128,7 +1130,7 @@ bool CDBAgent::LoadKnightsInfo(int knightsId, char* buffOut, int& buffIndex)
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.LoadKnightsInfo()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::LoadKnightsInfo()");
 		return false;
 	}
 
@@ -1160,7 +1162,7 @@ bool CDBAgent::SetLogInInfo(const char* accountId, const char* charId, const cha
 	}
 	else
 	{
-		spdlog::error("SetLogInInfo(): invalid init code specified (init: {}) for accountId={}",
+		spdlog::error("DBAgent::SetLogInInfo: invalid init code specified (init: {}) for accountId={}",
 			init, accountId);
 		return false;
 	}
@@ -1178,13 +1180,13 @@ bool CDBAgent::SetLogInInfo(const char* accountId, const char* charId, const cha
 		// affected_rows will be -1 if unavailable should be 1 if available
 		if (result.affected_rows() == 0)
 		{
-			spdlog::error("SetLogInInfo(): No rows affected for accountId={}", accountId);
+			spdlog::error("DBAgent::SetLogInInfo: No rows affected for accountId={}", accountId);
 			return false;
 		}
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.SetLogInInfo()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::SetLogInInfo()");
 		return false;
 	}
 
@@ -1208,25 +1210,25 @@ bool CDBAgent::AccountLogout(const char* accountId, int logoutCode)
 		auto result = weak_result.lock();
 		if (result == nullptr)
 		{
-			throw nanodbc::database_error(nullptr, 0, "expected result set");
+			throw nanodbc::database_error(nullptr, 0, "DBAgent::AccountLogout: expected result set");
 		}
 
 		// affected_rows will be -1 if unavailable should be 1 if available
 		if (result->affected_rows() == 0)
 		{
-			spdlog::error("AccountLogout(): No rows affected for accountId={}", accountId);
+			spdlog::error("DBAgent::AccountLogout: No rows affected for accountId={}", accountId);
 			return false;
 		}
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.AccountLogout()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::AccountLogout()");
 		return false;
 	}
 
 	if (ret1 != 1)
 	{
-		spdlog::debug("AccountLogout(): ret1 not updated by proc for accountId={}", accountId);
+		spdlog::debug("DBAgent::AccountLogout: ret1 not updated by proc for accountId={}", accountId);
 		//return false;
 	}
 
@@ -1269,7 +1271,7 @@ bool CDBAgent::CheckUserData(const char* accountId, const char* charId, int chec
 
 		if (!result.next())
 		{
-			spdlog::error("CheckUserData(): No rows affected for accountId={} charId={}", accountId, charId);
+			spdlog::error("DBAgent::CheckUserData: No rows affected for accountId={} charId={}", accountId, charId);
 			return false;
 		}
 
@@ -1278,14 +1280,14 @@ bool CDBAgent::CheckUserData(const char* accountId, const char* charId, int chec
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.CheckUserData()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::CheckUserData()");
 		return false;
 	}
 
 	if (dbTime != userUpdateTime
 		|| dbData != compareData)
 	{
-		spdlog::error("CheckUserData(): data mismatch dbTime(expected: {}, actual: {}) dbData(expected: {}, actual: {})\r\n",
+		spdlog::error("DBAgent::CheckUserData: data mismatch dbTime(expected: {}, actual: {}) dbData(expected: {}, actual: {})",
 			userUpdateTime, dbTime,
 			compareData, dbData);
 		return false;
@@ -1354,8 +1356,8 @@ void CDBAgent::LoadKnightsAllList(int nation)
 
 				if (retryCount >= maxRetry)
 				{
-					_main->OutputList.AddString(_T("Packet Drop: KNIGHTS_ALLLIST_REQ"));
-					spdlog::error("Packet Drop: KNIGHTS_ALLLIST_REQ");
+					_main->AddOutputMessage(_T("Packet Drop: KNIGHTS_ALLLIST_REQ"));
+					spdlog::error("DBAgent::LoadKnightsAllList: Packet Drop: KNIGHTS_ALLLIST_REQ");
 					return;
 				}
 
@@ -1368,7 +1370,7 @@ void CDBAgent::LoadKnightsAllList(int nation)
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.LoadKnightsAllList()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::LoadKnightsAllList()");
 		return;
 	}
 
@@ -1392,8 +1394,8 @@ void CDBAgent::LoadKnightsAllList(int nation)
 
 		if (retryCount >= maxRetry)
 		{
-			_main->OutputList.AddString(_T("Packet Drop: KNIGHTS_ALLLIST_REQ"));
-			spdlog::error("Packet Drop: KNIGHTS_ALLLIST_REQ");
+			_main->AddOutputMessage(_T("Packet Drop: KNIGHTS_ALLLIST_REQ"));
+			spdlog::error("DBAgent::LoadKnightsAllList: Packet Drop: KNIGHTS_ALLLIST_REQ");
 		}
 	}
 }
@@ -1422,13 +1424,13 @@ bool CDBAgent::UpdateBattleEvent(const char* charId, int nation)
 		// affected_rows will be -1 if unavailable should be 1 if available
 		if (result.affected_rows() == 0)
 		{
-			spdlog::error("UpdateBattleEvent(): No rows affected");
+			spdlog::error("DBAgent::UpdateBattleEvent: No rows affected");
 			return false;
 		}
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.UpdateBattleEvent()");
+		db::utils::LogDatabaseError(dbErr, "DBAgent::UpdateBattleEvent()");
 		return false;
 	}
 

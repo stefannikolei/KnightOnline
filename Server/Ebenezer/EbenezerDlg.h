@@ -148,6 +148,14 @@ public:
 	void Send_AIServer(int zone, char* pBuf, int len);
 	static CUser* GetUserPtr(const char* userid, NameType type);
 
+	/// \brief adds a message to the application's output box and updates scrollbar position
+	/// \see _outputList
+	void AddOutputMessage(std::string_view msg);
+
+	/// \brief adds a message to the application's output box and updates scrollbar position
+	/// \see _outputList
+	void AddOutputMessage(std::wstring_view msg);
+
 	CEbenezerDlg(CWnd* pParent = nullptr);	// standard constructor
 	~CEbenezerDlg();
 
@@ -261,22 +269,17 @@ public:
 	//{{AFX_DATA(CEbenezerDlg)
 	enum { IDD = IDD_EBENEZER_DIALOG };
 	CEdit	m_AnnounceEdit;
-	CListBox	m_StatusList;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CEbenezerDlg)
-public:
 	virtual BOOL DestroyWindow();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 	//}}AFX_VIRTUAL
-
-private:
-	CIni	m_Ini;
 // Implementation
-protected:
+
 	HICON m_hIcon;
 
 	// Generated message map functions
@@ -288,6 +291,12 @@ protected:
 	afx_msg void OnTimer(UINT nIDEvent);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+	
+private:
+	CIni	m_Ini;
+	
+	/// \brief output message box for the application
+	CListBox _outputList;
 };
 
 //{{AFX_INSERT_LOCATION}}

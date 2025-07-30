@@ -219,7 +219,7 @@ void CUser::Parsing(int len, char* pData)
 
 	BYTE command = GetByte(pData, index);
 
-	spdlog::debug("User::Parsing: userId={} charId={} command={:02X} len={}",
+	spdlog::trace("User::Parsing: userId={} charId={} command={:02X} len={}",
 		GetSocketID(), m_pUserData->m_id, command, len);
 
 	switch (command)
@@ -565,9 +565,8 @@ void CUser::LoginProcess(char* pBuf)
 	retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("Login Send Fail : %d"), retvalue);
-		m_pMain->m_StatusList.AddString(logstr);
+		std::wstring logstr = std::format(L"LoginProcess: send error: {}", retvalue);
+		m_pMain->AddOutputMessage(logstr);
 		goto fail_return;
 	}
 
@@ -669,9 +668,8 @@ void CUser::NewCharToAgent(char* pBuf)
 	retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("NewChar Send Fail : %d"), retvalue);
-		m_pMain->m_StatusList.AddString(logstr);
+		std::wstring logstr = std::format(L"NewCharToAgent: send error: {}", retvalue);
+		m_pMain->AddOutputMessage(logstr);
 		goto fail_return;
 	}
 
@@ -732,9 +730,8 @@ void CUser::DelCharToAgent(char* pBuf)
 	retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("DelChar Send Fail : %d"), retvalue);
-		m_pMain->m_StatusList.AddString(logstr);
+		std::wstring logstr = std::format(L"DelCharToAgent: send error: {}", retvalue);
+		m_pMain->AddOutputMessage(logstr);
 		goto fail_return;
 	}
 
@@ -767,9 +764,8 @@ void CUser::SelNationToAgent(char* pBuf)
 	retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("Nation Sel Send Fail : %d"), retvalue);
-		m_pMain->m_StatusList.AddString(logstr);
+		std::wstring logstr = std::format(L"SelNationToAgent: send error: {}", retvalue);
+		m_pMain->AddOutputMessage(logstr);
 		goto fail_return;
 	}
 
@@ -888,9 +884,8 @@ void CUser::SelCharToAgent(char* pBuf)
 	retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("SelChar Send Fail : %d"), retvalue);
-		m_pMain->m_StatusList.AddString(logstr);
+		std::wstring logstr = std::format(L"SelCharToAgent: send error: {}", retvalue);
+		m_pMain->AddOutputMessage(logstr);
 		goto fail_return;
 	}
 
@@ -1054,7 +1049,7 @@ void CUser::SelectCharacter(char* pBuf)
 				if (retvalue >= SMQ_FULL)
 				{
 					//goto fail_return;
-					m_pMain->m_StatusList.AddString(_T("KNIGHTS_LIST_REQ Packet Drop!!!"));
+					m_pMain->AddOutputMessage(_T("KNIGHTS_LIST_REQ Packet Drop!!!"));
 				}
 
 				pKnights = m_pMain->m_KnightsArray.GetData(m_pUserData->m_bKnights);
@@ -1112,9 +1107,8 @@ void CUser::SelectCharacter(char* pBuf)
 	retvalue = m_pMain->m_ItemLoggerSendQ.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("Login Logger Send Fail : %d"), retvalue);
-		m_pMain->m_StatusList.AddString(logstr);
+		std::wstring logstr = std::format(L"SelectCharacter: send error: {}", retvalue);
+		m_pMain->AddOutputMessage(logstr);
 	}
 	//TRACE(_T("SelectCharacter - id=%hs, knights=%d, fame=%d\n"), m_pUserData->m_id, m_pUserData->m_bKnights, m_pUserData->m_bFame);
 
@@ -1143,10 +1137,9 @@ void CUser::AllCharInfoToAgent()
 		send_index = 0;
 		SetByte(send_buff, WIZ_ALLCHAR_INFO_REQ, send_index);
 		SetByte(send_buff, 0xFF, send_index);
-
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("All CharInfo Send Fail : %d"), retvalue);
-		m_pMain->m_StatusList.AddString(logstr);
+		
+		std::wstring logstr = std::format(L"AllCharInfoToAgent: send error: {}", retvalue);
+		m_pMain->AddOutputMessage(logstr);
 	}
 }
 
@@ -1169,9 +1162,8 @@ void CUser::UserDataSaveToAgent()
 	retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("DataSave Send Fail : %d"), retvalue);
-		m_pMain->m_StatusList.AddString(logstr);
+		std::wstring logstr = std::format(L"UserDataSaveToAgent: send error: {}", retvalue);
+			m_pMain->AddOutputMessage(logstr);
 	}
 
 	memset(send_buff, 0, sizeof(send_buff));
@@ -1190,9 +1182,8 @@ void CUser::UserDataSaveToAgent()
 	retvalue = m_pMain->m_ItemLoggerSendQ.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("Exp Logger Send Fail : %d"), retvalue);
-		m_pMain->m_StatusList.AddString(logstr);
+		std::wstring logstr = std::format(L"UserDataSaveToAgent: item send error: {}", retvalue);
+		m_pMain->AddOutputMessage(logstr);
 	}
 }
 
@@ -1236,9 +1227,9 @@ void CUser::LogOut()
 
 	if (count > 29)
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("Logout Send Fail : acname=%hs, charid=%hs "), m_pUserData->m_Accountid, m_pUserData->m_id);
-		m_pMain->m_StatusList.AddString(logstr);
+		std::string logstr = std::format("LogOut: send error: accountId={} charId={}",
+			m_pUserData->m_Accountid, m_pUserData->m_id);
+		m_pMain->AddOutputMessage(logstr);
 	}
 
 	SetByte(send_buff, AG_USER_LOG_OUT, index);
@@ -1260,9 +1251,8 @@ void CUser::LogOut()
 	int retvalue = m_pMain->m_ItemLoggerSendQ.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("Logout Logger Send Fail : %d"), retvalue);
-		m_pMain->m_StatusList.AddString(logstr);
+		std::wstring logstr = std::format(L"LogOut: item send error: {}", retvalue);
+		m_pMain->AddOutputMessage(logstr);
 	}
 
 //	if (m_pUserData->m_bKnights > 0)
@@ -1313,9 +1303,11 @@ void CUser::MoveProcess(char* pBuf)
 		|| m_pUserData->m_sHp == 0)
 	{
 		if (speed != 0)
-			spdlog::error("User::MoveProcess: dead user is moving [charId={} socketId={} resHpType={} hp={} speed={} x={} z={}",
+		{
+			spdlog::warn("User::MoveProcess: dead user is moving [charId={} socketId={} resHpType={} hp={} speed={} x={} z={}]",
 				m_pUserData->m_id, m_Sid, m_bResHpType, m_pUserData->m_sHp, speed,
 				static_cast<int32_t>(m_pUserData->m_curx), static_cast<int32_t>(m_pUserData->m_curz));
+		}
 	}
 
 	if (speed != 0)
@@ -10969,9 +10961,8 @@ void CUser::SetLogInInfoToDB(BYTE bInit)
 	retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("UserInfo Send Fail : %d"), retvalue);
-		m_pMain->m_StatusList.AddString(logstr);
+		std::wstring logstr = std::format(L"SetLogInInfoToDb: send error: {}", retvalue);
+		m_pMain->AddOutputMessage(logstr);
 	}
 }
 
@@ -11617,9 +11608,8 @@ void CUser::ItemLogToAgent(const char* srcid, const char* tarid, int type, int64
 	retvalue = m_pMain->m_ItemLoggerSendQ.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("ItemLog Write Fail : %d"), retvalue);
-		m_pMain->m_StatusList.AddString(logstr);
+		std::wstring logstr = std::format(L"ItemLogToAgent: item send error: {}", retvalue);
+		m_pMain->AddOutputMessage(logstr);
 	}
 }
 
@@ -12261,9 +12251,8 @@ void CUser::OpenEditBox(int message, int event)
 	retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("Coupon Send Fail : %d"), retvalue);
-		m_pMain->m_StatusList.AddString(logstr);
+		std::wstring logstr = std::format(L"OpenEditBox: coupon send error: {}", retvalue);
+		m_pMain->AddOutputMessage(logstr);
 		//goto fail_return;
 	}
 /*
@@ -12361,9 +12350,8 @@ void CUser::LogCoupon(int itemid, int count)
 	retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
 	{
-		TCHAR logstr[256] = {};
-		_stprintf(logstr, _T("Coupon Send Fail : %d"), retvalue);
-		m_pMain->m_StatusList.AddString(logstr);
+		std::wstring logstr = std::format(L"LogCoupon: send error: {}", retvalue);
+		m_pMain->AddOutputMessage(logstr);
 		//goto fail_return;
 	}
 }

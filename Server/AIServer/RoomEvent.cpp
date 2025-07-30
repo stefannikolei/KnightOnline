@@ -5,12 +5,11 @@
 #include "stdafx.h"
 #include "server.h"
 #include "RoomEvent.h"
-
-#include <spdlog/spdlog.h>
-
 #include "ServerDlg.h"
 #include "define.h"
 //#include "Npc.h"
+
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE

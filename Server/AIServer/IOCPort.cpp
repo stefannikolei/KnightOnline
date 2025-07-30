@@ -22,7 +22,7 @@ DWORD WINAPI ReceiveWorkerThread(LPVOID lp);
 
 DWORD WINAPI AcceptThread(LPVOID lp)
 {
-	auto pIocport = (CIOCPort*)lp;
+	CIOCPort* pIocport = (CIOCPort*)lp;
 
 	WSANETWORKEVENTS network_event;
 	DWORD wait_return;
@@ -102,7 +102,7 @@ DWORD WINAPI AcceptThread(LPVOID lp)
 
 DWORD WINAPI ReceiveWorkerThread(LPVOID lp)
 {
-	auto pIocport = (CIOCPort*)lp;
+	CIOCPort* pIocport = (CIOCPort*)lp;
 
 	DWORD WorkIndex;
 	BOOL b;
@@ -204,7 +204,7 @@ DWORD WINAPI ReceiveWorkerThread(LPVOID lp)
 
 DWORD WINAPI ClientWorkerThread(LPVOID lp)
 {
-	auto pIocport = (CIOCPort*)lp;
+	CIOCPort* pIocport = (CIOCPort*)lp;
 
 	DWORD WorkIndex;
 	BOOL b;
@@ -310,7 +310,7 @@ DWORD WINAPI ClientWorkerThread(LPVOID lp)
 // sungyong 2002.05.22
 DWORD WINAPI SendThreadMain(LPVOID pVoid)
 {
-	auto pIocp = (CIOCPort*)pVoid;
+	CIOCPort* pIocp = (CIOCPort*)pVoid;
 
 	int nRet = 0;
 	int iRemainCount = 0;
@@ -511,7 +511,7 @@ BOOL CIOCPort::Listen(int port)
 	m_ListenSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (m_ListenSocket < 0)
 	{
-		spdlog::error("CIOCPort::Listen: failed to open socket");
+		spdlog::error("IOCPort::Listen: failed to open socket");
 		return FALSE;
 	}
 
@@ -536,7 +536,7 @@ BOOL CIOCPort::Listen(int port)
 
 	if (bind(m_ListenSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0)
 	{
-		spdlog::error("CIOCPort::Listen: failed to bind local address");
+		spdlog::error("IOCPort::Listen: failed to bind local address");
 		return FALSE;
 	}
 
@@ -549,7 +549,7 @@ BOOL CIOCPort::Listen(int port)
 	if (err == SOCKET_ERROR)
 	{
 		int socketErr = WSAGetLastError();
-		spdlog::error("CIOCPort::Listen: recvBuffer getsockopt failed on port={} winsock error={} socketLen={}",
+		spdlog::error("IOCPort::Listen: recvBuffer getsockopt failed on port={} winsock error={} socketLen={}",
 			port, socketErr, socklen);
 		return FALSE;
 	}
@@ -561,7 +561,7 @@ BOOL CIOCPort::Listen(int port)
 	if (err == SOCKET_ERROR)
 	{
 		int socketErr = WSAGetLastError();
-		spdlog::error("CIOCPort::Listen: sendBuffer getsockopt failed on port={} winsock error={} socketLen={}",
+		spdlog::error("IOCPort::Listen: sendBuffer getsockopt failed on port={} winsock error={} socketLen={}",
 			port, socketErr, socklen);
 		return FALSE;
 	}
@@ -572,13 +572,13 @@ BOOL CIOCPort::Listen(int port)
 	if (m_hListenEvent == WSA_INVALID_EVENT)
 	{
 		int socketErr = WSAGetLastError();
-		spdlog::error("CIOCPort::Listen: CreateEvent winsock error={}", socketErr);
+		spdlog::error("IOCPort::Listen: CreateEvent winsock error={}", socketErr);
 		return FALSE;
 	}
 
 	WSAEventSelect(m_ListenSocket, m_hListenEvent, FD_ACCEPT);
 
-	spdlog::info("CIOCPort::Listen: initialized port={:05}", port);
+	spdlog::info("IOCPort::Listen: initialized port={:05}", port);
 	
 	CreateAcceptThread();
 
@@ -589,7 +589,7 @@ BOOL CIOCPort::Associate(CIOCPSocket2* pIocpSock, HANDLE hPort)
 {
 	if (hPort == nullptr)
 	{
-		spdlog::error("CIOCPort::Associate: received null port");
+		spdlog::error("IOCPort::Associate: received null completion port");
 		return FALSE;
 	}
 
@@ -603,7 +603,7 @@ int CIOCPort::GetNewSid()
 {
 	if (m_SidList.empty())
 	{
-		spdlog::error("CIOCPort::GetNewSid: socketId list is empty");
+		spdlog::error("IOCPort::GetNewSid: socketId list is empty");
 		return -1;
 	}
 
@@ -618,7 +618,7 @@ void CIOCPort::PutOldSid(int sid)
 	if (sid < 0
 		|| sid >= m_SocketArraySize)
 	{
-		spdlog::error("CIOCPort::PutOldSid: out of range socketId={}", sid);
+		spdlog::error("IOCPort::PutOldSid: out of range socketId={}", sid);
 		return;
 	}
 
@@ -702,14 +702,14 @@ CIOCPSocket2* CIOCPort::GetIOCPSocket(int index)
 {
 	if (index >= m_SocketArraySize)
 	{
-		spdlog::error("CIOCPort::GetIOCPSocket: socketArray overflow index={}", index);
+		spdlog::error("IOCPort::GetIOCPSocket: socketArray overflow index={}", index);
 		return nullptr;
 	}
 
 	CIOCPSocket2* pIOCPSock = m_SockArrayInActive[index];
 	if (pIOCPSock == nullptr)
 	{
-		spdlog::error("CIOCPort::GetIOCPSocket: null socket index={}", index);
+		spdlog::error("IOCPort::GetIOCPSocket: null socket index={}", index);
 		return nullptr;
 	}
 
@@ -727,7 +727,8 @@ void CIOCPort::RidIOCPSocket(int index, CIOCPSocket2* pSock)
 		|| (pSock->GetSockType() == TYPE_ACCEPT && index >= m_SocketArraySize)
 		|| (pSock->GetSockType() == TYPE_CONNECT && index >= m_ClientSockSize))
 	{
-		spdlog::error("CIOCPort::RidIOCPSocket: invalid index={} for type={}", index, pSock->GetSockType());
+		spdlog::error("IOCPort::RidIOCPSocket: invalid index={} for type={}",
+			index, pSock->GetSockType());
 		return;
 	}
 
@@ -772,7 +773,7 @@ void CIOCPort::CreateSendThread()
 	//for(DWORD i = 0; i < m_dwConcurrency * 1; i++)	// sungyong
 	//{
 	//if(SErr((hThread = ::CreateThread( nullptr, 0, SendThreadMain, (LPVOID)this, 0, &dwWorkerId)) == nullptr, _T("CreateSendThread"))) return;
-	hThread = ::CreateThread(nullptr, 0, SendThreadMain, (LPVOID)this, 0, &dwWorkerId);
+	hThread = CreateThread(nullptr, 0, SendThreadMain, (LPVOID)this, 0, &dwWorkerId);
 	//}
 }
 

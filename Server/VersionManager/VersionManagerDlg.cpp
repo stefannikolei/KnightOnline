@@ -138,7 +138,7 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 	ini.GetString(ini::DOWNLOAD, ini::PATH, "/", _ftpPath, _countof(_ftpPath));
 
 	// configure logger
-	SetupLogger(ini, logger::VersionManager);
+	logger::SetupLogger(ini, logger::VersionManager);
 	
 	// TODO: KN_online should be Knight_Account
 	std::string datasourceName = ini.GetString(ini::ODBC, ini::DSN, "KN_online");
@@ -320,6 +320,8 @@ BOOL CVersionManagerDlg::DestroyWindow()
 		delete pInfo;
 	ServerList.clear();
 
+	spdlog::shutdown();
+
 	return CDialog::DestroyWindow();
 }
 
@@ -342,9 +344,11 @@ void CVersionManagerDlg::OnVersionSetting()
 
 void CVersionManagerDlg::ReportTableLoadError(const recordset_loader::Error& err, const char* source)
 {
-	CString msg;
-	msg.Format(_T("%hs failed: %hs"), source, err.Message.c_str());
-	AfxMessageBox(msg);
+	std::string error = std::format("VersionManagerDlg::ReportTableLoadError: {} failed: {}",
+		source, err.Message);
+	std::wstring werror = LocalToWide(error);
+	AfxMessageBox(werror.c_str());
+	spdlog::error(error);
 }
 
 /// \brief clears the _outputList text area and regenerates default output
@@ -356,13 +360,11 @@ void CVersionManagerDlg::ResetOutputList()
 	// print the ODBC connection string
 	// TODO: modelUtil::DbType::ACCOUNT;  Currently all models are assigned to GAME
 	std::string odbcString = db::ConnectionManager::GetOdbcConnectionString(modelUtil::DbType::GAME);
-	CString strConnection(CA2T(odbcString.c_str()));
-	_outputList.AddString(strConnection);
+	AddOutputMessage(odbcString);
 
 	// print the current version
-	CString version;
-	version.Format(_T("Latest Version : %d"), _lastVersion);
-	_outputList.AddString(version);
+	std::wstring version = std::format(L"Latest Version: {}", _lastVersion);
+	AddOutputMessage(version);
 }
 
 // \brief updates the last/latest version and resets the output list
@@ -370,4 +372,23 @@ void CVersionManagerDlg::SetLastVersion(int lastVersion)
 {
 	_lastVersion = lastVersion;
 	ResetOutputList();
+}
+
+/// \brief adds a message to the application's output box and updates scrollbar position
+/// \see _outputList
+void CVersionManagerDlg::AddOutputMessage(std::string_view msg)
+{
+	std::wstring wMsg = LocalToWide(msg);
+	AddOutputMessage(wMsg);
+}
+
+/// \brief adds a message to the application's output box and updates scrollbar position
+/// \see _outputList
+void CVersionManagerDlg::AddOutputMessage(std::wstring_view msg)
+{
+	_outputList.AddString(msg.data());
+	
+	// Set the focus to the last item and ensure it is visible
+	int lastIndex = _outputList.GetCount()-1;
+	_outputList.SetTopIndex(lastIndex);
 }

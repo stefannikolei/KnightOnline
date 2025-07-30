@@ -5,10 +5,10 @@
 #include "stdafx.h"
 #include "SharedMem.h"
 
-#include <codecvt>
 #include <process.h>
 
 #include <spdlog/spdlog.h>
+#include <shared/StringConversion.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -62,7 +62,7 @@ BOOL CSharedMemQueue::InitailizeMMF(DWORD dwOffsetsize, int maxcount, LPCTSTR lp
 
 	if (m_hMMFile == nullptr)
 	{
-		spdlog::error("Shared Memory Open Fail!!");
+		spdlog::error("SharedMem::InitializeMMF: failed to open shared memory");
 		return FALSE;
 	}
 
@@ -73,9 +73,8 @@ BOOL CSharedMemQueue::InitailizeMMF(DWORD dwOffsetsize, int maxcount, LPCTSTR lp
 	if (lpname != nullptr)
 	{
 		std::wstring lpStr = lpname;
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-		std::string lpStrA = converter.to_bytes(lpStr);
-		spdlog::trace("{} Address : {}\n", lpStrA, m_lpMMFile);
+		std::string lpStrA = WideToUtf8(lpStr);
+		spdlog::trace("SharedMem::InitializeMMF: {} Address : {}\n", lpStrA, m_lpMMFile);
 	}
 
 	m_bMMFCreate	= bCreate;
@@ -102,7 +101,7 @@ int CSharedMemQueue::PutData(char* pBuf, int size)
 
 	if (size > static_cast<int>(m_wOffset))
 	{
-		spdlog::error("DataSize Over.. - {} bytes", size);
+		spdlog::error("SharedMem::PutData: DataSize Over.. - {} bytes", size);
 		return SMQ_PKTSIZEOVER;
 	}
 

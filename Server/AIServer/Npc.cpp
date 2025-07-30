@@ -15,6 +15,7 @@ int surround_x[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
 int surround_z[8] = { 0, -1, -1, -1, 0, 1, 1, 1 };
 
 int test_id = 1056;
+bool useNpcTrace = false;
 
 constexpr int MAX_MAXWEAPON_CLASSES		= _countof(model::MakeWeapon::Class);
 constexpr int MAX_ITEM_GRADECODE_GRADES	= _countof(model::MakeItemGradeCode::Grade);
@@ -1261,10 +1262,10 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 		// 몬스터 총 수와 초기화한 몬스터의 수가 같다면
 		if (m_pMain->m_TotalNPC == m_pMain->m_CurrentNPC)
 		{
-			CString logstr;
-			logstr.Format(_T("All NPCs initialized: %d"), m_pMain->m_CurrentNPC);
-			m_pMain->m_StatusList.AddString(logstr);
-			spdlog::info("Npc::SetLive: All NPCs initialized [count={}]", m_pMain->m_CurrentNPC);
+			std::string logstr = std::format("All NPCs initialized [count={}]",
+				m_pMain->m_CurrentNPC);
+			m_pMain->AddOutputMessage(logstr);
+			spdlog::info("Npc::SetLive: {}", logstr);
 			m_pMain->GameServerAcceptThread();				// 게임서버 Accept
 		}
 		//TRACE(_T("Npc - SerLive : CurrentNpc = %d\n"), m_pMain->m_CurrentNPC);
@@ -5810,8 +5811,11 @@ void CNpc::SendAll(CIOCPort* pIOCP, const char* pBuf, int nLength)
 
 void CNpc::NpcTrace(std::string_view msg)
 {
-	spdlog::trace("NPCTrace: {} [serial={} npcId={} npcName={} x={} z={}]",
-		msg, m_sNid + NPC_BAND, m_sSid, m_strName, m_fCurX, m_fCurZ);
+	if (useNpcTrace)
+	{
+		spdlog::trace("NPCTrace: {} [serial={} npcId={} npcName={} x={} z={}]",
+			msg, m_sNid + NPC_BAND, m_sSid, m_strName, m_fCurX, m_fCurZ);
+	}
 }
 
 void CNpc::NpcMoveEnd(CIOCPort* pIOCP)

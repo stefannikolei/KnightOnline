@@ -53,7 +53,7 @@ bool CDBProcess::InitDatabase() noexcept(false)
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.InitDatabase()");
+		db::utils::LogDatabaseError(dbErr, "DBProcess::InitDatabase()");
 		return false;
 	}
 
@@ -92,7 +92,7 @@ int CDBProcess::AccountLogin(const char* accountId, const char* password)
 		auto stmt = recordSet.prepare(sql);
 		if (stmt == nullptr)
 		{
-			throw db::ApplicationError("statement could not be allocated");
+			throw db::ApplicationError("DBProcess::AccountLogin: statement could not be allocated");
 		}
 
 		stmt->bind(0, accountId);
@@ -118,7 +118,7 @@ int CDBProcess::AccountLogin(const char* accountId, const char* password)
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.AccountLogin()");
+		db::utils::LogDatabaseError(dbErr, "DBProcess::AccountLogin()");
 		return AUTH_FAILED;
 	}
 	
@@ -151,7 +151,7 @@ bool CDBProcess::InsertVersion(int version, const char* fileName, const char* co
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.InsertVersion()");
+		db::utils::LogDatabaseError(dbErr, "DBProcess::InsertVersion()");
 		return false;
 	}
 	
@@ -181,7 +181,7 @@ bool CDBProcess::DeleteVersion(int version)
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.DeleteVersion()");
+		db::utils::LogDatabaseError(dbErr, "DBProcess::DeleteVersion()");
 	}
 	
 	return false;
@@ -211,7 +211,7 @@ bool CDBProcess::LoadUserCountList()
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.LoadUserCountList()");
+		db::utils::LogDatabaseError(dbErr, "DBProcess::LoadUserCountList()");
 	}
 	
 	return false;
@@ -234,7 +234,7 @@ bool CDBProcess::IsCurrentUser(const char* accountId, char* serverIp, int& serve
 		auto stmt = recordSet.prepare(sql);
 		if (stmt == nullptr)
 		{
-			throw db::ApplicationError("statement could not be allocated");
+			throw db::ApplicationError("DBProcess::IsCurrentUser: statement could not be allocated");
 		}
 
 		stmt->bind(0, accountId);
@@ -251,7 +251,7 @@ bool CDBProcess::IsCurrentUser(const char* accountId, char* serverIp, int& serve
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.IsCurrentUser()");
+		db::utils::LogDatabaseError(dbErr, "DBProcess::IsCurrentUser()");
 	}
 
 	return false;
@@ -273,7 +273,7 @@ bool CDBProcess::LoadPremiumServiceUser(const char* accountId, short* premiumDay
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.LoadPremiumServiceUser()");
+		db::utils::LogDatabaseError(dbErr, "DBProcess::LoadPremiumServiceUser()");
 		return false;
 	}
 

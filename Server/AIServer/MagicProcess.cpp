@@ -6,12 +6,12 @@
 #include "server.h"
 #include "MagicProcess.h"
 
-#include <spdlog/spdlog.h>
-
 #include "ServerDlg.h"
 #include "User.h"
 #include "Npc.h"
 #include "Region.h"
+
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE

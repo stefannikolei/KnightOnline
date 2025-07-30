@@ -281,7 +281,7 @@ void CEbenezerDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEbenezerDlg)
 	DDX_Control(pDX, IDC_GONGJI_EDIT, m_AnnounceEdit);
-	DDX_Control(pDX, IDC_LIST1, m_StatusList);
+	DDX_Control(pDX, IDC_LIST1, _outputList);
 	//}}AFX_DATA_MAP
 }
 
@@ -376,7 +376,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching ITEM table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading ITEM table");
 	if (!LoadItemTable())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache ITEM table, closing");
@@ -385,7 +385,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching MAGIC table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC table");
 	if (!LoadMagicTable())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC table, closing");
@@ -394,7 +394,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching MAGIC_TYPE1 table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE1 table");
 	if (!LoadMagicType1())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE1 table, closing");
@@ -403,7 +403,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching MAGIC_TYPE2 table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE2 table");
 	if (!LoadMagicType2())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE2 table, closing");
@@ -412,7 +412,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching MAGIC_TYPE3 table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE3 table");
 	if (!LoadMagicType3())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE3 table, closing");
@@ -421,7 +421,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching MAGIC_TYPE4 table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE4 table");
 	if (!LoadMagicType4())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE4 table, closing");
@@ -430,7 +430,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching MAGIC_TYPE5 table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE5 table");
 	if (!LoadMagicType5())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE5 table, closing");
@@ -439,7 +439,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching MAGIC_TYPE8 table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE8 table");
 	if (!LoadMagicType8())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE8 table, closing");
@@ -448,7 +448,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching COEFFICIENT table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading COEFFICIENT table");
 	if (!LoadCoefficientTable())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache COEFFICIENT table, closing");
@@ -457,7 +457,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching LEVEL_UP table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading LEVEL_UP table");
 	if (!LoadLevelUpTable())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache LEVEL_UP table, closing");
@@ -466,7 +466,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching KNIGHTS table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading KNIGHTS table");
 	if (!LoadAllKnights())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache KNIGHTS table, closing");
@@ -475,7 +475,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching KNIGHTS_USER table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading KNIGHTS_USER table");
 	if (!LoadAllKnightsUserData())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache KNIGHTS_USER table, closing");
@@ -484,7 +484,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching HOME table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading HOME table");
 	if (!LoadHomeTable())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache HOME table, closing");
@@ -493,7 +493,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching START_POSITION table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading START_POSITION table");
 	if (!LoadStartPositionTable())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache START_POSITION table, closing");
@@ -502,7 +502,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: caching BATTLE table");
+	spdlog::info("EbenezerDlg::OnInitDialog: loading BATTLE table");
 	if (!LoadBattleTable())
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache BATTLE table, closing");
@@ -540,14 +540,17 @@ BOOL CEbenezerDlg::OnInitDialog()
 #endif
 	}
 
-	// this is called after all data is synced with AIServer - I don't think it should be called here.
-	// UserAcceptThread();
+#ifdef _DEBUG
+	// meant to be called when AI finishes connecting, to allow users to connect.
+	// we allow user connections early in debug builds so we do not need to wait
+	// for a full server load to log in
+	UserAcceptThread();
+#endif
 
 	CTime cur = CTime::GetCurrentTime();
-	CString starttime;
-	starttime.Format(_T("Ebenezer started: %02d/%02d %02d:%02d"),
+	std::wstring starttime = std::format(L"Ebenezer started: {:02}/{:02} {:02}:{:02}",
 		cur.GetMonth(), cur.GetDay(), cur.GetHour(), cur.GetMinute());
-	m_StatusList.AddString(starttime);
+	AddOutputMessage(starttime);
 	spdlog::info("EbenezerDlg::OnInitDialog: successfully initialized");
 
 	return TRUE;
@@ -681,6 +684,8 @@ BOOL CEbenezerDlg::DestroyWindow()
 	DeleteCriticalSection(&g_serial_critical);
 	DeleteCriticalSection(&g_region_critical);
 
+	spdlog::shutdown();
+
 	return CDialog::DestroyWindow();
 }
 
@@ -688,7 +693,7 @@ void CEbenezerDlg::UserAcceptThread()
 {
 	// User Socket Accept
 	ResumeThread(m_Iocport.m_hAcceptThread);
-	m_StatusList.AddString(_T("Accepting user connections"));
+	AddOutputMessage(_T("Accepting user connections"));
 }
 
 CUser* CEbenezerDlg::GetUserPtr(const char* userid, NameType type)
@@ -717,6 +722,25 @@ CUser* CEbenezerDlg::GetUserPtr(const char* userid, NameType type)
 	}
 
 	return nullptr;
+}
+
+/// \brief adds a message to the application's output box and updates scrollbar position
+/// \see _outputList
+void CEbenezerDlg::AddOutputMessage(std::string_view msg)
+{
+	std::wstring wMsg = LocalToWide(msg);
+	AddOutputMessage(wMsg);
+}
+
+/// \brief adds a message to the application's output box and updates scrollbar position
+/// \see _outputList
+void CEbenezerDlg::AddOutputMessage(std::wstring_view msg)
+{
+	_outputList.AddString(msg.data());
+	
+	// Set the focus to the last item and ensure it is visible
+	int lastIndex = _outputList.GetCount()-1;
+	_outputList.SetTopIndex(lastIndex);
 }
 
 void CEbenezerDlg::OnTimer(UINT nIDEvent)
@@ -1129,8 +1153,7 @@ BOOL CEbenezerDlg::InitializeMMF()
 		bCreate = FALSE;
 	}
 
-	logstr = _T("Shared Memory Create Success!!");
-	m_StatusList.AddString(logstr);
+	AddOutputMessage(_T("Shared memory created successfully"));
 
 	m_lpMMFile = (char*) MapViewOfFile(m_hMMFile, FILE_MAP_WRITE, 0, 0, 0);
 	if (m_lpMMFile == nullptr)
@@ -1237,10 +1260,11 @@ BOOL CEbenezerDlg::MapFileLoad()
 
 void CEbenezerDlg::ReportTableLoadError(const recordset_loader::Error& err, const char* source)
 {
-	CString msg;
-	msg.Format(_T("%hs failed: %hs"), source, err.Message.c_str());
-	spdlog::error("EbenezerDlg::ReportTableLoadError: {}: {}", source, err.Message.c_str());
-	AfxMessageBox(msg);
+	std::string error = std::format("EbenezerDlg::ReportTableLoadError: {} failed: {}",
+		source, err.Message);
+	std::wstring werror = LocalToWide(error);
+	AfxMessageBox(werror.c_str());
+	spdlog::error(error);
 }
 
 BOOL CEbenezerDlg::LoadItemTable()
@@ -1373,7 +1397,7 @@ void CEbenezerDlg::LoadConfig()
 
 	m_Ini.Load(iniPath);
 
-	SetupLogger(m_Ini, logger::Ebenezer);
+	logger::SetupLogger(m_Ini, logger::Ebenezer);
 	
 	m_nYear = m_Ini.GetInt("TIMER", "YEAR", 1);
 	m_nMonth = m_Ini.GetInt("TIMER", "MONTH", 1);
@@ -2319,7 +2343,7 @@ BOOL CEbenezerDlg::LoadNoticeData()
 #if !defined(_DEBUG)
 		AfxMessageBox(_T("cannot open Notice.txt!!"));
 #endif
-		spdlog::error("EbenezerDlg::LoadNoticeData: failed to open Notice.txt");
+		spdlog::warn("EbenezerDlg::LoadNoticeData: failed to open Notice.txt");
 		return FALSE;
 	}
 
@@ -2601,11 +2625,7 @@ void CEbenezerDlg::DeleteAllNpcList(int flag)
 		spdlog::error("EbenezerDlg::DeleteAllNpcList: pointCheckFlag set");
 		return;
 	}
-
-	CString logstr;
-	logstr.Format(_T("[Monster Point Delete]"));
-	m_StatusList.AddString(logstr);
-
+	
 	spdlog::debug("EbenezerDlg::DeleteAllNpcList: start");
 
 	CUser* pUser = nullptr;
@@ -2632,6 +2652,7 @@ void CEbenezerDlg::DeleteAllNpcList(int flag)
 
 	m_bServerCheckFlag = FALSE;
 
+	AddOutputMessage(_T("DeleteAllNpcList complete"));
 	spdlog::debug("EbenezerDlg::DeleteAllNpcList: end");
 }
 // ~sungyong 2002. 05. 23

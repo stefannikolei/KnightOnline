@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "ebenezer.h"
 #include "MagicProcess.h"
-
 #include "EbenezerDlg.h"
 #include "User.h"
 #include "Npc.h"
@@ -1475,7 +1474,7 @@ void CMagicProcess::ExecuteType3(int magicid, int sid, int tid, int data1, int d
 					// Killed by another player.
 					if (!bFlag)
 					{
-						// make it so that the only possible attack is throwing a snowball
+						// Players can only attack with snowballs during snow wars
 						if (m_pSrcUser->m_pUserData->m_bZone == ZONE_SNOW_BATTLE
 							&& m_pMain->m_byBattleOpen == SNOW_BATTLE)
 						{

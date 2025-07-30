@@ -150,6 +150,14 @@ public:
 	/// \see OnTimer(), HandleUserLogout()
 	void AllSaveRoutine();
 
+	/// \brief adds a message to the application's output box and updates scrollbar position
+	/// \see _outputList
+	void AddOutputMessage(std::string_view msg);
+
+	/// \brief adds a message to the application's output box and updates scrollbar position
+	/// \see _outputList
+	void AddOutputMessage(std::wstring_view msg);
+
 	CAujardDlg(CWnd* parent = nullptr);	// standard constructor
 	~CAujardDlg();
 
@@ -168,7 +176,6 @@ public:
 	// Dialog Data
 	//{{AFX_DATA(CAujardDlg)
 	enum { IDD = IDD_AUJARD_DIALOG };
-	CListBox	OutputList;
 	CStatic	    DBProcessNum;
 	//}}AFX_DATA
 
@@ -234,6 +241,10 @@ protected:
 	afx_msg void OnTimer(UINT EventId);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+
+private:
+	/// \brief output message box for the application
+	CListBox _outputList;
 };
 
 //{{AFX_INSERT_LOCATION}}
