@@ -16,7 +16,6 @@
 
 #include <db-library/ConnectionManager.h>
 #include <spdlog/spdlog.h>
-#include <codecvt>
 
 #include <math.h>
 #include <shared/StringConversion.h>

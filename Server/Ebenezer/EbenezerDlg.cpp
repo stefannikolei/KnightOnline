@@ -1134,7 +1134,6 @@ void CEbenezerDlg::Send_AIServer(int zone, char* pBuf, int len)
 BOOL CEbenezerDlg::InitializeMMF()
 {
 	BOOL bCreate = TRUE;
-	CString logstr;
 
 	DWORD filesize = MAX_USER * ALLOCATED_USER_DATA_BLOCK;
 	m_hMMFile = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, filesize, _T("KNIGHT_DB"));
@@ -1145,7 +1144,6 @@ BOOL CEbenezerDlg::InitializeMMF()
 		m_hMMFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, TRUE, _T("KNIGHT_DB"));
 		if (m_hMMFile == nullptr)
 		{
-			logstr = _T("Shared Memory Load Fail!!");
 			m_hMMFile = INVALID_HANDLE_VALUE;
 			return FALSE;
 		}
