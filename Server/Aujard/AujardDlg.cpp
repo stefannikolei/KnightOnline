@@ -966,7 +966,7 @@ void CAujardDlg::AllSaveRoutine()
 
 /// \brief adds a message to the application's output box and updates scrollbar position
 /// \see _outputList
-void CAujardDlg::AddOutputMessage(std::string_view msg)
+void CAujardDlg::AddOutputMessage(const std::string& msg)
 {
 	std::wstring wMsg = LocalToWide(msg);
 	AddOutputMessage(wMsg);
@@ -974,7 +974,7 @@ void CAujardDlg::AddOutputMessage(std::string_view msg)
 
 /// \brief adds a message to the application's output box and updates scrollbar position
 /// \see _outputList
-void CAujardDlg::AddOutputMessage(std::wstring_view msg)
+void CAujardDlg::AddOutputMessage(const std::wstring& msg)
 {
 	_outputList.AddString(msg.data());
 	

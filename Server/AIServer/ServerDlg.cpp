@@ -2217,7 +2217,7 @@ MAP* CServerDlg::GetMapByID(int iZoneID) const
 
 /// \brief adds a message to the application's output box and updates scrollbar position
 /// \see _outputList
-void CServerDlg::AddOutputMessage(std::string_view msg)
+void CServerDlg::AddOutputMessage(const std::string& msg)
 {
 	std::wstring wMsg = LocalToWide(msg);
 	AddOutputMessage(wMsg);
@@ -2225,7 +2225,7 @@ void CServerDlg::AddOutputMessage(std::string_view msg)
 
 /// \brief adds a message to the application's output box and updates scrollbar position
 /// \see _outputList
-void CServerDlg::AddOutputMessage(std::wstring_view msg)
+void CServerDlg::AddOutputMessage(const std::wstring& msg)
 {
 	_outputList.AddString(msg.data());
 	

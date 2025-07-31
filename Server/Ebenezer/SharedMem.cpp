@@ -71,8 +71,7 @@ BOOL CSharedMemQueue::InitailizeMMF(DWORD dwOffsetsize, int maxcount, LPCTSTR lp
 
 	if (lpname != nullptr)
 	{
-		std::wstring lpStr = lpname;
-		std::string lpStrA = WideToUtf8(lpStr);
+		std::string lpStrA = WideToUtf8(lpname);
 		spdlog::trace("SharedMem::InitializeMMF: {} Address : {}", lpStrA, m_lpMMFile);
 	}
 	

@@ -150,11 +150,11 @@ public:
 
 	/// \brief adds a message to the application's output box and updates scrollbar position
 	/// \see _outputList
-	void AddOutputMessage(std::string_view msg);
+	void AddOutputMessage(const std::string& msg);
 
 	/// \brief adds a message to the application's output box and updates scrollbar position
 	/// \see _outputList
-	void AddOutputMessage(std::wstring_view msg);
+	void AddOutputMessage(const std::wstring& msg);
 
 	CEbenezerDlg(CWnd* pParent = nullptr);	// standard constructor
 	~CEbenezerDlg();

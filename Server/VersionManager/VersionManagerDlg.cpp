@@ -376,7 +376,7 @@ void CVersionManagerDlg::SetLastVersion(int lastVersion)
 
 /// \brief adds a message to the application's output box and updates scrollbar position
 /// \see _outputList
-void CVersionManagerDlg::AddOutputMessage(std::string_view msg)
+void CVersionManagerDlg::AddOutputMessage(const std::string& msg)
 {
 	std::wstring wMsg = LocalToWide(msg);
 	AddOutputMessage(wMsg);
@@ -384,7 +384,7 @@ void CVersionManagerDlg::AddOutputMessage(std::string_view msg)
 
 /// \brief adds a message to the application's output box and updates scrollbar position
 /// \see _outputList
-void CVersionManagerDlg::AddOutputMessage(std::wstring_view msg)
+void CVersionManagerDlg::AddOutputMessage(const std::wstring& msg)
 {
 	_outputList.AddString(msg.data());
 	
