@@ -88,7 +88,7 @@ void CUser::Parsing(int len, char* pData)
 void CUser::LogInReq(char* pBuf)
 {
 	int index = 0, idlen = 0, pwdlen = 0, send_index = 0, result = 0, serverno = 0;
-	BOOL bCurrentuser = FALSE;
+	bool bCurrentuser = false;
 	char send_buff[256] = {},
 		serverip[MAX_IP_SIZE + 1] = {},
 		accountid[MAX_ID_SIZE + 1] = {},

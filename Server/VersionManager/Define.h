@@ -200,63 +200,6 @@ inline CString GetProgPath()
 	return Path;
 }
 
-inline void LogFileWrite(const TCHAR* logstr)
-{
-	CString LogFileName;
-	LogFileName.Format(_T("%s\\Login.log"), GetProgPath().GetString());
-	
-	
-	CFile file;
-	if (!file.Open(LogFileName, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite))
-		return;
-
-	file.SeekToEnd();
-
-#if defined(_UNICODE)
-	const std::string utf8 = WideToUtf8(logstr, wcslen(logstr));
-#if defined(_DEBUG)
-	std::cout << "using query: " << utf8 << '\n';
-#endif
-	file.Write(utf8.c_str(), static_cast<int>(utf8.size()));
-#else
-#if defined(_DEBUG)
-	std::cout << "using query: " << logstr << '\n';
-#endif
-	file.Write(logstr, strlen(logstr));
-#endif
-
-	file.Close();
-}
-
-inline void LogFileWrite(const std::string& logStr)
-{
-	CString clog = logStr.c_str();
-	LogFileWrite(clog);
-}
-
-inline int DisplayErrorMsg(SQLHANDLE hstmt)
-{
-	SQLTCHAR      SqlState[6], Msg[1024];
-	SQLINTEGER    NativeError;
-	SQLSMALLINT   i, MsgLen;
-	SQLRETURN     rc2;
-	TCHAR		  logstr[512] = {};
-
-	i = 1;
-	while ((rc2 = SQLGetDiagRec(SQL_HANDLE_STMT, hstmt, i, SqlState, &NativeError, Msg, _countof(Msg), &MsgLen)) != SQL_NO_DATA)
-	{
-		_sntprintf(logstr, _countof(logstr) - 1, _T("*** %s, %d, %s, %d ***\r\n"), SqlState, NativeError, Msg, MsgLen);
-		LogFileWrite(logstr);
-
-		i++;
-	}
-
-	if (_tcscmp((TCHAR*) SqlState, _T("08S01")) == 0)
-		return -1;
-
-	return 0;
-}
-
 // ini config variable names
 namespace ini
 {
@@ -274,6 +217,11 @@ namespace ini
 	// SERVER_LIST section
 	static constexpr char SERVER_LIST[] = "SERVER_LIST";
 	static constexpr char COUNT[] = "COUNT";
+
+	// Download section
+	static constexpr char DOWNLOAD[] = "DOWNLOAD";
+	static constexpr char URL[] = "URL";
+	static constexpr char PATH[] = "PATH";
 }
 
 #endif

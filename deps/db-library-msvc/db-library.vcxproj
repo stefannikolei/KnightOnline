@@ -24,7 +24,6 @@
     <ClInclude Include="..\db-library\DatasourceConfig.h" />
     <ClInclude Include="..\db-library\Exceptions.h" />
     <ClInclude Include="..\db-library\fwd.h" />
-    <ClInclude Include="..\db-library\hooks.h" />
     <ClInclude Include="..\db-library\Model.h" />
     <ClInclude Include="..\db-library\ModelRecordSet.h" />
     <ClInclude Include="..\db-library\pch.h" />
@@ -39,7 +38,6 @@
   <ItemGroup>
     <ClCompile Include="..\db-library\Connection.cpp" />
     <ClCompile Include="..\db-library\ConnectionManager.cpp" />
-    <ClCompile Include="..\db-library\hooks.cpp" />
     <ClCompile Include="..\db-library\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -73,6 +71,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <Import Project="$(PropsDir)db-modules.props" />
+  <Import Project="$(PropsDir)spdlog.props" />
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>

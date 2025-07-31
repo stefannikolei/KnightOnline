@@ -9,9 +9,10 @@
 #include "User.h"
 
 #include <shared/Ini.h>
+#include <shared/logger.h>
 
 #include <db-library/ConnectionManager.h>
-#include <db-library/hooks.h>
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -27,13 +28,6 @@ import VersionManagerBinder;
 CIOCPort CVersionManagerDlg::IocPort;
 
 constexpr int DB_POOL_CHECK = 100;
-
-static void LoggerImpl(const std::string& message)
-{
-	CString logLine;
-	logLine.Format(_T("%hs\r\n"), message.c_str());
-	LogFileWrite(logLine);
-}
 
 /////////////////////////////////////////////////////////////////////////////
 // CVersionManagerDlg dialog
@@ -51,8 +45,6 @@ CVersionManagerDlg::CVersionManagerDlg(CWnd* parent)
 	_lastVersion = 0;
 
 	_icon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-
-	db::hooks::Log = &LoggerImpl;
 
 	db::ConnectionManager::DefaultConnectionTimeout = DB_PROCESS_TIMEOUT;
 	db::ConnectionManager::Create();
@@ -141,8 +133,12 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 
 	CIni ini(iniPath);
 
-	ini.GetString("DOWNLOAD", "URL", "127.0.0.1", _ftpUrl, _countof(_ftpUrl));
-	ini.GetString("DOWNLOAD", "PATH", "/", _ftpPath, _countof(_ftpPath));
+	// ftp config
+	ini.GetString(ini::DOWNLOAD, ini::URL, "127.0.0.1", _ftpUrl, _countof(_ftpUrl));
+	ini.GetString(ini::DOWNLOAD, ini::PATH, "/", _ftpPath, _countof(_ftpPath));
+
+	// configure logger
+	logger::SetupLogger(ini, logger::VersionManager);
 	
 	// TODO: KN_online should be Knight_Account
 	std::string datasourceName = ini.GetString(ini::ODBC, ini::DSN, "KN_online");
@@ -182,16 +178,16 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 		_SERVER_INFO* pInfo = new _SERVER_INFO;
 
 		snprintf(key, sizeof(key), "SERVER_%02d", i);
-		ini.GetString("SERVER_LIST", key, "127.0.0.1", pInfo->strServerIP, _countof(pInfo->strServerIP));
+		ini.GetString(ini::SERVER_LIST, key, "127.0.0.1", pInfo->strServerIP, _countof(pInfo->strServerIP));
 
 		snprintf(key, sizeof(key), "NAME_%02d", i);
-		ini.GetString("SERVER_LIST", key, "TEST|Server 1", pInfo->strServerName, _countof(pInfo->strServerName));
+		ini.GetString(ini::SERVER_LIST, key, "TEST|Server 1", pInfo->strServerName, _countof(pInfo->strServerName));
 
 		snprintf(key, sizeof(key), "ID_%02d", i);
-		pInfo->sServerID = static_cast<short>(ini.GetInt("SERVER_LIST", key, 1));
+		pInfo->sServerID = static_cast<short>(ini.GetInt(ini::SERVER_LIST, key, 1));
 
 		snprintf(key, sizeof(key), "USER_LIMIT_%02d", i);
-		pInfo->sUserLimit = static_cast<short>(ini.GetInt("SERVER_LIST", key, MAX_USER));
+		pInfo->sUserLimit = static_cast<short>(ini.GetInt(ini::SERVER_LIST, key, MAX_USER));
 
 		ServerList.push_back(pInfo);
 	}
@@ -234,6 +230,8 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 
 	// Trigger a save to flush defaults to file.
 	ini.Save();
+
+	spdlog::info("Version Manager initialized");
 
 	return TRUE;
 }
@@ -322,6 +320,8 @@ BOOL CVersionManagerDlg::DestroyWindow()
 		delete pInfo;
 	ServerList.clear();
 
+	spdlog::shutdown();
+
 	return CDialog::DestroyWindow();
 }
 
@@ -344,9 +344,11 @@ void CVersionManagerDlg::OnVersionSetting()
 
 void CVersionManagerDlg::ReportTableLoadError(const recordset_loader::Error& err, const char* source)
 {
-	CString msg;
-	msg.Format(_T("%hs failed: %hs"), source, err.Message.c_str());
-	AfxMessageBox(msg);
+	std::string error = std::format("VersionManagerDlg::ReportTableLoadError: {} failed: {}",
+		source, err.Message);
+	std::wstring werror = LocalToWide(error);
+	AfxMessageBox(werror.c_str());
+	spdlog::error(error);
 }
 
 /// \brief clears the _outputList text area and regenerates default output
@@ -358,13 +360,11 @@ void CVersionManagerDlg::ResetOutputList()
 	// print the ODBC connection string
 	// TODO: modelUtil::DbType::ACCOUNT;  Currently all models are assigned to GAME
 	std::string odbcString = db::ConnectionManager::GetOdbcConnectionString(modelUtil::DbType::GAME);
-	CString strConnection(CA2T(odbcString.c_str()));
-	_outputList.AddString(strConnection);
+	AddOutputMessage(odbcString);
 
 	// print the current version
-	CString version;
-	version.Format(_T("Latest Version : %d"), _lastVersion);
-	_outputList.AddString(version);
+	std::wstring version = std::format(L"Latest Version: {}", _lastVersion);
+	AddOutputMessage(version);
 }
 
 // \brief updates the last/latest version and resets the output list
@@ -372,4 +372,23 @@ void CVersionManagerDlg::SetLastVersion(int lastVersion)
 {
 	_lastVersion = lastVersion;
 	ResetOutputList();
+}
+
+/// \brief adds a message to the application's output box and updates scrollbar position
+/// \see _outputList
+void CVersionManagerDlg::AddOutputMessage(const std::string& msg)
+{
+	std::wstring wMsg = LocalToWide(msg);
+	AddOutputMessage(wMsg);
+}
+
+/// \brief adds a message to the application's output box and updates scrollbar position
+/// \see _outputList
+void CVersionManagerDlg::AddOutputMessage(const std::wstring& msg)
+{
+	_outputList.AddString(msg.data());
+	
+	// Set the focus to the last item and ensure it is visible
+	int lastIndex = _outputList.GetCount()-1;
+	_outputList.SetTopIndex(lastIndex);
 }

@@ -11,6 +11,8 @@
 #include "GameDefine.h"
 
 #include <shared/packets.h>
+#include <shared/logger.h>
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -128,7 +130,9 @@ void CMagicProcess::MagicPacket(char* pBuf, int len)
 		if (pUser->m_bResHpType == USER_DEAD
 			|| pUser->m_pUserData->m_sHp == 0)
 		{
-			TRACE(_T("### Magic&Skill Fail : name=%hs(%d), m_bResHpType=%d, hp=%d###\n"), pUser->m_pUserData->m_id, pUser->GetSocketID(), pUser->m_bResHpType, pUser->m_pUserData->m_sHp);
+			spdlog::error("MagicProcess::MagicPacket: user is dead [charId={} userId={} resHpType={} hp={}]",
+				pUser->m_pUserData->m_id, pUser->GetSocketID(),
+				pUser->m_bResHpType, pUser->m_pUserData->m_sHp);
 			return;
 		}
 	}
@@ -1470,14 +1474,13 @@ void CMagicProcess::ExecuteType3(int magicid, int sid, int tid, int data1, int d
 					// Killed by another player.
 					if (!bFlag)
 					{
-					   // 눈싸움전쟁존에서 눈싸움중이라면 공격은 눈을 던지는 것만 가능하도록,,,
+						// Players can only attack with snowballs during snow wars
 						if (m_pSrcUser->m_pUserData->m_bZone == ZONE_SNOW_BATTLE
 							&& m_pMain->m_byBattleOpen == SNOW_BATTLE)
 						{
 							m_pSrcUser->GoldGain(SNOW_EVENT_MONEY);	// 10000노아를 주는 부분,,,,,
-
-							sprintf(strLogData, "%s -> %s userdead", m_pSrcUser->m_pUserData->m_id, pTUser->m_pUserData->m_id);
-							m_pMain->WriteEventLog(strLogData);
+							spdlog::get(logger::EbenezerEvent)->info("{} killed {}",
+								m_pSrcUser->m_pUserData->m_id, pTUser->m_pUserData->m_id);
 
 							if (m_pSrcUser->m_pUserData->m_bZone == ZONE_SNOW_BATTLE
 								&& m_pMain->m_byBattleOpen == SNOW_BATTLE)

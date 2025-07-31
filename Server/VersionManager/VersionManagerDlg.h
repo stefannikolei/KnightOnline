@@ -48,6 +48,14 @@ public:
 	BOOL GetInfoFromIni();
 	BOOL LoadVersionList();
 
+	/// \brief adds a message to the application's output box and updates scrollbar position
+	/// \see _outputList
+	void AddOutputMessage(const std::string& msg);
+
+	/// \brief adds a message to the application's output box and updates scrollbar position
+	/// \see _outputList
+	void AddOutputMessage(const std::wstring& msg);
+
 	static CIOCPort	 IocPort;
 
 	VersionInfoList	VersionList;
@@ -59,7 +67,6 @@ protected:
 // Dialog Data
 	//{{AFX_DATA(CVersionManagerDlg)
 	enum { IDD = IDD_VERSIONMANAGER_DIALOG };
-	CListBox _outputList;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
@@ -82,7 +89,6 @@ protected:
 	//}}AFX_VIRTUAL
 
 // Implementation
-protected:
 	HICON			_icon;
 
 	char			_ftpUrl[256];
@@ -101,6 +107,10 @@ protected:
 	afx_msg void OnVersionSetting();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+
+private:
+	/// \brief output message box for the application
+	CListBox _outputList;
 };
 
 //{{AFX_INSERT_LOCATION}}

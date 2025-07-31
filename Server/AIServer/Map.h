@@ -55,8 +55,7 @@ public:
 	RoomEventArray		m_arRoomEventArray;
 	short				m_sKarusRoom;		// karus의 성갯수
 	short				m_sElmoradRoom;		// elmorad의 성갯수
-
-public:
+	
 	MAP();
 	virtual ~MAP();
 
@@ -92,6 +91,9 @@ public:
 	void InitializeRoom();
 
 	CRoomEvent* SetRoomEvent(int number);
+
+	/// \brief Checks if a position is valid for the map
+	bool IsValidPosition(float x, float z) const;
 
 protected:
 	void RemoveMapData();

@@ -12,6 +12,7 @@
 #include <db-library/utils.h>
 
 #include <nanodbc/nanodbc.h>
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -41,36 +42,36 @@ CDBProcess::~CDBProcess()
 
 /// \brief attempts a connection with db::ConnectionManager to the ACCOUNT dbType
 /// \throws nanodbc::database_error
-/// \returns TRUE is successful, FALSE otherwise
-BOOL CDBProcess::InitDatabase() noexcept(false)
+/// \returns true is successful, false otherwise
+bool CDBProcess::InitDatabase() noexcept(false)
 {
 	try
 	{
 		auto conn = db::ConnectionManager::CreatePoolConnection(modelUtil::DbType::ACCOUNT, DB_PROCESS_TIMEOUT);
 		if (conn == nullptr)
-			return FALSE;
+			return false;
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.InitDatabase()");
-		return FALSE;
+		db::utils::LogDatabaseError(dbErr, "DBProcess::InitDatabase()");
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 /// \brief loads the VERSION table into VersionManagerDlg.VersionList
-/// \returns TRUE if successful, FALSE otherwise
-BOOL CDBProcess::LoadVersionList(VersionInfoList* versionList)
+/// \return true on success, false on failure
+bool CDBProcess::LoadVersionList(VersionInfoList* versionList)
 {
 	recordset_loader::STLMap loader(*versionList);
 	if (!loader.Load_ForbidEmpty())
 	{
 		_main->ReportTableLoadError(loader.GetError(), __func__);
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 /// \brief Attempts account authentication with a given accountId and password
@@ -91,7 +92,7 @@ int CDBProcess::AccountLogin(const char* accountId, const char* password)
 		auto stmt = recordSet.prepare(sql);
 		if (stmt == nullptr)
 		{
-			throw db::ApplicationError("statement could not be allocated");
+			throw db::ApplicationError("DBProcess::AccountLogin: statement could not be allocated");
 		}
 
 		stmt->bind(0, accountId);
@@ -117,7 +118,7 @@ int CDBProcess::AccountLogin(const char* accountId, const char* password)
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.AccountLogin()");
+		db::utils::LogDatabaseError(dbErr, "DBProcess::AccountLogin()");
 		return AUTH_FAILED;
 	}
 	
@@ -125,8 +126,8 @@ int CDBProcess::AccountLogin(const char* accountId, const char* password)
 }
 
 /// \brief attempts to create a new Version table record
-/// \returns TRUE on success, FALSE on failure
-BOOL CDBProcess::InsertVersion(int version, const char* fileName, const char* compressName, int historyVersion)
+/// \returns true on success, false on failure
+bool CDBProcess::InsertVersion(int version, const char* fileName, const char* compressName, int historyVersion)
 {
 	using ModelType = model::Version;
 
@@ -136,7 +137,7 @@ BOOL CDBProcess::InsertVersion(int version, const char* fileName, const char* co
 	{
 		auto conn = db::ConnectionManager::CreatePoolConnection(ModelType::DbType(), DB_PROCESS_TIMEOUT);
 		if (conn == nullptr)
-			return FALSE;
+			return false;
 
 		nanodbc::statement stmt = conn->CreateStatement(insert);
 		stmt.bind(0, &version);
@@ -146,20 +147,20 @@ BOOL CDBProcess::InsertVersion(int version, const char* fileName, const char* co
 
 		nanodbc::result result = stmt.execute();
 		if (result.affected_rows() > 0)
-			return TRUE;
+			return true;
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.InsertVersion()");
-		return FALSE;
+		db::utils::LogDatabaseError(dbErr, "DBProcess::InsertVersion()");
+		return false;
 	}
 	
-	return FALSE;
+	return false;
 }
 
 /// \brief Deletes Version table entry tied to the specified key
-/// \return TRUE on success, FALSE on failure
-BOOL CDBProcess::DeleteVersion(int version)
+/// \return true on success, false on failure
+bool CDBProcess::DeleteVersion(int version)
 {
 	using ModelType = model::Version;
 
@@ -169,26 +170,26 @@ BOOL CDBProcess::DeleteVersion(int version)
 	{
 		auto conn = db::ConnectionManager::CreatePoolConnection(ModelType::DbType(), DB_PROCESS_TIMEOUT);
 		if (conn == nullptr)
-			return FALSE;
+			return false;
 
 		nanodbc::statement stmt = conn->CreateStatement(deleteQuery);
 		stmt.bind(0, &version);
 
 		nanodbc::result result = stmt.execute();
 		if (result.affected_rows() > 0)
-			return TRUE;
+			return true;
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.DeleteVersion()");
+		db::utils::LogDatabaseError(dbErr, "DBProcess::DeleteVersion()");
 	}
 	
-	return FALSE;
+	return false;
 }
 
 /// \brief updates the server's concurrent user counts
-/// \return TRUE on success, FALSE on failure
-BOOL CDBProcess::LoadUserCountList()
+/// \return true on success, false on failure
+bool CDBProcess::LoadUserCountList()
 {
 	try
 	{
@@ -206,14 +207,14 @@ BOOL CDBProcess::LoadUserCountList()
 			_main->ServerList[serverId]->sUserCount = concurrent.Zone1Count + concurrent.Zone2Count + concurrent.Zone3Count;
 		}
 
-		return TRUE;
+		return true;
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.LoadUserCountList()");
+		db::utils::LogDatabaseError(dbErr, "DBProcess::LoadUserCountList()");
 	}
 	
-	return FALSE;
+	return false;
 }
 
 /// \brief Checks to see if a user is present in CURRENTUSER for a particular server
@@ -221,8 +222,8 @@ BOOL CDBProcess::LoadUserCountList()
 /// \param accountId
 /// \param[out] serverIp output of the server IP the user is connected to
 /// \param[out] serverId output of the serverId the user is connected to
-/// \return TRUE on success, FALSE on failure
-BOOL CDBProcess::IsCurrentUser(const char* accountId, char* serverIp, int& serverId)
+/// \return true on success, false on failure
+bool CDBProcess::IsCurrentUser(const char* accountId, char* serverIp, int& serverId)
 {
 	db::SqlBuilder<model::CurrentUser> sql;
 	sql.IsWherePK = true;
@@ -233,35 +234,35 @@ BOOL CDBProcess::IsCurrentUser(const char* accountId, char* serverIp, int& serve
 		auto stmt = recordSet.prepare(sql);
 		if (stmt == nullptr)
 		{
-			throw db::ApplicationError("statement could not be allocated");
+			throw db::ApplicationError("DBProcess::IsCurrentUser: statement could not be allocated");
 		}
 
 		stmt->bind(0, accountId);
 		recordSet.execute();
 
 		if (!recordSet.next())
-			return FALSE;
+			return false;
 
 		model::CurrentUser user = recordSet.get();
 		serverId = user.ServerId;
 		strcpy(serverIp, user.ServerIP.c_str());
 
-		return TRUE;
+		return true;
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.IsCurrentUser()");
+		db::utils::LogDatabaseError(dbErr, "DBProcess::IsCurrentUser()");
 	}
 
-	return FALSE;
+	return false;
 }
 
 /// \brief calls LoadPremiumServiceUser and writes how many days of premium remain
 /// to premiumDaysRemaining
 /// \param accountId
 /// \param[out] premiumDaysRemaining output value of remaining premium days
-/// \return TRUE on success, FALSE on failure
-BOOL CDBProcess::LoadPremiumServiceUser(const char* accountId, short* premiumDaysRemaining)
+/// \return true on success, false on failure
+bool CDBProcess::LoadPremiumServiceUser(const char* accountId, short* premiumDaysRemaining)
 {
 	int32_t premiumType = 0, // NOTE: we don't need this in the login server
 		daysRemaining = 0;
@@ -272,10 +273,10 @@ BOOL CDBProcess::LoadPremiumServiceUser(const char* accountId, short* premiumDay
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
-		db::utils::LogDatabaseError(dbErr, "DBProcess.LoadPremiumServiceUser()");
-		return FALSE;
+		db::utils::LogDatabaseError(dbErr, "DBProcess::LoadPremiumServiceUser()");
+		return false;
 	}
 
 	*premiumDaysRemaining = static_cast<short>(daysRemaining);
-	return TRUE;
+	return true;
 }

@@ -5,10 +5,13 @@
 #include "stdafx.h"
 #include "server.h"
 #include "MagicProcess.h"
+
 #include "ServerDlg.h"
 #include "User.h"
 #include "Npc.h"
 #include "Region.h"
+
+#include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -718,10 +721,10 @@ short CMagicProcess::AreaAttack(int magictype, int magicid, int moral, int data1
 
 	if (magictype == 3)
 	{
-		pType3 = m_pMain->m_Magictype3Array.GetData(magicid);      // Get magic skill table type 3.
+		pType3 = m_pMain->m_Magictype3Array.GetData(magicid);
 		if (pType3 == nullptr)
 		{
-			TRACE(_T("#### CMagicProcess-AreaAttack Fail : magic table3 error ,, magicid=%d\n"), magicid);
+			spdlog::error("MagicProcess::AreaAttack: No MAGIC_TYPE3 definition [magicId={}]", magicid);
 			return 0;
 		}
 
@@ -732,7 +735,7 @@ short CMagicProcess::AreaAttack(int magictype, int magicid, int moral, int data1
 		pType4 = m_pMain->m_Magictype4Array.GetData(magicid);      // Get magic skill table type 3.
 		if (pType4 == nullptr)
 		{
-			TRACE(_T("#### CMagicProcess-AreaAttack Fail : magic table4 error ,, magicid=%d\n"), magicid);
+			spdlog::error("MagicProcess::AreaAttack: No MAGIC_TYPE4 definition [magicId={}]", magicid);
 			return 0;
 		}
 
@@ -741,7 +744,8 @@ short CMagicProcess::AreaAttack(int magictype, int magicid, int moral, int data1
 
 	if (radius <= 0)
 	{
-		TRACE(_T("#### CMagicProcess-AreaAttack Fail : magicid=%d, radius = %d\n"), magicid, radius);
+		spdlog::error("MagicProcess::AreaAttack: Invalid radius [magicId={} radius={}",
+			magicid, radius);
 		return 0;
 	}
 
@@ -751,8 +755,8 @@ short CMagicProcess::AreaAttack(int magictype, int magicid, int moral, int data1
 	MAP* pMap = m_pMain->GetMapByIndex(m_pSrcUser->m_sZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### CMagicProcess--AreaAttack ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_pSrcUser->m_strUserID, m_pSrcUser->m_sZoneIndex);
-		return 0;
+		spdlog::error("MagicProcess::AreaAttack: No map found: [charId={} zoneIndex={}]",
+			m_pSrcUser->m_strUserID, m_pSrcUser->m_sZoneIndex);
 		return 0;
 	}
 
@@ -794,7 +798,8 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 	MAP* pMap = m_pMain->GetMapByIndex(m_pSrcUser->m_sZoneIndex);
 	if (pMap == nullptr)
 	{
-		TRACE(_T("#### CMagicProcess--AreaAttackDamage ZoneIndex Fail : [name=%hs], zoneindex=%d, pMap == NULL #####\n"), m_pSrcUser->m_strUserID, m_pSrcUser->m_sZoneIndex);
+		spdlog::error("MagicProcess::AreaAttackDamage: No map found: [charId={} zoneIndex={}]",
+			m_pSrcUser->m_strUserID, m_pSrcUser->m_sZoneIndex);
 		return;
 	}
 
@@ -804,7 +809,8 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 		|| rx > pMap->GetXRegionMax()
 		|| rz > pMap->GetZRegionMax())
 	{
-		TRACE(_T("#### CMagicProcess-AreaAttackDamage() Fail : [nid=%d, name=%hs], nRX=%d, nRZ=%d #####\n"), m_pSrcUser->m_iUserId, m_pSrcUser->m_strUserID, rx, rz);
+		spdlog::error("MagicProcess::AreaAttackDamage: region out of bounds [userId={} charId={} x={} z={}]",
+			m_pSrcUser->m_iUserId, m_pSrcUser->m_strUserID, rx, rz);
 		return;
 	}
 
@@ -815,19 +821,19 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 	int damage = 0, tid = 0, target_damage = 0, attribute = 0;
 	float fRadius = 0;
 
-	pMagic = m_pMain->m_MagictableArray.GetData(magicid);   // Get main magic table.
+	pMagic = m_pMain->m_MagictableArray.GetData(magicid);
 	if (pMagic == nullptr)
 	{
-		TRACE(_T("#### CMagicProcess-AreaAttackDamage Fail : magic maintable error ,, magicid=%d\n"), magicid);
+		spdlog::error("MagicProcess::AreaAttackDamage: No MAGIC definition [magicId={}]", magicid);
 		return;
 	}
 
 	if (magictype == 3)
 	{
-		pType3 = m_pMain->m_Magictype3Array.GetData(magicid);      // Get magic skill table type 3.
+		pType3 = m_pMain->m_Magictype3Array.GetData(magicid);
 		if (pType3 == nullptr)
 		{
-			TRACE(_T("#### CMagicProcess-AreaAttackDamage Fail : magic table3 error ,, magicid=%d\n"), magicid);
+			spdlog::error("MagicProcess::AreaAttackDamage: No MAGIC_TYPE3 definition [magicId={}]", magicid);
 			return;
 		}
 
@@ -837,10 +843,10 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 	}
 	else if (magictype == 4)
 	{
-		pType4 = m_pMain->m_Magictype4Array.GetData(magicid);      // Get magic skill table type 3.
+		pType4 = m_pMain->m_Magictype4Array.GetData(magicid);
 		if (pType4 == nullptr)
 		{
-			TRACE(_T("#### CMagicProcess-AreaAttackDamage Fail : magic table4 error ,, magicid=%d\n"), magicid);
+			spdlog::error("MagicProcess::AreaAttackDamage: No MAGIC_TYPE4 definition [magicId={}]", magicid);
 			return;
 		}
 
@@ -849,7 +855,8 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 
 	if (fRadius <= 0)
 	{
-		TRACE(_T("#### CMagicProcess-AreaAttackDamage Fail : magicid=%d, radius = %d\n"), magicid, fRadius);
+		spdlog::error("MagicProcess::AreaAttackDamage: invalid radius [magicId={} radius={}]",
+			magicid, fRadius);
 		return;
 	}
 
@@ -901,7 +908,8 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 			if (magictype == 3)
 			{
 				damage = GetMagicDamage(pNpc->m_sNid + NPC_BAND, target_damage, attribute, dexpoint, righthand_damage);
-				TRACE(_T("Area magictype3 ,, magicid=%d, damage=%d\n"), magicid, damage);
+				spdlog::trace("MagicProcess::AreaAttackDamage: magic damage calculated [magicId={} damage={}]",
+					magicid, damage);
 				if (damage >= 0)
 				{
 					result = pNpc->SetHMagicDamage(damage, m_pSrcUser->m_pIocport);
@@ -995,7 +1003,7 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 						break;
 				}
 
-				TRACE(_T("Area magictype4 ,, magicid=%d\n"), magicid);
+				spdlog::trace("MagicProcess::AreaAttackDamage: type4 processed [magicId={}]", magicid);
 
 				SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
 				SetByte(send_buff, MAGIC_EFFECTING, send_index);

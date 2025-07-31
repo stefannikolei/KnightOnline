@@ -252,32 +252,3 @@ BOOL CheckMaxValueReturn(DWORD& dest, DWORD add)
 	else
 		return FALSE;//dest = _MAX_DWORD;
 }
-
-void LogFileWrite(CString logstr)
-{
-	CString LogFileName;
-	LogFileName.Format(_T("%s\\AIServer.log"), GetProgPath().GetString());
-
-	CFile file;
-	if (!file.Open(LogFileName, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite))
-		return;
-
-	file.SeekToEnd();
-
-#if defined(_UNICODE)
-	const std::string utf8 = WideToUtf8(logstr.GetString(), static_cast<size_t>(logstr.GetLength()));
-	file.Write(utf8.c_str(), static_cast<int>(utf8.size()));
-#else
-	file.Write(logstr, logstr.GetLength());
-#endif
-
-	file.Close();
-}
-
-void TimeTrace(const TCHAR* pMsg)
-{
-	CString szMsg;
-	CTime time = CTime::GetCurrentTime();
-	szMsg.Format(_T("%s,,  time : %d-%d-%d, %d:%d]\n"), pMsg, time.GetYear(), time.GetMonth(), time.GetDay(), time.GetHour(), time.GetMinute());
-	TRACE(szMsg);
-}

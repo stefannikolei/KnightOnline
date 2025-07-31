@@ -61,29 +61,6 @@ typedef std::vector <MAP*>					ZoneArray;
 
 class CServerDlg : public CDialog
 {
-private:
-	void ResumeAI();
-	BOOL LoadNpcPosTable(std::vector<model::NpcPos*>& rows);
-	BOOL CreateNpcThread();
-	void ReportTableLoadError(const recordset_loader::Error& err, const char* source);
-	BOOL GetMagicTableData();
-	BOOL GetMagicType1Data();
-	BOOL GetMagicType2Data();
-	BOOL GetMagicType3Data();
-	BOOL GetMagicType4Data();
-	BOOL GetMonsterTableData();
-	BOOL GetNpcTableData();
-	BOOL GetNpcItemTable();
-	BOOL GetMakeWeaponItemTableData();
-	BOOL GetMakeDefensiveItemTableData();
-	BOOL GetMakeGradeItemTableData();
-	BOOL GetMakeLareItemTableData();
-	BOOL MapFileLoad();
-	void GetServerInfoIni();
-
-	void SyncTest();
-	void RegionCheck();		// region안에 들어오는 유저 체크 (스레드에서 FindEnermy()함수의 부하를 줄이기 위한 꽁수)
-	void TestCode();
 // Construction
 public:
 	void GameServerAcceptThread();
@@ -95,9 +72,9 @@ public:
 	CNpc* GetEventNpcPtr();
 	BOOL   SetSummonNpcData(CNpc* pNpc, int zone_id, float fx, float fz);
 	int    MonsterSummon(const char* pNpcName, int zone_id, float fx, float fz);
-	int GetZoneIndex(int zone_id) const;
-	int GetServerNumber(int zone_id) const;
-	void ClostSocket(int zonenumber);
+	int GetZoneIndex(int zoneId) const;
+	int GetServerNumber(int zoneId) const;
+	void CloseSocket(int zonenumber);
 
 	void CheckAliveTest();
 	void DeleteUserList(int uid);
@@ -109,6 +86,14 @@ public:
 	MAP* GetMapByIndex(int iZoneIndex) const;
 	MAP* GetMapByID(int iZoneID) const;
 
+	/// \brief adds a message to the application's output box and updates scrollbar position
+	/// \see _outputList
+	void AddOutputMessage(const std::string& msg);
+
+	/// \brief adds a message to the application's output box and updates scrollbar position
+	/// \see _outputList
+	void AddOutputMessage(const std::wstring& msg);
+
 	CServerDlg(CWnd* pParent = nullptr);	// standard constructor
 	~CServerDlg();
 
@@ -119,13 +104,11 @@ public:
 // Dialog Data
 	//{{AFX_DATA(CServerDlg)
 	enum { IDD = IDD_SERVER_DIALOG };
-	CListBox	m_StatusList;
 	CString	m_strStatus;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CServerDlg)
-public:
 	virtual BOOL DestroyWindow();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 protected:
@@ -159,9 +142,6 @@ public:
 	// class 객체
 	CNpcItem				m_NpcItem;
 
-	CFile					m_UserLogFile;
-	CFile					m_ItemLogFile;
-
 	// 전역 객체 변수
 	//BOOL			m_bNpcExit;
 	long			m_TotalNPC;			// DB에있는 총 수
@@ -188,14 +168,6 @@ public:
 
 	static CServerDlg* s_pInstance;
 
-private:
-	// 패킷 압축에 필요 변수   -------------
-	int					m_CompCount;
-	char				m_CompBuf[10240];
-	int					m_iCompIndex;
-	// ~패킷 압축에 필요 변수   -------------
-
-	BYTE				m_byZone;
 
 // Implementation
 protected:
@@ -209,6 +181,12 @@ protected:
 	// Generated message map functions
 	//{{AFX_MSG(CServerDlg)
 	virtual BOOL OnInitDialog();
+
+	/// \brief attempts to listen on the port associated with m_byZone
+	/// \see m_byZone
+	/// \returns true when successful, otherwise false
+	bool ListenByZone();
+	
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
@@ -216,6 +194,41 @@ protected:
 	//}}AFX_MSG
 	afx_msg LRESULT OnGameServerLogin(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
+
+private:
+	// 패킷 압축에 필요 변수   -------------
+	int					m_CompCount;
+	char				m_CompBuf[10240];
+	int					m_iCompIndex;
+	// ~패킷 압축에 필요 변수   -------------
+
+	BYTE				m_byZone;
+	
+	/// \brief output message box for the application
+	CListBox _outputList;
+
+	void ResumeAI();
+	BOOL LoadNpcPosTable(std::vector<model::NpcPos*>& rows);
+	BOOL CreateNpcThread();
+	void ReportTableLoadError(const recordset_loader::Error& err, const char* source);
+	BOOL GetMagicTableData();
+	BOOL GetMagicType1Data();
+	BOOL GetMagicType2Data();
+	BOOL GetMagicType3Data();
+	BOOL GetMagicType4Data();
+	BOOL GetMonsterTableData();
+	BOOL GetNpcTableData();
+	BOOL GetNpcItemTable();
+	BOOL GetMakeWeaponItemTableData();
+	BOOL GetMakeDefensiveItemTableData();
+	BOOL GetMakeGradeItemTableData();
+	BOOL GetMakeRareItemTableData();
+	BOOL MapFileLoad();
+	void GetServerInfoIni();
+
+	void SyncTest();
+	void RegionCheck();		// region안에 들어오는 유저 체크 (스레드에서 FindEnermy()함수의 부하를 줄이기 위한 꽁수)
+	void TestCode();
 };
 
 //{{AFX_INSERT_LOCATION}}

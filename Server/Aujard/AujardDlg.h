@@ -47,10 +47,6 @@ public:
     /// \see WIZ_BATTLE_EVENT
 	void BattleEventResult(char* data);
 
-	/// \brief Writes a string to the AujardLog-DATE.txt log
-	/// \todo: refactor out for LogFileWrite in Define.h or other logger solution
-	void WriteLogFile(char* data);
-
 	/// \brief checks for users who have not saved their data in AUTOSAVE_DELTA milliseconds
 	/// and performs a UserDataSave() for them.
 	/// \note this is currently disabled in OnTimer()
@@ -154,6 +150,14 @@ public:
 	/// \see OnTimer(), HandleUserLogout()
 	void AllSaveRoutine();
 
+	/// \brief adds a message to the application's output box and updates scrollbar position
+	/// \see _outputList
+	void AddOutputMessage(const std::string& msg);
+
+	/// \brief adds a message to the application's output box and updates scrollbar position
+	/// \see _outputList
+	void AddOutputMessage(const std::wstring& msg);
+
 	CAujardDlg(CWnd* parent = nullptr);	// standard constructor
 	~CAujardDlg();
 
@@ -172,7 +176,6 @@ public:
 	// Dialog Data
 	//{{AFX_DATA(CAujardDlg)
 	enum { IDD = IDD_AUJARD_DIALOG };
-	CListBox	OutputList;
 	CStatic	    DBProcessNum;
 	//}}AFX_DATA
 
@@ -180,7 +183,6 @@ protected:
 	static CAujardDlg*	_instance;
 
 	CDBAgent			_dbAgent;
-	CFile				_logFile;
 
 	HANDLE				_readQueueThread;
 	HANDLE				_sharedMemoryHandle;
@@ -192,7 +194,6 @@ protected:
 	int					_packetCount;		// packet의 수를 체크
 	int					_sendPacketCount;	// packet의 수를 체크
 	int					_recvPacketCount;	// packet의 수를 체크
-	int					_logFileDay;
 
 	HICON				_icon;
 
@@ -240,6 +241,10 @@ protected:
 	afx_msg void OnTimer(UINT EventId);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+
+private:
+	/// \brief output message box for the application
+	CListBox _outputList;
 };
 
 //{{AFX_INSERT_LOCATION}}

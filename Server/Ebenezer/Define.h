@@ -421,42 +421,6 @@ inline CString GetProgPath()
 	return Path;
 }
 
-inline void LogFileWrite(LPCTSTR logstr)
-{
-	CString LogFileName;
-	LogFileName.Format(_T("%s\\Ebenezer.log"), GetProgPath().GetString());
-
-	CFile file;
-	if (!file.Open(LogFileName, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite))
-		return;
-
-	file.SeekToEnd();
-
-#if defined(_UNICODE)
-	const std::string utf8 = WideToUtf8(logstr, wcslen(logstr));
-	file.Write(utf8.c_str(), static_cast<int>(utf8.size()));
-#else
-	file.Write(logstr, strlen(logstr));
-#endif
-
-	file.Close();
-}
-
-inline void DisplayErrorMsg(SQLHANDLE hstmt)
-{
-	SQLTCHAR      SqlState[6], Msg[1024];
-	SQLINTEGER    NativeError;
-	SQLSMALLINT   i, MsgLen;
-	SQLRETURN     rc2;
-
-	i = 1;
-	while ((rc2 = SQLGetDiagRec(SQL_HANDLE_STMT, hstmt, i, SqlState, &NativeError, Msg, _countof(Msg), &MsgLen)) != SQL_NO_DATA)
-	{
-		TRACE(_T("*** %s, %d, %hs, %d ***\n"), SqlState, NativeError, Msg, MsgLen);
-		i++;
-	}
-}
-
 inline int myrand(int min, int max)
 {
 	if (min == max)
@@ -509,14 +473,6 @@ inline float TimeGet()
 	}
 
 	return (float) timeGetTime();
-}
-
-inline void	TimeTrace(TCHAR* pMsg)
-{
-	CString szMsg;
-	CTime time = CTime::GetCurrentTime();
-	szMsg.Format(_T("%s,,  time : %d-%d-%d, %d:%d]\n"), pMsg, time.GetYear(), time.GetMonth(), time.GetDay(), time.GetHour(), time.GetMinute());
-	TRACE(szMsg);
 }
 
 #endif

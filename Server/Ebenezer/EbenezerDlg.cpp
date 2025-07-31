@@ -11,6 +11,7 @@
 #include <shared/StringUtils.h>
 
 #include <db-library/ConnectionManager.h>
+#include <shared/logger.h>
 
 constexpr int GAME_TIME       	= 100;
 constexpr int SEND_TIME			= 200;
@@ -37,7 +38,6 @@ using namespace db;
 
 CRITICAL_SECTION g_serial_critical;
 CRITICAL_SECTION g_region_critical;
-CRITICAL_SECTION g_LogFile_critical;
 
 CEbenezerDlg* CEbenezerDlg::s_pInstance = nullptr;
 CIOCPort CEbenezerDlg::m_Iocport;
@@ -138,7 +138,8 @@ DWORD WINAPI ReadQueueThread(LPVOID lp)
 				if (pUser != nullptr
 					&& strlen(pUser->m_pUserData->m_id) != 0)
 				{
-					TRACE(_T("Logout Strange...%hs\n"), pUser->m_pUserData->m_id);
+					spdlog::debug("EbenezerDlg::ReadQueueThread: WIZ_LOGOUT [charId={}]",
+						pUser->m_pUserData->m_id);
 					pUser->Close();
 				}
 				break;
@@ -280,7 +281,7 @@ void CEbenezerDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEbenezerDlg)
 	DDX_Control(pDX, IDC_GONGJI_EDIT, m_AnnounceEdit);
-	DDX_Control(pDX, IDC_LIST1, m_StatusList);
+	DDX_Control(pDX, IDC_LIST1, _outputList);
 	//}}AFX_DATA_MAP
 }
 
@@ -325,25 +326,11 @@ BOOL CEbenezerDlg::OnInitDialog()
 	m_sReSocketCount = 0;
 	m_fReConnectStart = 0.0f;
 	// sungyong~ 2002.05.23
-
-	//----------------------------------------------------------------------
-	//	Logfile initialize
-	//----------------------------------------------------------------------
-	CTime cur = CTime::GetCurrentTime();
-	TCHAR strLogFile[50] = {};
-	wsprintf(strLogFile, _T("RegionLog-%d-%d-%d.txt"), cur.GetYear(), cur.GetMonth(), cur.GetDay());
-	m_RegionLogFile.Open(strLogFile, CFile::modeWrite | CFile::modeCreate | CFile::modeNoTruncate | CFile::shareDenyNone);
-	m_RegionLogFile.SeekToEnd();
-
-	wsprintf(strLogFile, _T("PacketLog-%d-%d-%d.txt"), cur.GetYear(), cur.GetMonth(), cur.GetDay());
-	m_LogFile.Open(strLogFile, CFile::modeWrite | CFile::modeCreate | CFile::modeNoTruncate | CFile::shareDenyNone);
-	m_LogFile.SeekToEnd();
-
-	InitializeCriticalSection(&g_LogFile_critical);
+	
 	InitializeCriticalSection(&g_serial_critical);
 	InitializeCriticalSection(&g_region_critical);
 
-	GetTimeFromIni();
+	LoadConfig();
 
 	m_Iocport.Init(MAX_USER, CLIENT_SOCKSIZE, 4);
 
@@ -389,140 +376,157 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before item\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading ITEM table");
 	if (!LoadItemTable())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache ITEM table, closing");
 		AfxMessageBox(_T("ItemTable Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before main\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC table");
 	if (!LoadMagicTable())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC table, closing");
 		AfxMessageBox(_T("MagicTable Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before 1\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE1 table");
 	if (!LoadMagicType1())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE1 table, closing");
 		AfxMessageBox(_T("MagicType1 Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before 2\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE2 table");
 	if (!LoadMagicType2())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE2 table, closing");
 		AfxMessageBox(_T("MagicType2 Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before 3\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE3 table");
 	if (!LoadMagicType3())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE3 table, closing");
 		AfxMessageBox(_T("MagicType3 Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before 4\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE4 table");
 	if (!LoadMagicType4())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE4 table, closing");
 		AfxMessageBox(_T("MagicType4 Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before 5\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE5 table");
 	if (!LoadMagicType5())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE5 table, closing");
 		AfxMessageBox(_T("MagicType5 Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before 8\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE8 table");
 	if (!LoadMagicType8())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE8 table, closing");
 		AfxMessageBox(_T("MagicType8 Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before Coeffi\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading COEFFICIENT table");
 	if (!LoadCoefficientTable())
 	{
-		AfxMessageBox(_T("CharaterDataTable Load Fail"));
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache COEFFICIENT table, closing");
+		AfxMessageBox(_T("COEFFICIENT Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before Level\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading LEVEL_UP table");
 	if (!LoadLevelUpTable())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache LEVEL_UP table, closing");
 		AfxMessageBox(_T("LevelUpTable Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before All Kinghts\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading KNIGHTS table");
 	if (!LoadAllKnights())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache KNIGHTS table, closing");
 		AfxMessageBox(_T("KnightsData Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before All Knights User\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading KNIGHTS_USER table");
 	if (!LoadAllKnightsUserData())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache KNIGHTS_USER table, closing");
 		AfxMessageBox(_T("LoadAllKnightsUserData Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before home\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading HOME table");
 	if (!LoadHomeTable())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache HOME table, closing");
 		AfxMessageBox(_T("LoadHomeTable Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before item LoadStartPositionTable table\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading START_POSITION table");
 	if (!LoadStartPositionTable())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache START_POSITION table, closing");
 		AfxMessageBox(_T("LoadStartPositionTable Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before battle\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading BATTLE table");
 	if (!LoadBattleTable())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache BATTLE table, closing");
 		AfxMessageBox(_T("LoadBattleTable Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	LogFileWrite(_T("before map file\r\n"));
+	spdlog::info("EbenezerDlg::OnInitDialog: loading maps");
 	if (!MapFileLoad())
+	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to load maps, closing");
 		AfxPostQuitMessage(0);
-
-	LogFileWrite(_T("after map file\r\n"));
+	}
 
 	LoadNoticeData();
 
 	DWORD id;
-	m_hReadQueueThread = ::CreateThread(nullptr, 0, ReadQueueThread, this, 0, &id);
+	m_hReadQueueThread = CreateThread(nullptr, 0, ReadQueueThread, this, 0, &id);
 
 	m_pUdpSocket = new CUdpSocket(this);
 	if (!m_pUdpSocket->CreateSocket())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to create UDP socket");
 		AfxMessageBox(_T("Udp Socket Create Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
@@ -530,22 +534,26 @@ BOOL CEbenezerDlg::OnInitDialog()
 
 	if (!AIServerConnect())
 	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to connect to the AIServer");
 #ifndef _DEBUG
 		AfxPostQuitMessage(0);
 #endif
 	}
 
-	LogFileWrite(_T("success\r\n"));
+#ifdef _DEBUG
+	// meant to be called when AI finishes connecting, to allow users to connect.
+	// we allow user connections early in debug builds so we do not need to wait
+	// for a full server load to log in
 	UserAcceptThread();
+#endif
 
-	//CTime cur = CTime::GetCurrentTime();
-	CString starttime;
-	starttime.Format(
-		_T("Game Server Start : %d월 %d일 %d시 %d분\r\n"), cur.GetMonth(), cur.GetDay(), cur.GetHour(), cur.GetMinute());
-	LogFileWrite(starttime);
-	m_StatusList.AddString(starttime);
+	CTime cur = CTime::GetCurrentTime();
+	std::wstring starttime = std::format(L"Ebenezer started: {:02}/{:02} {:02}:{:02}",
+		cur.GetMonth(), cur.GetDay(), cur.GetHour(), cur.GetMinute());
+	AddOutputMessage(starttime);
+	spdlog::info("EbenezerDlg::OnInitDialog: successfully initialized");
 
-	return TRUE;  // return TRUE  unless you set the focus to a control
+	return TRUE;
 }
 
 void CEbenezerDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -598,19 +606,13 @@ BOOL CEbenezerDlg::DestroyWindow()
 	KillTimer(PACKET_CHECK);
 
 	if (m_hReadQueueThread != nullptr)
-		::TerminateThread(m_hReadQueueThread, 0);
+		TerminateThread(m_hReadQueueThread, 0);
 
 	if (m_bMMFCreate)
 	{
 		UnmapViewOfFile(m_lpMMFile);
 		CloseHandle(m_hMMFile);
 	}
-
-	if (m_RegionLogFile.m_hFile != CFile::hFileNull)
-		m_RegionLogFile.Close();
-
-	if (m_LogFile.m_hFile != CFile::hFileNull)
-		m_LogFile.Close();
 
 	if (!m_ItemtableArray.IsEmpty())
 		m_ItemtableArray.DeleteAllData();
@@ -679,9 +681,10 @@ BOOL CEbenezerDlg::DestroyWindow()
 
 	s_pInstance = nullptr;
 
-	DeleteCriticalSection(&g_LogFile_critical);
 	DeleteCriticalSection(&g_serial_critical);
 	DeleteCriticalSection(&g_region_critical);
+
+	spdlog::shutdown();
 
 	return CDialog::DestroyWindow();
 }
@@ -689,7 +692,8 @@ BOOL CEbenezerDlg::DestroyWindow()
 void CEbenezerDlg::UserAcceptThread()
 {
 	// User Socket Accept
-	::ResumeThread(m_Iocport.m_hAcceptThread);
+	ResumeThread(m_Iocport.m_hAcceptThread);
+	AddOutputMessage(_T("Accepting user connections"));
 }
 
 CUser* CEbenezerDlg::GetUserPtr(const char* userid, NameType type)
@@ -718,6 +722,25 @@ CUser* CEbenezerDlg::GetUserPtr(const char* userid, NameType type)
 	}
 
 	return nullptr;
+}
+
+/// \brief adds a message to the application's output box and updates scrollbar position
+/// \see _outputList
+void CEbenezerDlg::AddOutputMessage(const std::string& msg)
+{
+	std::wstring wMsg = LocalToWide(msg);
+	AddOutputMessage(wMsg);
+}
+
+/// \brief adds a message to the application's output box and updates scrollbar position
+/// \see _outputList
+void CEbenezerDlg::AddOutputMessage(const std::wstring& msg)
+{
+	_outputList.AddString(msg.data());
+	
+	// Set the focus to the last item and ensure it is visible
+	int lastIndex = _outputList.GetCount()-1;
+	_outputList.SetTopIndex(lastIndex);
 }
 
 void CEbenezerDlg::OnTimer(UINT nIDEvent)
@@ -758,7 +781,7 @@ void CEbenezerDlg::OnTimer(UINT nIDEvent)
 			if (!retval)
 			{
 				int errValue = GetLastError();
-				TRACE(_T("Send PostQueued Error : %d\n"), errValue);
+				spdlog::error("EbenezerDlg::OnTimer: PostQueuedCompletionStatus error code {}", errValue);
 			}
 			break;
 
@@ -785,7 +808,9 @@ BOOL CEbenezerDlg::AIServerConnect()
 	{
 		if (!AISocketConnect(i))
 		{
-			AfxMessageBox(_T("AI Server Connect Fail!!"));
+			std::wstring msg = std::format(L"Failed to connect to AIServer zone {}", i);
+			AfxMessageBox(msg.c_str());
+			spdlog::error("EbenezerDlg::AIServerConnect: failed to connect to AIServer zone {}", i);
 			return FALSE;
 		}
 	}
@@ -860,7 +885,7 @@ BOOL CEbenezerDlg::AISocketConnect(int zone, int flag)
 	//m_sSocketCount = zone;
 	m_AISocketArray.PutData(zone, pAISock);
 
-	TRACE(_T("**** AISocket Connect Success!! ,, zone = %d ****\n"), zone);
+	spdlog::debug("EbenezerDlg::AISocketConnect: connected to zone {}", zone);
 	return TRUE;
 }
 // ~sungyong 2002.05.22
@@ -1109,7 +1134,6 @@ void CEbenezerDlg::Send_AIServer(int zone, char* pBuf, int len)
 BOOL CEbenezerDlg::InitializeMMF()
 {
 	BOOL bCreate = TRUE;
-	CString logstr;
 
 	DWORD filesize = MAX_USER * ALLOCATED_USER_DATA_BLOCK;
 	m_hMMFile = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, filesize, _T("KNIGHT_DB"));
@@ -1120,7 +1144,6 @@ BOOL CEbenezerDlg::InitializeMMF()
 		m_hMMFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, TRUE, _T("KNIGHT_DB"));
 		if (m_hMMFile == nullptr)
 		{
-			logstr = _T("Shared Memory Load Fail!!");
 			m_hMMFile = INVALID_HANDLE_VALUE;
 			return FALSE;
 		}
@@ -1128,8 +1151,7 @@ BOOL CEbenezerDlg::InitializeMMF()
 		bCreate = FALSE;
 	}
 
-	logstr = _T("Shared Memory Create Success!!");
-	m_StatusList.AddString(logstr);
+	AddOutputMessage(_T("Shared memory created successfully"));
 
 	m_lpMMFile = (char*) MapViewOfFile(m_hMMFile, FILE_MAP_WRITE, 0, 0, 0);
 	if (m_lpMMFile == nullptr)
@@ -1236,9 +1258,11 @@ BOOL CEbenezerDlg::MapFileLoad()
 
 void CEbenezerDlg::ReportTableLoadError(const recordset_loader::Error& err, const char* source)
 {
-	CString msg;
-	msg.Format(_T("%hs failed: %hs"), source, err.Message.c_str());
-	AfxMessageBox(msg);
+	std::string error = std::format("EbenezerDlg::ReportTableLoadError: {} failed: {}",
+		source, err.Message);
+	std::wstring werror = LocalToWide(error);
+	AfxMessageBox(werror.c_str());
+	spdlog::error(error);
 }
 
 BOOL CEbenezerDlg::LoadItemTable()
@@ -1361,15 +1385,18 @@ BOOL CEbenezerDlg::LoadLevelUpTable()
 	return TRUE;
 }
 
-void CEbenezerDlg::GetTimeFromIni()
+void CEbenezerDlg::LoadConfig()
 {
-	int year = 0, month = 0, date = 0, hour = 0, server_count = 0, sgroup_count = 0;
+	int year = 0, month = 0, date = 0, hour = 0, serverCount = 0, sgroup_count = 0;
 	char ipkey[20] = {};
 
 	std::filesystem::path iniPath(GetProgPath().GetString());
 	iniPath /= L"gameserver.ini";
 
 	m_Ini.Load(iniPath);
+
+	logger::SetupLogger(m_Ini, logger::Ebenezer);
+	
 	m_nYear = m_Ini.GetInt("TIMER", "YEAR", 1);
 	m_nMonth = m_Ini.GetInt("TIMER", "MONTH", 1);
 	m_nDate = m_Ini.GetInt("TIMER", "DATE", 1);
@@ -1394,14 +1421,15 @@ void CEbenezerDlg::GetTimeFromIni()
 	m_nCastleCapture = m_Ini.GetInt("CASTLE", "NATION", 1);
 	m_nServerNo = m_Ini.GetInt("ZONE_INFO", "MY_INFO", 1);
 	m_nServerGroup = m_Ini.GetInt("ZONE_INFO", "SERVER_NUM", 0);
-	server_count = m_Ini.GetInt("ZONE_INFO", "SERVER_COUNT", 1);
-	if (server_count < 1)
+	serverCount = m_Ini.GetInt("ZONE_INFO", "SERVER_COUNT", 1);
+	if (serverCount < 1)
 	{
-		AfxMessageBox(_T("ServerCount Error!!"));
+		AfxMessageBox(_T("SERVER_COUNT must be greater than 0"));
+		spdlog::error("EbenezerDlg::LoadConfig: invalid SERVER_COUNT={}", serverCount);
 		return;
 	}
 
-	for (int i = 0; i < server_count; i++)
+	for (int i = 0; i < serverCount; i++)
 	{
 		_ZONE_SERVERINFO* pInfo = new _ZONE_SERVERINFO;
 
@@ -1573,7 +1601,7 @@ void CEbenezerDlg::SetGameTime()
 
 void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 {
-	int send_index = 0, buff_index = 0, i = 0, j = 0, t_count = 0, prev_index = 0;
+	int send_index = 0, buff_index = 0, i = 0, j = 0, t_count = 0, prevIndex = 0;
 	C3DMap* pMap = nullptr;
 	int region_x = -1, region_z = -1, user_count = 0, uid = -1;
 	char buff[16384] = {}, send_buff[49152] = {};
@@ -1598,11 +1626,11 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 	memset(buff, 0, sizeof(buff));
 	region_x = pSendUser->m_RegionX;	region_z = pSendUser->m_RegionZ - 1;		// NORTH
 	buff_index = GetRegionUserIn(pMap, region_x, region_z, buff, t_count);
-	prev_index = buff_index + send_index;
+	prevIndex = buff_index + send_index;
 
-	if (prev_index >= 49152)
+	if (prevIndex >= 49152)
 	{
-		TRACE(_T("#### UserInOutForMe - buffer overflow = %d ####\n"), prev_index);
+		spdlog::error("EbenezerDlg::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
 		return;
 	}
 
@@ -1611,11 +1639,11 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 	memset(buff, 0, sizeof(buff));
 	region_x = pSendUser->m_RegionX + 1;	region_z = pSendUser->m_RegionZ - 1;	// NORTH EAST
 	buff_index = GetRegionUserIn(pMap, region_x, region_z, buff, t_count);
-	prev_index = buff_index + send_index;
+	prevIndex = buff_index + send_index;
 
-	if (prev_index >= 49152)
+	if (prevIndex >= 49152)
 	{
-		TRACE(_T("#### UserInOutForMe - buffer overflow = %d ####\n"), prev_index);
+		spdlog::error("EbenezerDlg::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
 		return;
 	}
 
@@ -1624,11 +1652,11 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 	memset(buff, 0, sizeof(buff));
 	region_x = pSendUser->m_RegionX - 1;	region_z = pSendUser->m_RegionZ;		// WEST
 	buff_index = GetRegionUserIn(pMap, region_x, region_z, buff, t_count);
-	prev_index = buff_index + send_index;
+	prevIndex = buff_index + send_index;
 
-	if (prev_index >= 49152)
+	if (prevIndex >= 49152)
 	{
-		TRACE(_T("#### UserInOutForMe - buffer overflow = %d ####\n"), prev_index);
+		spdlog::error("EbenezerDlg::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
 		return;
 	}
 
@@ -1637,10 +1665,10 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 	memset(buff, 0, sizeof(buff));
 	region_x = pSendUser->m_RegionX + 1;	region_z = pSendUser->m_RegionZ;		// EAST
 	buff_index = GetRegionUserIn(pMap, region_x, region_z, buff, t_count);
-	prev_index = buff_index + send_index;
-	if (prev_index >= 49152)
+	prevIndex = buff_index + send_index;
+	if (prevIndex >= 49152)
 	{
-		TRACE(_T("#### UserInOutForMe - buffer overflow = %d ####\n"), prev_index);
+		spdlog::error("EbenezerDlg::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
 		return;
 	}
 
@@ -1649,10 +1677,10 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 	memset(buff, 0, sizeof(buff));
 	region_x = pSendUser->m_RegionX - 1;	region_z = pSendUser->m_RegionZ + 1;	// SOUTH WEST
 	buff_index = GetRegionUserIn(pMap, region_x, region_z, buff, t_count);
-	prev_index = buff_index + send_index;
-	if (prev_index >= 49152)
+	prevIndex = buff_index + send_index;
+	if (prevIndex >= 49152)
 	{
-		TRACE(_T("#### UserInOutForMe - buffer overflow = %d ####\n"), prev_index);
+		spdlog::error("EbenezerDlg::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
 		return;
 	}
 
@@ -1661,11 +1689,11 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 	memset(buff, 0, sizeof(buff));
 	region_x = pSendUser->m_RegionX;	region_z = pSendUser->m_RegionZ + 1;		// SOUTH
 	buff_index = GetRegionUserIn(pMap, region_x, region_z, buff, t_count);
-	prev_index = buff_index + send_index;
+	prevIndex = buff_index + send_index;
 
-	if (prev_index >= 49152)
+	if (prevIndex >= 49152)
 	{
-		TRACE(_T("#### UserInOutForMe - buffer overflow = %d ####\n"), prev_index);
+		spdlog::error("EbenezerDlg::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
 		return;
 	}
 
@@ -1673,10 +1701,10 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 	memset(buff, 0, sizeof(buff));
 	region_x = pSendUser->m_RegionX + 1;	region_z = pSendUser->m_RegionZ + 1;	// SOUTH EAST
 	buff_index = GetRegionUserIn(pMap, region_x, region_z, buff, t_count);
-	prev_index = buff_index + send_index;
-	if (prev_index >= 49152)
+	prevIndex = buff_index + send_index;
+	if (prevIndex >= 49152)
 	{
-		TRACE(_T("#### UserInOutForMe - buffer overflow = %d ####\n"), prev_index);
+		spdlog::error("EbenezerDlg::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
 		return;
 	}
 
@@ -1693,7 +1721,7 @@ void CEbenezerDlg::RegionUserInOutForMe(CUser* pSendUser)
 {
 	int send_index = 0, buff_index = 0, i = 0, j = 0, t_count = 0;
 	C3DMap* pMap = nullptr;
-	int region_x = -1, region_z = -1, user_count = 0, uid_sendindex = 0;
+	int region_x = -1, region_z = -1, userCount = 0, uid_sendindex = 0;
 	char uid_buff[2048] = {}, send_buff[16384] = {};
 
 	if (pSendUser == nullptr)
@@ -1706,57 +1734,57 @@ void CEbenezerDlg::RegionUserInOutForMe(CUser* pSendUser)
 	uid_sendindex = 3;	// packet command 와 user_count 는 나중에 셋팅한다...
 
 	region_x = pSendUser->m_RegionX;	region_z = pSendUser->m_RegionZ;			// CENTER
-	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, user_count);
+	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, userCount);
 	SetString(send_buff, uid_buff, buff_index, uid_sendindex);
 	memset(uid_buff, 0, sizeof(uid_buff));
 
 	region_x = pSendUser->m_RegionX - 1;	region_z = pSendUser->m_RegionZ - 1;	// NORTH WEST
-	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, user_count);
+	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, userCount);
 	SetString(send_buff, uid_buff, buff_index, uid_sendindex);
 	memset(uid_buff, 0, sizeof(uid_buff));
 
 	region_x = pSendUser->m_RegionX;	region_z = pSendUser->m_RegionZ - 1;		// NORTH
-	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, user_count);
+	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, userCount);
 	SetString(send_buff, uid_buff, buff_index, uid_sendindex);
 	memset(uid_buff, 0, sizeof(uid_buff));
 
 	region_x = pSendUser->m_RegionX + 1;	region_z = pSendUser->m_RegionZ - 1;	// NORTH EAST
-	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, user_count);
+	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, userCount);
 	SetString(send_buff, uid_buff, buff_index, uid_sendindex);
 	memset(uid_buff, 0, sizeof(uid_buff));
 
 	region_x = pSendUser->m_RegionX - 1;	region_z = pSendUser->m_RegionZ;		// WEST
-	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, user_count);
+	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, userCount);
 	SetString(send_buff, uid_buff, buff_index, uid_sendindex);
 	memset(uid_buff, 0, sizeof(uid_buff));
 
 	region_x = pSendUser->m_RegionX + 1;	region_z = pSendUser->m_RegionZ;		// EAST
-	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, user_count);
+	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, userCount);
 	SetString(send_buff, uid_buff, buff_index, uid_sendindex);
 	memset(uid_buff, 0, sizeof(uid_buff));
 
 	region_x = pSendUser->m_RegionX - 1;	region_z = pSendUser->m_RegionZ + 1;	// SOUTH WEST
-	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, user_count);
+	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, userCount);
 	SetString(send_buff, uid_buff, buff_index, uid_sendindex);
 	memset(uid_buff, 0, sizeof(uid_buff));
 
 	region_x = pSendUser->m_RegionX;	region_z = pSendUser->m_RegionZ + 1;		// SOUTH
-	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, user_count);
+	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, userCount);
 	SetString(send_buff, uid_buff, buff_index, uid_sendindex);
 	memset(uid_buff, 0, sizeof(uid_buff));
 
 	region_x = pSendUser->m_RegionX + 1;	region_z = pSendUser->m_RegionZ + 1;	// SOUTH EAST
-	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, user_count);
+	buff_index = GetRegionUserList(pMap, region_x, region_z, uid_buff, userCount);
 	SetString(send_buff, uid_buff, buff_index, uid_sendindex);
 
 	int temp_index = 0;
 	SetByte(send_buff, WIZ_REGIONCHANGE, temp_index);
-	SetShort(send_buff, user_count, temp_index);
+	SetShort(send_buff, userCount, temp_index);
 
 	pSendUser->Send(send_buff, uid_sendindex);
 
-	if (user_count > 500)
-		TRACE(_T("Req UserIn: %d \n"), user_count);
+	if (userCount > 500)
+		spdlog::debug("EbenezerDlg::RegionUserInOutForMe: userCount={}", userCount);
 }
 
 int CEbenezerDlg::GetRegionUserIn(C3DMap* pMap, int region_x, int region_z, char* buff, int& t_count)
@@ -1964,7 +1992,7 @@ void CEbenezerDlg::RegionNpcInfoForMe(CUser* pSendUser, int nType)
 {
 	int send_index = 0, buff_index = 0, i = 0, j = 0, t_count = 0;
 	C3DMap* pMap = nullptr;
-	int region_x = -1, region_z = -1, npc_count = 0, nid_sendindex = 0;
+	int region_x = -1, region_z = -1, npcCount = 0, nid_sendindex = 0;
 	char nid_buff[1024] = {}, send_buff[8192] = {};
 	CString string;
 
@@ -1980,57 +2008,52 @@ void CEbenezerDlg::RegionNpcInfoForMe(CUser* pSendUser, int nType)
 	// test
 	if (nType == 1)
 	{
-		char strLog[256] = {};
-		CTime t = CTime::GetCurrentTime();
-		sprintf(strLog, "**** RegionNpcInfoForMe start(%d:%d-%d) : name=%s, x=%d, z=%d **** \r\n", t.GetHour(), t.GetMinute(), t.GetSecond(), pSendUser->m_pUserData->m_id, pSendUser->m_RegionX, pSendUser->m_RegionZ);
-		EnterCriticalSection(&g_LogFile_critical);
-		m_RegionLogFile.Write(strLog, strlen(strLog));
-		LeaveCriticalSection(&g_LogFile_critical);
-		//TRACE(strLog);
+		spdlog::get(logger::EbenezerRegion)->info("RegionNpcInfoForMe start: charId={} x={} z={}",
+			pSendUser->m_pUserData->m_id, pSendUser->m_RegionX, pSendUser->m_RegionZ);
 	}
 
 	region_x = pSendUser->m_RegionX;	region_z = pSendUser->m_RegionZ;			// CENTER
-	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npc_count, nType);
+	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npcCount, nType);
 	SetString(send_buff, nid_buff, buff_index, nid_sendindex);
 
 	memset(nid_buff, 0, sizeof(nid_buff));
 	region_x = pSendUser->m_RegionX - 1;	region_z = pSendUser->m_RegionZ - 1;	// NORTH WEST
-	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npc_count, nType);
+	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npcCount, nType);
 	SetString(send_buff, nid_buff, buff_index, nid_sendindex);
 
 	memset(nid_buff, 0, sizeof(nid_buff));
 	region_x = pSendUser->m_RegionX;	region_z = pSendUser->m_RegionZ - 1;		// NORTH
-	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npc_count, nType);
+	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npcCount, nType);
 	SetString(send_buff, nid_buff, buff_index, nid_sendindex);
 
 	memset(nid_buff, 0, sizeof(nid_buff));
 	region_x = pSendUser->m_RegionX + 1;	region_z = pSendUser->m_RegionZ - 1;	// NORTH EAST
-	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npc_count, nType);
+	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npcCount, nType);
 	SetString(send_buff, nid_buff, buff_index, nid_sendindex);
 
 	memset(nid_buff, 0, sizeof(nid_buff));
 	region_x = pSendUser->m_RegionX - 1;	region_z = pSendUser->m_RegionZ;		// WEST
-	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npc_count, nType);
+	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npcCount, nType);
 	SetString(send_buff, nid_buff, buff_index, nid_sendindex);
 
 	memset(nid_buff, 0, sizeof(nid_buff));
 	region_x = pSendUser->m_RegionX + 1;	region_z = pSendUser->m_RegionZ;		// EAST
-	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npc_count, nType);
+	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npcCount, nType);
 	SetString(send_buff, nid_buff, buff_index, nid_sendindex);
 
 	memset(nid_buff, 0, sizeof(nid_buff));
 	region_x = pSendUser->m_RegionX - 1;	region_z = pSendUser->m_RegionZ + 1;	// SOUTH WEST
-	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npc_count, nType);
+	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npcCount, nType);
 	SetString(send_buff, nid_buff, buff_index, nid_sendindex);
 
 	memset(nid_buff, 0, sizeof(nid_buff));
 	region_x = pSendUser->m_RegionX;	region_z = pSendUser->m_RegionZ + 1;		// SOUTH
-	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npc_count, nType);
+	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npcCount, nType);
 	SetString(send_buff, nid_buff, buff_index, nid_sendindex);
 
 	memset(nid_buff, 0, sizeof(nid_buff));
 	region_x = pSendUser->m_RegionX + 1;	region_z = pSendUser->m_RegionZ + 1;	// SOUTH EAST
-	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npc_count, nType);
+	buff_index = GetRegionNpcList(pMap, region_x, region_z, nid_buff, npcCount, nType);
 	SetString(send_buff, nid_buff, buff_index, nid_sendindex);
 
 	int temp_index = 0;
@@ -2038,25 +2061,21 @@ void CEbenezerDlg::RegionNpcInfoForMe(CUser* pSendUser, int nType)
 	// test 
 	if (nType == 1)
 	{
-		char strLog[256] = {};
 		SetByte(send_buff, WIZ_TEST_PACKET, temp_index);
-		sprintf(strLog, "**** RegionNpcInfoForMe end : name=%s, x=%d, z=%d, count=%d **** \r\n", pSendUser->m_pUserData->m_id, pSendUser->m_RegionX, pSendUser->m_RegionZ, npc_count);
-		EnterCriticalSection(&g_LogFile_critical);
-		m_RegionLogFile.Write(strLog, strlen(strLog));
-		LeaveCriticalSection(&g_LogFile_critical);
-		//TRACE(strLog);
+		spdlog::get(logger::EbenezerRegion)->info("RegionNpcInfoForMe end: charId={} x={} z={} count={}",
+			pSendUser->m_pUserData->m_id, pSendUser->m_RegionX, pSendUser->m_RegionZ, npcCount);
 	}
 	else
 	{
 		SetByte(send_buff, WIZ_NPC_REGION, temp_index);
 	}
 
-	SetShort(send_buff, npc_count, temp_index);
+	SetShort(send_buff, npcCount, temp_index);
 
 	pSendUser->Send(send_buff, nid_sendindex);
 
-	if (npc_count > 500)
-		TRACE(_T("Req Npc In: %d \n"), npc_count);
+	if (npcCount > 500)
+		spdlog::debug("EbenezerDlg::RegionNpcInfoForMe: npcCount={}", npcCount);
 }
 
 int CEbenezerDlg::GetRegionNpcList(C3DMap* pMap, int region_x, int region_z, char* nid_buff, int& t_count, int nType)
@@ -2074,27 +2093,23 @@ int CEbenezerDlg::GetRegionNpcList(C3DMap* pMap, int region_x, int region_z, cha
 		|| region_z > pMap->GetZRegionMax())
 		return 0;
 
-	char strLog[1024] = {};
 	int buff_index = 0;
 
 	EnterCriticalSection(&g_region_critical);
 
 	if (nType == 1)
 	{
-		sprintf(strLog, "++++ GetRegionNpcList , x=%d, z=%d ++++\r\n", region_x, region_z);
-		EnterCriticalSection(&g_LogFile_critical);
-		m_RegionLogFile.Write(strLog, strlen(strLog));
-		LeaveCriticalSection(&g_LogFile_critical);
-		memset(strLog, 0, sizeof(strLog));
+		spdlog::get(logger::EbenezerRegion)->info("GetRegionNpcList: x={} z={}",
+			region_x, region_z);
 	}
 
 	for (const auto& [_, pNid] : pMap->m_ppRegion[region_x][region_z].m_RegionNpcArray)
 	{
-		int nid = *pNid;
-		if (nid < 0)
+		int npcId = *pNid;
+		if (npcId < 0)
 			continue;
 
-		CNpc* pNpc = m_arNpcArray.GetData(nid);
+		CNpc* pNpc = m_arNpcArray.GetData(npcId);
 		//if( pNpc && (pNpc->m_NpcState == NPC_LIVE ) ) {  // 수정할 것,,
 		if (pNpc != nullptr)
 		{
@@ -2102,30 +2117,15 @@ int CEbenezerDlg::GetRegionNpcList(C3DMap* pMap, int region_x, int region_z, cha
 			t_count++;
 			if (nType == 1)
 			{
-				sprintf(strLog, "%d   ", pNpc->m_sNid);
-				EnterCriticalSection(&g_LogFile_critical);
-				m_RegionLogFile.Write(strLog, strlen(strLog));
-				LeaveCriticalSection(&g_LogFile_critical);
+				spdlog::get(logger::EbenezerRegion)->info("GetRegionNpcList: serial={}",
+					pNpc->m_sNid);
 			}
 		}
-		else
+		else if (nType == 1)
 		{
-			if (nType == 1)
-			{
-				sprintf(strLog, "%d(Err)   ", nid);
-				EnterCriticalSection(&g_LogFile_critical);
-				m_RegionLogFile.Write(strLog, strlen(strLog));
-				LeaveCriticalSection(&g_LogFile_critical);
-			}
+			spdlog::get(logger::EbenezerRegion)->error("GetRegionNpcList: not found: npcId={}",
+				npcId);
 		}
-	}
-
-	if (nType == 1)
-	{
-		sprintf(strLog, "\r\n");
-		EnterCriticalSection(&g_LogFile_critical);
-		m_RegionLogFile.Write(strLog, strlen(strLog));
-		LeaveCriticalSection(&g_LogFile_critical);
 	}
 
 	LeaveCriticalSection(&g_region_critical);
@@ -2199,7 +2199,7 @@ BOOL CEbenezerDlg::PreTranslateMessage(MSG* pMsg)
 			if (_strnicmp("/down", chatstr, 5) == 0)
 			{
 				g_serverdown_flag = TRUE;
-				::SuspendThread(m_Iocport.m_hAcceptThread);
+				SuspendThread(m_Iocport.m_hAcceptThread);
 				KickOutAllUsers();
 				return TRUE;
 			}
@@ -2270,7 +2270,7 @@ BOOL CEbenezerDlg::PreTranslateMessage(MSG* pMsg)
 			else
 			{
 				//sprintf( finalstr, "#### 공지 : %s ####", chatstr );
-				::_LoadStringFromResource(IDP_ANNOUNCEMENT, buff2);
+				_LoadStringFromResource(IDP_ANNOUNCEMENT, buff2);
 				sprintf(finalstr, buff2.c_str(), chatstr);
 			}
 
@@ -2341,13 +2341,17 @@ BOOL CEbenezerDlg::LoadNoticeData()
 #if !defined(_DEBUG)
 		AfxMessageBox(_T("cannot open Notice.txt!!"));
 #endif
+		spdlog::warn("EbenezerDlg::LoadNoticeData: failed to open Notice.txt");
 		return FALSE;
 	}
 
 	while (txt_file.ReadString(buff))
 	{
 		if (count > 19)
+		{
 			AfxMessageBox(_T("Notice Count Overflow!!"));
+			spdlog::error("EbenezerDlg::LoadNoticeData: notice count overflow [count={}]", count);
+		}
 
 		strcpy(m_ppNotice[count], CT2A(buff));
 		count++;
@@ -2448,7 +2452,7 @@ void CEbenezerDlg::SyncRegionTest(C3DMap* pMap, int rx, int rz, FILE* pfile, int
 			CUser* pUser = (CUser*) m_Iocport.m_SockArray[nid];
 			if (pUser == nullptr)
 			{
-				TRACE(_T("SyncRegionTest : nid fail = %d\n"), nid);
+				spdlog::error("EbenezerDlg::SyncRegionTest: userId={} not found", nid);
 				fprintf(pfile, "%d(fail)	", nid);
 				continue;
 			}
@@ -2458,9 +2462,9 @@ void CEbenezerDlg::SyncRegionTest(C3DMap* pMap, int rx, int rz, FILE* pfile, int
 		else if (nType == 2)
 		{
 			CNpc* pNpc = m_arNpcArray.GetData(nid);
-			if (pNpc== nullptr)
+			if (pNpc == nullptr)
 			{
-				TRACE(_T("SyncRegionTest : nid fail = %d\n"), nid);
+				spdlog::error("EbenezerDlg::SyncRegionTest: npcId={} not found", nid);
 				fprintf(pfile, "%d(fail)	", nid);
 				continue;
 			}
@@ -2539,7 +2543,7 @@ void CEbenezerDlg::SendAllUserInfo()
 			continue;
 
 		send_index = 0;
-		::ZeroMemory(send_buff, sizeof(send_buff));
+		ZeroMemory(send_buff, sizeof(send_buff));
 		SetByte(send_buff, AG_PARTY_INFO_ALL, send_index);
 		SetShort(send_buff, i, send_index);					// 파티 번호
 		//if( i == pParty->wIndex )
@@ -2557,12 +2561,12 @@ void CEbenezerDlg::SendAllUserInfo()
 	LeaveCriticalSection(&g_region_critical);
 
 	send_index = 0;
-	::ZeroMemory(send_buff, sizeof(send_buff));
+	ZeroMemory(send_buff, sizeof(send_buff));
 	SetByte(send_buff, AG_SERVER_INFO, send_index);
 	SetByte(send_buff, SERVER_INFO_END, send_index);
 	Send_AIServer(1000, send_buff, send_index);
 
-	TRACE(_T("** SendAllUserInfo() **\n"));
+	spdlog::trace("EbenezerDlg::SendAllUserInfo: completed");
 }
 
 void CEbenezerDlg::SendCompressedData()
@@ -2588,7 +2592,7 @@ void CEbenezerDlg::SendCompressedData()
 	if (comp_data_len == 0
 		|| comp_data_len > sizeof(comp_buff))
 	{
-		TRACE(_T("Failed to compress AI packet\n"));
+		spdlog::error("EbenezerDlg::SendCompressedData: Failed to compress AI packet");
 		return;
 	}
 
@@ -2616,15 +2620,11 @@ void CEbenezerDlg::DeleteAllNpcList(int flag)
 	if (m_bPointCheckFlag)
 	{
 		m_bPointCheckFlag = FALSE;
-		TRACE(_T("*** Point 참조 하면 안되여 *** \n"));
+		spdlog::error("EbenezerDlg::DeleteAllNpcList: pointCheckFlag set");
 		return;
 	}
-
-	CString logstr;
-	logstr.Format(_T("[Monster Point Delete]"));
-	m_StatusList.AddString(logstr);
-
-	TRACE(_T("*** DeleteAllNpcList - Start *** \n"));
+	
+	spdlog::debug("EbenezerDlg::DeleteAllNpcList: start");
 
 	CUser* pUser = nullptr;
 
@@ -2650,7 +2650,8 @@ void CEbenezerDlg::DeleteAllNpcList(int flag)
 
 	m_bServerCheckFlag = FALSE;
 
-	TRACE(_T("*** DeleteAllNpcList - End *** \n"));
+	AddOutputMessage(_T("DeleteAllNpcList complete"));
+	spdlog::debug("EbenezerDlg::DeleteAllNpcList: end");
 }
 // ~sungyong 2002. 05. 23
 
@@ -2770,7 +2771,8 @@ void CEbenezerDlg::BattleZoneOpenTimer()
 			memset(m_strKarusCaptain, 0, sizeof(m_strKarusCaptain));
 			memset(m_strElmoradCaptain, 0, sizeof(m_strElmoradCaptain));
 
-			TRACE(_T("전쟁 종료 0단계\n"));
+			// original: 전쟁 종료 0단계
+			spdlog::debug("EbenezerDlg::BattleZoneOpenTimer: war ended, stage 0");
 
 			if (m_nServerNo == KARUS)
 			{
@@ -2822,7 +2824,8 @@ void CEbenezerDlg::BattleZoneOpenTimer()
 				Announcement(DECLARE_WINNER, m_bVictory);
 				Announcement(DECLARE_LOSER, loser_nation);
 			}
-			TRACE(_T("전쟁 종료 1단계, m_bVictory=%d\n"), m_bVictory);
+			spdlog::debug("EbenezerDlg::BattleZoneOpenTimer: War ended, stage 1: m_bVictory={}",
+				m_bVictory);
 		}
 		else if (m_sBanishDelay == 8)
 		{
@@ -2830,12 +2833,13 @@ void CEbenezerDlg::BattleZoneOpenTimer()
 		}
 		else if (m_sBanishDelay == 10)
 		{
-			TRACE(_T("전쟁 종료 2단계 - 모든 유저 자기 국가로 가 \n"));
+			spdlog::debug("EbenezerDlg::BattleZoneOpenTimer: War ended, stage 2: All users return to their own nation");
 			BanishLosers();
 		}
 		else if (m_sBanishDelay == 20)
 		{
-			TRACE(_T("전쟁 종료 3단계 - 초기화 해주세여 \n"));
+			// original: 전쟁 종료 3단계 - 초기화 해주세여
+			spdlog::debug("EbenezerDlg::BattleZoneOpenTimer: War ended, stage 3: resetting battlezone");
 			SetByte(send_buff, AG_BATTLE_EVENT, send_index);
 			SetByte(send_buff, BATTLE_EVENT_OPEN, send_index);
 			SetByte(send_buff, BATTLEZONE_CLOSE, send_index);
@@ -2851,7 +2855,6 @@ void CEbenezerDlg::BattleZoneOpen(int nType)
 {
 	int send_index = 0;
 	char send_buff[1024] = {};
-	CTime time = CTime::GetCurrentTime();
 
 	// Open battlezone.
 	if (nType == BATTLEZONE_OPEN)
@@ -2864,11 +2867,6 @@ void CEbenezerDlg::BattleZoneOpen(int nType)
 	{
 		m_byBattleOpen = SNOW_BATTLE;
 		m_byOldBattleOpen = SNOW_BATTLE;
-
-		TCHAR strLogFile[100] = {};
-		_stprintf(strLogFile, _T("EventLog-%d-%d-%d.txt"), time.GetYear(), time.GetMonth(), time.GetDay());
-		if (m_EvnetLogFile.Open(strLogFile, CFile::modeWrite | CFile::modeCreate | CFile::modeNoTruncate | CFile::shareDenyNone))
-			m_EvnetLogFile.SeekToEnd();
 	}
 	// battle close
 	else if (nType == BATTLEZONE_CLOSE)
@@ -2949,14 +2947,6 @@ void CEbenezerDlg::BanishLosers()
 
 void CEbenezerDlg::ResetBattleZone()
 {
-	if (m_byOldBattleOpen == SNOW_BATTLE)
-	{
-		if (m_EvnetLogFile.m_hFile != CFile::hFileNull)
-			m_EvnetLogFile.Close();
-
-		TRACE(_T("Event Log close\n"));
-	}
-
 	m_bVictory = 0;
 	m_bBanishDelayStart = 0;
 	m_byBanishFlag = 0;
@@ -2987,24 +2977,24 @@ void CEbenezerDlg::Announcement(BYTE type, int nation, int chat_type)
 	switch (type)
 	{
 		case BATTLEZONE_OPEN:
-			::_LoadStringFromResource(IDP_BATTLEZONE_OPEN, buff);
+			_LoadStringFromResource(IDP_BATTLEZONE_OPEN, buff);
 			sprintf(chatstr, buff.c_str());
 			break;
 
 		case SNOW_BATTLEZONE_OPEN:
-			::_LoadStringFromResource(IDP_BATTLEZONE_OPEN, buff);
+			_LoadStringFromResource(IDP_BATTLEZONE_OPEN, buff);
 			sprintf(chatstr, buff.c_str());
 			break;
 
 		case DECLARE_WINNER:
 			if (m_bVictory == KARUS)
 			{
-				::_LoadStringFromResource(IDP_KARUS_VICTORY, buff);
+				_LoadStringFromResource(IDP_KARUS_VICTORY, buff);
 				sprintf(chatstr, buff.c_str(), m_sElmoradDead, m_sKarusDead);
 			}
 			else if (m_bVictory == ELMORAD)
 			{
-				::_LoadStringFromResource(IDP_ELMORAD_VICTORY, buff);
+				_LoadStringFromResource(IDP_ELMORAD_VICTORY, buff);
 				sprintf(chatstr, buff.c_str(), m_sKarusDead, m_sElmoradDead);
 			}
 			else
@@ -3016,12 +3006,12 @@ void CEbenezerDlg::Announcement(BYTE type, int nation, int chat_type)
 		case DECLARE_LOSER:
 			if (m_bVictory == KARUS)
 			{
-				::_LoadStringFromResource(IDS_ELMORAD_LOSER, buff);
+				_LoadStringFromResource(IDS_ELMORAD_LOSER, buff);
 				sprintf(chatstr, buff.c_str(), m_sKarusDead, m_sElmoradDead);
 			}
 			else if (m_bVictory == ELMORAD)
 			{
-				::_LoadStringFromResource(IDS_KARUS_LOSER, buff);
+				_LoadStringFromResource(IDS_KARUS_LOSER, buff);
 				sprintf(chatstr, buff.c_str(), m_sElmoradDead, m_sKarusDead);
 			}
 			else
@@ -3031,37 +3021,37 @@ void CEbenezerDlg::Announcement(BYTE type, int nation, int chat_type)
 			break;
 
 		case DECLARE_BAN:
-			::_LoadStringFromResource(IDS_BANISH_USER, buff);
+			_LoadStringFromResource(IDS_BANISH_USER, buff);
 			sprintf(chatstr, buff.c_str());
 			break;
 
 		case BATTLEZONE_CLOSE:
-			::_LoadStringFromResource(IDS_BATTLE_CLOSE, buff);
+			_LoadStringFromResource(IDS_BATTLE_CLOSE, buff);
 			sprintf(chatstr, buff.c_str());
 			break;
 
 		case KARUS_CAPTAIN_NOTIFY:
-			::_LoadStringFromResource(IDS_KARUS_CAPTAIN, buff);
+			_LoadStringFromResource(IDS_KARUS_CAPTAIN, buff);
 			sprintf(chatstr, buff.c_str(), m_strKarusCaptain);
 			break;
 
 		case ELMORAD_CAPTAIN_NOTIFY:
-			::_LoadStringFromResource(IDS_ELMO_CAPTAIN, buff);
+			_LoadStringFromResource(IDS_ELMO_CAPTAIN, buff);
 			sprintf(chatstr, buff.c_str(), m_strElmoradCaptain);
 			break;
 
 		case KARUS_CAPTAIN_DEPRIVE_NOTIFY:
-			::_LoadStringFromResource(IDS_KARUS_CAPTAIN_DEPRIVE, buff);
+			_LoadStringFromResource(IDS_KARUS_CAPTAIN_DEPRIVE, buff);
 			sprintf(chatstr, buff.c_str(), m_strKarusCaptain);
 			break;
 
 		case ELMORAD_CAPTAIN_DEPRIVE_NOTIFY:
-			::_LoadStringFromResource(IDS_ELMO_CAPTAIN_DEPRIVE, buff);
+			_LoadStringFromResource(IDS_ELMO_CAPTAIN_DEPRIVE, buff);
 			sprintf(chatstr, buff.c_str(), m_strElmoradCaptain);
 			break;
 	}
 
-	::_LoadStringFromResource(IDP_ANNOUNCEMENT, buff2);
+	_LoadStringFromResource(IDP_ANNOUNCEMENT, buff2);
 	sprintf(finalstr, buff2.c_str(), chatstr);
 	//sprintf( finalstr, "## 공지 : %s ##", chatstr );
 	SetByte(send_buff, WIZ_CHAT, send_index);
@@ -3172,7 +3162,8 @@ BOOL CEbenezerDlg::LoadAllKnights()
 
 			if (!m_KnightsArray.PutData(pKnights->m_sIndex, pKnights))
 			{
-				TRACE(_T("Knights PutData Fail - %d\n"), pKnights->m_sIndex);
+				spdlog::error("EbenezerDlg::LoadAllKnights: failed to put into KnightsArray [knightsId={}]",
+					pKnights->m_sIndex);
 				delete pKnights;
 			}
 		}
@@ -3383,10 +3374,8 @@ void CEbenezerDlg::MarketBBSSellDelete(short index)
 
 void CEbenezerDlg::WritePacketLog()
 {
-	CTime cur = CTime::GetCurrentTime();
-	CString starttime;
-	starttime.Format(_T("* Packet Check : send=%d, realsend=%d, recv=%d, time %d:%d분\r\n"), m_iPacketCount, m_iSendPacketCount, m_iRecvPacketCount, cur.GetHour(), cur.GetMinute());
-	LogFileWrite(starttime);
+	spdlog::info("EbenezerDlg::WritePacketLog: send={} realsend={} recv={}",
+		m_iPacketCount, m_iSendPacketCount, m_iRecvPacketCount);
 }
 
 int CEbenezerDlg::GetKnightsGrade(int nPoints)
@@ -3426,10 +3415,8 @@ void CEbenezerDlg::CheckAliveUser()
 			if (pUser->m_sAliveCount > 3)
 			{
 				pUser->Close();
-
-				TCHAR logstr[1024] = {};
-				_stprintf(logstr, _T("User Alive Close - (%d) %hs\r\n"), pUser->GetSocketID(), pUser->m_pUserData->m_id);
-				LogFileWrite(logstr);
+				spdlog::debug("EbenezerDlg::CheckAliveUser: User Alive Close [userId={} charId={}]",
+					pUser->GetSocketID(), pUser->m_pUserData->m_id);
 			}
 
 			pUser->m_sAliveCount++;
@@ -3678,15 +3665,15 @@ BOOL CEbenezerDlg::LoadKnightsRankTable()
 	}
 
 	std::string buff;
-	::_LoadStringFromResource(IDS_KARUS_CAPTAIN, buff);
+	_LoadStringFromResource(IDS_KARUS_CAPTAIN, buff);
 	sprintf(strKarusCaptainName, buff.c_str(), strKarusCaptain[0], strKarusCaptain[1], strKarusCaptain[2], strKarusCaptain[3], strKarusCaptain[4]);
 
-	::_LoadStringFromResource(IDS_ELMO_CAPTAIN, buff);
+	_LoadStringFromResource(IDS_ELMO_CAPTAIN, buff);
 	sprintf(strElmoCaptainName, buff.c_str(), strElmoCaptain[0], strElmoCaptain[1], strElmoCaptain[2], strElmoCaptain[3], strElmoCaptain[4]);
 
 	//sprintf( strKarusCaptainName, "카루스의 지휘관은 %s, %s, %s, %s, %s 입니다", strKarusCaptain[0], strKarusCaptain[1], strKarusCaptain[2], strKarusCaptain[3], strKarusCaptain[4]);
 	//sprintf( strElmoCaptainName, "엘모라드의 지휘관은 %s, %s, %s, %s, %s 입니다", strKarusCaptain[0], strKarusCaptain[1], strKarusCaptain[2], strKarusCaptain[3], strKarusCaptain[4]);
-	TRACE(_T("LoadKnightsRankTable Success\n"));
+	spdlog::trace("EbenezerDlg::LoadKnightsRankTable: success");
 
 	char send_buff[1024] = {},
 		temp_buff[1024] = {};
@@ -3770,16 +3757,6 @@ void CEbenezerDlg::FlySanta()
 
 	SetByte(send_buff, WIZ_SANTA, send_index);
 	Send_All(send_buff, send_index);
-}
-
-void CEbenezerDlg::WriteEventLog(char* pBuf)
-{
-	TCHAR strLog[256] = {};
-	CTime t = CTime::GetCurrentTime();
-	_stprintf(strLog, _T("%d:%d-%d : %hs \r\n"), t.GetHour(), t.GetMinute(), t.GetSecond(), pBuf);
-	EnterCriticalSection(&g_LogFile_critical);
-	m_EvnetLogFile.Write(strLog, _tcslen(strLog));
-	LeaveCriticalSection(&g_LogFile_critical);
 }
 
 C3DMap* CEbenezerDlg::GetMapByIndex(int iZoneIndex) const

@@ -21,7 +21,6 @@ void	SetString1(char* tBuf, const char* sBuf, BYTE len, int& index);
 void	SetString2(char* tBuf, const char* sBuf, short len, int& index);
 int		ParseSpace(char* tBuf, const char* sBuf);
 CString	GetProgPath();
-void	LogFileWrite(CString logstr);
 int		myrand(int min, int max, BOOL bSame = FALSE);
 int		XdY(int x, int y);
 
@@ -29,4 +28,3 @@ void	CheckMaxValue(DWORD& dest, DWORD add);
 void	CheckMaxValue(int& dest, int add);
 void	CheckMaxValue(short& dest, short add);
 BOOL	CheckMaxValueReturn(DWORD& dest, DWORD add);
-void	TimeTrace(const TCHAR* pMsg);

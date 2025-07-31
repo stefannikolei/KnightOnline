@@ -25,3 +25,7 @@
 	path = deps/db-library
 	url = https://github.com/Open-KO/OpenKO-db-library.git
 	branch = main
+[submodule "deps/spdlog"]
+	path = deps/spdlog
+	url = https://github.com/gabime/spdlog.git
+	branch = v1.x
