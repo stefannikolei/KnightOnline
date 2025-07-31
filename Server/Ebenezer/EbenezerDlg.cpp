@@ -1390,12 +1390,15 @@ void CEbenezerDlg::LoadConfig()
 	int year = 0, month = 0, date = 0, hour = 0, serverCount = 0, sgroup_count = 0;
 	char ipkey[20] = {};
 
-	std::filesystem::path iniPath(GetProgPath().GetString());
+	CString exePath(GetProgPath());
+	std::string exePathUtf8(CT2A(exePath, CP_UTF8));
+
+	std::filesystem::path iniPath(exePath.GetString());
 	iniPath /= L"gameserver.ini";
 
 	m_Ini.Load(iniPath);
 
-	logger::SetupLogger(m_Ini, logger::Ebenezer);
+	logger::SetupLogger(m_Ini, logger::Ebenezer, exePathUtf8);
 	
 	m_nYear = m_Ini.GetInt("TIMER", "YEAR", 1);
 	m_nMonth = m_Ini.GetInt("TIMER", "MONTH", 1);

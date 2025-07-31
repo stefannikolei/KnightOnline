@@ -2127,14 +2127,17 @@ void CServerDlg::CloseSocket(int zonenumber)
 
 void CServerDlg::GetServerInfoIni()
 {
-	std::filesystem::path iniPath(GetProgPath().GetString());
+	CString exePath = GetProgPath();
+	std::string exePathUtf8(CT2A(exePath, CP_UTF8));
+
+	std::filesystem::path iniPath(exePath.GetString());
 	iniPath /= L"server.ini";
 	
 	CIni inifile;
 	inifile.Load(iniPath);
 
 	// logger setup
-	logger::SetupLogger(inifile, logger::AIServer);
+	logger::SetupLogger(inifile, logger::AIServer, exePathUtf8);
 	
 	m_byZone = inifile.GetInt(_T("SERVER"), _T("ZONE"), 1);
 
