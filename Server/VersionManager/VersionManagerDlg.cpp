@@ -128,7 +128,10 @@ BOOL CVersionManagerDlg::OnInitDialog()
 
 BOOL CVersionManagerDlg::GetInfoFromIni()
 {
-	std::filesystem::path iniPath(GetProgPath().GetString());
+	CString exePath = GetProgPath();
+	std::string exePathUtf8(CT2A(exePath, CP_UTF8));
+
+	std::filesystem::path iniPath(exePath.GetString());
 	iniPath /= L"Version.ini";
 
 	CIni ini(iniPath);
@@ -138,7 +141,7 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 	ini.GetString(ini::DOWNLOAD, ini::PATH, "/", _ftpPath, _countof(_ftpPath));
 
 	// configure logger
-	logger::SetupLogger(ini, logger::VersionManager);
+	logger::SetupLogger(ini, logger::VersionManager, exePathUtf8);
 	
 	// TODO: KN_online should be Knight_Account
 	std::string datasourceName = ini.GetString(ini::ODBC, ini::DSN, "KN_online");

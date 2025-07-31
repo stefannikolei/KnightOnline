@@ -1,28 +1,21 @@
 ﻿#pragma once
+
 #include <string>
-#include <memory>
 
 // forward declarations
 class CIni;
-namespace spdlog::details
-{
-	class thread_pool;
-}
 
 namespace logger
 {
 	/// \brief Sets up spdlog from an ini file using standardized server settings
 	/// \param ini server application's ini file (already loaded)
-	/// \param name application name (VersionManager, Aujard, AIServer, Ebenezer)
-	void SetupLogger(CIni& ini, const std::string& name);
-
-	void SetupExtraLogger(CIni& ini, const std::string& appName,
-		const std::string& logFileConfigProp,
-		std::shared_ptr<spdlog::details::thread_pool> threadPool);
+	/// \param appName application name (VersionManager, Aujard, AIServer, Ebenezer)
+	/// \param baseDir base directory to store logs folder under. must end in a trailing slash.
+	void SetupLogger(CIni& ini, const std::string& appName, const std::string& baseDir);
 
 	// setup defaults
-	static constexpr uint16_t messageQueueSize = 8196;
-	static constexpr uint8_t threadPoolSize = 1;
+	static constexpr uint16_t MessageQueueSize = 8192;
+	static constexpr uint8_t ThreadPoolSize = 1;
 	
 	// application names used by our loggers
 	static constexpr char AIServer[] = "AIServer";
