@@ -19,6 +19,7 @@
 #include "UIRepairTooltipDlg.h"
 #include "UIHotKeyDlg.h"
 #include "UISkillTreeDlg.h"
+#include "MagicSkillMng.h"
 
 #include "text_resources.h"
 
@@ -1494,16 +1495,34 @@ bool CUIInventory::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 					
 					// Get Item..
 					spItem = GetHighlightIconItem((CN3UIIcon* )pSender);
-
-					CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd = UIWND_INVENTORY;
-					if (bSlot)
-						CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
-					else
-						CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict = UIWND_DISTRICT_INVENTORY_INV;
 					
+					CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd = UIWND_INVENTORY;
 					CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder = iRBtn;
 					CN3UIWndBase::m_sSelectedIconInfo.pItemSelect = spItem;
-					
+
+					// player right-clicked on an equipped item
+					if (bSlot)
+					{
+						CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
+					}
+					// player right-clicked on item which is not equipped
+					else
+					{
+						CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict = UIWND_DISTRICT_INVENTORY_INV;
+
+						// determine if there's an empty slot on the skillbar (CUIHotKeyDlg)
+						// if so, we should allocate an icon there
+						CUIHotKeyDlg* pDlg = CGameProcedure::s_pProcMain->m_pUIHotKeyDlg;
+						int iIndex;
+						if (pDlg->GetEmptySlotIndex(iIndex))
+						{
+							CN3UIWndBase::m_sSkillSelectInfo.UIWnd = UIWND_INVENTORY;
+
+							if (pDlg->SetReceiveSelectedItem(iIndex))
+								return true;
+						}
+					}
+
 					if (spItem) PlayItemSound(spItem->pItemBasic);
 
 					//..
