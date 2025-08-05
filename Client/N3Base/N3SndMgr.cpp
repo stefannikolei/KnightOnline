@@ -7,9 +7,17 @@
 #include "N3SndObjStream.h"
 #include "N3Base.h"
 
+#include <mpg123.h>
+#include <filesystem>
+
 #ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
+#endif
+
+#ifdef _WIN32
+#pragma comment(lib, "mpg123.lib")
+#pragma comment(lib, "shlwapi.lib")
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -45,9 +53,12 @@ CN3SndObj* CN3SndMgr::CreateObj(int iID, e_SndType eType)
 	return this->CreateObj(pTbl->szFN, eType);
 }
 
-CN3SndObj* CN3SndMgr::CreateObj(const std::string& szFN, e_SndType eType)
+CN3SndObj* CN3SndMgr::CreateObj(std::string szFN, e_SndType eType)
 {
 	if(!m_bSndEnable) return NULL;
+
+	if (!PreprocessFilename(szFN))
+		return nullptr;
 
 	CN3SndObj* pObjSrc = NULL;
 	itm_Snd it = m_SndObjSrcs.find(szFN);
@@ -78,8 +89,11 @@ CN3SndObj* CN3SndMgr::CreateObj(const std::string& szFN, e_SndType eType)
 	return pObjNew;
 }
 
-CN3SndObjStream* CN3SndMgr::CreateStreamObj(const std::string& szFN)
+CN3SndObjStream* CN3SndMgr::CreateStreamObj(std::string szFN)
 {
+	if (!PreprocessFilename(szFN))
+		return nullptr;
+
 	CN3SndObjStream* pObj = new CN3SndObjStream();
 	if(false == pObj->Create(szFN))
 	{
@@ -358,4 +372,158 @@ bool CN3SndMgr::PlayOnceAndRelease(int iSndID, const _D3DVECTOR* pPos)
 	m_SndObjs_PlayOnceAndRelease.push_back(pObj);
 	return true;
 */
+}
+
+bool CN3SndMgr::PreprocessFilename(std::string& szFN)
+{
+	// Expect an extension (.mp3, .wav)
+	if (szFN.length() < 4)
+		return false;
+
+	// Officially it has native support for MP3 decoding.
+	// We decode back to WAV (one-time) and use the new filename instead.
+	// Ideally this would just load it into memory directly, but that would require restructuring
+	// a little.
+	// This approach is fairly unintrusive and only incurs the performance hit once.
+	// There's also very few mp3 files to actually convert, so space should not be an issue.
+	// Finally, the game requires admin access, so it should have write access.
+	if (_stricmp(&szFN[szFN.length() - 4], ".mp3") == 0)
+	{
+		if (!DecodeMp3ToWav(szFN))
+			return false;
+	}
+
+	return true;
+}
+
+bool CN3SndMgr::DecodeMp3ToWav(std::string& filename)
+{
+	std::filesystem::path newPath(filename);
+
+	// Differentiate the converted files from any that already exist.
+	// We want to be able to identify them for ignoring (so they don't make the repo 'dirty'),
+	// and we generally don't want to assume any old, existing wav files match.
+	newPath.replace_extension(".mp3.wav");
+
+	// If we've already converted this file, we can just use it immediately.
+	std::error_code fsErrorCode = {};
+	if (std::filesystem::exists(newPath, fsErrorCode))
+	{
+		filename = newPath.string();
+		return true;
+	}
+
+	// We have yet to convert it, so we need to load it up and decode it.
+	int error = MPG123_ERR;
+
+	mpg123_handle* mpgHandle = mpg123_new(nullptr, &error);
+	if (mpgHandle == nullptr)
+		return false;
+
+	// Force output as 16-bit PCM - preserve sample rate and channel count.
+	mpg123_format(mpgHandle, 0, 0, MPG123_ENC_SIGNED_16);
+
+	error = mpg123_open(mpgHandle, filename.c_str());
+	if (error != MPG123_OK)
+	{
+#ifdef _N3GAME
+		CLogWriter::Write("Failed to open MP3: %s (%d)",
+			filename.c_str(), error);
+#endif
+		mpg123_delete(mpgHandle);
+		return false;
+	}
+
+	long rate = 0;
+	int channels = 0, encoding = 0;
+
+	error = mpg123_getformat(mpgHandle, &rate, &channels, &encoding);
+	if (error != MPG123_OK)
+	{
+#ifdef _N3GAME
+		CLogWriter::Write("Failed to get MP3 format: %s (%d: %s)",
+			filename.c_str(), error, mpg123_strerror(mpgHandle));
+#endif
+
+		mpg123_delete(mpgHandle);
+		return false;
+	}
+
+	off_t sampleCount = mpg123_length(mpgHandle);
+	if (sampleCount < 0)
+	{
+#ifdef _N3GAME
+		CLogWriter::Write("Failed to get total MP3 samples per channel: %s",
+			filename.c_str());
+#endif
+
+		mpg123_delete(mpgHandle);
+		return false;
+	}
+
+	const int sampleSizeBytes = mpg123_encsize(encoding);
+	const size_t totalDataSize = sampleCount * channels * sampleSizeBytes;
+
+	std::vector<uint8_t> decodedWavFile(sizeof(WavFileHeader) + totalDataSize);
+
+	WavFileHeader& wavFileHeader = reinterpret_cast<WavFileHeader&>(decodedWavFile[0]);
+
+	// Initialise header to defaults (since it's reusing the preallocated zero-initialised memory).
+	wavFileHeader = {};
+
+	// Setup the file header.
+	wavFileHeader.Format.AudioFormat	= 1; // PCM
+	wavFileHeader.Format.NumChannels	= static_cast<uint16_t>(channels);
+	wavFileHeader.Format.SampleRate		= static_cast<uint16_t>(rate);
+	wavFileHeader.Format.BitsPerSample	= static_cast<uint16_t>(sampleSizeBytes * 8);
+	wavFileHeader.Format.BytesPerBlock	= wavFileHeader.Format.NumChannels * wavFileHeader.Format.BitsPerSample / 8;
+	wavFileHeader.Format.BytesPerSec	= wavFileHeader.Format.SampleRate * wavFileHeader.Format.BytesPerBlock;
+
+	size_t done = 0, decodedBytes = 0;
+	const size_t frameSize = mpg123_outblock(mpgHandle);
+	uint8_t* dataBuffer = &decodedWavFile[sizeof(WavFileHeader)];
+
+	error = mpg123_read(mpgHandle, dataBuffer, frameSize, &done);
+	while (error == MPG123_OK)
+	{
+		decodedBytes += done;
+		dataBuffer += done;
+		error = mpg123_read(mpgHandle, dataBuffer, frameSize, &done);
+	}
+
+	mpg123_delete(mpgHandle);
+
+	if (error != MPG123_DONE)
+	{
+#ifdef _N3GAME
+		CLogWriter::Write("Failed to decode MP3: %s (%d - decoded %zu bytes)",
+			filename.c_str(), error, decodedBytes);
+#endif
+		return false;
+	}
+
+	wavFileHeader.FileSize += static_cast<uint32_t>(decodedBytes);
+	wavFileHeader.Data.Size = static_cast<uint32_t>(decodedBytes);
+
+	filename = newPath.string();
+
+	// Output the new decoded WAV file.
+	FILE* fp = fopen(filename.c_str(), "wb");
+	if (fp == nullptr)
+	{
+#ifdef _N3GAME
+		CLogWriter::Write("Failed to write decoded MP3: %s",
+			filename.c_str());
+#endif
+		return false;
+	}
+
+	// Write out the effective file contents.
+	// The buffer size is based on full blocks; if the last block isn't full,
+	// we shouldn't write the entire block.
+	const size_t effectiveFileSize = sizeof(WavFileHeader) + decodedBytes;
+	fwrite(&decodedWavFile[0], effectiveFileSize, 1, fp);
+	fclose(fp);
+
+	return true;
 }

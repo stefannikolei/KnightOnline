@@ -21,11 +21,39 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\mpg123\src\compat\compat.c" />
+    <ClCompile Include="..\mpg123\src\compat\compat_str.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\parse.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\frame.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\format.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\dct64.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\equalizer.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\id3.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\optimize.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\readers.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\tabinit.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\libmpg123.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\index.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\icy.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\icy2utf8.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\layer1.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\layer2.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\layer3.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\ntom.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\synth_8bit.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\synth.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\synth_s32.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\synth_real.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\stringbuf.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\feature.c" />
+    <ClCompile Include="..\mpg123\src\libmpg123\lfs_wrap.c" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{adbae15c-f602-4531-8e80-1c3ed2f2d859}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>nanodbc</ProjectName>
+    <ProjectName>mpg123</ProjectName>
   </PropertyGroup>
   <Import Project="..\..\props\platform_root.props" />
   <PropertyGroup Label="Configuration">
@@ -33,7 +61,7 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <OutDir>$(StaticLibDir)</OutDir>
-    <TargetName>nanodbc</TargetName>
+    <TargetName>mpg123</TargetName>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)'=='Release'">
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -45,16 +73,20 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <Import Project="$(PropsDir)nanodbc.props" />
+  <Import Project="$(PropsDir)mpg123.props" />
   <ItemDefinitionGroup>
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_NONSTDC_NO_WARNINGS;WIN32;_WINDOWS;</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;OPT_GENERIC;REAL_IS_FLOAT;_CRT_SECURE_NO_WARNINGS;NOXFERMEM</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(DependencyDir)mpg123-msvc\libmpg123;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_NONSTDC_NO_WARNINGS;WIN32;_WINDOWS;</PreprocessorDefinitions>
-    </ResourceCompile>
+    <PreBuildEvent>
+      <Command>
+	    mkdir "$(ProjectDir)libmpg123"
+	    xcopy /Y /S /I "..\mpg123\src\include\*.h" "$(ProjectDir)libmpg123\"
+	    xcopy /Y /I "$(ProjectDir)config.h" "$(ProjectDir)libmpg123\"
+	  </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -120,12 +152,6 @@
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\nanodbc\nanodbc\nanodbc.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\nanodbc\nanodbc\nanodbc.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
