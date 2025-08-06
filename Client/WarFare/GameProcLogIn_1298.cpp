@@ -78,6 +78,12 @@ void CGameProcLogIn_1298::Init()
 	std::string szFN = "Snd\\Intro_Sound.mp3";
 	s_pSnd_BGM = s_SndMgr.CreateStreamObj(szFN);
 
+	if (s_pSnd_BGM != nullptr)
+	{
+		s_pSnd_BGM->Looping(true);
+		s_pSnd_BGM->Play();
+	}
+
 	s_pUIMgr->SetFocusedUI(m_pUILogIn);
 
 	// Socket connection..
@@ -132,26 +138,6 @@ void CGameProcLogIn_1298::Init()
 	if (LIC_KNIGHTONLINE != s_eLogInClassification)
 	{
 		MsgSend_AccountLogIn(s_eLogInClassification); // 로그인..
-	}
-}
-
-void CGameProcLogIn_1298::Tick() // 프로시져 인덱스를 리턴한다. 0 이면 그대로 진행
-{
-	CGameProcedure::Tick();	// 키, 마우스 입력 등등..
-
-	static float fTmp = 0;
-	if (fTmp == 0)
-	{
-		if (s_pSnd_BGM != nullptr)
-			s_pSnd_BGM->Play(); // 음악 시작..
-	}
-
-	fTmp += CN3Base::s_fSecPerFrm;
-	if(fTmp > 191.0f)
-	{
-		fTmp = 0;
-		if (s_pSnd_BGM != nullptr)
-			s_pSnd_BGM->Stop();
 	}
 }
 

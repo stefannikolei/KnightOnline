@@ -66,6 +66,9 @@
         if exist "$(ProjectDir)WarFare.vcxproj.user.default" if not exist "$(ProjectDir)WarFare.vcxproj.user" (
           copy /Y "$(ProjectDir)WarFare.vcxproj.user.default" "$(ProjectDir)WarFare.vcxproj.user"
         )
+        if exist "$(ProjectDir)warfare_config.h.default" if not exist "$(ProjectDir)warfare_config.h" (
+          copy /Y "$(ProjectDir)warfare_config.h.default" "$(ProjectDir)warfare_config.h"
+        )
         if exist "$(ProjectDir)..\Data\Server.ini.default" if not exist "$(ProjectDir)..\Data\Server.ini" (
           copy /Y "$(ProjectDir)..\Data\Server.ini.default" "$(ProjectDir)..\Data\Server.ini"
         )
@@ -326,6 +329,7 @@
     <ClInclude Include="UIVarious.h" />
     <ClInclude Include="UIWareHouseDlg.h" />
     <ClInclude Include="UIWarp.h" />
+    <ClInclude Include="warfare_config.h" />
     <ClInclude Include="WarMessage.h" />
   </ItemGroup>
   <ItemGroup>
