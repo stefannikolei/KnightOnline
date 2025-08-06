@@ -82,10 +82,10 @@
     </ClCompile>
     <PreBuildEvent>
       <Command>
-	    mkdir "$(ProjectDir)libmpg123"
-	    xcopy /Y /S /I "..\mpg123\src\include\*.h" "$(ProjectDir)libmpg123\"
-	    xcopy /Y /I "$(ProjectDir)config.h" "$(ProjectDir)libmpg123\"
-	  </Command>
+        mkdir "$(ProjectDir)libmpg123"
+        xcopy /Y /S /I "..\mpg123\src\include\*.h" "$(ProjectDir)libmpg123\"
+        xcopy /Y /I "$(ProjectDir)config.h" "$(ProjectDir)libmpg123\"
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

@@ -61,6 +61,16 @@
       <AdditionalLibraryDirectories>..\..\Server\shared\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
+    <PreBuildEvent>
+      <Command>
+        if exist "$(ProjectDir)WarFare.vcxproj.user.default" if not exist "$(ProjectDir)WarFare.vcxproj.user" (
+          copy /Y "$(ProjectDir)WarFare.vcxproj.user.default" "$(ProjectDir)WarFare.vcxproj.user"
+        )
+        if exist "$(ProjectDir)..\Data\Server.ini.default" if not exist "$(ProjectDir)..\Data\Server.ini" (
+          copy /Y "$(ProjectDir)..\Data\Server.ini.default" "$(ProjectDir)..\Data\Server.ini"
+        )
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
