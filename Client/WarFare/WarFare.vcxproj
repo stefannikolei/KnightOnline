@@ -63,10 +63,13 @@
     </Link>
     <PreBuildEvent>
       <Command>
-        if exist "..\Data\Server.ini.default" if not exist "..\Data\Server.ini" (
-            copy /Y "..\Data\Server.ini.default" "..\Data\Server.ini"
+        if exist "$(ProjectDir)WarFare.vcxproj.user.default" if not exist "$(ProjectDir)WarFare.vcxproj.user" (
+          copy /Y "$(ProjectDir)WarFare.vcxproj.user.default" "$(ProjectDir)WarFare.vcxproj.user"
         )
-	  </Command>
+        if exist "$(ProjectDir)..\Data\Server.ini.default" if not exist "$(ProjectDir)..\Data\Server.ini" (
+          copy /Y "$(ProjectDir)..\Data\Server.ini.default" "$(ProjectDir)..\Data\Server.ini"
+        )
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
