@@ -61,6 +61,13 @@
       <AdditionalLibraryDirectories>..\..\Server\shared\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
+    <PreBuildEvent>
+      <Command>
+        if exist "..\Data\Server.ini.default" if not exist "..\Data\Server.ini" (
+            copy /Y "..\Data\Server.ini.default" "..\Data\Server.ini"
+        )
+	  </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
