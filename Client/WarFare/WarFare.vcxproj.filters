@@ -686,6 +686,9 @@
     <ClInclude Include="text_resources.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="warfare_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
