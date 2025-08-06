@@ -63,9 +63,6 @@
     </Link>
     <PreBuildEvent>
       <Command>
-        if exist "$(ProjectDir)WarFare.vcxproj.user.default" if not exist "$(ProjectDir)WarFare.vcxproj.user" (
-          copy /Y "$(ProjectDir)WarFare.vcxproj.user.default" "$(ProjectDir)WarFare.vcxproj.user"
-        )
         if exist "$(ProjectDir)warfare_config.h.default" if not exist "$(ProjectDir)warfare_config.h" (
           copy /Y "$(ProjectDir)warfare_config.h.default" "$(ProjectDir)warfare_config.h"
         )
@@ -338,4 +335,8 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <PropertyGroup Label="Debugger defaults">
+    <LocalDebuggerWorkingDirectory>..\Data\</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>
