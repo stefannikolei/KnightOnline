@@ -281,6 +281,7 @@ enum e_ItemClass	{	ITEM_CLASS_DAGGER = 11, // dagger
 						ITEM_CLASS_ARMOR_PRIEST = 240, // Priest armor
 
 						ITEM_CLASS_ETC = 251, // Miscellaneous
+						ITEM_CLASS_CONSUMABLE = 255, // Consumable items with 'charges' that use the durability/duration instead of stacks
 
 						ITEM_CLASS_UNKNOWN = 0xffffffff }; // 
 
