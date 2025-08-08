@@ -1053,12 +1053,12 @@ void CPlayerMySelf::KnightsInfoSet(int iID, const std::string& szName, int iGrad
 		std::string szFontID;
 		GetText(IDS_FONT_ID, &szFontID);
 
-		m_pClanFont = new CDFont(szFontID, 12);
+		m_pClanFont = new CDFont(szFontID, 12, D3DFONT_BOLD);
 		m_pClanFont->InitDeviceObjects(s_lpD3DDev);
 		m_pClanFont->RestoreDeviceObjects();
 	}
 
-	m_pClanFont->SetText(m_InfoExt.szKnights.c_str(), D3DFONT_BOLD); // 폰트에 텍스트 지정.
+	m_pClanFont->SetText(m_InfoExt.szKnights.c_str()); // 폰트에 텍스트 지정.
 	m_pClanFont->SetFontColor(KNIGHTS_FONT_COLOR);
 }
 
