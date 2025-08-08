@@ -11,6 +11,9 @@
 
 #include <N3Base/N3ShapeMgr.h>
 
+#include <ranges>
+#include <algorithm>
+
 #ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
@@ -647,4 +650,9 @@ std::string CGameBase::FormatNumber(int iNumber)
 	}
 
 	return szFormattedNum;
+}
+
+void CGameBase::ConvertPipesToNewlines(std::string& input)
+{
+	std::ranges::replace(input, '|', '\n');
 }
