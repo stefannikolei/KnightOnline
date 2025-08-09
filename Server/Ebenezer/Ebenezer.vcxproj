@@ -145,6 +145,7 @@
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Npc.cpp" />
     <ClCompile Include="Region.cpp" />
+    <ClCompile Include="ServerResourceFormatter.cpp" />
     <ClCompile Include="SharedMem.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>

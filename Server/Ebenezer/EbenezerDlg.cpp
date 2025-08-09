@@ -511,6 +511,15 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
+	spdlog::info("EbenezerDlg::OnInitDialog: loading SERVER_RESOURCE table");
+	if (!LoadServerResourceTable())
+	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache BATTLE SERVER_RESOURCE, closing");
+		AfxMessageBox(_T("LoadServerResourceTable Load Fail"));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
+
 	spdlog::info("EbenezerDlg::OnInitDialog: loading maps");
 	if (!MapFileLoad())
 	{
@@ -3056,6 +3065,24 @@ BOOL CEbenezerDlg::LoadStartPositionTable()
 		return FALSE;
 	}
 
+	return TRUE;
+}
+
+BOOL CEbenezerDlg::LoadServerResourceTable()
+{
+	ServerResourceTableMap tableMap;
+
+	recordset_loader::STLMap loader(tableMap);
+	if (!loader.Load_ForbidEmpty())
+	{
+		ReportTableLoadError(loader.GetError(), __func__);
+		return FALSE;
+	}
+
+	for (auto& [_, serverResource] : tableMap)
+		rtrim(serverResource->Resource);
+
+	m_ServerResourceTableMap.Swap(tableMap);
 	return TRUE;
 }
 

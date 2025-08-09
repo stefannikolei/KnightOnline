@@ -81,6 +81,9 @@
     <ClCompile Include="..\..\Client\N3Base\N3ShapeMgr.cpp">
       <Filter>N3Base</Filter>
     </ClCompile>
+    <ClCompile Include="ServerResourceFormatter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AISocket.h">

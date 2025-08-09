@@ -66,6 +66,7 @@ typedef CSTLMap <_PARTY_GROUP>				PartyMap;
 typedef CSTLMap <CKnights>					KnightsMap;
 typedef CSTLMap <_ZONE_SERVERINFO>			ServerMap;
 typedef CSTLMap <model::Home>				HomeTableMap;
+typedef CSTLMap <model::ServerResource>		ServerResourceTableMap;
 typedef CSTLMap <model::StartPosition>		StartPositionTableMap;
 typedef	CSTLMap	<EVENT>						EventMap;
 
@@ -105,6 +106,7 @@ public:
 	BOOL LoadAllKnightsUserData();
 	BOOL LoadAllKnights();
 	BOOL LoadStartPositionTable();
+	BOOL LoadServerResourceTable();
 	BOOL LoadHomeTable();
 	void Announcement(BYTE type, int nation = 0, int chat_type = 8);
 	void ResetBattleZone();
@@ -206,6 +208,7 @@ public:
 	PartyMap				m_PartyMap;
 	KnightsMap				m_KnightsMap;
 	HomeTableMap			m_HomeTableMap;
+	ServerResourceTableMap	m_ServerResourceTableMap;
 	StartPositionTableMap	m_StartPositionTableMap;
 	EventMap				m_EventMap;
 
