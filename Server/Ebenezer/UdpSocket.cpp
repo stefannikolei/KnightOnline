@@ -444,7 +444,7 @@ void CUdpSocket::RecvCreateKnights(char* pBuf)
 	pKnights->m_byGrade = 5;
 	pKnights->m_byRanking = 0;
 
-	m_pMain->m_KnightsArray.PutData(pKnights->m_sIndex, pKnights);
+	m_pMain->m_KnightsMap.PutData(pKnights->m_sIndex, pKnights);
 
 	// 클랜정보에 추가
 	m_pMain->m_KnightsManager.AddKnightsUser(knightsindex, chiefname);
@@ -464,7 +464,7 @@ void CUdpSocket::RecvJoinKnights(char* pBuf, BYTE command)
 	idlen = GetShort(pBuf, index);
 	GetString(charId, pBuf, idlen, index);
 
-	pKnights = m_pMain->m_KnightsArray.GetData(knightsId);
+	pKnights = m_pMain->m_KnightsMap.GetData(knightsId);
 
 	if (command == KNIGHTS_JOIN)
 	{
@@ -514,7 +514,7 @@ void CUdpSocket::RecvModifyFame(char* pBuf, BYTE command)
 	GetString(userid, pBuf, idlen, index);
 
 	pTUser = m_pMain->GetUserPtr(userid, NameType::Character);
-	pKnights = m_pMain->m_KnightsArray.GetData(knightsindex);
+	pKnights = m_pMain->m_KnightsMap.GetData(knightsindex);
 
 	switch (command)
 	{
@@ -633,7 +633,7 @@ void CUdpSocket::RecvDestroyKnights(char* pBuf)
 
 	knightsId = GetShort(pBuf, index);
 
-	pKnights = m_pMain->m_KnightsArray.GetData(knightsId);
+	pKnights = m_pMain->m_KnightsMap.GetData(knightsId);
 	if (pKnights == nullptr)
 	{
 		spdlog::error("UdpSocket::RecvDestroyKnights: knightsId={} not found",
@@ -684,7 +684,7 @@ void CUdpSocket::RecvDestroyKnights(char* pBuf)
 		}
 	}
 
-	m_pMain->m_KnightsArray.DeleteData(knightsId);
+	m_pMain->m_KnightsMap.DeleteData(knightsId);
 	//TRACE(_T("UDP - RecvDestoryKnights - index=%d\n"), knightsindex);
 }
 
