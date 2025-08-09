@@ -1064,6 +1064,8 @@ void CUISkillTreeDlg::TooltipRenderEnable(__IconItemSkill* spSkill)
 	szStr.clear();
 
 	// Tooltip - item consumed
+	if (!m_pStr_skill_item2->IsVisible())
+		m_pStr_skill_item2->SetVisible(true);
 	uint32_t requiredItemID = spSkill->pSkill->dwExhaustItem;
 	uint32_t consumedItemID = 0;
 	
