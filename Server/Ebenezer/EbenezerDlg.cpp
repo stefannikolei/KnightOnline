@@ -4,11 +4,11 @@
 #include "stdafx.h"
 #include "EbenezerDlg.h"
 #include "User.h"
+#include "db_resources.h"
 
 #include <shared/crc32.h>
 #include <shared/lzf.h>
 #include <shared/packets.h>
-#include <shared/ServerResourceFormatter.h>
 #include <shared/StringUtils.h>
 
 #include <db-library/ConnectionManager.h>
@@ -507,6 +507,15 @@ BOOL CEbenezerDlg::OnInitDialog()
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache BATTLE table, closing");
 		AfxMessageBox(_T("LoadBattleTable Load Fail"));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
+
+	spdlog::info("EbenezerDlg::OnInitDialog: loading SERVER_RESOURCE table");
+	if (!LoadServerResourceTable())
+	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache BATTLE SERVER_RESOURCE, closing");
+		AfxMessageBox(_T("LoadServerResourceTable Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
@@ -2273,7 +2282,7 @@ BOOL CEbenezerDlg::PreTranslateMessage(MSG* pMsg)
 			if (m_bPermanentChatFlag)
 				finalstr = fmt::format("- {} -", chatstr);
 			else
-				finalstr = fmt::format_win32_resource(IDP_ANNOUNCEMENT, chatstr);
+				finalstr = fmt::format_db_resource(IDP_ANNOUNCEMENT, chatstr);
 
 			//
 			SetByte(buff, WIZ_CHAT, buffindex);
@@ -2973,57 +2982,57 @@ void CEbenezerDlg::Announcement(BYTE type, int nation, int chat_type)
 	switch (type)
 	{
 		case BATTLEZONE_OPEN:
-			chatstr = fmt::format_win32_resource(IDP_BATTLEZONE_OPEN);
+			chatstr = fmt::format_db_resource(IDP_BATTLEZONE_OPEN);
 			break;
 
 		case SNOW_BATTLEZONE_OPEN:
-			chatstr = fmt::format_win32_resource(IDP_BATTLEZONE_OPEN);
+			chatstr = fmt::format_db_resource(IDP_BATTLEZONE_OPEN);
 			break;
 
 		case DECLARE_WINNER:
 			if (m_bVictory == KARUS)
-				chatstr = fmt::format_win32_resource(IDP_KARUS_VICTORY, m_sElmoradDead, m_sKarusDead);
+				chatstr = fmt::format_db_resource(IDP_KARUS_VICTORY, m_sElmoradDead, m_sKarusDead);
 			else if (m_bVictory == ELMORAD)
-				chatstr = fmt::format_win32_resource(IDP_ELMORAD_VICTORY, m_sKarusDead, m_sElmoradDead);
+				chatstr = fmt::format_db_resource(IDP_ELMORAD_VICTORY, m_sKarusDead, m_sElmoradDead);
 			else
 				return;
 			break;
 
 		case DECLARE_LOSER:
 			if (m_bVictory == KARUS)
-				chatstr = fmt::format_win32_resource(IDS_ELMORAD_LOSER, m_sKarusDead, m_sElmoradDead);
+				chatstr = fmt::format_db_resource(IDS_ELMORAD_LOSER, m_sKarusDead, m_sElmoradDead);
 			else if (m_bVictory == ELMORAD)
-				chatstr = fmt::format_win32_resource(IDS_KARUS_LOSER, m_sElmoradDead, m_sKarusDead);
+				chatstr = fmt::format_db_resource(IDS_KARUS_LOSER, m_sElmoradDead, m_sKarusDead);
 			else
 				return;
 			break;
 
 		case DECLARE_BAN:
-			chatstr = fmt::format_win32_resource(IDS_BANISH_USER);
+			chatstr = fmt::format_db_resource(IDS_BANISH_USER);
 			break;
 
 		case BATTLEZONE_CLOSE:
-			chatstr = fmt::format_win32_resource(IDS_BATTLE_CLOSE);
+			chatstr = fmt::format_db_resource(IDS_BATTLE_CLOSE);
 			break;
 
 		case KARUS_CAPTAIN_NOTIFY:
-			chatstr = fmt::format_win32_resource(IDS_KARUS_CAPTAIN, m_strKarusCaptain);
+			chatstr = fmt::format_db_resource(IDS_KARUS_CAPTAIN, m_strKarusCaptain);
 			break;
 
 		case ELMORAD_CAPTAIN_NOTIFY:
-			chatstr = fmt::format_win32_resource(IDS_ELMO_CAPTAIN, m_strElmoradCaptain);
+			chatstr = fmt::format_db_resource(IDS_ELMO_CAPTAIN, m_strElmoradCaptain);
 			break;
 
 		case KARUS_CAPTAIN_DEPRIVE_NOTIFY:
-			chatstr = fmt::format_win32_resource(IDS_KARUS_CAPTAIN_DEPRIVE, m_strKarusCaptain);
+			chatstr = fmt::format_db_resource(IDS_KARUS_CAPTAIN_DEPRIVE, m_strKarusCaptain);
 			break;
 
 		case ELMORAD_CAPTAIN_DEPRIVE_NOTIFY:
-			chatstr = fmt::format_win32_resource(IDS_ELMO_CAPTAIN_DEPRIVE, m_strElmoradCaptain);
+			chatstr = fmt::format_db_resource(IDS_ELMO_CAPTAIN_DEPRIVE, m_strElmoradCaptain);
 			break;
 	}
 
-	chatstr = fmt::format_win32_resource(IDP_ANNOUNCEMENT, chatstr);
+	chatstr = fmt::format_db_resource(IDP_ANNOUNCEMENT, chatstr);
 	SetByte(send_buff, WIZ_CHAT, send_index);
 	SetByte(send_buff, chat_type, send_index);
 	SetByte(send_buff, 1, send_index);
@@ -3056,6 +3065,24 @@ BOOL CEbenezerDlg::LoadStartPositionTable()
 		return FALSE;
 	}
 
+	return TRUE;
+}
+
+BOOL CEbenezerDlg::LoadServerResourceTable()
+{
+	ServerResourceTableMap tableMap;
+
+	recordset_loader::STLMap loader(tableMap);
+	if (!loader.Load_ForbidEmpty())
+	{
+		ReportTableLoadError(loader.GetError(), __func__);
+		return FALSE;
+	}
+
+	for (auto& [_, serverResource] : tableMap)
+		rtrim(serverResource->Resource);
+
+	m_ServerResourceTableMap.Swap(tableMap);
 	return TRUE;
 }
 
@@ -3634,10 +3661,10 @@ BOOL CEbenezerDlg::LoadKnightsRankTable()
 		return FALSE;
 	}
 
-	std::string strKarusCaptainName = fmt::format_win32_resource(IDS_KARUS_CAPTAIN,
+	std::string strKarusCaptainName = fmt::format_db_resource(IDS_KARUS_CAPTAIN,
 		strKarusCaptain[0], strKarusCaptain[1], strKarusCaptain[2], strKarusCaptain[3], strKarusCaptain[4]);
 
-	std::string strElmoCaptainName = fmt::format_win32_resource(IDS_ELMO_CAPTAIN,
+	std::string strElmoCaptainName = fmt::format_db_resource(IDS_ELMO_CAPTAIN,
 		strElmoCaptain[0], strElmoCaptain[1], strElmoCaptain[2], strElmoCaptain[3], strElmoCaptain[4]);
 
 	spdlog::trace("EbenezerDlg::LoadKnightsRankTable: success");
