@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <shared/ServerResourceFormatter.h>
+#include "EbenezerResourceFormatter.h"
 
 enum e_DBResourceID
 {

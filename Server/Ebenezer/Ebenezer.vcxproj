@@ -145,7 +145,7 @@
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Npc.cpp" />
     <ClCompile Include="Region.cpp" />
-    <ClCompile Include="ServerResourceFormatter.cpp" />
+    <ClCompile Include="EbenezerResourceFormatter.cpp" />
     <ClCompile Include="SharedMem.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -163,6 +163,7 @@
     <ClInclude Include="Define.h" />
     <ClInclude Include="Ebenezer.h" />
     <ClInclude Include="EbenezerDlg.h" />
+    <ClInclude Include="EbenezerResourceFormatter.h" />
     <ClInclude Include="EVENT.h" />
     <ClInclude Include="EVENT_DATA.h" />
     <ClInclude Include="EXEC.h" />

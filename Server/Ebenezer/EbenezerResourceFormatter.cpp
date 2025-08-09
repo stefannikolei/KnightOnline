@@ -1,7 +1,6 @@
 ﻿#include "StdAfx.h"
 #include "EbenezerDlg.h"
-
-#include <shared/ServerResourceFormatter.h>
+#include "EbenezerResourceFormatter.h"
 
 bool fmt::resource_helper::get_from_db(uint32_t resourceId, std::string& fmtStr)
 {
