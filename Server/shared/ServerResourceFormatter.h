@@ -35,7 +35,7 @@ namespace fmt
 		std::string fmtStr;
 		if (!resource_helper::get_from_win32(resourceId, fmtStr))
 		{
-			spdlog::error("format_win32_resource({}) failed - resource not found.",
+			spdlog::error("get_from_win32({}) failed - resource not found.",
 				resourceId);
 			return std::to_string(resourceId);
 		}
@@ -63,7 +63,12 @@ namespace fmt
 	template <typename... Args>
 	inline std::string format_db_resource(uint32_t resourceId, Args&&... args)
 	{
-		auto fmtStr = resource_helper::get_from_db(resourceId);
+		std::string fmtStr;
+
+		// NOTE: Let the implementation error accordingly
+		if (!resource_helper::get_from_db(resourceId, fmtStr))
+			return std::to_string(resourceId);
+
 		try
 		{
 			return fmt::sprintf(fmtStr, std::forward<Args>(args)...);

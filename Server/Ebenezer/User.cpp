@@ -7,9 +7,9 @@
 #include "EbenezerDlg.h"
 #include "User.h"
 #include "Map.h"
+#include "db_resources.h"
 
 #include <shared/packets.h>
-#include <shared/ServerResourceFormatter.h>
 #include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
@@ -1924,7 +1924,7 @@ void CUser::Chat(char* pBuf)
 		if (m_pUserData->m_bAuthority != AUTHORITY_MANAGER)
 			return;
 
-		finalstr = fmt::format_win32_resource(IDP_ANNOUNCEMENT, chatstr);
+		finalstr = fmt::format_db_resource(IDP_ANNOUNCEMENT, chatstr);
 	}
 	else
 	{
@@ -7239,14 +7239,14 @@ void CUser::Dead()
 
 		//TRACE(_T("---> Dead Captain Deprive - %hs\n"), m_pUserData->m_id);
 		if (m_pUserData->m_bNation == KARUS)
-			chatstr = fmt::format_win32_resource(IDS_KARUS_CAPTAIN_DEPRIVE, strKnightsName, m_pUserData->m_id);
+			chatstr = fmt::format_db_resource(IDS_KARUS_CAPTAIN_DEPRIVE, strKnightsName, m_pUserData->m_id);
 		else if (m_pUserData->m_bNation == ELMORAD)
-			chatstr = fmt::format_win32_resource(IDS_ELMO_CAPTAIN_DEPRIVE, strKnightsName, m_pUserData->m_id);
+			chatstr = fmt::format_db_resource(IDS_ELMO_CAPTAIN_DEPRIVE, strKnightsName, m_pUserData->m_id);
 
 		memset(send_buff, 0, sizeof(send_buff));
 		send_index = 0;
 
-		chatstr = fmt::format_win32_resource(IDP_ANNOUNCEMENT, chatstr);
+		chatstr = fmt::format_db_resource(IDP_ANNOUNCEMENT, chatstr);
 		SetByte(send_buff, WIZ_CHAT, send_index);
 		SetByte(send_buff, WAR_SYSTEM_CHAT, send_index);
 		SetByte(send_buff, 1, send_index);
@@ -12191,11 +12191,11 @@ void CUser::NativeZoneReturn()
 
 BOOL CUser::CheckEditBox()
 {
-	std::string id = fmt::format_win32_resource(IDS_COUPON_NOTEPAD_ID);
+	std::string id = fmt::format_db_resource(IDS_COUPON_NOTEPAD_ID);
 	if (id == m_strCouponId)
 		return TRUE;
 
-	id = fmt::format_win32_resource(IDS_COUPON_POSTIT_ID);
+	id = fmt::format_db_resource(IDS_COUPON_POSTIT_ID);
 	if (id == m_strCouponId)
 		return TRUE;
 
