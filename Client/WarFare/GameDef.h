@@ -453,6 +453,8 @@ struct __InfoPartyOrForce
 	e_Class		eClass;				// Class
 	int			iHP;				// Hit Points
 	int			iHPMax;				// Max Hit Points
+	int			iMP;				// Mana Points
+	int			iMPMax;				// Max Mana Points
 	bool		bSufferDown_HP;		// Status - HP debuffed.
 	bool		bSufferDown_Etc;	// Status - Cursed.
 	std::string szID;				// Player's name
@@ -464,6 +466,8 @@ struct __InfoPartyOrForce
 		eClass = CLASS_UNKNOWN;
 		iHP = 0;
 		iHPMax = 0;
+		iMP = 0;
+		iMPMax = 0;
 		szID.clear();
 
 		bSufferDown_HP = false;			
