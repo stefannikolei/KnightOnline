@@ -55,6 +55,7 @@
 #include "UIDead.h"
 #include "UIUpgradeSelect.h"
 #include "UILevelGuide.h"
+#include "UIMsgBoxOkCancel.h"
 
 #include "SubProcPerTrade.h"
 #include "CountableItemEditDlg.h"
@@ -4178,7 +4179,6 @@ void CGameProcMain::InitUI()
 	iX = iW - (rc.right - rc.left);
 	iY = 10; //same pos with inventory
 	m_pUILevelGuide->SetPos(iX, iY);
-
 }
 
 void CGameProcMain::MsgSend_RequestTargetHP(int16_t siIDTarget, uint8_t byUpdateImmediately)
