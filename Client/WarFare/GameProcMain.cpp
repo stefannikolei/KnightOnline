@@ -4797,7 +4797,6 @@ bool CGameProcMain::CommandToggleUIMiniMap()
 
 bool CGameProcMain::CommandToggleCmdList()
 {
-	
 	bool bNeedOpen = !(m_pUICmdListDlg->IsVisible());
 
 	if (m_pSubProcPerTrade->m_ePerTradeState != PER_TRADE_STATE_NONE)
@@ -4805,13 +4804,6 @@ bool CGameProcMain::CommandToggleCmdList()
 
 	if (bNeedOpen)
 	{
-		if (m_pUIInventory->IsVisible())
-			m_pUIInventory->Close();
-		if (m_pUITransactionDlg->IsVisible())
-			m_pUITransactionDlg->LeaveTransactionState();
-		if (m_pUIWareHouseDlg->IsVisible())
-			m_pUIWareHouseDlg->LeaveWareHouseState();
-
 		s_pUIMgr->SetFocusedUI(m_pUICmdListDlg);
 		m_pUICmdListDlg->Open();
 	}
