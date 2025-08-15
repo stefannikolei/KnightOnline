@@ -188,23 +188,6 @@ bool CMagicSkillMng::CheckValidSkillMagic(__TABLE_UPC_SKILL* pSkill)
 	int LeftItem = s_pPlayer->ItemClass_LeftHand();
 	int RightItem = s_pPlayer->ItemClass_RightHand();
 
-	if(pSkill->iNeedSkill==1055 || pSkill->iNeedSkill==2055)
-	{
-		if((LeftItem != ITEM_CLASS_SWORD && LeftItem != ITEM_CLASS_AXE && LeftItem != ITEM_CLASS_MACE ) ||
-			(RightItem != ITEM_CLASS_SWORD && RightItem != ITEM_CLASS_AXE && RightItem != ITEM_CLASS_MACE) )
-		{
-			return false;
-		}
-	}
-	else if(pSkill->iNeedSkill==1056 || pSkill->iNeedSkill==2056)
-	{
-		if(	RightItem != ITEM_CLASS_SWORD_2H && RightItem != ITEM_CLASS_AXE_2H &&
-			RightItem != ITEM_CLASS_MACE_2H && RightItem != ITEM_CLASS_POLEARM )
-		{
-			return false;
-		}
-	}
-
 	if(pInfoBase->iHP < pSkill->iExhaustHP) return false;
 
 	int LeftItem1 = LeftItem/10;
