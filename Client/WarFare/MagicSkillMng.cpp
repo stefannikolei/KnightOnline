@@ -188,29 +188,23 @@ bool CMagicSkillMng::CheckValidSkillMagic(__TABLE_UPC_SKILL* pSkill)
 	int LeftItem = s_pPlayer->ItemClass_LeftHand();
 	int RightItem = s_pPlayer->ItemClass_RightHand();
 
-	if(pInfoBase->iHP < pSkill->iExhaustHP) return false;
+	if (pInfoBase->iHP < pSkill->iExhaustHP)
+		return false;
 
-	int LeftItem1 = LeftItem/10;
-	int RightItem1 = RightItem/10;
+	int LeftItemGroup = LeftItem / 10;
+	int RightItemGroup = RightItem / 10;
+
+	if (pSkill->dwNeedItem != 9
+		&& pSkill->dwNeedItem != 0
+		&& pSkill->dwNeedItem != static_cast<uint32_t>(LeftItemGroup)
+		&& pSkill->dwNeedItem != static_cast<uint32_t>(RightItemGroup))
+		return false;
 	
-	// NOTE(srmeier): I'm not sure about this but "9" for the e_ItemClass is jewels and stuff...
-	// - none of these type of items would be in the hands so... ?
-	// - if dwNeedItem == 0 then some other check is needed so maybe dwNeedItem == 9 indicates that no item is needed
-	if (pSkill->dwNeedItem != 9) {
-
-		if (pSkill->dwNeedItem != 0 && pSkill->dwNeedItem != LeftItem1 && pSkill->dwNeedItem != RightItem1)
-		{
-			return false;
-		}
-		if (pSkill->dwNeedItem == 0 && (pSkill->dw1stTableType == 1 || pSkill->dw2ndTableType == 1))
-		{
-			if (LeftItem != 11 && (LeftItem1 < 1 || LeftItem1>5) && RightItem1 != 11 && (RightItem1 < 1 || RightItem1>5))
-			{
-				return false;
-			}
-		}
-
-	}
+	// NOTE: Officially this is explicitly == 0, but only for CheckValidSkillMagic().
+	// We'll just keep it consistent with the logic enforced on cast, as that's the real enforcer here.
+	if (pSkill->dwNeedItem != 9
+		&& !s_pPlayer->HasWeaponEquipped())
+		return false;
 
 	if(pSkill->dwExhaustItem>0)
 	{
@@ -542,30 +536,25 @@ bool CMagicSkillMng::CheckValidCondition(int iTargetID, __TABLE_UPC_SKILL* pSkil
 		return false;
 	}
 
-	int LeftItem1 = LeftItem/10;
-	int RightItem1 = RightItem/10;
-	
-	// NOTE(srmeier): I'm not sure about this but "9" for the e_ItemClass is jewels and stuff...
-	// - none of these type of items would be in the hands so... ?
-	// - if dwNeedItem == 0 then some other check is needed so maybe dwNeedItem == 9 indicates that no item is needed
-	if (pSkill->dwNeedItem != 9) {
+	int LeftItemGroup = LeftItem / 10;
+	int RightItemGroup = RightItem / 10;
 
-		if (pSkill->dwNeedItem != 0 && pSkill->dwNeedItem != LeftItem1 && pSkill->dwNeedItem != RightItem1)
-		{
-			std::string buff = fmt::format_text_resource(IDS_SKILL_FAIL_INVALID_ITEM);
-			m_pGameProcMain->MsgOutput(buff, 0xffffff00);
-			return false;
-		}
-		if (pSkill->dwNeedItem == 0 && (pSkill->dw1stTableType == 1 || pSkill->dw2ndTableType == 1))
-		{
-			if (LeftItem != 11 && (LeftItem1<1 || LeftItem1>5) && RightItem1 != 11 && (RightItem1<1 || RightItem1>5))
-			{
-				std::string buff = fmt::format_text_resource(IDS_SKILL_FAIL_INVALID_ITEM);
-				m_pGameProcMain->MsgOutput(buff, 0xffffff00);
-				return false;
-			}
-		}
+	if (pSkill->dwNeedItem != 9
+		&& pSkill->dwNeedItem != 0
+		&& pSkill->dwNeedItem != static_cast<uint32_t>(LeftItemGroup)
+		&& pSkill->dwNeedItem != static_cast<uint32_t>(RightItemGroup))
+	{
+		std::string buff = fmt::format_text_resource(IDS_SKILL_FAIL_INVALID_ITEM);
+		m_pGameProcMain->MsgOutput(buff, 0xffffff00);
+		return false;
+	}
 
+	if (pSkill->dwNeedItem != 9
+		&& !s_pPlayer->HasWeaponEquipped())
+	{
+		std::string buff = fmt::format_text_resource(IDS_SKILL_FAIL_PLEASE_EQUIP_YOUR_WEAPON);
+		m_pGameProcMain->MsgOutput(buff, 0xffffff00);
+		return false;
 	}
 
 	if(pSkill->dwExhaustItem>0)
