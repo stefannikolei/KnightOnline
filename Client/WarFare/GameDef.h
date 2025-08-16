@@ -1178,7 +1178,6 @@ enum e_SkillMagicTaget	{	SKILLMAGIC_TARGET_SELF = 1,					// Targets myself
 							SKILLMAGIC_TARGET_UNKNOWN = 0xffffffff
 						};
 
-
 // define fx...
 struct __TABLE_FX
 {
