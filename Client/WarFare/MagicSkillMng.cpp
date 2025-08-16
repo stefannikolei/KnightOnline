@@ -198,6 +198,10 @@ bool CMagicSkillMng::HasRequiredMana(const __TABLE_UPC_SKILL* pSkill) const
 
 bool CMagicSkillMng::HasRequiredHealth(const __TABLE_UPC_SKILL* pSkill) const
 {
+	// Ignore HP requirement for Sacrifice skill.
+	if (pSkill->iExhaustHP >= 10000)
+		return true;
+
 	return s_pPlayer->m_InfoBase.iHP >= pSkill->iExhaustHP;
 }
 
