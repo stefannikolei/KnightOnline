@@ -142,7 +142,7 @@ void CEventManager::Behavior(int16_t sEventType, int16_t sPreEventType)
 	{
 	case EVENT_TYPE_POISON:
 		{
-			int iID = CGameProcedure::s_pPlayer->IDNumber();
+			int iID = CGameBase::s_pPlayer->IDNumber();
 			int iFX = FXID_REGION_POISON;
 			CGameProcedure::s_pFX->Stop(iID, iID, iFX, -1, true);
 		}
@@ -153,7 +153,7 @@ void CEventManager::Behavior(int16_t sEventType, int16_t sPreEventType)
 	{
 	case EVENT_TYPE_POISON:
 		{
-			int iID = CGameProcedure::s_pPlayer->IDNumber();
+			int iID = CGameBase::s_pPlayer->IDNumber();
 			int iFX = FXID_REGION_POISON;
 			CGameProcedure::s_pFX->TriggerBundle(iID, 0, iFX, iID, -1, FX_BUNDLE_REGION_POISON);
 		}

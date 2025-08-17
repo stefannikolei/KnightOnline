@@ -111,36 +111,36 @@ void CUIClassChange::Open(int iCode)
 			switch ( pInfoBase->eClass )
 			{
 				case CLASS_KA_WARRIOR:
-					CGameProcedure::GetTextByClass(CLASS_KA_BERSERKER, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameProcedure::GetTextByClass(CLASS_KA_GUARDIAN, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_BERSERKER, szClassTmp); m_pText_Info0->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_GUARDIAN, szClassTmp); m_pText_Info1->SetString(szClassTmp);
 					break;
 				case CLASS_KA_ROGUE:
-					CGameProcedure::GetTextByClass(CLASS_KA_HUNTER, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameProcedure::GetTextByClass(CLASS_KA_PENETRATOR, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_HUNTER, szClassTmp); m_pText_Info0->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_PENETRATOR, szClassTmp); m_pText_Info1->SetString(szClassTmp);
 					break;
 				case CLASS_KA_WIZARD:
-					CGameProcedure::GetTextByClass(CLASS_KA_SORCERER, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameProcedure::GetTextByClass(CLASS_KA_NECROMANCER, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_SORCERER, szClassTmp); m_pText_Info0->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_NECROMANCER, szClassTmp); m_pText_Info1->SetString(szClassTmp);
 					break;
 				case CLASS_KA_PRIEST:
-					CGameProcedure::GetTextByClass(CLASS_KA_SHAMAN, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameProcedure::GetTextByClass(CLASS_KA_DARKPRIEST, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_SHAMAN, szClassTmp); m_pText_Info0->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_DARKPRIEST, szClassTmp); m_pText_Info1->SetString(szClassTmp);
 					break;
 				case CLASS_EL_WARRIOR:
-					CGameProcedure::GetTextByClass(CLASS_EL_BLADE, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameProcedure::GetTextByClass(CLASS_EL_PROTECTOR, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_BLADE, szClassTmp); m_pText_Info0->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_PROTECTOR, szClassTmp); m_pText_Info1->SetString(szClassTmp);
 					break;
 				case CLASS_EL_ROGUE:
-					CGameProcedure::GetTextByClass(CLASS_EL_RANGER, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameProcedure::GetTextByClass(CLASS_EL_ASSASIN, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_RANGER, szClassTmp); m_pText_Info0->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_ASSASIN, szClassTmp); m_pText_Info1->SetString(szClassTmp);
 					break;
 				case CLASS_EL_WIZARD:
-					CGameProcedure::GetTextByClass(CLASS_EL_MAGE, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameProcedure::GetTextByClass(CLASS_EL_ENCHANTER, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_MAGE, szClassTmp); m_pText_Info0->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_ENCHANTER, szClassTmp); m_pText_Info1->SetString(szClassTmp);
 					break;
 				case CLASS_EL_PRIEST:
-					CGameProcedure::GetTextByClass(CLASS_EL_CLERIC, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameProcedure::GetTextByClass(CLASS_EL_DRUID, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_CLERIC, szClassTmp); m_pText_Info0->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_DRUID, szClassTmp); m_pText_Info1->SetString(szClassTmp);
 					break;
 			}
 			break;

@@ -577,7 +577,7 @@ void CUIKnights::Clear()
 	m_pText_Duty->SetString("");
 	m_pText_MemberCount->SetString("0");
 
-	this->ChangeUIByDuty(CGameProcedure::s_pPlayer->m_InfoExt.eKnightsDuty);
+	this->ChangeUIByDuty(CGameBase::s_pPlayer->m_InfoExt.eKnightsDuty);
 }
 
 void CUIKnights::SetVisible(bool bVisible)
@@ -718,7 +718,7 @@ void CUIKnights::AdmitButtonHandler()
 
 	m_fTimeLimit_Admit = 0.0f;
 
-	CGameProcedure::s_pProcMain->MsgSend_KnightsJoin(CGameProcedure::s_pPlayer->m_iIDTarget);
+	CGameProcedure::s_pProcMain->MsgSend_KnightsJoin(CGameBase::s_pPlayer->m_iIDTarget);
 	m_fTimeLimit_Admit = 0.0f;
 }
 
@@ -786,8 +786,8 @@ void CUIKnights::RefreshList()
 		if (KMI.iConnected)
 		{
 			std::string szClass, szDuty;
-			CGameProcedure::GetTextByKnightsDuty(KMI.eDuty, szDuty);
-			CGameProcedure::GetTextByClass(KMI.eClass, szClass);
+			CGameBase::GetTextByKnightsDuty(KMI.eDuty, szDuty);
+			CGameBase::GetTextByClass(KMI.eClass, szClass);
 
 			std::string level = std::to_string(KMI.iLevel);
 
@@ -974,11 +974,11 @@ void CUIKnights::ChangeUIByDuty(e_KnightsDuty eDuty) // 권한에 따라 UI 변�
 
 void CUIKnights::UpdateExceptList()
 {
-	UpdateKnightsDuty(CGameProcedure::s_pPlayer->m_InfoExt.eKnightsDuty);
-	UpdateKnightsName(CGameProcedure::s_pPlayer->m_InfoExt.szKnights);
-	UpdateKnightsGrade(CGameProcedure::s_pPlayer->m_InfoExt.iKnightsGrade);
-	UpdateKnightsRank(CGameProcedure::s_pPlayer->m_InfoExt.iKnightsRank);
-	ChangeUIByDuty(CGameProcedure::s_pPlayer->m_InfoExt.eKnightsDuty);
+	UpdateKnightsDuty(CGameBase::s_pPlayer->m_InfoExt.eKnightsDuty);
+	UpdateKnightsName(CGameBase::s_pPlayer->m_InfoExt.szKnights);
+	UpdateKnightsGrade(CGameBase::s_pPlayer->m_InfoExt.iKnightsGrade);
+	UpdateKnightsRank(CGameBase::s_pPlayer->m_InfoExt.iKnightsRank);
+	ChangeUIByDuty(CGameBase::s_pPlayer->m_InfoExt.eKnightsDuty);
 }
 
 
@@ -1134,8 +1134,8 @@ bool CUIFriends::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		}
 		else if(pSender == m_pBtn_Add) // 추가.
 		{
-			CPlayerOther* pUPC = CGameProcedure::s_pOPMgr->UPCGetByID(CGameProcedure::s_pPlayer->m_iIDTarget, false);
-			if(pUPC)
+			CPlayerOther* pUPC = CGameProcedure::s_pOPMgr->UPCGetByID(CGameBase::s_pPlayer->m_iIDTarget, false);
+			if (pUPC != nullptr)
 			{
 				if(this->MemberAdd(pUPC->IDString(), pUPC->IDNumber(), true, false)) // 추가 성공이면..
 				{
@@ -1574,21 +1574,21 @@ void CUIVarious::UpdateAllStates(const __InfoPlayerBase* pInfoBase, const __Info
 	
 	if(m_pPageState->m_pText_Class) // 직업
 	{
-		CGameProcedure::GetTextByClass(pInfoBase->eClass, szVal);
+		CGameBase::GetTextByClass(pInfoBase->eClass, szVal);
 		m_pPageState->m_pText_Class->SetString(szVal);
 	}
 
 	// 종족
 	if(m_pPageState->m_pText_Race) 
 	{
-		CGameProcedure::GetTextByRace(pInfoBase->eRace, szVal);
+		CGameBase::GetTextByRace(pInfoBase->eRace, szVal);
 		m_pPageState->m_pText_Race->SetString(szVal);
 	}
 	
 	// 국가
 	if(m_pPageState->m_pText_Nation)
 	{
-		CGameProcedure::GetTextByNation(pInfoBase->eNation, szVal);
+		CGameBase::GetTextByNation(pInfoBase->eNation, szVal);
 		m_pPageState->m_pText_Nation->SetString(szVal);
 	}
 
@@ -1666,10 +1666,10 @@ void CUIVarious::UpdateKnightsInfo()
 	if(NULL == m_pPageKnights) return;
 
 	/*
-		m_pPageKnights->UpdateKnightsDuty(CGameProcedure::s_pPlayer->m_InfoExt.eKnightsDuty);
-		m_pPageKnights->UpdateKnightsName(CGameProcedure::s_pPlayer->m_InfoExt.szKnights);
-		m_pPageKnights->UpdateKnightsGrade(CGameProcedure::s_pPlayer->m_InfoExt.iKnightsGrade);
-		m_pPageKnights->UpdateKnightsRank(CGameProcedure::s_pPlayer->m_InfoExt.iKnightsRank);
+		m_pPageKnights->UpdateKnightsDuty(CGameBase::s_pPlayer->m_InfoExt.eKnightsDuty);
+		m_pPageKnights->UpdateKnightsName(CGameBase::s_pPlayer->m_InfoExt.szKnights);
+		m_pPageKnights->UpdateKnightsGrade(CGameBase::s_pPlayer->m_InfoExt.iKnightsGrade);
+		m_pPageKnights->UpdateKnightsRank(CGameBase::s_pPlayer->m_InfoExt.iKnightsRank);
 	*/
 
 	m_pPageKnights->UpdateExceptList();
