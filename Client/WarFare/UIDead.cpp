@@ -87,7 +87,7 @@ bool CUIDead::ReceiveMessage(CN3UIBase *pSender, uint32_t dwMsg)
 			if(CGameProcedure::s_pProcMain->m_pUIInventory)
 				iItemCnt = CGameProcedure::s_pProcMain->m_pUIInventory->GetIndexItemCount(LIFE_STONE_INDEX);
 
-			iLevel = CGameProcedure::s_pPlayer->m_InfoBase.iLevel;
+			iLevel = CGameBase::s_pPlayer->m_InfoBase.iLevel;
 			iNeedItemCnt = iLevel * TIMES_LIFE_STONE;
 			std::string szMsg;
 
@@ -237,7 +237,9 @@ void CUIDead::MsgSend_Revival(uint8_t byType)
 {
 	if(m_bProcessing) return;
 
-	if(CGameProcedure::s_pPlayer->m_iSendRegeneration >= 2) return; // 한번 보내면 다시 죽을때까지 안보내는 플래그
+	// 한번 보내면 다시 죽을때까지 안보내는 플래그
+	if (CGameBase::s_pPlayer->m_iSendRegeneration >= 2)
+		return;
 
 	uint8_t byBuff[4];
 	int iOffset=0;
@@ -247,7 +249,7 @@ void CUIDead::MsgSend_Revival(uint8_t byType)
 	CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
 
 	CLogWriter::Write("Send Regeneration");
-	CGameProcedure::s_pPlayer->m_iSendRegeneration = 2; // 한번 보내면 다시 죽을때까지 안보내는 플래그
+	CGameBase::s_pPlayer->m_iSendRegeneration = 2; // 한번 보내면 다시 죽을때까지 안보내는 플래그
 	//TRACE("보냄 - 다시 살아나기\n");
 
 	m_bProcessing = true;
@@ -263,10 +265,10 @@ void CUIDead::MsgRecv_Revival(Packet& pkt)
 	vPosPlayer.y = (pkt.read<int16_t>())/10.0f;
 	
 	CGameProcedure::s_pProcMain->InitPlayerPosition(vPosPlayer); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다.
-	CGameProcedure::s_pPlayer->RegenerateCollisionMesh(); // 충돌 메시를 다시 만든다..
+	CGameBase::s_pPlayer->RegenerateCollisionMesh(); // 충돌 메시를 다시 만든다..
 
-	CGameProcedure::s_pPlayer->m_iSendRegeneration = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그
-	CGameProcedure::s_pPlayer->m_fTimeAfterDeath = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그
+	CGameBase::s_pPlayer->m_iSendRegeneration = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그
+	CGameBase::s_pPlayer->m_fTimeAfterDeath = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그
 	//TRACE("받음 - 다시 살아나기(%.1f, %.1f)\n", vPosPlayer.x, vPosPlayer.z);
 
 	//
@@ -280,10 +282,10 @@ void CUIDead::MsgRecv_Revival(Packet& pkt)
 
 	CLogWriter::Write("Receive Regeneration");
 
-	int iID = CGameProcedure::s_pPlayer->IDNumber();
-	if(CGameProcedure::s_pPlayer->Nation()==NATION_KARUS) 
+	int iID = CGameBase::s_pPlayer->IDNumber();
+	if(CGameBase::s_pPlayer->Nation()==NATION_KARUS) 
 		CGameProcedure::s_pFX->TriggerBundle(iID, -1, FXID_REGEN_KARUS, iID, -1);
-	else if(CGameProcedure::s_pPlayer->Nation()==NATION_ELMORAD) 
+	else if(CGameBase::s_pPlayer->Nation()==NATION_ELMORAD) 
 		CGameProcedure::s_pFX->TriggerBundle(iID, -1, FXID_REGEN_ELMORAD, iID, -1);
 
 	SetVisible(false);

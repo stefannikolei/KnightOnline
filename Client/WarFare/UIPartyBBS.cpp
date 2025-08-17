@@ -289,7 +289,7 @@ void CUIPartyBBS::RefreshPage()
 		if(it==m_Datas.end()) return;
 
 		__InfoPartyBBS IPB = (*it);
-		CGameProcedure::GetTextByClass(IPB.eClass, szClass);
+		CGameBase::GetTextByClass(IPB.eClass, szClass);
 		SetContentString(i, IPB.szID.c_str(), IPB.iLevel, szClass.c_str());
 		it++;
 	}
@@ -300,28 +300,28 @@ void CUIPartyBBS::PartyStringSet(uint8_t byType)
 	switch(byType)
 	{
 	case N3_SP_PARTY_REGISTER:
-		CGameProcedure::s_pPlayer->m_bRecruitParty = true;
+		CGameBase::s_pPlayer->m_bRecruitParty = true;
 		break;
 	case N3_SP_PARTY_REGISTER_CANCEL:
-		CGameProcedure::s_pPlayer->m_bRecruitParty = false;
+		CGameBase::s_pPlayer->m_bRecruitParty = false;
 		break;
 	}
 
-	if(CGameProcedure::s_pPlayer->m_bRecruitParty)
+	if (CGameBase::s_pPlayer->m_bRecruitParty)
 	{
-		int iLevel = CGameProcedure::s_pPlayer->m_InfoBase.iLevel;
+		int iLevel = CGameBase::s_pPlayer->m_InfoBase.iLevel;
 		int iLMin = iLevel - 8;
 		if(iLMin < 0) iLMin = 0;
 		int iLMax = iLevel + 8;
 		if(iLMax > 80) iLMax = 80;
 
 		std::string szMsg = fmt::format_text_resource(IDS_WANT_PARTY_MEMBER, iLMin, iLMax);
-		CGameProcedure::s_pPlayer->InfoStringSet(szMsg, 0xff00ff00);
+		CGameBase::s_pPlayer->InfoStringSet(szMsg, 0xff00ff00);
 		CGameProcedure::s_pProcMain->MsgSend_StateChange(N3_SP_STATE_CHANGE_RECRUIT_PARTY, 0x02); // 파티 요청.. 취소
 	}
 	else
 	{
-		CGameProcedure::s_pPlayer->InfoStringSet("", 0);
+		CGameBase::s_pPlayer->InfoStringSet("", 0);
 		CGameProcedure::s_pProcMain->MsgSend_StateChange(N3_SP_STATE_CHANGE_RECRUIT_PARTY, 0x01); // 파티 요청..
 	}
 }
@@ -451,10 +451,9 @@ void CUIPartyBBS::RequestWhisper()
 		if( i == m_iCurIndex )
 		{
 			__InfoPartyBBS IPB = (*it);
-			if(0 != lstrcmpi(IPB.szID.c_str(), CGameProcedure::s_pPlayer->m_InfoBase.szID.c_str()))
-			{//나 자신에게는 귓속말을 못하게 한다...
+			//나 자신에게는 귓속말을 못하게 한다...
+			if (lstrcmpi(IPB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) != 0)
 				CGameProcedure::s_pProcMain->MsgSend_ChatSelectTarget(IPB.szID);
-			}
 			break;
 		}
 	}
@@ -475,7 +474,7 @@ void CUIPartyBBS::RequestParty()
 			__InfoPartyBBS IPB = (*it);
 
 			// 나 자신에게는 파티 신청을 못하게 한다...
-			if(0 != lstrcmpi(IPB.szID.c_str(), CGameProcedure::s_pPlayer->m_InfoBase.szID.c_str()))
+			if (lstrcmpi(IPB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) != 0)
 			{
 				std::string szMsg;
 				if (CGameProcedure::s_pProcMain->MsgSend_PartyOrForceCreate(0, IPB.szID))

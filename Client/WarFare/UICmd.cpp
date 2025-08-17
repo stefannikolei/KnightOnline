@@ -137,8 +137,8 @@ bool CUICmd::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 		else if(pSender == m_pBtn_Party_Invite)
 		{
-			CPlayerOther* pUPC = CGameProcedure::s_pOPMgr->UPCGetByID(CGameProcedure::s_pPlayer->m_iIDTarget, true);
-			if(pUPC && pUPC->m_InfoBase.eNation == CGameProcedure::s_pPlayer->m_InfoBase.eNation) // 국가 체크
+			CPlayerOther* pUPC = CGameProcedure::s_pOPMgr->UPCGetByID(CGameBase::s_pPlayer->m_iIDTarget, true);
+			if (pUPC != nullptr && pUPC->m_InfoBase.eNation == CGameBase::s_pPlayer->m_InfoBase.eNation) // 국가 체크
 			{
 				CGameProcedure::s_pProcMain->MsgSend_PartyOrForceCreate(0, pUPC->IDString()); // 파티 초대하기..
 			}

@@ -265,7 +265,7 @@ void CPlayerMySelf::Tick()
 						{
 							if(CGameProcedure::s_pEng->ViewPoint() == VP_THIRD_PERSON)
 							{
-								CGameProcedure::s_pPlayer->RotateTo(pTarget); // 방향을 돌린다.
+								RotateTo(pTarget); // 방향을 돌린다.
 
 								float fDist = (pTarget->Position() - m_Chr.Pos()).Magnitude(); // 공격 거리를 구하고..
 								float fDistLimit = this->AttackableDistance(pTarget);

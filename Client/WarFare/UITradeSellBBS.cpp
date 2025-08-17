@@ -507,12 +507,12 @@ void CUITradeSellBBS::OnButtonRegisterCancel()
 		{
 			__InfoTradeSellBBS ITSB = (*it);
 
-			if(0 == lstrcmpi(ITSB.szID.c_str(), CGameProcedure::s_pPlayer->m_InfoBase.szID.c_str()))
+			if (lstrcmpi(ITSB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) == 0)
 			{//자기것만 등록해제하게..
 				MsgSend_RegisterCancel(ITSB.sIndex);
 				break;
 			}
-			else if(AUTHORITY_MANAGER == CGameProcedure::s_pProcMain->s_pPlayer->m_InfoBase.iAuthority)
+			else if (CGameProcedure::s_pProcMain->s_pPlayer->m_InfoBase.iAuthority == AUTHORITY_MANAGER)
 			{//운영자에게는 해제 권한을 준다...(도배나 욕설등의 게시물 삭제를 위해서...)
 				MsgSend_RegisterCancel(ITSB.sIndex);
 				break;
@@ -533,10 +533,9 @@ void CUITradeSellBBS::OnButtonWhisper()
 		if( i == m_iCurIndex )
 		{
 			__InfoTradeSellBBS ITSB = (*it);
-			if(0 != lstrcmpi(ITSB.szID.c_str(), CGameProcedure::s_pPlayer->m_InfoBase.szID.c_str()))
-			{//나 자신에게는 귓속말을 못하게 한다...
+			//나 자신에게는 귓속말을 못하게 한다...
+			if (lstrcmpi(ITSB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) != 0)
 				CGameProcedure::s_pProcMain->MsgSend_ChatSelectTarget(ITSB.szID);
-			}
 			break;
 		}
 	}
@@ -566,7 +565,7 @@ void CUITradeSellBBS::OnButtonTrade()
 		{
 			__InfoTradeSellBBS ITSB = (*it);
 
-			if (0 != lstrcmpi(ITSB.szID.c_str(), CGameProcedure::s_pPlayer->m_InfoBase.szID.c_str()))
+			if (lstrcmpi(ITSB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) != 0)
 			{
 				std::string szMsg = fmt::format_text_resource(IDS_TRADE_BBS_PER_TRADE, 5000);
 
@@ -635,9 +634,13 @@ void CUITradeSellBBS::OnListExplanation()
 
 void CUITradeSellBBS::MsgSend_PerTrade()
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
-	if(0 == lstrcmpi(m_ITSB.szID.c_str(), CGameProcedure::s_pPlayer->m_InfoBase.szID.c_str()))
-		return; //자기 자신에게는 거래를 하지 못하게
+	// 전에 보낸 패킷 응답이 없으면
+	if (m_bProcessing)
+		return;
+
+	// 자기 자신에게는 거래를 하지 못하게
+	if (lstrcmpi(m_ITSB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) == 0)
+		return;
 
 	uint8_t byBuff[10];
 
