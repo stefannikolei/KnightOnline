@@ -4623,6 +4623,15 @@ void CUser::NpcEvent(char* pBuf)
 			Send(send_buff, send_index);
 			break;
 
+		case NPC_RENTAL:
+			SetByte(send_buff, WIZ_RENTAL, send_index);
+			SetByte(send_buff, RENTAL_NPC, send_index);
+			// 1 = enabled, -1 = disabled
+			SetShort(send_buff, 1, send_index);
+			SetDWORD(send_buff, pNpc->m_iSellingGroup, send_index);
+			Send(send_buff, send_index);
+			break;
+
 #if 0 // not typically available
 		case NPC_COUPON:
 			if (m_pMain->m_byNationID == 1
