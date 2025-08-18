@@ -654,7 +654,6 @@ model::Magic* CMagicProcess::IsAvailable(int magicid, int tid, int sid, BYTE typ
 				moral = m_pSrcUser->m_pUserData->m_bNation;
 			else
 				moral = 1;
-
 		}
 	}
 	else
