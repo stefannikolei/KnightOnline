@@ -11618,7 +11618,11 @@ void CUser::GoldGain(int gold)
 	int64_t iTotalGold = 0;
 
 	if (m_pUserData->m_iGold < 0)
-		m_pUserData->m_iGold = 0;
+	{
+		spdlog::error("User::GoldGain: user has negative gold [charId={} existingGold={}]",
+			m_pUserData->m_id, m_pUserData->m_iGold);
+		return;
+	}	
 
 	if (gold < 0)
 		gold = 0;
@@ -11638,14 +11642,24 @@ void CUser::GoldGain(int gold)
 	Send(send_buff, send_index);
 }
 
-BOOL CUser::GoldLose(int gold)
+bool CUser::GoldLose(int gold)
 {
 	int send_index = 0;
 	char send_buff[256] = {};
 
+	if (m_pUserData->m_iGold < 0)
+	{
+		spdlog::error("User::GoldLose: user has negative gold [charId={} existingGold={}]",
+			m_pUserData->m_id, m_pUserData->m_iGold);
+		return false;
+	}
+
+	if (gold < 0)
+		gold = 0;
+
 	// Insufficient gold!
 	if (m_pUserData->m_iGold < gold)
-		return FALSE;
+		return false;
 
 	m_pUserData->m_iGold -= gold;	// Subtract gold.
 
@@ -11655,7 +11669,7 @@ BOOL CUser::GoldLose(int gold)
 	SetDWORD(send_buff, m_pUserData->m_iGold, send_index);
 	Send(send_buff, send_index);
 
-	return TRUE;
+	return true;
 }
 
 BOOL CUser::CheckSkillPoint(BYTE skillnum, BYTE min, BYTE max)
