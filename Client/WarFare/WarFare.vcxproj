@@ -103,7 +103,6 @@
     <ClCompile Include="APISocket.cpp" />
     <ClCompile Include="Bird.cpp" />
     <ClCompile Include="BirdMng.cpp" />
-    <ClCompile Include="Catapult.cpp" />
     <ClCompile Include="ClientResourceFormatter.cpp" />
     <ClCompile Include="CountableItemEditDlg.cpp" />
     <ClCompile Include="DungeonManager.cpp" />
@@ -125,8 +124,6 @@
     <ClCompile Include="ItemRepairMgr.cpp" />
     <ClCompile Include="LightMgr.cpp" />
     <ClCompile Include="LocalInput.cpp" />
-    <ClCompile Include="MachineBase.cpp" />
-    <ClCompile Include="MachineMng.cpp" />
     <ClCompile Include="MagicSkillMng.cpp" />
     <ClCompile Include="N3ClientShapeMgr.cpp" />
     <ClCompile Include="N3FXBundleGame.cpp" />
@@ -216,7 +213,6 @@
     <ClInclude Include="Bird.h" />
     <ClInclude Include="BirdMng.h" />
     <ClInclude Include="Bitset.h" />
-    <ClInclude Include="Catapult.h" />
     <ClInclude Include="ClientResourceFormatter.h" />
     <ClInclude Include="CountableItemEditDlg.h" />
     <ClInclude Include="DungeonManager.h" />
@@ -247,8 +243,6 @@
     <ClInclude Include="ItemRepairMgr.h" />
     <ClInclude Include="LightMgr.h" />
     <ClInclude Include="LocalInput.h" />
-    <ClInclude Include="MachineBase.h" />
-    <ClInclude Include="MachineMng.h" />
     <ClInclude Include="MagicSkillMng.h" />
     <ClInclude Include="N3EffectWave2.h" />
     <ClInclude Include="N3FXBundleGame.h" />
