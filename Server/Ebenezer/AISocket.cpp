@@ -1709,7 +1709,7 @@ void CAISocket::RecvGateOpen(char* pBuf)
 		|| pNpc->m_tNpcType == NPC_SPECIAL_GATE)
 	{
 		SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);
-		SetByte(send_buff, pEvent->sType, send_index);
+		SetByte(send_buff, static_cast<uint8_t>(pEvent->sType), send_index);
 		SetByte(send_buff, 0x01, send_index);
 		SetShort(send_buff, instanceId, send_index);
 		SetByte(send_buff, pNpc->m_byGateOpen, send_index);
