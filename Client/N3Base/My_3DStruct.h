@@ -1113,31 +1113,17 @@ const uint32_t OBJ_ANIM_CONTROL			= 0x40000000;
 #include "CrtDbg.h"
 
 #ifndef _DEBUG
-#define __ASSERT(expr, expMessage) \
-if(!(expr)) {\
-	printf("ERROR-> %s\n%s: %d\n\n", expMessage, __FILE__, __LINE__);\
-}
-
+#define __ASSERT(expr, expMessage)
 #else
-
 #define __ASSERT(expr, expMessage) \
-if(!(expr)) {\
-	printf("ERROR-> %s\n%s: %d\n\n", expMessage, __FILE__, __LINE__);\
-}
-
-/*
-#define __ASSERT(expr, expMessage) \
-if(!(expr)) \
+if (!(expr)) \
 { \
-	_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, "N3 Custom Assert Functon", expMessage); \
-	char __szErr[512]; \
-	sprintf(__szErr, "  ---- N3 Assert Warning (File:%s, Line:%d) ---- \n", __FILE__, __LINE__); \
-	OutputDebugString(__szErr); \
-	sprintf(__szErr, "    : %s\n", expMessage); \
-	OutputDebugString(__szErr); \
+	_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, "N3 Custom Assert Function", expMessage); \
+	char __szErr[512] = {}; \
+	snprintf(__szErr, sizeof(__szErr), "%s(%d): %s\n", __FILE__, __LINE__, expMessage); \
+	OutputDebugStringA(__szErr); \
 	_CrtDbgBreak(); \
 }
-*/
 #endif
 
 

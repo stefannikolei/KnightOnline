@@ -59,27 +59,30 @@ CUIPartyBBS::~CUIPartyBBS()
 
 bool CUIPartyBBS::Load(HANDLE hFile)
 {
-	if(CN3UIBase::Load(hFile)==false) return false;
+	if (!CN3UIBase::Load(hFile))
+		return false;
 
-	N3_VERIFY_UI_COMPONENT(m_pBtn_PageUp, GetChildByID<CN3UIButton>("btn_page_up"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_PageDown, GetChildByID<CN3UIButton>("btn_page_down"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Refresh, GetChildByID<CN3UIButton>("btn_refresh"));
+	// NOTE: This entire UI is outdated. It no longer remotely resembles the original UI.
+#if 0
+	N3_VERIFY_UI_COMPONENT(m_pBtn_PageUp,			GetChildByID<CN3UIButton>("btn_page_up"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_PageDown,			GetChildByID<CN3UIButton>("btn_page_down"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Refresh,			GetChildByID<CN3UIButton>("btn_refresh"));
 	
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Close, GetChildByID<CN3UIButton>("btn_exit"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Register, GetChildByID<CN3UIButton>("btn_add"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_RegisterCancel, GetChildByID<CN3UIButton>("btn_delete"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Whisper, GetChildByID<CN3UIButton>("btn_whisper"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Party, GetChildByID<CN3UIButton>("btn_Party"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Close,			GetChildByID<CN3UIButton>("btn_exit"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Register,			GetChildByID<CN3UIButton>("btn_add"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_RegisterCancel,	GetChildByID<CN3UIButton>("btn_delete"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Whisper,			GetChildByID<CN3UIButton>("btn_whisper"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Party,			GetChildByID<CN3UIButton>("btn_Party"));
 
-
-	N3_VERIFY_UI_COMPONENT(m_pText_Page, GetChildByID<CN3UIString>("string_page"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Page,			GetChildByID<CN3UIString>("string_page"));
 
 	std::string szID;
 	for (int i = 0; i < PARTY_BBS_MAXSTRING; i++)
 	{
 		szID = fmt::format("text_{:02}", i);
-		N3_VERIFY_UI_COMPONENT(m_pText[i], GetChildByID<CN3UIString>(szID));
+		N3_VERIFY_UI_COMPONENT(m_pText[i],			GetChildByID<CN3UIString>(szID));
 	}
+#endif
 
 	m_iCurPage = 0; // 현재 페이지..
 

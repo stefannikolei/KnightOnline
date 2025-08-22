@@ -185,13 +185,13 @@ bool CUIStateBar::Load(HANDLE hFile)
 
 	// MiniMap
 	N3_VERIFY_UI_COMPONENT(m_pGroup_MiniMap, GetChildByID("Group_MiniMap"));
-	if(m_pGroup_MiniMap)
+	if (m_pGroup_MiniMap != nullptr)
 	{
 		m_pGroup_MiniMap->SetVisible(false);
 
-		N3_VERIFY_UI_COMPONENT(m_pImage_Map, GetChildByID<CN3UIImage>("Img_MiniMap"));
-		N3_VERIFY_UI_COMPONENT(m_pBtn_ZoomIn, GetChildByID<CN3UIButton>("Btn_ZoomIn"));
-		N3_VERIFY_UI_COMPONENT(m_pBtn_ZoomOut, GetChildByID<CN3UIButton>("Btn_ZoomOut"));
+		N3_VERIFY_UI_COMPONENT(m_pImage_Map,	m_pGroup_MiniMap->GetChildByID<CN3UIImage>("Img_MiniMap"));
+		N3_VERIFY_UI_COMPONENT(m_pBtn_ZoomIn,	m_pGroup_MiniMap->GetChildByID<CN3UIButton>("Btn_ZoomIn"));
+		N3_VERIFY_UI_COMPONENT(m_pBtn_ZoomOut,	m_pGroup_MiniMap->GetChildByID<CN3UIButton>("Btn_ZoomOut"));
 	}
 
 	m_pBtn_Quest = GetChildByID<CN3UIButton>("btn_quest");
