@@ -473,7 +473,7 @@ void CN3UIString::ChangeFont(const std::string& szFont)
 }
 #endif
 
-int CN3UIString::GetStringRealWidth(int iNum)
+int CN3UIString::GetStringRealWidth(int iNum) const
 {
 	SIZE size;
 	BOOL bFlag = m_pDFont->GetTextExtent("가", lstrlen("가"), &size);
@@ -484,12 +484,32 @@ int CN3UIString::GetStringRealWidth(int iNum)
 	return (size.cx*iNum) / 2;
 }
 
-int CN3UIString::GetStringRealWidth(std::string& szText)
+int	CN3UIString::GetStringRealWidth(const std::string& szText) const
 {
-	SIZE size;
-	BOOL bFlag = m_pDFont->GetTextExtent(szText, szText.length(), &size);
-	__ASSERT(bFlag, "cannot get size of dfont");
-	return size.cx;
+	if (szText.empty())
+		return 0;
+
+	int iRealWidth = 0;
+	for (size_t i = 0; i < szText.size();)
+	{
+		char c = szText[i];
+
+		SIZE size = { 0, 0 };
+		if (c & 0x80)
+		{
+			m_pDFont->GetTextExtent(&szText[i], 2, &size);
+			i += 2;
+		}
+		else
+		{
+			m_pDFont->GetTextExtent(&szText[i], 1, &size);
+			i += 1;
+		}
+
+		iRealWidth += size.cx;
+	}
+
+	return iRealWidth;
 }
 
 void CN3UIString::SetStyle(uint32_t dwType, uint32_t dwStyleEx)
