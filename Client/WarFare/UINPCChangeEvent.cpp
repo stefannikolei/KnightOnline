@@ -57,10 +57,10 @@ bool CUINPCChangeEvent::Load(HANDLE hFile)
 
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-	m_pBtn_Change		= (CN3UIButton*)GetChildByID("Btn_change");		__ASSERT(m_pBtn_Change,	"NULL UI Component!!");
-	m_pBtn_Repoint0		= (CN3UIButton*)GetChildByID("Btn_repoint0");	__ASSERT(m_pBtn_Repoint0, "NULL UI Component!!");
-	m_pBtn_Repoint1		= (CN3UIButton*)GetChildByID("Btn_repoint1");	__ASSERT(m_pBtn_Repoint1,	"NULL UI Component!!");
-	m_pBtn_Close		= (CN3UIButton*)GetChildByID("Btn_close");		__ASSERT(m_pBtn_Close,	"NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Change, GetChildByID<CN3UIButton>("Btn_change"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Repoint0, GetChildByID<CN3UIButton>("Btn_repoint0"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Repoint1, GetChildByID<CN3UIButton>("Btn_repoint1"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Close, GetChildByID<CN3UIButton>("Btn_close"));
 
 	// UIPointInitDlg.. ^^
 	e_Nation eNation = CGameBase::s_pPlayer->m_InfoBase.eNation; // 국가....

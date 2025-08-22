@@ -755,14 +755,16 @@ void CUIHotKeyDlg::ClassChangeHotkeyFlush()
 CN3UIString* CUIHotKeyDlg::GetTooltipStrControl(int iIndex)
 {
 	std::string str = std::to_string(iIndex + 10);
-	CN3UIString* pStr = (CN3UIString*) GetChildByID(str);	 __ASSERT(pStr, "NULL UI Component!!");
+	CN3UIString* pStr = nullptr;
+	N3_VERIFY_UI_COMPONENT(pStr, GetChildByID<CN3UIString>(str));
 	return pStr;
 }
 
 CN3UIString* CUIHotKeyDlg::GetCountStrControl(int iIndex)
 {
 	std::string str = std::to_string(iIndex);
-	CN3UIString* pStr = (CN3UIString*) GetChildByID(str);	 __ASSERT(pStr, "NULL UI Component!!");
+	CN3UIString* pStr = nullptr;
+	N3_VERIFY_UI_COMPONENT(pStr, GetChildByID<CN3UIString>(str));
 	return pStr;
 }
 

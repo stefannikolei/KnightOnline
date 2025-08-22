@@ -118,9 +118,9 @@ BOOL CUIMessageWnd::MoveOffset(int iOffsetX, int iOffsetY)
 bool CUIMessageWnd::Load(HANDLE hFile)
 {
 	if (false == CN3UIBase::Load(hFile)) return false;
-	m_pChatOut = (CN3UIString*)GetChildByID("text_message");	__ASSERT(m_pChatOut, "NULL UI Component!!");
-	m_pScrollbar = (CN3UIScrollBar*)GetChildByID("scroll");		__ASSERT(m_pScrollbar, "NULL UI Component!!");
-	m_pBtn_Fold = (CN3UIBase*)GetChildByID("btn_off");	__ASSERT(m_pBtn_Fold, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pChatOut, GetChildByID<CN3UIString>("text_message"));
+	N3_VERIFY_UI_COMPONENT(m_pScrollbar, GetChildByID<CN3UIScrollBar>("scroll"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Fold, GetChildByID("btn_off"));
 
 	m_rcChatOutRegion = m_pChatOut->GetRegion();
 	CreateLines();
@@ -445,7 +445,7 @@ CUIMessageWnd2::CUIMessageWnd2()
 bool CUIMessageWnd2::Load(HANDLE hFile)
 {
 	if (false == CN3UIBase::Load(hFile)) return false;
-	m_pBtn_Fold = GetChildByID("btn_on");			__ASSERT(m_pBtn_Fold, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Fold, GetChildByID("btn_on"));
 	return true;
 }
 

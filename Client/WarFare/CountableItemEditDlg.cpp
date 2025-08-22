@@ -160,9 +160,8 @@ void CCountableItemEditDlg::Open(e_UIWND eUW, e_UIWND_DISTRICT eUD, bool bCountG
 		szMsg = fmt::format_text_resource(IDS_EDIT_BOX_COUNT);
 
 	CN3UIString* pString = nullptr;
-	pString = (CN3UIString*)this->GetChildByID("String_PersonTradeEdit_Msg");
-	__ASSERT(pString, "NULL UI Component!!");
-	if (pString)
+	N3_VERIFY_UI_COMPONENT(pString, GetChildByID<CN3UIString>("String_PersonTradeEdit_Msg"));
+	if (pString != nullptr)
 		pString->SetString(szMsg);
 
 	RECT rc, rcThis;
@@ -172,10 +171,11 @@ void CCountableItemEditDlg::Open(e_UIWND eUW, e_UIWND_DISTRICT eUD, bool bCountG
 	this->SetQuantity(-1);
 
 	SetVisible(true);
-	CN3UIEdit* pEdit = (CN3UIEdit*)this->GetChildByID("edit_trade");
-	__ASSERT(pEdit, "NULL UI Component!!");
-	if(pEdit) pEdit->SetFocus();
 
+	CN3UIEdit* pEdit = nullptr;
+	N3_VERIFY_UI_COMPONENT(pEdit, GetChildByID<CN3UIEdit>("edit_trade"));
+	if (pEdit != nullptr)
+		pEdit->SetFocus();
 
 	m_eCallerWnd = eUW;
 	m_eCallerWndDistrict = eUD;
@@ -217,16 +217,16 @@ void CCountableItemEditDlg::Close()
 
 int	CCountableItemEditDlg::GetQuantity() // "edit_trade" Edit Control 에서 정수값을 얻오온다..
 {
-	CN3UIEdit* pEdit = (CN3UIEdit*)this->GetChildByID("edit_trade");
-	__ASSERT(pEdit, "NULL UI Component!!");
+	CN3UIEdit* pEdit = nullptr;
+	N3_VERIFY_UI_COMPONENT(pEdit, GetChildByID<CN3UIEdit>("edit_trade"));
 
 	return atoi(pEdit->GetString().c_str());
 }
 
 void CCountableItemEditDlg::SetQuantity(int iQuantity) // "edit_trade" Edit Control 에서 정수값을 문자열로 세팅한다..
 {
-	CN3UIEdit* pEdit = (CN3UIEdit*) GetChildByID("edit_trade");
-	__ASSERT(pEdit, "NULL UI Component!!");
+	CN3UIEdit* pEdit = nullptr;
+	N3_VERIFY_UI_COMPONENT(pEdit, GetChildByID<CN3UIEdit>("edit_trade"));
 
 	std::string buff;
 	if (iQuantity != -1)
@@ -259,8 +259,8 @@ bool CCountableItemEditDlg::Load(HANDLE hFile)
 {
 	if(false == CN3UIBase::Load(hFile)) return false;
 
-	m_pBtnOk	 = (CN3UIButton*)(this->GetChildByID("btn_ok"));		__ASSERT(m_pBtnOk, "NULL UI Component!!!");
-	m_pBtnCancel = (CN3UIButton*)(this->GetChildByID("btn_cancel"));	__ASSERT(m_pBtnCancel, "NULL UI Component!!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtnOk,		GetChildByID<CN3UIButton>("btn_ok"));
+	N3_VERIFY_UI_COMPONENT(m_pBtnCancel,	GetChildByID<CN3UIButton>("btn_cancel"));
 
 	return true;
 }

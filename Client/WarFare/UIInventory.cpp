@@ -388,13 +388,13 @@ void CUIInventory::Render()
 
 void CUIInventory::InitIconWnd(e_UIWND eWnd)
 {
-	m_pArea_User = (CN3UIArea *)GetChildByID("area_char"); __ASSERT(m_pArea_User, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pArea_User, GetChildByID<CN3UIArea>("area_char"));
 	if(nullptr == m_pArea_User) return;
 
-	m_pArea_Destroy = (CN3UIArea *)GetChildByID("area_samma"); __ASSERT(m_pArea_Destroy, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pArea_Destroy, GetChildByID<CN3UIArea>("area_samma"));
 	if(nullptr == m_pArea_Destroy) return;
 
-	m_pText_Weight		= (CN3UIString*)GetChildByID("text_weight");	__ASSERT(m_pText_Weight	, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pText_Weight, GetChildByID<CN3UIString>("text_weight"));
 	__TABLE_UI_RESRC* pTblUI = CGameBase::s_pTbl_UI.Find(CGameBase::s_pPlayer->m_InfoBase.eNation);
 	__ASSERT(pTblUI, "NULL Pointer UI Table");
 
@@ -547,8 +547,8 @@ uint32_t CUIInventory::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POI
 
 	if (m_bDestoyDlgAlive)	
 	{ 
-		CN3UIImage* pImg = (CN3UIImage* )m_pArea_Destroy->GetChildByID("img_Destroy");
-		__ASSERT(pImg, "NULL UI Component!!");
+		CN3UIImage* pImg = nullptr;
+		N3_VERIFY_UI_COMPONENT(pImg, m_pArea_Destroy->GetChildByID<CN3UIImage>("img_Destroy"));
 
 		if (!pImg) return dwRet;
 		if (!pImg->IsIn(ptCur.x, ptCur.y))
@@ -2829,14 +2829,16 @@ bool CUIInventory::OnKeyPress(int iKey)
 		{
 		case DIK_RETURN:
 			{
-				CN3UIButton* pBtnDestroyOk = (CN3UIButton* )m_pArea_Destroy->GetChildByID("btn_Destroy_ok");
+				CN3UIButton* pBtnDestroyOk = nullptr;
+				N3_VERIFY_UI_COMPONENT(pBtnDestroyOk, m_pArea_Destroy->GetChildByID<CN3UIButton>("btn_Destroy_ok"));
 				if(pBtnDestroyOk) m_pArea_Destroy->ReceiveMessage(pBtnDestroyOk, UIMSG_BUTTON_CLICK);
 				else return false;
 			}
 			return true;
 		case DIK_ESCAPE:
 			{
-				CN3UIButton* pBtnDestroyCancel = (CN3UIButton* )m_pArea_Destroy->GetChildByID("btn_Destroy_cancel");
+				CN3UIButton* pBtnDestroyCancel = nullptr;
+				N3_VERIFY_UI_COMPONENT(pBtnDestroyCancel, m_pArea_Destroy->GetChildByID<CN3UIButton>("btn_Destroy_cancel"));
 				if(pBtnDestroyCancel) m_pArea_Destroy->ReceiveMessage(pBtnDestroyCancel, UIMSG_BUTTON_CLICK);
 				else return false;
 			}

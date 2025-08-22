@@ -357,7 +357,8 @@ void CUITransactionDlg::EnterTransactionState()
 	InitIconUpdate();
 	m_iCurPage = 0;
 
-	CN3UIString* pStr = (CN3UIString*) GetChildByID("string_page");
+	CN3UIString* pStr = nullptr;
+	N3_VERIFY_UI_COMPONENT(pStr, GetChildByID<CN3UIString>("string_page"));
 	if (pStr != nullptr)
 		pStr->SetStringAsInt(m_iCurPage + 1);
 
@@ -1470,7 +1471,7 @@ bool CUITransactionDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			if(m_iCurPage<0)
 				m_iCurPage = 0;
 
-			pStr = (CN3UIString*) GetChildByID("string_page");
+			N3_VERIFY_UI_COMPONENT(pStr, GetChildByID<CN3UIString>("string_page"));
 			if (pStr != nullptr)
 				pStr->SetStringAsInt(m_iCurPage + 1);
 
@@ -1502,7 +1503,7 @@ bool CUITransactionDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			if (m_iCurPage >= MAX_ITEM_TRADE_PAGE)
 				m_iCurPage = MAX_ITEM_TRADE_PAGE-1;
 
-			pStr = (CN3UIString*) GetChildByID("string_page");
+			N3_VERIFY_UI_COMPONENT(pStr, GetChildByID<CN3UIString>("string_page"));
 			if (pStr != nullptr)
 				pStr->SetStringAsInt(m_iCurPage + 1);
 
@@ -1678,9 +1679,9 @@ bool CUITransactionDlg::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-	m_pBtnClose		= (CN3UIButton*)(this->GetChildByID("btn_close"));		__ASSERT(m_pBtnClose, "NULL UI Component!!");
-	m_pBtnPageUp	= (CN3UIButton*)(this->GetChildByID("btn_page_up"));	__ASSERT(m_pBtnPageUp, "NULL UI Component!!");
-	m_pBtnPageDown	= (CN3UIButton*)(this->GetChildByID("btn_page_down"));	__ASSERT(m_pBtnPageDown, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtnClose, GetChildByID<CN3UIButton>("btn_close"));
+	N3_VERIFY_UI_COMPONENT(m_pBtnPageUp, GetChildByID<CN3UIButton>("btn_page_up"));
+	N3_VERIFY_UI_COMPONENT(m_pBtnPageDown, GetChildByID<CN3UIButton>("btn_page_down"));
 
 	return true;
 }

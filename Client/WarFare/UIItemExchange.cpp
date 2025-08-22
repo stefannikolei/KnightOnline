@@ -80,8 +80,8 @@ bool CUIItemExchange::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-	m_pImage_Repair		= (CN3UIImage*)GetChildByID("img_repair");
-	m_pImage_Exchange	= (CN3UIImage*)GetChildByID("img_change");
+	m_pImage_Repair		= GetChildByID<CN3UIImage>("img_repair");
+	m_pImage_Exchange	= GetChildByID<CN3UIImage>("img_change");
 
 	return true;
 }
@@ -279,8 +279,8 @@ bool CUIItemExchange::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 
 void CUIItemExchange::UpdateGoldValue()
 {
-	CN3UIString* pStrGold = (CN3UIString*) GetChildByID("string_gold");
-	__ASSERT(pStrGold, "NULL UI Component!!");
+	CN3UIString* pStrGold = nullptr;
+	N3_VERIFY_UI_COMPONENT(pStrGold, GetChildByID<CN3UIString>("string_gold"));
 
 	// 돈 업데이트..	
 	if (pStrGold != nullptr)
