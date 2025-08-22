@@ -7,8 +7,6 @@
 #include "GameProcMain.h"
 #include "UIInventory.h"
 #include "UITransactionDlg.h"
-#include "UIItemExchange.h"
-#include "UINpcTalk.h"
 #include "SubProcPerTrade.h"
 #include "UISkillTreeDlg.h"
 #include "UIManager.h"
@@ -88,17 +86,6 @@ bool CUINPCEvent::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 		}
 
-/*		if(pSender->m_szID == "Btn_Change")
-		{
-			Close();
-			CGameProcedure::s_pProcMain->m_pUIItemREDlg->Open();
-		}
-
-		if(pSender->m_szID == "Btn_Talk")
-		{
-			Close();
-			CGameProcedure::s_pProcMain->m_pUINpcTalk->Open(m_iIDTarget);
-		}*/
 
 		if(pSender->m_szID == "btn_close")
 			Close();
