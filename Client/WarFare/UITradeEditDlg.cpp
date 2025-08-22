@@ -29,9 +29,9 @@ static char THIS_FILE[]=__FILE__;
 
 CUITradeEditDlg::CUITradeEditDlg()
 {
-	m_pSubProcPerTrade = NULL;
-	m_pArea = NULL;
-	m_pImageOfIcon = NULL;
+	m_pSubProcPerTrade = nullptr;
+	m_pArea = nullptr;
+	m_pImageOfIcon = nullptr;
 }
 
 CUITradeEditDlg::~CUITradeEditDlg()
@@ -65,7 +65,7 @@ void CUITradeEditDlg::SetQuantity(int iQuantity) // "edit_trade" Edit Control ì—
 
 bool CUITradeEditDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if(NULL == pSender) return false;
+	if(nullptr == pSender) return false;
 
 	if (dwMsg == UIMSG_BUTTON_CLICK)					
 	{
@@ -87,7 +87,7 @@ void CUITradeEditDlg::Open(bool bCountGold)
 	else
 		szMsg = fmt::format_text_resource(IDS_EDIT_BOX_COUNT);
 
-	CN3UIString* pString = NULL;
+	CN3UIString* pString = nullptr;
 	pString = (CN3UIString*)this->GetChildByID("String_PersonTradeEdit_Msg");
 	__ASSERT(pString, "NULL UI Component!!");
 	if (pString)

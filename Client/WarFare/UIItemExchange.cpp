@@ -27,17 +27,17 @@ static char THIS_FILE[]=__FILE__;
 
 CUIItemExchange::CUIItemExchange()
 {
-	m_pUITooltipDlg = NULL;
+	m_pUITooltipDlg = nullptr;
 
 	int i;
 	for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
 	{
-		m_pMyInvWnd[i] = NULL;
+		m_pMyInvWnd[i] = nullptr;
 	}
 
 	for( i = 0; i < MAX_ITEM_EX_RE_NPC; i++ )
 	{
-		m_pMyNpcWnd[i] = NULL;
+		m_pMyNpcWnd[i] = nullptr;
 	}
 
 	for( i = 0; i < MAX_ITEM_EX_RE_NPC; i++ )
@@ -59,19 +59,19 @@ void CUIItemExchange::Release()
 
 	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )
 	{
-		if ( m_pMyInvWnd[i] != NULL )
+		if ( m_pMyInvWnd[i] != nullptr )
 		{
 			delete m_pMyInvWnd[i];
-			m_pMyInvWnd[i] = NULL;
+			m_pMyInvWnd[i] = nullptr;
 		}
 	}
 
 	for(int i = 0; i < MAX_ITEM_EX_RE_NPC; i++ )
 	{
-		if ( m_pMyNpcWnd[i] != NULL )
+		if ( m_pMyNpcWnd[i] != nullptr )
 		{
 			delete m_pMyNpcWnd[i];
-			m_pMyNpcWnd[i] = NULL;
+			m_pMyNpcWnd[i] = nullptr;
 		}
 	}
 }
@@ -128,11 +128,11 @@ __IconItemSkill* CUIItemExchange::GetHighlightIconItem(CN3UIIcon* pUIIcon)
 	int i;
 	for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
 	{
-		if ( (m_pMyInvWnd[i] != NULL) && (m_pMyInvWnd[i]->pUIIcon == pUIIcon) )
+		if ( (m_pMyInvWnd[i] != nullptr) && (m_pMyInvWnd[i]->pUIIcon == pUIIcon) )
 			return m_pMyInvWnd[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 int	CUIItemExchange::GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWndDist)
@@ -144,7 +144,7 @@ int	CUIItemExchange::GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWn
 		case UIWND_DISTRICT_EX_RE_INV:
 			for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
 			{
-				if ( (m_pMyInvWnd[i] != NULL) && (m_pMyInvWnd[i] == spItem) )
+				if ( (m_pMyInvWnd[i] != nullptr) && (m_pMyInvWnd[i] == spItem) )
 					return i;
 			}
 			break;
@@ -157,13 +157,13 @@ e_UIWND_DISTRICT CUIItemExchange::GetWndDistrict(__IconItemSkill* spItem)
 {
 	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )
 	{
-		if ( (m_pMyInvWnd[i] != NULL) && (m_pMyInvWnd[i] == spItem) )
+		if ( (m_pMyInvWnd[i] != nullptr) && (m_pMyInvWnd[i] == spItem) )
 			return UIWND_DISTRICT_EX_RE_INV;
 	}
 
 	for(int i = 0; i < MAX_ITEM_EX_RE_NPC; i++ )
 	{
-		if ( (m_pMyNpcWnd[i] != NULL) && (m_pMyNpcWnd[i] == spItem) )
+		if ( (m_pMyNpcWnd[i] != nullptr) && (m_pMyNpcWnd[i] == spItem) )
 			return UIWND_DISTRICT_EX_RE_NPC;
 	}
 	return UIWND_DISTRICT_UNKNOWN;
@@ -191,7 +191,7 @@ void CUIItemExchange::IconRestore()
 	switch ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict )
 	{
 		case UIWND_DISTRICT_EX_RE_INV:
-			if ( m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != NULL )
+			if ( m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr )
 			{
 				pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_REPAIR_INV, CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder);
 				if ( pArea )
@@ -257,7 +257,7 @@ bool CUIItemExchange::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 	if (!bFound)	FAIL_RETURN
 
 	// 받아들인다..
-	m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] = NULL;
+	m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] = nullptr;
 
 	spItem->pUIIcon->SetRegion(pArea->GetRegion());
 	spItem->pUIIcon->SetMoveRect(pArea->GetRegion());
@@ -313,7 +313,7 @@ bool CUIItemExchange::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				return false;	\
 			}
 
-	if(NULL == pSender) return false;
+	if(nullptr == pSender) return false;
 
 
 	if (dwMsg == UIMSG_BUTTON_CLICK)					
@@ -326,7 +326,7 @@ bool CUIItemExchange::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			UserPressOK();
 	}
 
-	__IconItemSkill* spItem = NULL;
+	__IconItemSkill* spItem = nullptr;
 	e_UIWND_DISTRICT eUIWnd;
 	int iOrder;
 
@@ -403,7 +403,7 @@ void CUIItemExchange::Open()
 	int i;
 	for( i = 0; i < MAX_ITEM_EX_RE_NPC; i++ )
 	{
-		m_pMyNpcWnd[i] = NULL;
+		m_pMyNpcWnd[i] = nullptr;
 	}
 
 	for( i = 0; i < MAX_ITEM_EX_RE_NPC; i++ )
@@ -471,7 +471,7 @@ void CUIItemExchange::ReceiveResultFromServer(int iResult, int iUserGold)
 	s_bWaitFromServer = false;
 
 	// 이 윈도우의 npc 영역의 아이템을 이 윈도우의 inv 영역으로 옮긴다..
-	CN3UIArea* pArea = NULL;
+	CN3UIArea* pArea = nullptr;
 	for( int i = 0; i < MAX_ITEM_EX_RE_NPC; i++ )
 	{
 		if(m_pMyNpcWnd[i])
@@ -484,7 +484,7 @@ void CUIItemExchange::ReceiveResultFromServer(int iResult, int iUserGold)
 			}			
 
 			m_pMyInvWnd[m_pMyNpcWndOriginIndex[i]] = m_pMyNpcWnd[i];
-			m_pMyNpcWnd[i] = NULL;
+			m_pMyNpcWnd[i] = nullptr;
 		}
 	}
 
@@ -494,7 +494,7 @@ void CUIItemExchange::ReceiveResultFromServer(int iResult, int iUserGold)
 
 void CUIItemExchange::UserPressCancel()
 {
-	CN3UIArea* pArea = NULL;
+	CN3UIArea* pArea = nullptr;
 
 	// 이 윈도우의 npc 영역의 아이템을 이 윈도우의 inv 영역으로 옮긴다..
 	int i;
@@ -510,7 +510,7 @@ void CUIItemExchange::UserPressCancel()
 			}			
 
 			m_pMyInvWnd[m_pMyNpcWndOriginIndex[i]] = m_pMyNpcWnd[i];
-			m_pMyNpcWnd[i] = NULL;
+			m_pMyNpcWnd[i] = nullptr;
 		}
 	}
 
@@ -534,7 +534,7 @@ void CUIItemExchange::ItemMoveFromInvToThis()
 	int i;
 	for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
 	{
-		m_pMyInvWnd[i] = NULL;
+		m_pMyInvWnd[i] = nullptr;
 	}
 
 	for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
@@ -544,7 +544,7 @@ void CUIItemExchange::ItemMoveFromInvToThis()
 			__IconItemSkill* spItem = pInven->m_pMyInvWnd[i];
 			spItem->pUIIcon->SetParent(this);
 
-			pInven->m_pMyInvWnd[i] = NULL;
+			pInven->m_pMyInvWnd[i] = nullptr;
 			CN3UIArea* pArea;
 
 			pArea = GetChildAreaByiOrder(UI_AREA_TYPE_REPAIR_INV, i);
@@ -572,7 +572,7 @@ void CUIItemExchange::ItemMoveFromThisToInv()
 			__IconItemSkill* spItem = m_pMyInvWnd[i];
 			spItem->pUIIcon->SetParent(pInven);
 
-			m_pMyInvWnd[i] = NULL;
+			m_pMyInvWnd[i] = nullptr;
 
 			CN3UIArea* pArea;
 

@@ -21,12 +21,12 @@ static char THIS_FILE[]=__FILE__;
 
 CUITradeBBSEditDlg::CUITradeBBSEditDlg()
 {
-	m_pEditTitle		= NULL;
-	m_pEditPrice		= NULL;
-	m_pEditExplanation	= NULL;
+	m_pEditTitle		= nullptr;
+	m_pEditPrice		= nullptr;
+	m_pEditExplanation	= nullptr;
 
-	m_pBtn_Ok			= NULL;
-	m_pBtn_Cancel		= NULL;
+	m_pBtn_Ok			= nullptr;
+	m_pBtn_Cancel		= nullptr;
 }
 
 CUITradeBBSEditDlg::~CUITradeBBSEditDlg()
@@ -80,7 +80,7 @@ bool CUITradeBBSEditDlg::Load(HANDLE hFile)
 
 bool CUITradeBBSEditDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if(NULL == pSender) return false;
+	if(nullptr == pSender) return false;
 
 	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{

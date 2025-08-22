@@ -142,7 +142,7 @@ int APIENTRY WinMain(
 	CGameProcedure::ProcActiveSet((CGameProcedure*)CGameProcedure::s_pProcLogIn);
 
 #if _DEBUG
-	HACCEL hAccel = LoadAccelerators( NULL, MAKEINTRESOURCE(IDR_MAIN_ACCELATOR) );
+	HACCEL hAccel = LoadAccelerators( nullptr, MAKEINTRESOURCE(IDR_MAIN_ACCELATOR) );
 	HDC hDC = GetDC(hWndMain);
 #endif // #if _DEBUG
 

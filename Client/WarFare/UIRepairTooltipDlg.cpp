@@ -22,12 +22,12 @@ CUIRepairTooltipDlg::CUIRepairTooltipDlg()
 {
 	m_iPosXBack = 0;
 	m_iPosYBack = 0;
-	m_spItemBack = NULL;
+	m_spItemBack = nullptr;
 
 	m_bBRender = false;
 	m_iBxpos = -1;
 	m_iBypos = -1;
-	m_pBspItem = NULL;
+	m_pBspItem = nullptr;
 	m_iBRequiredGold = 0;
 	m_bBHaveEnough = true;
 
@@ -162,7 +162,7 @@ void CUIRepairTooltipDlg::DisplayTooltipsEnable(int xpos, int ypos, __IconItemSk
 
 void CUIRepairTooltipDlg::DisplayTooltipsDisable()
 {
-	m_spItemBack = NULL;
+	m_spItemBack = nullptr;
 	if ( IsVisible() )
 		SetVisible(FALSE);
 }

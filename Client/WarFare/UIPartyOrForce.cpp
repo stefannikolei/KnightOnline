@@ -129,7 +129,7 @@ bool CUIPartyOrForce::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
 	if( dwMsg == UIMSG_BUTTON_CLICK )
 	{
-		__InfoPartyOrForce* pIP = NULL;
+		__InfoPartyOrForce* pIP = nullptr;
 		auto it = m_Members.begin(), itEnd = m_Members.end();
 		for(int i = 0; it != itEnd && i < MAX_PARTY_OR_FORCE; it++, i++)
 		{
@@ -160,7 +160,7 @@ void CUIPartyOrForce::Render()
 		|| m_iIndexSelected >= MAX_PARTY_OR_FORCE)
 		return;
 
-	if(NULL == m_pStatic_IDs[m_iIndexSelected] || NULL == m_pProgress_HPs[m_iIndexSelected]) return;
+	if(nullptr == m_pStatic_IDs[m_iIndexSelected] || nullptr == m_pProgress_HPs[m_iIndexSelected]) return;
 
 	RECT rc1 = m_pStatic_IDs[m_iIndexSelected]->GetRegion();
 	rc1.left -= 2; rc1.top -= 2; rc1.right += 2; rc1.bottom += 2;
@@ -196,7 +196,7 @@ bool CUIPartyOrForce::TargetByIndex(int iIndex)
 
 const __InfoPartyOrForce* CUIPartyOrForce::MemberInfoGetByID(int iID, int& iIndexResult)
 {
-	if(m_Members.empty()) return NULL;
+	if(m_Members.empty()) return nullptr;
 
 	auto it = m_Members.begin(), itEnd = m_Members.end();
 	iIndexResult = 0;
@@ -209,7 +209,7 @@ const __InfoPartyOrForce* CUIPartyOrForce::MemberInfoGetByID(int iID, int& iInde
 	}
 
 	iIndexResult = -1;
-	return NULL;
+	return nullptr;
 }
 
 const __InfoPartyOrForce* CUIPartyOrForce::MemberInfoGetByIndex(int iIndex)
@@ -229,13 +229,13 @@ CPlayerOther* CUIPartyOrForce::MemberGetByNearst(const __Vector3& vPosPlayer)
 	if(m_Members.empty()) return nullptr;
 
 	float fDistMin = FLT_MAX, fDistTmp = 0;
-	CPlayerOther* pTarget = NULL;
+	CPlayerOther* pTarget = nullptr;
 
 	auto it = m_Members.begin(), itEnd = m_Members.end();
 	for(; it != itEnd; it++)
 	{
 		CPlayerOther* pUPC = CGameBase::s_pOPMgr->UPCGetByID(it->iID, false);
-		if(NULL == pUPC) continue;
+		if(nullptr == pUPC) continue;
 
 		fDistTmp = pUPC->Distance(vPosPlayer);
 		if(fDistTmp < fDistMin)
@@ -408,7 +408,7 @@ void CUIPartyOrForce::MemberHPChange(int iID, int iHP, int iHPMax, int iMP, int 
 void CUIPartyOrForce::MemberStatusChange(int iID, e_PartyStatus ePS, bool bSuffer)
 {
 	auto it = m_Members.begin(), itEnd = m_Members.end();
-	__InfoPartyOrForce* pIP = NULL;
+	__InfoPartyOrForce* pIP = nullptr;
 	for(int i = 0; it != itEnd && i < MAX_PARTY_OR_FORCE; it++, i++)
 	{
 		pIP = &(*it); // 디버깅 하기 쉬우라고 이렇게 했다..
@@ -424,7 +424,7 @@ void CUIPartyOrForce::MemberStatusChange(int iID, e_PartyStatus ePS, bool bSuffe
 void CUIPartyOrForce::MemberLevelChange(int iID, int iLevel)
 {
 	auto it = m_Members.begin(), itEnd = m_Members.end();
-	__InfoPartyOrForce* pIP = NULL;
+	__InfoPartyOrForce* pIP = nullptr;
 	for(int i = 0; it != itEnd && i < MAX_PARTY_OR_FORCE; it++, i++)
 	{
 		pIP = &(*it); // 디버깅 하기 쉬우라고 이렇게 했다..
@@ -439,7 +439,7 @@ void CUIPartyOrForce::MemberLevelChange(int iID, int iLevel)
 void CUIPartyOrForce::MemberClassChange(int iID, e_Class eClass)
 {
 	auto it = m_Members.begin(), itEnd = m_Members.end();
-	__InfoPartyOrForce* pIP = NULL;
+	__InfoPartyOrForce* pIP = nullptr;
 	for(int i = 0; it != itEnd && i < MAX_PARTY_OR_FORCE; it++, i++)
 	{
 		pIP = &(*it); // 디버깅 하기 쉬우라고 이렇게 했다..

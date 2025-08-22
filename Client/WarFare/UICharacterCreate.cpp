@@ -32,15 +32,15 @@ CUICharacterCreate::CUICharacterCreate()
 	memset(m_pImg_Disable_Classes, 0, sizeof(m_pImg_Disable_Classes));
 	memset(m_pStr_Stats, 0, sizeof(m_pStr_Stats));
 	memset(m_pArea_Stats, 0, sizeof(m_pArea_Stats));
-	m_pStr_Desc = NULL;
-	m_pStr_Bonus = NULL;
+	m_pStr_Desc = nullptr;
+	m_pStr_Bonus = nullptr;
 
-	m_pBtn_Face_Left = NULL;
-	m_pBtn_Face_Right = NULL;
-	m_pBtn_Hair_Left = NULL;
-	m_pBtn_Hair_Right = NULL;
+	m_pBtn_Face_Left = nullptr;
+	m_pBtn_Face_Right = nullptr;
+	m_pBtn_Hair_Left = nullptr;
+	m_pBtn_Hair_Right = nullptr;
 
-	m_pArea_Character = NULL;
+	m_pArea_Character = nullptr;
 
 	m_iBonusPoint = m_iMaxBonusPoint = 0;
 }
@@ -59,15 +59,15 @@ void CUICharacterCreate::Release()
 	memset(m_pStr_Stats, 0, sizeof(m_pStr_Stats));
 	memset(m_pArea_Stats, 0, sizeof(m_pArea_Stats));
 
-	m_pStr_Desc = NULL;
-	m_pStr_Bonus = NULL;
+	m_pStr_Desc = nullptr;
+	m_pStr_Bonus = nullptr;
 
-	m_pBtn_Face_Left = NULL;
-	m_pBtn_Face_Right = NULL;
-	m_pBtn_Hair_Left = NULL;
-	m_pBtn_Hair_Right = NULL;
+	m_pBtn_Face_Left = nullptr;
+	m_pBtn_Face_Right = nullptr;
+	m_pBtn_Hair_Left = nullptr;
+	m_pBtn_Hair_Right = nullptr;
 
-	m_pArea_Character = NULL;
+	m_pArea_Character = nullptr;
 
 	m_iBonusPoint = m_iMaxBonusPoint = 0;
 }

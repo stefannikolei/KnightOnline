@@ -35,22 +35,22 @@ static char THIS_FILE[]=__FILE__;
 
 CUITradeSellBBS::CUITradeSellBBS()
 {
-//	m_pList_Infos			= NULL;
-	m_pBtn_PageUp			= NULL;
-	m_pBtn_PageDown			= NULL;
-	m_pBtn_Refresh			= NULL;
-	m_pBtn_Close			= NULL;
-	m_pBtn_Register			= NULL;
-	m_pBtn_RegisterCancel	= NULL;
-	m_pBtn_Whisper			= NULL;
-	m_pBtn_Trade			= NULL;
+//	m_pList_Infos			= nullptr;
+	m_pBtn_PageUp			= nullptr;
+	m_pBtn_PageDown			= nullptr;
+	m_pBtn_Refresh			= nullptr;
+	m_pBtn_Close			= nullptr;
+	m_pBtn_Register			= nullptr;
+	m_pBtn_RegisterCancel	= nullptr;
+	m_pBtn_Whisper			= nullptr;
+	m_pBtn_Trade			= nullptr;
 
-	m_pImage_Sell			= NULL;
-	m_pImage_Buy			= NULL;
-	m_pImage_Sell_Title		= NULL;
-	m_pImage_Buy_Title		= NULL;
+	m_pImage_Sell			= nullptr;
+	m_pImage_Buy			= nullptr;
+	m_pImage_Sell_Title		= nullptr;
+	m_pImage_Buy_Title		= nullptr;
 
-	m_pString_Page			= NULL;
+	m_pString_Page			= nullptr;
 
 	m_byBBSKind				= 0;
 	m_iCurPage				= 0;
@@ -95,7 +95,7 @@ bool CUITradeSellBBS::Load(HANDLE hFile)
 
 	m_iCurPage = 0; // 현재 페이지..
 
-	__TABLE_UI_RESRC*	pTblUI	= NULL;
+	__TABLE_UI_RESRC*	pTblUI	= nullptr;
 	pTblUI = CGameBase::s_pTbl_UI.Find(NATION_ELMORAD);
 
 	m_MsgBox.LoadFromFile(pTblUI->szMessageBox);

@@ -23,9 +23,9 @@ static char THIS_FILE[]=__FILE__;
 
 CUINotice::CUINotice()
 {
-	m_pText_Notice = NULL;
-	m_pScrollBar = NULL;
-	m_pBtn_OK = NULL;
+	m_pText_Notice = nullptr;
+	m_pScrollBar = nullptr;
+	m_pBtn_OK = nullptr;
 }
 
 CUINotice::~CUINotice()
@@ -57,7 +57,7 @@ bool CUINotice::Load(HANDLE hFile)
 
 bool CUINotice::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if(NULL == pSender) return false;
+	if(nullptr == pSender) return false;
 
 	//s_CameraData.vp;  //불러 오는 과정을 살펴본다 
 	//uint32_t mm = s_CameraData.vp.Height;
@@ -85,7 +85,7 @@ bool CUINotice::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 void CUINotice::GenerateText()
 {
-	if(NULL == m_pText_Notice) return;
+	if(nullptr == m_pText_Notice) return;
 	
 	// 글자수를 센다..
 	int iTextLen = 0;

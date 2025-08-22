@@ -113,12 +113,12 @@ CGameProcedure::~CGameProcedure()
 
 void CGameProcedure::Release()
 {
-	s_pUIMgr->SetFocusedUI(NULL);
+	s_pUIMgr->SetFocusedUI(nullptr);
 }
 
 void CGameProcedure::Init()
 {
-	s_pUIMgr->SetFocusedUI(NULL);
+	s_pUIMgr->SetFocusedUI(nullptr);
 }
 
 void CGameProcedure::StaticMemberInit(
@@ -215,7 +215,7 @@ void CGameProcedure::StaticMemberInit(
 	s_pFX = new CN3FXMgr();
 
 	__TABLE_UI_RESRC* pTblUI = s_pTbl_UI.Find(NATION_ELMORAD); // 기본은 엘모라드 UI 로 한다..
-	if(pTblUI == NULL) {
+	if(pTblUI == nullptr) {
 		printf("ERROR: UI table is NULL.\n");
 		system("pause");
 		//Sleep(1000 * 5);
@@ -240,9 +240,9 @@ void CGameProcedure::StaticMemberInit(
 
 void CGameProcedure::StaticMemberRelease()
 {
-	delete s_pSocket; s_pSocket = NULL; // 통신 끊기..
-	delete s_pSocketSub; s_pSocketSub = NULL; // 서브 소켓 없애기..
-	delete s_pFX; s_pFX = NULL;
+	delete s_pSocket; s_pSocket = nullptr; // 통신 끊기..
+	delete s_pSocketSub; s_pSocketSub = nullptr; // 서브 소켓 없애기..
+	delete s_pFX; s_pFX = nullptr;
 
 	////////////////////////////////////////////////////////////
 	// 기본값 쓰기..
@@ -319,23 +319,23 @@ void CGameProcedure::StaticMemberRelease()
 	}
 
 	// 각 프로시저들
-	delete s_pProcLogIn; s_pProcLogIn = NULL; 						// 로그인 프로시져
-	delete s_pProcNationSelect; s_pProcNationSelect = NULL; 		// 나라 선택
-	delete s_pProcCharacterSelect; s_pProcCharacterSelect = NULL; 	// 캐릭터 선택
-	delete s_pProcCharacterCreate; s_pProcCharacterCreate = NULL; 	// 캐릭터 만들기
-	delete s_pProcMain; s_pProcMain = NULL; 						// 메인 게임 프로시져
-	delete s_pProcOption; s_pProcOption = NULL; 					// 게임 옵션 프로시져
+	delete s_pProcLogIn; s_pProcLogIn = nullptr; 						// 로그인 프로시져
+	delete s_pProcNationSelect; s_pProcNationSelect = nullptr; 		// 나라 선택
+	delete s_pProcCharacterSelect; s_pProcCharacterSelect = nullptr; 	// 캐릭터 선택
+	delete s_pProcCharacterCreate; s_pProcCharacterCreate = nullptr; 	// 캐릭터 만들기
+	delete s_pProcMain; s_pProcMain = nullptr; 						// 메인 게임 프로시져
+	delete s_pProcOption; s_pProcOption = nullptr; 					// 게임 옵션 프로시져
 
 	// UI 들 날리기..
-	if(s_pUILoading) delete s_pUILoading; s_pUILoading = NULL;		// Loading Bar
+	if(s_pUILoading) delete s_pUILoading; s_pUILoading = nullptr;		// Loading Bar
 	delete s_pMsgBoxMgr;
-	delete s_pUIMgr; s_pUIMgr = NULL;				// UI Manager
+	delete s_pUIMgr; s_pUIMgr = nullptr;				// UI Manager
 
-//	delete s_pIME; s_pIME = NULL;
-	delete s_pLocalInput; s_pLocalInput = NULL;
-	delete s_pEng; s_pEng = NULL; // 젤 마지막에 엔진 날리기.!!!!!
+//	delete s_pIME; s_pIME = nullptr;
+	delete s_pLocalInput; s_pLocalInput = nullptr;
+	delete s_pEng; s_pEng = nullptr; // 젤 마지막에 엔진 날리기.!!!!!
 
-	if(s_pGameCursor) delete s_pGameCursor; s_pGameCursor = NULL;
+	if(s_pGameCursor) delete s_pGameCursor; s_pGameCursor = nullptr;
 
 	CGameBase::StaticMemberRelease();
 }
@@ -486,23 +486,23 @@ bool CGameProcedure::CaptureScreenAndSaveToFile(const std::string& szFN)
 	int iH = CN3Base::s_CameraData.vp.Height;
 
 	bool bResult = false;
-	LPDIRECT3DSURFACE8 lpDDSTmp = NULL;
-	LPDIRECT3DSURFACE8 lpDDSBack = NULL;
+	LPDIRECT3DSURFACE8 lpDDSTmp = nullptr;
+	LPDIRECT3DSURFACE8 lpDDSBack = nullptr;
 	CN3Base::s_lpD3DDev->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &lpDDSBack);
 	if(lpDDSBack)
 	{
 		CN3Base::s_lpD3DDev->CreateImageSurface(iW, iH, D3DFMT_X8R8G8B8, &lpDDSTmp);
 		if(lpDDSTmp)
 		{
-			HRESULT rval = D3DXLoadSurfaceFromSurface(lpDDSTmp, NULL, NULL, lpDDSBack, NULL, NULL, D3DX_FILTER_NONE, 0);
-//			HRESULT rval = s_lpD3DDev->CopyRects(lpDDSBack, NULL, 0, lpDDSTmp, NULL);
+			HRESULT rval = D3DXLoadSurfaceFromSurface(lpDDSTmp, nullptr, nullptr, lpDDSBack, nullptr, nullptr, D3DX_FILTER_NONE, 0);
+//			HRESULT rval = s_lpD3DDev->CopyRects(lpDDSBack, nullptr, 0, lpDDSTmp, nullptr);
 //			char szErr[256];
 //			::D3DXGetErrorString(rval, szErr, 256);
 
 			if(D3D_OK == rval)
 			{
 				D3DLOCKED_RECT LR;
-				if(D3D_OK == lpDDSTmp->LockRect(&LR, NULL, 0))
+				if(D3D_OK == lpDDSTmp->LockRect(&LR, nullptr, 0))
 				{
 //					std::vector<uint8_t> buff(iW * iH * 3, 0);
 					CBitMapFile bmf;
@@ -530,12 +530,12 @@ bool CGameProcedure::CaptureScreenAndSaveToFile(const std::string& szFN)
 			}
 			
 			lpDDSTmp->Release();
-			lpDDSTmp = NULL;
+			lpDDSTmp = nullptr;
 		}
 
 
 		lpDDSBack->Release();
-		lpDDSBack = NULL;
+		lpDDSBack = nullptr;
 	}
 
 	return bResult;
@@ -631,7 +631,7 @@ bool CGameProcedure::RegGetSetting( const char *ValueName, void *pValueData, lon
 	}
 
 	// get the value
-	if ( RegQueryValueEx( hKey, ValueName, NULL, &Type, (uint8_t *)pValueData, &len ) != ERROR_SUCCESS )
+	if ( RegQueryValueEx( hKey, ValueName, nullptr, &Type, (uint8_t *)pValueData, &len ) != ERROR_SUCCESS )
 	{
 //		__ASSERT(0, "Registry Query Failed!!!");
 		RegCloseKey( hKey );
@@ -649,7 +649,7 @@ bool CGameProcedure::RegGetSetting( const char *ValueName, void *pValueData, lon
 
 void CGameProcedure::UIPostData_Write(const std::string& szKey, CN3UIBase* pUI)
 {
-	if(szKey.empty() || NULL == pUI) return;
+	if(szKey.empty() || nullptr == pUI) return;
 
 	__WndInfo WI;
 	lstrcpyn(WI.szName, szKey.c_str(), 16);
@@ -661,7 +661,7 @@ void CGameProcedure::UIPostData_Write(const std::string& szKey, CN3UIBase* pUI)
 
 void CGameProcedure::UIPostData_Read(const std::string& szKey, CN3UIBase* pUI, int iDefaultX, int	 iDefaultY)
 {
-	if(szKey.empty() || NULL == pUI) return;
+	if(szKey.empty() || nullptr == pUI) return;
 
 	// 1. 디폴트 데이터를 만든다..
 	// 2. 데이터를 읽어온다..
@@ -707,7 +707,7 @@ void CGameProcedure::SetGameCursor(HCURSOR hCursor, bool bLocked)
 			eCursor = CURSOR_PRE_REPAIR;
 		else if(hCursor == s_hCursorNowRepair)
 			eCursor = CURSOR_NOW_REPAIR;
-		else if(hCursor == NULL)
+		else if(hCursor == nullptr)
 			eCursor = CURSOR_UNKNOWN;
 
 		SetGameCursor(eCursor, bLocked);
@@ -737,7 +737,7 @@ void CGameProcedure::SetGameCursor(HCURSOR hCursor, bool bLocked)
 
 void CGameProcedure::SetGameCursor(e_Cursor eCursor, bool bLocked)
 {
-	if(s_pGameCursor == NULL) return;
+	if(s_pGameCursor == nullptr) return;
 	s_pGameCursor->SetGameCursor(eCursor, bLocked);
 }
 
@@ -1117,15 +1117,15 @@ void CGameProcedure::LoadingUIChange(int iVictoryNation)
 	s_pPlayer->m_InfoExt.iVictoryNation = iVictoryNation;
 
 	std::string szLoading;
-	if(s_pUILoading) delete s_pUILoading; s_pUILoading = NULL;		// Loading Bar
+	if(s_pUILoading) delete s_pUILoading; s_pUILoading = nullptr;		// Loading Bar
 
 	s_pUILoading = new CUILoading();
 	__ASSERT(s_pUILoading, "로딩화면 생성 실패");
-	if(s_pUILoading == NULL) return;
+	if(s_pUILoading == nullptr) return;
 
 	__TABLE_UI_RESRC* pTblUI = s_pTbl_UI.Find(NATION_ELMORAD); // 기본은 엘모라드 UI 로 한다..
 	__ASSERT(pTblUI, "기본 UI 가 없습니다.");
-	if(pTblUI == NULL) return;
+	if(pTblUI == nullptr) return;
 
 	switch(iVictoryNation)
 	{

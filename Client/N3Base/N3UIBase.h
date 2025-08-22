@@ -104,7 +104,7 @@ protected:
 	CN3SndObj*	m_pSnd_OpenUI;	// UI가 화면에 보이는 순간 내는 소리
 	CN3SndObj*	m_pSnd_CloseUI;	// UI가 화면에서 사라지는 순간 내는 소리
 
-	static CN3UIEdit*		s_pFocusedEdit;		// 현재 포커스를 가지고 있는 Edit, NULL이면 아무도 포커스를 가지고 있지 않다.
+	static CN3UIEdit*		s_pFocusedEdit;		// 현재 포커스를 가지고 있는 Edit, nullptr이면 아무도 포커스를 가지고 있지 않다.
 	
 public:
 	CN3UIBase();
@@ -163,7 +163,7 @@ public:
 	virtual void	SetVisibleWithNoSound(bool bVisible, bool bWork = false, bool bReFocus = false);
 
 	virtual void	CallBackProc(int iID, uint32_t dwFlag);
-	virtual void	ShowWindow(int iID = -1, CN3UIBase* pParent = NULL);
+	virtual void	ShowWindow(int iID = -1, CN3UIBase* pParent = nullptr);
 	virtual bool	Load(HANDLE hFile);
 	virtual bool	ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg); // 메시지를 받는다.. 보낸놈, msg
 	virtual uint32_t	MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld);

@@ -25,9 +25,9 @@ static char THIS_FILE[]=__FILE__;
 
 CUITradeBBSSelector::CUITradeBBSSelector()
 {
-	m_pBtn_BBSSell		= NULL;
-	m_pBtn_BBSBuy		= NULL;
-	m_pBtn_BBSCancel	= NULL;
+	m_pBtn_BBSSell		= nullptr;
+	m_pBtn_BBSBuy		= nullptr;
+	m_pBtn_BBSCancel	= nullptr;
 }
 
 CUITradeBBSSelector::~CUITradeBBSSelector()

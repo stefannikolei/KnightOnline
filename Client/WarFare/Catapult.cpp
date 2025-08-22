@@ -15,7 +15,7 @@ static char THIS_FILE[]=__FILE__;
 
 CCatapult::CCatapult()
 {
-	m_Thrower.pStone = NULL;
+	m_Thrower.pStone = nullptr;
 	Release();
 }
 
@@ -27,7 +27,7 @@ CCatapult::~CCatapult()
 void CCatapult::Release()
 {
 	CMachineBase::Release();
-	if (m_Thrower.pStone) { delete m_Thrower.pStone; m_Thrower.pStone = NULL;}
+	if (m_Thrower.pStone) { delete m_Thrower.pStone; m_Thrower.pStone = nullptr;}
 	ZeroMemory(&m_Thrower, sizeof(m_Thrower));
 }
 
@@ -156,7 +156,7 @@ void CCatapult::Tick(float fFrm)
 
 void CCatapult::LoadMachine(FILE* stream)
 {
-	if (stream == NULL) return;
+	if (stream == nullptr) return;
 	Release();
 	CMachineBase::LoadMachine(stream);
 
@@ -174,7 +174,7 @@ void CCatapult::LoadMachine(FILE* stream)
 	result = fscanf(stream, "Thrower_StoneShapeName = %s\n", szStoneShapeName);						__ASSERT(result != EOF, "잘못된 Machine 세팅 파일");
 	result = fscanf(stream, "Thrower_StoneOffset = %f %f %f\n", &x, &y, &z);						__ASSERT(result != EOF, "잘못된 Machine 세팅 파일");
 
-	__ASSERT(m_Thrower.pStone == NULL, "catapult memory leak 가능성 존재");
+	__ASSERT(m_Thrower.pStone == nullptr, "catapult memory leak 가능성 존재");
 	m_Thrower.pStone = new CN3Shape;
 	m_Thrower.pStone->Load(szStoneShapeName);
 	m_Thrower.vStoneOffset.Set(x, y, z);

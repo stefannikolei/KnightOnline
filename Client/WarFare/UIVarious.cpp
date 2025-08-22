@@ -31,48 +31,48 @@ static char THIS_FILE[]=__FILE__;
 
 CUIState::CUIState()
 {
-	m_pText_ID = NULL;
-	m_pText_Level = NULL;
-	m_pText_RealmPoint = NULL;
+	m_pText_ID = nullptr;
+	m_pText_Level = nullptr;
+	m_pText_RealmPoint = nullptr;
 
-	m_pText_Class = NULL;
-	m_pText_Race = NULL;
-	m_pText_Nation = NULL;
+	m_pText_Class = nullptr;
+	m_pText_Race = nullptr;
+	m_pText_Nation = nullptr;
 
-	m_pText_HP = NULL;
-	m_pText_MP = NULL;
-	m_pText_Exp = NULL;
-	m_pText_AP = NULL;	// 공격 = NULL력
-	m_pText_GP = NULL;			// 방어 = NULL력
-	m_pText_Weight = NULL;
+	m_pText_HP = nullptr;
+	m_pText_MP = nullptr;
+	m_pText_Exp = nullptr;
+	m_pText_AP = nullptr;	// 공격 = nullptr력
+	m_pText_GP = nullptr;			// 방어 = nullptr력
+	m_pText_Weight = nullptr;
 
 	
-	m_pText_BonusPoint = NULL;
+	m_pText_BonusPoint = nullptr;
 
-	m_pBtn_Strength = NULL;
-	m_pBtn_Stamina = NULL;
-	m_pBtn_Dexterity = NULL;
-	m_pBtn_MagicAttak = NULL;
-	m_pBtn_Intelligence = NULL;
+	m_pBtn_Strength = nullptr;
+	m_pBtn_Stamina = nullptr;
+	m_pBtn_Dexterity = nullptr;
+	m_pBtn_MagicAttak = nullptr;
+	m_pBtn_Intelligence = nullptr;
 
-	m_pText_Strength = NULL;
-	m_pText_Stamina = NULL;
-	m_pText_Dexterity = NULL;
-	m_pText_MagicAttak = NULL;
-	m_pText_Intelligence = NULL;
+	m_pText_Strength = nullptr;
+	m_pText_Stamina = nullptr;
+	m_pText_Dexterity = nullptr;
+	m_pText_MagicAttak = nullptr;
+	m_pText_Intelligence = nullptr;
 
-	m_pText_RegistFire = NULL;
-	m_pText_RegistMagic = NULL;
-	m_pText_RegistIce = NULL;
-	m_pText_RegistCurse = NULL;
-	m_pText_RegistLight = NULL;
-	m_pText_RegistPoison = NULL;
+	m_pText_RegistFire = nullptr;
+	m_pText_RegistMagic = nullptr;
+	m_pText_RegistIce = nullptr;
+	m_pText_RegistCurse = nullptr;
+	m_pText_RegistLight = nullptr;
+	m_pText_RegistPoison = nullptr;
 
-	m_pImg_Str = NULL;
-	m_pImg_Sta = NULL;
-	m_pImg_Dex = NULL;
-	m_pImg_Int = NULL;
-	m_pImg_MAP = NULL;
+	m_pImg_Str = nullptr;
+	m_pImg_Sta = nullptr;
+	m_pImg_Dex = nullptr;
+	m_pImg_Int = nullptr;
+	m_pImg_MAP = nullptr;
 }
 
 CUIState::~CUIState()
@@ -83,48 +83,48 @@ void CUIState::Release()
 {
 	CN3UIBase::Release();
 
-	m_pText_ID = NULL;
-	m_pText_Level = NULL;
-	m_pText_RealmPoint = NULL;
+	m_pText_ID = nullptr;
+	m_pText_Level = nullptr;
+	m_pText_RealmPoint = nullptr;
 
-	m_pText_Class = NULL;
-	m_pText_Race = NULL;
-	m_pText_Nation = NULL;
+	m_pText_Class = nullptr;
+	m_pText_Race = nullptr;
+	m_pText_Nation = nullptr;
 
-	m_pText_HP = NULL;
-	m_pText_MP = NULL;
-	m_pText_Exp = NULL;
-	m_pText_AP = NULL;	// 공격 = NULL력
-	m_pText_GP = NULL;			// 방어 = NULL력
-	m_pText_Weight = NULL;
+	m_pText_HP = nullptr;
+	m_pText_MP = nullptr;
+	m_pText_Exp = nullptr;
+	m_pText_AP = nullptr;	// 공격 = nullptr력
+	m_pText_GP = nullptr;			// 방어 = nullptr력
+	m_pText_Weight = nullptr;
 
 	
-	m_pText_BonusPoint = NULL;
+	m_pText_BonusPoint = nullptr;
 
-	m_pBtn_Strength = NULL;
-	m_pBtn_Stamina = NULL;
-	m_pBtn_Dexterity = NULL;
-	m_pBtn_MagicAttak = NULL;
-	m_pBtn_Intelligence = NULL;
+	m_pBtn_Strength = nullptr;
+	m_pBtn_Stamina = nullptr;
+	m_pBtn_Dexterity = nullptr;
+	m_pBtn_MagicAttak = nullptr;
+	m_pBtn_Intelligence = nullptr;
 
-	m_pText_Strength = NULL;
-	m_pText_Stamina = NULL;
-	m_pText_Dexterity = NULL;
-	m_pText_MagicAttak = NULL;
-	m_pText_Intelligence = NULL;
+	m_pText_Strength = nullptr;
+	m_pText_Stamina = nullptr;
+	m_pText_Dexterity = nullptr;
+	m_pText_MagicAttak = nullptr;
+	m_pText_Intelligence = nullptr;
 
-	m_pText_RegistFire = NULL;
-	m_pText_RegistMagic = NULL;
-	m_pText_RegistIce = NULL;
-	m_pText_RegistCurse = NULL;
-	m_pText_RegistLight = NULL;
-	m_pText_RegistPoison = NULL;
+	m_pText_RegistFire = nullptr;
+	m_pText_RegistMagic = nullptr;
+	m_pText_RegistIce = nullptr;
+	m_pText_RegistCurse = nullptr;
+	m_pText_RegistLight = nullptr;
+	m_pText_RegistPoison = nullptr;
 
-	m_pImg_Str = NULL;
-	m_pImg_Sta = NULL;
-	m_pImg_Dex = NULL;
-	m_pImg_Int = NULL;
-	m_pImg_MAP = NULL;
+	m_pImg_Str = nullptr;
+	m_pImg_Sta = nullptr;
+	m_pImg_Dex = nullptr;
+	m_pImg_Int = nullptr;
+	m_pImg_MAP = nullptr;
 }
 
 bool CUIState::Load(HANDLE hFile)
@@ -941,13 +941,13 @@ bool CUIKnights::MsgRecv_MemberInfo(Packet& pkt)
 
 void CUIKnights::UpdateKnightsName(const std::string& szName)
 {
-	if(NULL == m_pText_Name) return;
+	if(nullptr == m_pText_Name) return;
 	m_pText_Name->SetString(szName);
 }
 
 void CUIKnights::UpdateKnightsDuty(e_KnightsDuty eDuty)
 {
-	if(NULL == m_pText_Duty) return;
+	if(nullptr == m_pText_Duty) return;
 	std::string szDuty;
 	switch(eDuty)
 	{
@@ -1018,17 +1018,17 @@ CUIFriends::CUIFriends()
 {
 	m_iPageCur = 0;
 
-	m_pList_Friends = NULL;
-	m_pText_Page = NULL;
+	m_pList_Friends = nullptr;
+	m_pText_Page = nullptr;
 
-	m_pBtn_NextPage = NULL;
-	m_pBtn_PrevPage = NULL;
+	m_pBtn_NextPage = nullptr;
+	m_pBtn_PrevPage = nullptr;
 	
-	m_pBtn_Refresh = NULL;
-	m_pBtn_Party = NULL;
-	m_pBtn_Whisper = NULL;
-	m_pBtn_Add = NULL;
-	m_pBtn_Delete = NULL;
+	m_pBtn_Refresh = nullptr;
+	m_pBtn_Party = nullptr;
+	m_pBtn_Whisper = nullptr;
+	m_pBtn_Add = nullptr;
+	m_pBtn_Delete = nullptr;
 }
 
 CUIFriends::~CUIFriends()
@@ -1091,7 +1091,7 @@ void CUIFriends::SaveListToTextFile(const std::string& szID) // 문자열이 있
 	char szFlags[4] = "w";
 	if(!szID.empty()) lstrcpy(szFlags, "a");
 	FILE* pFile = fopen(szFN.c_str(), szFlags);
-	if (NULL == pFile) return;
+	if (nullptr == pFile) return;
 
 	std::string szIDTmp;
 	if(szID.empty())
@@ -1243,7 +1243,7 @@ bool CUIFriends::MemberDelete(const std::string &szID)
 
 void CUIFriends::UpdateList()
 {
-	if(NULL == m_pList_Friends) return;
+	if(nullptr == m_pList_Friends) return;
 	int iSelPrev = m_pList_Friends->GetCurSel();
 
 	m_pList_Friends->ResetContent();
@@ -1297,7 +1297,7 @@ void CUIFriends::MsgSend_MemberInfo(bool bDisableInterval)
 
 
 	if(m_MapFriends.empty()) return;
-	if(NULL == m_pList_Friends) return;
+	if(nullptr == m_pList_Friends) return;
 
 	int iFC = m_pList_Friends->GetCount();
 	if(iFC <= 0) return;
@@ -1384,16 +1384,16 @@ CUIQuest::~CUIQuest()
 
 CUIVarious::CUIVarious()
 {
-	m_pBtn_Knights = NULL;
-	m_pBtn_State = NULL;
-	m_pBtn_Quest = NULL;
-	m_pBtn_Friends = NULL;
-	m_pBtn_Close = NULL;
+	m_pBtn_Knights = nullptr;
+	m_pBtn_State = nullptr;
+	m_pBtn_Quest = nullptr;
+	m_pBtn_Friends = nullptr;
+	m_pBtn_Close = nullptr;
 
-	m_pPageState = NULL;
-	m_pPageKnights = NULL;
-	m_pPageQuest = NULL;
-	m_pPageFriends = NULL;
+	m_pPageState = nullptr;
+	m_pPageKnights = nullptr;
+	m_pPageQuest = nullptr;
+	m_pPageFriends = nullptr;
 
 	m_bOpenningNow = false; // 열리고 있다..
 	m_bClosingNow = false;	// 닫히고 있다..
@@ -1408,16 +1408,16 @@ void CUIVarious::Release()
 {
 	CN3UIBase::Release();
 	
-	m_pBtn_Knights = NULL;
-	m_pBtn_State = NULL;
-	m_pBtn_Quest = NULL;
-	m_pBtn_Friends = NULL;
-	m_pBtn_Close = NULL;
+	m_pBtn_Knights = nullptr;
+	m_pBtn_State = nullptr;
+	m_pBtn_Quest = nullptr;
+	m_pBtn_Friends = nullptr;
+	m_pBtn_Close = nullptr;
 
-	m_pPageState = NULL;
-	m_pPageKnights = NULL;
-	m_pPageQuest = NULL;
-	m_pPageFriends = NULL;
+	m_pPageState = nullptr;
+	m_pPageKnights = nullptr;
+	m_pPageQuest = nullptr;
+	m_pPageFriends = nullptr;
 
 	m_bOpenningNow = false; // 열리고 있다..
 	m_bClosingNow = false;	// 닫히고 있다..
@@ -1438,21 +1438,21 @@ bool CUIVarious::Load(HANDLE hFile)
 	if(m_pBtn_Quest) m_pBtn_Quest->SetState(UI_STATE_BUTTON_DISABLE);
 	if(m_pBtn_Friends) m_pBtn_Friends->SetState(UI_STATE_BUTTON_DISABLE);
 
-	if(NULL == m_pPageState) m_pPageState = new CUIState();
+	if(nullptr == m_pPageState) m_pPageState = new CUIState();
 	else m_pPageState->Release();
 	m_pPageState->Init(this);
 
-	if(NULL == m_pPageKnights) m_pPageKnights = new CUIKnights();
+	if(nullptr == m_pPageKnights) m_pPageKnights = new CUIKnights();
 	else m_pPageKnights->Release();
 	m_pPageKnights->Init(this);
 	
-	m_pPageQuest = NULL;
-	if(NULL == m_pPageQuest) m_pPageQuest = new CUIQuest();
+	m_pPageQuest = nullptr;
+	if(nullptr == m_pPageQuest) m_pPageQuest = new CUIQuest();
 	else m_pPageQuest->Release();
 	m_pPageQuest->Init(this);
 	
-	m_pPageFriends = NULL;
-	if(NULL == m_pPageFriends) m_pPageFriends = new CUIFriends();
+	m_pPageFriends = nullptr;
+	if(nullptr == m_pPageFriends) m_pPageFriends = new CUIFriends();
 	else m_pPageFriends->Release();
 	m_pPageFriends->Init(this);
 	
@@ -1477,8 +1477,8 @@ bool CUIVarious::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 void CUIVarious::UpdatePageButtons(CN3UIButton* pButtonToActive)
 {
-	static CN3UIButton* pButtonPrev = NULL;
-	if(NULL == pButtonToActive || pButtonToActive == pButtonPrev) return;
+	static CN3UIButton* pButtonPrev = nullptr;
+	if(nullptr == pButtonToActive || pButtonToActive == pButtonPrev) return;
 	pButtonPrev = pButtonToActive;
 
 	CN3UIButton*	pBtns[4] = { m_pBtn_Knights, m_pBtn_State, m_pBtn_Quest, m_pBtn_Friends };
@@ -1486,7 +1486,7 @@ void CUIVarious::UpdatePageButtons(CN3UIButton* pButtonToActive)
 	
 	for(int i = 0; i < 4; i++)
 	{
-		if(NULL == pBtns[i]) continue;
+		if(nullptr == pBtns[i]) continue;
 
 		if(pBtns[i] == pButtonToActive)
 		{
@@ -1597,7 +1597,7 @@ void CUIVarious::Tick()
 
 void CUIVarious::UpdateAllStates(const __InfoPlayerBase* pInfoBase, const __InfoPlayerMySelf* pInfoExt)
 {
-	if(NULL == pInfoBase || NULL == pInfoExt) return;
+	if(nullptr == pInfoBase || nullptr == pInfoExt) return;
 	
 	std::string szVal;
 	
@@ -1692,7 +1692,7 @@ void CUIVarious::UpdateAllStates(const __InfoPlayerBase* pInfoBase, const __Info
 
 void CUIVarious::UpdateKnightsInfo()
 {
-	if(NULL == m_pPageKnights) return;
+	if(nullptr == m_pPageKnights) return;
 
 	/*
 		m_pPageKnights->UpdateKnightsDuty(CGameBase::s_pPlayer->m_InfoExt.eKnightsDuty);

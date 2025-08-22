@@ -23,7 +23,7 @@ static char THIS_FILE[]=__FILE__;
 
 CUITradeList::CUITradeList()
 {
-	m_pScrollbar = NULL;
+	m_pScrollbar = nullptr;
 }
 
 CUITradeList::~CUITradeList()
@@ -35,7 +35,7 @@ void CUITradeList::Release()
 {
 	CN3UIBase::Release();
 
-	m_pScrollbar = NULL;
+	m_pScrollbar = nullptr;
 }
 
 bool CUITradeList::Load(HANDLE hFile)
@@ -81,9 +81,9 @@ void CUITradeList::Open(int iIDTarget)
 
 	if (iIDTarget == -1) return;
 
-	__TABLE_EXCHANGE_QUEST* pQuest = NULL;
-	__TABLE_PLAYER_LOOKS* pPlayer = NULL;
-	__TABLE_ITEM_BASIC* pItem = NULL;
+	__TABLE_EXCHANGE_QUEST* pQuest = nullptr;
+	__TABLE_PLAYER_LOOKS* pPlayer = nullptr;
+	__TABLE_ITEM_BASIC* pItem = nullptr;
 
 	// 아이디 = 직업 코드*1000 + 001부터.. (직업 코드+1)*100 + 001까지..
 	int i, iIDFirst, iIDIndexFirst, iIDIndexLast, iDivide, iTotalCount;
@@ -175,7 +175,7 @@ void CUITradeList::SetTopLine(int iTopLine)		// 맨 윗줄을 지정해준다.
 
 	for (i = 0; i < 9; i++)
 	{
-		if(NULL == m_pStr_List[i]) continue;
+		if(nullptr == m_pStr_List[i]) continue;
 		m_pStr_List[i]->SetString(m_sStr[iFirstIndex+i]);
 	}
 

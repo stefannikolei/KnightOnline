@@ -470,7 +470,7 @@ e_ItemType CGameBase::MakeResrcFileNameForUPC(	__TABLE_ITEM_BASIC* pItem,
 	if(pszResrcFN) *pszResrcFN = "";
 	if(pszIconFN) *pszIconFN = "";
 
-	if(NULL == pItem) return ITEM_TYPE_UNKNOWN;
+	if(nullptr == pItem) return ITEM_TYPE_UNKNOWN;
 	
 	e_ItemType eType	= ITEM_TYPE_UNKNOWN;
 	e_ItemPosition ePos	= (e_ItemPosition)pItem->byAttachPoint;
@@ -592,7 +592,7 @@ bool CGameBase::IsValidCharacter(CPlayerBase* pCharacter)
 
 CPlayerBase* CGameBase::CharacterGetByID(int iID, bool bFromAlive)
 {
-	if(iID < 0) return NULL;
+	if(iID < 0) return nullptr;
 	if(iID == s_pPlayer->IDNumber()) return s_pPlayer;
 	return s_pOPMgr->CharacterGetByID(iID, bFromAlive);
 }

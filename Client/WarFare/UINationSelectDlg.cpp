@@ -18,14 +18,14 @@ static char THIS_FILE[]=__FILE__;
 
 CUINationSelectDlg::CUINationSelectDlg()
 {
-	m_pProcNationSelectRef = NULL;
+	m_pProcNationSelectRef = nullptr;
 }
 
 CUINationSelectDlg::~CUINationSelectDlg()
 {
-	m_pBtnKarus = NULL;
-	m_pBtnElmorad = NULL;
-	m_pBtnBack = NULL;
+	m_pBtnKarus = nullptr;
+	m_pBtnElmorad = nullptr;
+	m_pBtnBack = nullptr;
 }
 
 bool CUINationSelectDlg::Load(HANDLE hFile)
@@ -45,7 +45,7 @@ bool CUINationSelectDlg::Load(HANDLE hFile)
 
 bool CUINationSelectDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if(NULL == pSender) return false;
+	if(nullptr == pSender) return false;
 
 	if( dwMsg == UIMSG_BUTTON_CLICK )
 	{

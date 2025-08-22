@@ -163,7 +163,7 @@ public:
 	void UserInOutForMe(CUser* pSendUser);	// 9 Regions All Users USERINOUT Packet Packaging Function
 	void NpcInOutForMe(CUser* pSendUser);	// 9 Regions All Npcs NPCINOUT Packet Packaging Function
 	void Send_Region(char* pBuf, int len, int zone, int x, int z, CUser* pExceptUser = nullptr, bool bDirect = true);	// zone == real zone number
-	void Send_All(char* pBuf, int len, CUser* pExceptUser = nullptr, int nation = 0);	// pointer != NULL don`t send to that user pointer
+	void Send_All(char* pBuf, int len, CUser* pExceptUser = nullptr, int nation = 0);	// pointer != nullptr don`t send to that user pointer
 	void Send_AIServer(int zone, char* pBuf, int len);
 	static CUser* GetUserPtr(const char* userid, NameType type);
 

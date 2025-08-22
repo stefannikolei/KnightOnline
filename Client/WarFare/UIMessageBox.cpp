@@ -36,13 +36,13 @@ static char THIS_FILE[]=__FILE__;
 
 CUIMessageBox::CUIMessageBox()
 {
-	m_pBtn_OK = NULL;
-	m_pBtn_Yes = NULL;
-	m_pBtn_No = NULL;
-	m_pBtn_Cancel = NULL;
-	m_pText_Message = NULL;
-	m_pText_Title = NULL;
-	m_pEdit_Common = NULL;
+	m_pBtn_OK = nullptr;
+	m_pBtn_Yes = nullptr;
+	m_pBtn_No = nullptr;
+	m_pBtn_Cancel = nullptr;
+	m_pText_Message = nullptr;
+	m_pText_Title = nullptr;
+	m_pEdit_Common = nullptr;
 
 	m_eBehavior = BEHAVIOR_NOTHING;
 	m_iStyle	= MB_OK;
@@ -80,7 +80,7 @@ void CUIMessageBox::SetTitle(const std::string& szTitle)
 
 bool CUIMessageBox::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if(NULL == pSender) return false;
+	if(nullptr == pSender) return false;
 
 	//s_CameraData.vp;  //불러 오는 과정을 살펴본다 
 	//uint32_t mm = s_CameraData.vp.Height;
@@ -153,7 +153,7 @@ bool CUIMessageBox::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				case BEHAVIOR_PARTY_BBS_REGISTER_CANCEL:	if(pProcMain->m_pUIPartyBBS)pProcMain->m_pUIPartyBBS->MsgSend_RegisterCancel(); break;// 파티 게시판에 등록 해제
 				case BEHAVIOR_EXECUTE_OPTION:
 					{
-						::ShellExecute(NULL, "open", "Option.exe", NULL, NULL, SW_SHOWNORMAL); // 홈페이지로 이동..
+						::ShellExecute(nullptr, "open", "Option.exe", nullptr, nullptr, SW_SHOWNORMAL); // 홈페이지로 이동..
 						PostQuitMessage(0);	// 종료...
 					}
 					break;
@@ -222,7 +222,7 @@ void CUIMessageBox::SetBoxStyle(int iStyle)
 
 void CUIMessageBox::SetVisibleEditControl(bool bVisible) // Edit Control Visible
 {
-	if(NULL == m_pEdit_Common) return;
+	if(nullptr == m_pEdit_Common) return;
 	
 	m_pEdit_Common->SetString("");
 	m_pEdit_Common->SetVisible(bVisible);

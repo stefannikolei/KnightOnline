@@ -21,10 +21,10 @@ static char THIS_FILE[]=__FILE__;
 
 CUITradeExplanation::CUITradeExplanation()
 {
-	m_pBtn_PageUp		= NULL;
-	m_pBtn_PageDown		= NULL;	
-	m_pBtn_Close		= NULL;
-	m_pText_Explanation = NULL;
+	m_pBtn_PageUp		= nullptr;
+	m_pBtn_PageDown		= nullptr;	
+	m_pBtn_Close		= nullptr;
+	m_pText_Explanation = nullptr;
 	
 	m_szExplanation		= "";
 	m_iCurSel			= 0;
