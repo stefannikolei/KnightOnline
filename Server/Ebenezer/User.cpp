@@ -9329,6 +9329,16 @@ void CUser::SelectWarpList(char* pBuf)
 	if (pWarp == nullptr)
 		return;
 
+	// We cannot use warp gates when invading.
+	if (m_pUserData->m_bNation != pWarp->sZone
+		&& pWarp->sZone <= ZONE_ELMORAD)
+		return;
+
+	// We cannot use warp gates belonging to another nation.
+	if (pWarp->sNation != 0
+		&& pWarp->sNation != m_pUserData->m_bNation)
+		return;
+
 	pTargetMap = m_pMain->GetMapByID(pWarp->sZone);
 	if (pTargetMap == nullptr)
 		return;
@@ -9524,7 +9534,7 @@ BOOL CUser::BindObjectEvent(short objectindex, short nid)
 	}
 
 	SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);
-	SetByte(send_buff, pEvent->sType, send_index);
+	SetByte(send_buff, static_cast<uint8_t>(pEvent->sType), send_index);
 	SetByte(send_buff, result, send_index);
 	Send(send_buff, send_index);
 
@@ -9574,7 +9584,7 @@ BOOL CUser::GateObjectEvent(short objectindex, short nid)
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
 	SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);
-	SetByte(send_buff, pEvent->sType, send_index);
+	SetByte(send_buff, static_cast<uint8_t>(pEvent->sType), send_index);
 	SetByte(send_buff, result, send_index);
 	SetShort(send_buff, nid, send_index);
 	SetByte(send_buff, pNpc->m_byGateOpen, send_index);
@@ -9647,7 +9657,7 @@ BOOL CUser::GateLeverObjectEvent(short objectindex, short nid)
 			memset(send_buff, 0, sizeof(send_buff));
 			send_index = 0;
 			SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);
-			SetByte(send_buff, pGateEvent->sType, send_index);
+			SetByte(send_buff, static_cast<uint8_t>(pGateEvent->sType), send_index);
 			SetByte(send_buff, result, send_index);
 			SetShort(send_buff, pGateNpc->m_sNid, send_index);
 			SetByte(send_buff, pGateNpc->m_byGateOpen, send_index);
@@ -9662,7 +9672,7 @@ BOOL CUser::GateLeverObjectEvent(short objectindex, short nid)
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
 	SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);
-	SetByte(send_buff, pEvent->sType, send_index);
+	SetByte(send_buff, static_cast<uint8_t>(pEvent->sType), send_index);
 	SetByte(send_buff, result, send_index);
 	SetShort(send_buff, nid, send_index);
 	SetByte(send_buff, pNpc->m_byGateOpen, send_index);
@@ -9744,7 +9754,7 @@ BOOL CUser::FlagObjectEvent(short objectindex, short nid)
 			send_index = 0;
 
 			SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);		// (Send to Region...)
-			SetByte(send_buff, pFlagEvent->sType, send_index);
+			SetByte(send_buff, static_cast<uint8_t>(pFlagEvent->sType), send_index);
 			SetByte(send_buff, result, send_index);
 			SetShort(send_buff, pFlagNpc->m_sNid, send_index);
 			SetByte(send_buff, pFlagNpc->m_byGateOpen, send_index);
@@ -9768,7 +9778,7 @@ BOOL CUser::FlagObjectEvent(short objectindex, short nid)
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
 	SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);
-	SetByte(send_buff, pEvent->sType, send_index);
+	SetByte(send_buff, static_cast<uint8_t>(pEvent->sType), send_index);
 	SetByte(send_buff, result, send_index);
 	SetShort(send_buff, nid, send_index);
 	SetByte(send_buff, pNpc->m_byGateOpen, send_index);
@@ -9790,6 +9800,16 @@ BOOL CUser::WarpListObjectEvent(short objectindex, short nid)
 	if (pEvent == nullptr)
 		return FALSE;
 
+	// We cannot use warp gates belonging to another nation.
+	if (pEvent->sBelong != 0
+		&& pEvent->sBelong != m_pUserData->m_bNation)
+		return FALSE;
+
+	// We cannot use warp gates when invading.
+	if (m_pUserData->m_bNation != m_pUserData->m_bZone
+		&& m_pUserData->m_bZone <= ZONE_ELMORAD)
+		return FALSE;
+
 	if (!GetWarpList(pEvent->sControlNpcID))
 		return FALSE;
 
@@ -9800,6 +9820,7 @@ void CUser::ObjectEvent(char* pBuf)
 {
 	int index = 0, objectindex = 0, send_index = 0, result = 0, nid = 0;
 	char send_buff[128] = {};
+	uint8_t objectType = 0;
 
 	C3DMap* pMap = nullptr;
 	_OBJECT_EVENT* pEvent = nullptr;
@@ -9814,6 +9835,8 @@ void CUser::ObjectEvent(char* pBuf)
 	pEvent = pMap->GetObjectEvent(objectindex);
 	if (pEvent == nullptr)
 		goto fail_return;
+
+	objectType = static_cast<uint8_t>(pEvent->sType);
 
 	switch (pEvent->sType)
 	{
@@ -9855,6 +9878,7 @@ void CUser::ObjectEvent(char* pBuf)
 
 fail_return:
 	SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);
+	SetByte(send_buff, objectType, send_index);
 	SetByte(send_buff, 0, send_index);
 	Send(send_buff, send_index);
 }
