@@ -173,7 +173,6 @@
     <ClCompile Include="UIImageTooltipDlg.cpp" />
     <ClCompile Include="UIInn.cpp" />
     <ClCompile Include="UIInventory.cpp" />
-    <ClCompile Include="UIItemExchange.cpp" />
     <ClCompile Include="UIKnightsOperation.cpp" />
     <ClCompile Include="UILevelGuide.cpp" />
     <ClCompile Include="UILoading.cpp" />
@@ -188,7 +187,6 @@
     <ClCompile Include="UINotice.cpp" />
     <ClCompile Include="UINPCChangeEvent.cpp" />
     <ClCompile Include="UINPCEvent.cpp" />
-    <ClCompile Include="UINpcTalk.cpp" />
     <ClCompile Include="UIPartyBBS.cpp" />
     <ClCompile Include="UIPartyBBSSelector.cpp" />
     <ClCompile Include="UIPartyOrForce.cpp" />
@@ -204,7 +202,6 @@
     <ClCompile Include="UITradeBBSSelector.cpp" />
     <ClCompile Include="UITradeEditDlg.cpp" />
     <ClCompile Include="UITradeExplanation.cpp" />
-    <ClCompile Include="UITradeList.cpp" />
     <ClCompile Include="UITradeSellBBS.cpp" />
     <ClCompile Include="UITransactionDlg.cpp" />
     <ClCompile Include="UIUpgradeSelect.cpp" />
@@ -294,7 +291,6 @@
     <ClInclude Include="UIImageTooltipDlg.h" />
     <ClInclude Include="UIInn.h" />
     <ClInclude Include="UIInventory.h" />
-    <ClInclude Include="UIItemExchange.h" />
     <ClInclude Include="UIKnightsOperation.h" />
     <ClInclude Include="UILevelGuide.h" />
     <ClInclude Include="UILoading.h" />
@@ -309,7 +305,6 @@
     <ClInclude Include="UINotice.h" />
     <ClInclude Include="UINPCChangeEvent.h" />
     <ClInclude Include="UINPCEvent.h" />
-    <ClInclude Include="UINpcTalk.h" />
     <ClInclude Include="UIPartyBBS.h" />
     <ClInclude Include="UIPartyBBSSelector.h" />
     <ClInclude Include="UIPartyOrForce.h" />
@@ -325,7 +320,6 @@
     <ClInclude Include="UITradeBBSSelector.h" />
     <ClInclude Include="UITradeEditDlg.h" />
     <ClInclude Include="UITradeExplanation.h" />
-    <ClInclude Include="UITradeList.h" />
     <ClInclude Include="UITradeSellBBS.h" />
     <ClInclude Include="UITransactionDlg.h" />
     <ClInclude Include="UIUpgradeSelect.h" />

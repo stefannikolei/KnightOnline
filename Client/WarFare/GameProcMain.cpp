@@ -37,9 +37,7 @@
 #include "UIHotKeyDlg.h"
 #include "UIClassChange.h"
 #include "UINpcEvent.h"
-#include "UIItemExchange.h"
 #include "UIRepairTooltipDlg.h"
-#include "UINpcTalk.h"
 #include "UIKnightsOperation.h"
 #include "UIPartyBBS.h"
 #include "UIWareHouseDlg.h"
@@ -146,7 +144,6 @@ CGameProcMain::CGameProcMain()				// r기본 생성자.. 각 변수의 역활은
 	m_pUINotice = new CUINotice();
 	m_pUIClassChange = new CUIClassChange();
 	m_pUINpcEvent = new CUINPCEvent();
-	m_pUIItemREDlg = new CUIItemExchange();
 	m_pUIRepairTooltip = new CUIRepairTooltipDlg();
 	m_pUIDroppedItemDlg = new CUIDroppedItemDlg();
 	m_pUITransactionDlg = new CUITransactionDlg();
@@ -156,7 +153,6 @@ CGameProcMain::CGameProcMain()				// r기본 생성자.. 각 변수의 역활은
 	m_pUICmdListDlg = new CUICmdList();
 	m_pUICmdEditDlg = new CUICmdEdit();
 	m_pUIHotKeyDlg = new CUIHotKeyDlg();
-	m_pUINpcTalk = new CUINpcTalk();
 	m_pUIKnightsOp = new CUIKnightsOperation();			// 기사단 리스트 보기, 가입, 등...
 	m_pUIPartyBBS = new CUIPartyBBS(); // 파티 지원 시스템 게시판??..
 	m_pUIWareHouseDlg = new CUIWareHouseDlg();
@@ -199,8 +195,6 @@ CGameProcMain::~CGameProcMain()
 	delete m_pUINotice;
 	delete m_pUIClassChange;
 	delete m_pUINpcEvent;
-	delete m_pUIItemREDlg;
-	delete m_pUIRepairTooltip;
 	delete m_pUIDroppedItemDlg;
 	delete m_pUITransactionDlg;
 	delete m_pUIInventory;
@@ -209,7 +203,6 @@ CGameProcMain::~CGameProcMain()
 	delete m_pUICmdListDlg;
 	delete m_pUICmdEditDlg;
 	delete m_pUIHotKeyDlg;
-	delete m_pUINpcTalk;
 	delete m_pUIKnightsOp;
 	delete m_pUIPartyBBS;
 	delete m_pUIWareHouseDlg;
@@ -263,15 +256,12 @@ void CGameProcMain::ReleaseUIs()
 	m_pUINotice->Release();
 	m_pUIClassChange->Release();
 	m_pUINpcEvent->Release();
-	m_pUIItemREDlg->Release();
 	m_pUIRepairTooltip->Release();
 	m_pUIPartyOrForce->Release();
 	m_pUISkillTreeDlg->Release();
 	m_pUICmdListDlg->Release();
 	m_pUICmdEditDlg->Release();
 	m_pUIHotKeyDlg->Release();
-	m_pUINpcTalk->Release();
-//	m_pUITradeList->Release();
 	m_pUIKnightsOp->Release();			// 기사단 리스트 보기, 가입, 등...
 	m_pUIPartyBBS->Release();
 	m_pUIWareHouseDlg->Release();
@@ -3929,14 +3919,6 @@ void CGameProcMain::InitUI()
 	iY = (iH - (rc.bottom - rc.top))/2;
 	m_pUINpcEvent->SetPos(iX, iY);
 
-	m_pUINpcTalk->Init(s_pUIMgr);
-	m_pUINpcTalk->LoadFromFile(pTbl->szNpcTalk);
-	m_pUINpcTalk->SetVisibleWithNoSound(false);
-	rc = m_pUINpcTalk->GetRegion();
-	iX = (iW - (rc.right - rc.left))/2;
-	iY = (iH - (rc.bottom - rc.top))/2;
-	m_pUINpcTalk->SetPos(iX, iY);
-
 	m_pUIWarp->Init(s_pUIMgr);
 	m_pUIWarp->LoadFromFile(pTbl->szZoneChangeOrWarp);
 	m_pUIWarp->SetVisibleWithNoSound(false);
@@ -3945,25 +3927,6 @@ void CGameProcMain::InitUI()
 	iY = (iH - (rc.bottom - rc.top))/2;
 	m_pUIWarp->SetPos(iX, iY);
 	m_pUIWarp->SetStyle(UISTYLE_USER_MOVE_HIDE | UISTYLE_SHOW_ME_ALONE);
-
-//	m_pUITradeList->Init(s_pUIMgr);
-//	m_pUITradeList->LoadFromFile(pTbl->szNpcExchangeList);
-//	m_pUITradeList->SetVisibleWithNoSound(false);
-//	rc = m_pUITradeList->GetRegion();
-//	iX = (iW - (rc.right - rc.left))/2;
-//	iY = (iH - (rc.bottom - rc.top))/2;
-//	m_pUITradeList->SetPos(iX, iY);
-
-	m_pUIItemREDlg->Init(s_pUIMgr);
-	m_pUIItemREDlg->LoadFromFile(pTbl->szExchangeRepair);
-	m_pUIItemREDlg->SetVisibleWithNoSound(false);
-	rc = m_pUIItemREDlg->GetRegion();
-	iX = (iW - (rc.right - rc.left))/2;
-	iY = (iH - (rc.bottom - rc.top))/2;
-	m_pUIItemREDlg->SetPos(iX, iY);
-	m_pUIItemREDlg->InitIconWnd(UIWND_EXCHANGE_REPAIR);
-	m_pUIItemREDlg->SetUIType(UI_TYPE_ICON_MANAGER);
-	m_pUIItemREDlg->SetState(UI_STATE_COMMON_NONE);
 
 	m_pUIRepairTooltip->Init(s_pUIMgr);
 	m_pUIRepairTooltip->LoadFromFile(pTbl->szRepairTooltip);

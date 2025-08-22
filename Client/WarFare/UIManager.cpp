@@ -13,7 +13,6 @@
 #include "SubProcPerTrade.h"
 #include "CountableItemEditDlg.h"
 #include "UIMsgBoxOkCancel.h"
-#include "UIItemExchange.h"
 #include "UIWareHouseDlg.h"
 
 #include <N3Base/DFont.h>
@@ -351,10 +350,6 @@ bool CUIManager::BroadcastIconDropMsg(__IconItemSkill* spItem)
 
 			case UIWND_WARE_HOUSE:
 				CGameProcedure::s_pProcMain->m_pUIWareHouseDlg->CancelIconDrop(spItem);
-				break;
-
-			case UIWND_EXCHANGE_REPAIR:
-				CGameProcedure::s_pProcMain->m_pUIItemREDlg->CancelIconDrop(spItem);
 				break;
 		}
 	}

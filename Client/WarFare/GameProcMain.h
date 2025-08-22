@@ -41,7 +41,6 @@ public:
 	class CUINotice*			m_pUINotice;
 	class CUIClassChange*		m_pUIClassChange;
 	class CUINPCEvent*			m_pUINpcEvent;
-	class CUIItemExchange*		m_pUIItemREDlg;
 	class CUIRepairTooltipDlg*	m_pUIRepairTooltip;
 	class CUIWareHouseDlg*		m_pUIWareHouseDlg;
 	class CUIInn*				m_pUIInn;
@@ -66,7 +65,6 @@ public:
 	class CN3SndObjStream*		m_pSnd_Town, *m_pSnd_Battle;	//마을음악, 전투음악 포인터..
 	class CMagicSkillMng*		m_pMagicSkillMng;
 
-	class CUINpcTalk*			m_pUINpcTalk;	
 	class CUINPCChangeEvent*	m_pUINpcChange;
 	class CUIWarp*				m_pUIWarp;
 	class CWarMessage*			m_pWarMessage;					// 전쟁관련 메시지
