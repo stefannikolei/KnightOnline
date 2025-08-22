@@ -112,10 +112,10 @@ uint32_t CUIHotKeyDlg::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POI
 	// 드래그 되는 아이콘 갱신..
 	if ( GetState() == UI_STATE_ICON_MOVING ) 
 	{
-		if(CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo)
+		if(CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo)
 		{
-			CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
-			CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
+			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
+			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
 		}
 	}
 
@@ -142,9 +142,9 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			spSkill = GetHighlightIconItem((CN3UIIcon* )pSender);
 
 			// Save Select Info..
-			CN3UIWndBase::m_sSkillSelectInfo.UIWnd = UIWND_HOTKEY;
-			CN3UIWndBase::m_sSkillSelectInfo.iOrder = GetAreaiOrder();
-			CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = spSkill;
+			CN3UIWndBase::s_sSkillSelectInfo.UIWnd = UIWND_HOTKEY;
+			CN3UIWndBase::s_sSkillSelectInfo.iOrder = GetAreaiOrder();
+			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = spSkill;
 
 			// Calc Move Rect Offset..
 			if ( !CalcMoveOffset() )
@@ -154,8 +154,8 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		case UIMSG_ICON_DOWN:
 			if ( GetState()  == UI_STATE_ICON_MOVING )
 			{
-				CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
-				CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
+				CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
+				CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
 			}
 			break;
 
@@ -178,7 +178,7 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			if ( IsIn(ptCur.x, ptCur.y) )
 			{
 				int iOrder = GetAreaiOrder();
-				if ( CN3UIWndBase::m_sSkillSelectInfo.iOrder == iOrder )	// 실행..
+				if ( CN3UIWndBase::s_sSkillSelectInfo.iOrder == iOrder )	// 실행..
 				{
 					CN3UIArea* pArea;
 					pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, iOrder);
@@ -195,7 +195,7 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 					if ( iOrder == -1 )
 					{
 						// 리소스 Free..
-						spSkill = CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
+						spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 
 						// 매니저에서 제거..
 						RemoveChild(spSkill->pUIIcon);
@@ -206,8 +206,8 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 						spSkill->pUIIcon = NULL;
 						delete spSkill;
 						spSkill = NULL;
-						m_pMyHotkey[m_iCurPage][CN3UIWndBase::m_sSkillSelectInfo.iOrder] = NULL;
-						if(m_iCurPage == m_iSelectPage && CN3UIWndBase::m_sSkillSelectInfo.iOrder == m_iSelectIndex)
+						m_pMyHotkey[m_iCurPage][CN3UIWndBase::s_sSkillSelectInfo.iOrder] = NULL;
+						if(m_iCurPage == m_iSelectPage && CN3UIWndBase::s_sSkillSelectInfo.iOrder == m_iSelectIndex)
 						{
 							m_iSelectPage	= -1;
 							m_iSelectIndex	= -1;
@@ -235,11 +235,11 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 							m_pMyHotkey[m_iCurPage][iOrder] = NULL;
 						}
 
-						spSkill = m_pMyHotkey[m_iCurPage][CN3UIWndBase::m_sSkillSelectInfo.iOrder];
+						spSkill = m_pMyHotkey[m_iCurPage][CN3UIWndBase::s_sSkillSelectInfo.iOrder];
 						m_pMyHotkey[m_iCurPage][iOrder] = spSkill;
-						m_pMyHotkey[m_iCurPage][CN3UIWndBase::m_sSkillSelectInfo.iOrder] = NULL;
+						m_pMyHotkey[m_iCurPage][CN3UIWndBase::s_sSkillSelectInfo.iOrder] = NULL;
 
-						if(m_iCurPage == m_iSelectPage && CN3UIWndBase::m_sSkillSelectInfo.iOrder == m_iSelectIndex)
+						if(m_iCurPage == m_iSelectPage && CN3UIWndBase::s_sSkillSelectInfo.iOrder == m_iSelectIndex)
 						{
 							m_iSelectPage	= -1;
 							m_iSelectIndex	= -1;
@@ -260,7 +260,7 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			else		// 삭제..
 			{
 				// 리소스 Free..
-				spSkill = CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
+				spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 
 				// 매니저에서 제거..
 				RemoveChild(spSkill->pUIIcon);
@@ -271,9 +271,9 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				spSkill->pUIIcon = NULL;
 				delete spSkill;
 				spSkill = NULL;
-				m_pMyHotkey[m_iCurPage][CN3UIWndBase::m_sSkillSelectInfo.iOrder] = NULL;
+				m_pMyHotkey[m_iCurPage][CN3UIWndBase::s_sSkillSelectInfo.iOrder] = NULL;
 
-				if(m_iCurPage == m_iSelectPage && CN3UIWndBase::m_sSkillSelectInfo.iOrder == m_iSelectIndex)
+				if(m_iCurPage == m_iSelectPage && CN3UIWndBase::s_sSkillSelectInfo.iOrder == m_iSelectIndex)
 				{
 					m_iSelectPage	= -1;
 					m_iSelectIndex	= -1;
@@ -281,7 +281,7 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 				CloseIconRegistry();
 			}
-			CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = NULL;
+			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = NULL;
 			SetState(UI_STATE_COMMON_NONE);
 			break;
 
@@ -304,13 +304,13 @@ void CUIHotKeyDlg::Render()
 	for(UIListReverseItor itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
-		if ( (GetState() == UI_STATE_ICON_MOVING) && (pChild->UIType() == UI_TYPE_ICON) && (CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo) &&
-			((CN3UIIcon *)pChild == CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon) )	continue;
+		if ( (GetState() == UI_STATE_ICON_MOVING) && (pChild->UIType() == UI_TYPE_ICON) && (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo) &&
+			((CN3UIIcon *)pChild == CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon) )	continue;
 			pChild->Render();
 	}
 
-	if ( (GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo) )
-		CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->Render();		
+	if ( (GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo) )
+		CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->Render();		
 
 	if(m_iCurPage == m_iSelectPage && m_pMyHotkey[m_iSelectPage][m_iSelectIndex])
 	{
@@ -576,7 +576,7 @@ bool CUIHotKeyDlg::IsSelectedSkillInRealIconArea()
 			|| !pArea->IsIn(ptCur.x, ptCur.y))
 			continue;
 
-		if (m_sSkillSelectInfo.pSkillDoneInfo == nullptr)
+		if (s_sSkillSelectInfo.pSkillDoneInfo == nullptr)
 			return false;
 
 		SetReceiveSelectedSkill(i);
@@ -627,8 +627,8 @@ void CUIHotKeyDlg::SetReceiveSelectedSkill(int iIndex)
 	pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, iIndex);
 
 	// 그 다음에.. 그 자리에 
-	m_pMyHotkey[m_iCurPage][iIndex] = CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
-	m_pMyHotkey[m_iCurPage][iIndex]->szIconFN = CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->szIconFN;
+	m_pMyHotkey[m_iCurPage][iIndex] = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
+	m_pMyHotkey[m_iCurPage][iIndex]->szIconFN = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->szIconFN;
 	m_pMyHotkey[m_iCurPage][iIndex]->pUIIcon->SetRegion(pArea->GetRegion());
 	m_pMyHotkey[m_iCurPage][iIndex]->pUIIcon->SetMoveRect(pArea->GetRegion());
 	m_pMyHotkey[m_iCurPage][iIndex]->pUIIcon->SetParent(this);
@@ -835,7 +835,7 @@ bool CUIHotKeyDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 {
 	bool bFound = false;
 	// 내가 가졌던 아이콘이 아니면..
-	if ( CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd != UIWND_INVENTORY )
+	if ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd != UIWND_INVENTORY )
 		return false;
 	else
 	{
@@ -875,7 +875,7 @@ bool CUIHotKeyDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 			m_pMyHotkey[m_iCurPage][iOrder] = NULL;
 		}
 
-		spItem = CN3UIWndBase::m_sSelectedIconInfo.pItemSelect;
+		spItem = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect;
 
 		__TABLE_UPC_SKILL* pUSkill = CGameBase::s_pTbl_Skill.Find(spItem->pItemBasic->dwEffectID1);
 		if ( pUSkill == NULL ) return false;
@@ -917,10 +917,10 @@ bool CUIHotKeyDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 
 bool CUIHotKeyDlg::SetReceiveSelectedItem(int iIndex)
 {
-	if (CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd != UIWND_INVENTORY)
+	if (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd != UIWND_INVENTORY)
 		return false;
 
-	__IconItemSkill* spItem = CN3UIWndBase::m_sSelectedIconInfo.pItemSelect;
+	__IconItemSkill* spItem = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect;
 
 	__TABLE_UPC_SKILL* pUSkill = CGameBase::s_pTbl_Skill.Find(spItem->pItemBasic->dwEffectID1);
 	if (pUSkill == nullptr)

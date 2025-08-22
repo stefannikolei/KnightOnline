@@ -119,11 +119,11 @@ class CN3UIWndBase  : public CN3UIBase		// 가상 함수로 자식의 Area 갯�
 	void				PlayItemArmorSound();
 
 public:
-	static __InfoSelectedIcon		m_sSelectedIconInfo;
-	static __RecoveryJobInfo		m_sRecoveryJobInfo;
-	static __SkillSelectInfo		m_sSkillSelectInfo;
-	static CN3UIImage*				m_pSelectionImage;
-	static CCountableItemEditDlg*	m_pCountableItemEdit;
+	static __InfoSelectedIcon		s_sSelectedIconInfo;
+	static __RecoveryJobInfo		s_sRecoveryJobInfo;
+	static __SkillSelectInfo		s_sSkillSelectInfo;
+	static CN3UIImage*				s_pSelectionImage;
+	static CCountableItemEditDlg*	s_pCountableItemEdit;
 
 protected:
 	e_UIWND						m_eUIWnd;

@@ -50,8 +50,8 @@ CUISkillTreeDlg::CUISkillTreeDlg()
 			for( k = 0; k < MAX_SKILL_IN_PAGE; k++ )
 				m_pMySkillTree[i][j][k] = NULL;	
 			
-	CN3UIWndBase::m_sSkillSelectInfo.UIWnd = UIWND_HOTKEY;
-	CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = NULL;
+	CN3UIWndBase::s_sSkillSelectInfo.UIWnd = UIWND_HOTKEY;
+	CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = NULL;
 }
 
 CUISkillTreeDlg::~CUISkillTreeDlg()
@@ -68,10 +68,10 @@ CUISkillTreeDlg::~CUISkillTreeDlg()
 					m_pMySkillTree[i][j][k] = NULL;
 				}
 
-	if ( (CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo != NULL) && (CN3UIWndBase::m_sSkillSelectInfo.UIWnd == UIWND_SKILL_TREE) )
+	if ( (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo != NULL) && (CN3UIWndBase::s_sSkillSelectInfo.UIWnd == UIWND_SKILL_TREE) )
 	{
-		delete CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
-		CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = NULL;
+		delete CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
+		CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = NULL;
 	}*/
 }
 
@@ -100,10 +100,10 @@ void CUISkillTreeDlg::Release()
 		}
 	}
 
-	if ( (CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo != NULL) && (CN3UIWndBase::m_sSkillSelectInfo.UIWnd == UIWND_SKILL_TREE) )
+	if ( (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo != NULL) && (CN3UIWndBase::s_sSkillSelectInfo.UIWnd == UIWND_SKILL_TREE) )
 	{
-		delete CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
-		CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = NULL;
+		delete CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
+		CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = NULL;
 	}
 }
 
@@ -200,10 +200,10 @@ uint32_t CUISkillTreeDlg::MouseProc(uint32_t dwFlags, const POINT& ptCur, const 
 	// 드래그 되는 아이콘 갱신..
 	if ( GetState() == UI_STATE_ICON_MOVING ) 
 	{
-		if(CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo)
+		if(CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo)
 		{
-			CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
-			CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
+			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
+			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
 		}
 	}
 
@@ -328,12 +328,12 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 							spSkillCopy->pUIIcon->SetStyle(bitMask);
 
 							// Save Select Info..
-							CN3UIWndBase::m_sSkillSelectInfo.UIWnd = UIWND_SKILL_TREE;
-							CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = spSkillCopy;
+							CN3UIWndBase::s_sSkillSelectInfo.UIWnd = UIWND_SKILL_TREE;
+							CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = spSkillCopy;
 
 							pDlg->SetReceiveSelectedSkill(iIndex);
 
-							CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = NULL;
+							CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = NULL;
 							pDlg->CloseIconRegistry();
 						}
 					}
@@ -366,17 +366,17 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			spSkillCopy->pUIIcon->SetMoveRect(GetSampleRect());
 
 			// Save Select Info..
-			CN3UIWndBase::m_sSkillSelectInfo.UIWnd = UIWND_SKILL_TREE;
-			CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = spSkillCopy;
+			CN3UIWndBase::s_sSkillSelectInfo.UIWnd = UIWND_SKILL_TREE;
+			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = spSkillCopy;
 			break;
 
 		case UIMSG_ICON_DOWN:
 			if ( GetState()  == UI_STATE_ICON_MOVING )
 			{
-				if(CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo)
+				if(CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo)
 				{
-					CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
-					CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
+					CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
+					CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
 				}
 			}
 			break;
@@ -390,7 +390,7 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 					if (!pDlg->IsSelectedSkillInRealIconArea())
 					{
 						// 리소스 Free..
-						spSkill = CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
+						spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 						if (spSkill)
 						{
 							// 매니저에서 제거..
@@ -408,7 +408,7 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				else
 				{
 					// 리소스 Free..
-					spSkill = CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
+					spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 					if (spSkill)
 					{
 						// 매니저에서 제거..
@@ -423,7 +423,7 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 					}
 				}
 
-				CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = NULL;
+				CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = NULL;
 				SetState(UI_STATE_COMMON_NONE);
 				pDlg->CloseIconRegistry();
 			}
@@ -753,8 +753,8 @@ void CUISkillTreeDlg::Render()
 	for(UIListReverseItor itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
-		if ( (GetState() == UI_STATE_ICON_MOVING) && (pChild->UIType() == UI_TYPE_ICON) && (CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo) &&
-			((CN3UIIcon *)pChild == CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon) )	
+		if ( (GetState() == UI_STATE_ICON_MOVING) && (pChild->UIType() == UI_TYPE_ICON) && (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo) &&
+			((CN3UIIcon *)pChild == CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon) )	
 			continue;
 		pChild->Render();
 		if ( (pChild->UIType() == UI_TYPE_ICON) && (pChild->GetStyle() & UISTYLE_ICON_HIGHLIGHT) && 
@@ -767,8 +767,8 @@ void CUISkillTreeDlg::Render()
 
 	CheckButtonTooltipRenderEnable();
 
-	if ( (GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo) ) 
-		CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->Render();		
+	if ( (GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo) ) 
+		CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->Render();		
 }
 
 void CUISkillTreeDlg::CheckButtonTooltipRenderEnable()
@@ -1524,7 +1524,7 @@ void CUISkillTreeDlg::Close()
 {
 	// 리소스 Free..
 	__IconItemSkill* spSkill = NULL;
-	spSkill = CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
+	spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 	if (spSkill)
 	{
 		// 매니저에서 제거..
@@ -1537,7 +1537,7 @@ void CUISkillTreeDlg::Close()
 		delete spSkill;
 		spSkill = NULL;
 	}
-	CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = NULL;
+	CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = NULL;
 	SetState(UI_STATE_COMMON_NONE);
 	CN3UIWndBase::AllHighLightIconFree();
 

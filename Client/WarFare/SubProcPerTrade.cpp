@@ -695,21 +695,21 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 				case PER_TRADE_ITEM_OTHER:
 					{
 						// 전에 작업한 아이템 종류가 아이템인 경우..
-						if( (m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->
+						if( (m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->
 							pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) ||
-							(m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->
+							(m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->
 							pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL) )
 						{
 							// 활이나 물약등 아이템인 경우..
 							bool bFound = false;
 
 							// 인벤토리에 아이템이 없어진 경우.. 만든다..
-							if ( !m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder] )
+							if ( !m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] )
 							{
 								bFound = true;
 								// 인벤토리에 만들고 아이템의 갯수를 정해준다..
 								__IconItemSkill *spItem, *spItemNew = NULL;
-								spItem = m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
+								spItem = m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 
 								// 아이콘이 없으면 아이콘을 만드록 갯수는 0으로..
 								spItemNew				= new __IconItemSkill;
@@ -729,32 +729,32 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 								spItemNew->pUIIcon->SetStyle(UISTYLE_ICON_ITEM|UISTYLE_ICON_CERTIFICATION_NEED);
 								spItemNew->pUIIcon->SetVisible(true);
 								CN3UIArea* pArea;
-								pArea = m_pUIPerTradeDlg->GetChildAreaByiOrder(UI_AREA_TYPE_PER_TRADE_INV, CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder);
+								pArea = m_pUIPerTradeDlg->GetChildAreaByiOrder(UI_AREA_TYPE_PER_TRADE_INV, CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder);
 								if ( pArea )
 								{
 									spItemNew->pUIIcon->SetRegion(pArea->GetRegion());
 									spItemNew->pUIIcon->SetMoveRect(pArea->GetRegion());
 								}
 
-								m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItemNew;
+								m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItemNew;
 
 								// 내 거래창의 아이템이 있는 경우 .. 갯수 갱신..
 								if ( m_pUIPerTradeDlg->m_iBackupiCount != 
-									m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount )
+									m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount )
 								{
-									m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount
+									m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount
 										-= m_pUIPerTradeDlg->m_iBackupiCount;
 								}
 							}
 
 							// 아이콘이 내 거래창의 슬롯에 생긴경우.. 삭제한다..
 							if ( m_pUIPerTradeDlg->m_iBackupiCount == 
-								m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount )
+								m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount )
 							{
 								bFound = true;
 
 								__IconItemSkill* spItem;
-								spItem = m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
+								spItem = m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 
 								// 매니저에서 제거..
 								m_pUIPerTradeDlg->RemoveChild(spItem->pUIIcon);
@@ -765,12 +765,12 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 								spItem->pUIIcon = NULL;
 								delete spItem;
 								spItem = NULL;
-								m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = NULL;
+								m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = NULL;
 
 								// 인벤토리에 아이템이 있는 경우.. 갯수 갱신..
-								if ( m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder] )
+								if ( m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] )
 								{
-									m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount
+									m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount
 										+= m_pUIPerTradeDlg->m_iBackupiCount;
 								}
 							}
@@ -779,27 +779,27 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 							if ( !bFound)
 							{
 								// 내 거래창과 인벤토리의 아이템의 갯수를 정해준다..
-								m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount
+								m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount
 									+= m_pUIPerTradeDlg->m_iBackupiCount;
 
-								m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount
+								m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount
 									-= m_pUIPerTradeDlg->m_iBackupiCount;
 							}
 						}
 						else
 						{
 							__IconItemSkill* spItem;
-							spItem = CN3UIWndBase::m_sRecoveryJobInfo.pItemSource;
+							spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource;
 							spItem->pUIIcon->SetParent(m_pUIPerTradeDlg);
 
 							// 인벤토리 윈도우에 세팅하고..
-							m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItem;
+							m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItem;
 
 							// 내 거래 윈도우에서 클리어..
-							m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = NULL;
+							m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = NULL;
 
 							CN3UIArea* pArea;
-							pArea = m_pUIPerTradeDlg->GetChildAreaByiOrder(UI_AREA_TYPE_PER_TRADE_INV, CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder);
+							pArea = m_pUIPerTradeDlg->GetChildAreaByiOrder(UI_AREA_TYPE_PER_TRADE_INV, CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder);
 							if ( pArea )
 							{
 								spItem->pUIIcon->SetRegion(pArea->GetRegion());

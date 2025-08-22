@@ -70,7 +70,7 @@ uint32_t CUIManager::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT
 		if ( CGameProcedure::s_pProcMain && CGameProcedure::s_pProcMain->m_pUITransactionDlg && 
 			(CGameProcedure::s_pProcMain->m_pUITransactionDlg->IsVisible()))// && (pChild->UIType() != UI_TYPE_ICON_MANAGER) )
 		{	
-			if ( CN3UIWndBase::m_pCountableItemEdit->IsLocked() )
+			if ( CN3UIWndBase::s_pCountableItemEdit->IsLocked() )
 			{
 				if ( pChild->m_szID.compare("base_tradeedit") != 0 )
 					{	++itor; continue;	}
@@ -80,7 +80,7 @@ uint32_t CUIManager::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT
 		if ( CGameProcedure::s_pProcMain && CGameProcedure::s_pProcMain->m_pUIWareHouseDlg && 
 			(CGameProcedure::s_pProcMain->m_pUIWareHouseDlg->IsVisible()))// && (pChild->UIType() != UI_TYPE_ICON_MANAGER) )
 		{	
-			if ( CN3UIWndBase::m_pCountableItemEdit->IsLocked() )
+			if ( CN3UIWndBase::s_pCountableItemEdit->IsLocked() )
 			{
 				if ( pChild->m_szID.compare("base_tradeedit") != 0 )
 					{	++itor; continue;	}
@@ -96,7 +96,7 @@ uint32_t CUIManager::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT
 					{	++itor; continue;	}
 			}
 
-			if ( CN3UIWndBase::m_pCountableItemEdit->IsLocked() )
+			if ( CN3UIWndBase::s_pCountableItemEdit->IsLocked() )
 			{
 				if ( pChild->m_szID.compare("base_tradeedit") != 0 )
 					{	++itor; continue;	}
@@ -339,7 +339,7 @@ bool CUIManager::BroadcastIconDropMsg(__IconItemSkill* spItem)
 	// 어느 누구의 영역에도 속하지 않으면.. 해당 아이콘을 가진 윈도우에게 Cancel 메시지를 날려 준다..
 	if ( !bFound )
 	{
-		switch ( CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd )
+		switch ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd )
 		{
 			case UIWND_INVENTORY:
 				CGameProcedure::s_pProcMain->m_pUIInventory->CancelIconDrop(spItem);
