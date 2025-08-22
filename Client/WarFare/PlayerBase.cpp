@@ -268,7 +268,7 @@ void CPlayerBase::SetSoundAndInitFont(uint32_t dwFontFlag)
 		m_pIDFont->InitDeviceObjects( s_lpD3DDev );
 		m_pIDFont->RestoreDeviceObjects();
 
-		m_pIDFont->SetText(m_InfoBase.szID.c_str()); // 폰트에 텍스트 지정.
+		m_pIDFont->SetText(m_InfoBase.szID); // 폰트에 텍스트 지정.
 		m_pIDFont->SetFontColor(m_InfoBase.crID);
 	}
 }
