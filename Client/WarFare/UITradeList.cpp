@@ -42,17 +42,17 @@ bool CUITradeList::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-	m_pScrollbar = (CN3UIScrollBar*)GetChildByID("scroll");//	__ASSERT(m_pScrollbar, "NULL UI Component!!");
+	m_pScrollbar = GetChildByID<CN3UIScrollBar>("scroll");//	__ASSERT(m_pScrollbar, "NULL UI Component!!");
 
-	m_pStr_List[0] = (CN3UIString*)GetChildByID("string_list0");//	__ASSERT(m_pStr_List[0], "NULL UI Component!!");
-	m_pStr_List[1] = (CN3UIString*)GetChildByID("string_list1");//	__ASSERT(m_pStr_List[1], "NULL UI Component!!");
-	m_pStr_List[2] = (CN3UIString*)GetChildByID("string_list2");//	__ASSERT(m_pStr_List[2], "NULL UI Component!!");
-	m_pStr_List[3] = (CN3UIString*)GetChildByID("string_list3");//	__ASSERT(m_pStr_List[3], "NULL UI Component!!");
-	m_pStr_List[4] = (CN3UIString*)GetChildByID("string_list4");//	__ASSERT(m_pStr_List[4], "NULL UI Component!!");
-	m_pStr_List[5] = (CN3UIString*)GetChildByID("string_list5");//	__ASSERT(m_pStr_List[5], "NULL UI Component!!");
-	m_pStr_List[6] = (CN3UIString*)GetChildByID("string_list6");//	__ASSERT(m_pStr_List[6], "NULL UI Component!!");
-	m_pStr_List[7] = (CN3UIString*)GetChildByID("string_list7");//	__ASSERT(m_pStr_List[7], "NULL UI Component!!");
-	m_pStr_List[8] = (CN3UIString*)GetChildByID("string_list8");//	__ASSERT(m_pStr_List[8], "NULL UI Component!!");
+	m_pStr_List[0] = GetChildByID<CN3UIString>("string_list0");//	__ASSERT(m_pStr_List[0], "NULL UI Component!!");
+	m_pStr_List[1] = GetChildByID<CN3UIString>("string_list1");//	__ASSERT(m_pStr_List[1], "NULL UI Component!!");
+	m_pStr_List[2] = GetChildByID<CN3UIString>("string_list2");//	__ASSERT(m_pStr_List[2], "NULL UI Component!!");
+	m_pStr_List[3] = GetChildByID<CN3UIString>("string_list3");//	__ASSERT(m_pStr_List[3], "NULL UI Component!!");
+	m_pStr_List[4] = GetChildByID<CN3UIString>("string_list4");//	__ASSERT(m_pStr_List[4], "NULL UI Component!!");
+	m_pStr_List[5] = GetChildByID<CN3UIString>("string_list5");//	__ASSERT(m_pStr_List[5], "NULL UI Component!!");
+	m_pStr_List[6] = GetChildByID<CN3UIString>("string_list6");//	__ASSERT(m_pStr_List[6], "NULL UI Component!!");
+	m_pStr_List[7] = GetChildByID<CN3UIString>("string_list7");//	__ASSERT(m_pStr_List[7], "NULL UI Component!!");
+	m_pStr_List[8] = GetChildByID<CN3UIString>("string_list8");//	__ASSERT(m_pStr_List[8], "NULL UI Component!!");
 
 	return true;
 }

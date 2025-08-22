@@ -68,8 +68,8 @@ bool CUIPartyBBSSelector::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-	m_pBtn_WantPartyMember	= (CN3UIButton*)GetChildByID("Btn_WantParty");			__ASSERT(m_pBtn_WantPartyMember,	"NULL UI Component!!");
-	m_pBtn_WantParty		= (CN3UIButton*)GetChildByID("Btn_WantPartyMember");	__ASSERT(m_pBtn_WantParty,	"NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_WantPartyMember, GetChildByID<CN3UIButton>("Btn_WantParty"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_WantParty, GetChildByID<CN3UIButton>("Btn_WantPartyMember"));
 
 	return true;
 }

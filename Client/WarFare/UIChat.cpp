@@ -258,9 +258,9 @@ void CUIChat::CreateLines()
 bool CUIChat::Load(HANDLE hFile)
 {
 	if (false == CN3UIBase::Load(hFile)) return false;
-	m_pChatOut		= (CN3UIString*)GetChildByID("text0");				__ASSERT(m_pChatOut, "NULL UI Component!!");
-	m_pScrollbar	= (CN3UIScrollBar*)GetChildByID("scroll");			__ASSERT(m_pScrollbar, "NULL UI Component!!");
-	m_pNoticeTitle	= (CN3UIString*)GetChildByID("text_notice_title");	__ASSERT(m_pNoticeTitle, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pChatOut, GetChildByID<CN3UIString>("text0"));
+	N3_VERIFY_UI_COMPONENT(m_pScrollbar, GetChildByID<CN3UIScrollBar>("scroll"));
+	N3_VERIFY_UI_COMPONENT(m_pNoticeTitle, GetChildByID<CN3UIString>("text_notice_title"));
 
 	m_rcChatOutRegion = m_pChatOut->GetRegion();
 	CreateLines();
@@ -268,18 +268,18 @@ bool CUIChat::Load(HANDLE hFile)
 	__ASSERT(0<m_iChatLineCount,"채팅창이 너무 작아요");
 
 	//son, chat_in
-	m_pEdit = (CN3UIEdit*)GetChildByID("edit0");				__ASSERT(m_pEdit, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pEdit, GetChildByID<CN3UIEdit>("edit0"));
 	m_pEdit->SetMaxString(256); // 채팅 문자열 길이 제한..
 	//son, chat_in
 
-	m_pBtn_Normal			= GetChildByID("btn_normal");			__ASSERT(m_pBtn_Normal, "NULL UI Component!!");
-	m_pBtn_Private			= GetChildByID("btn_private");			__ASSERT(m_pBtn_Private, "NULL UI Component!!");
-	m_pBtn_PartyOrForce		= GetChildByID("btn_party_force");		__ASSERT(m_pBtn_PartyOrForce, "NULL UI Component!!");
-	//m_pBtn_KnightsOrGuild = GetChildByID("btn_knights_guild");	__ASSERT(m_pBtn_KnightsOrGuild, "NULL UI Component!!");
-	m_pBtn_KnightsOrGuild	= GetChildByID("btn_knights");			__ASSERT(m_pBtn_KnightsOrGuild, "NULL UI Component!!");
-	m_pBtn_Shout			= GetChildByID("btn_shout");			__ASSERT(m_pBtn_Shout, "NULL UI Component!!");
-	m_pBtn_Check			= GetChildByID("btn_check_normal");		__ASSERT(m_pBtn_Check, "NULL UI Component!!");
-	m_pBtn_Fold				= GetChildByID("btn_off");				__ASSERT(m_pBtn_Fold, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Normal, GetChildByID("btn_normal"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Private, GetChildByID("btn_private"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_PartyOrForce, GetChildByID("btn_party_force"));
+	//N3_VERIFY_UI_COMPONENT(m_pBtn_KnightsOrGuild, GetChildByID("btn_knights_guild"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_KnightsOrGuild, GetChildByID("btn_knights"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Shout, GetChildByID("btn_shout"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Check, GetChildByID("btn_check_normal"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Fold, GetChildByID("btn_off"));
 
 	this->ChangeChattingMode(N3_CHAT_NORMAL); // 보통 채팅 모드이다..
 
@@ -826,7 +826,7 @@ CUIChat2::CUIChat2()
 bool CUIChat2::Load(HANDLE hFile)
 {
 	if (false == CN3UIBase::Load(hFile)) return false;
-	m_pBtn_Fold = GetChildByID("btn_on");			__ASSERT(m_pBtn_Fold, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Fold, GetChildByID("btn_on"));
 	return true;
 }
 

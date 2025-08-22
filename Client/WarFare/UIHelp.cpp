@@ -43,7 +43,7 @@ bool CUIHelp::Load(HANDLE hFile)
 	for (int i = 0; i < MAX_HELP_PAGE; i++)
 	{
 		szID = fmt::format("Page{}", i);
-		m_pPages[i] = GetChildByID(szID);
+		N3_VERIFY_UI_COMPONENT(m_pPages[i], GetChildByID(szID));
 		if (m_pPages[i] != nullptr)
 		{
 			m_pPages[i]->SetVisible(0 == iPageCount);

@@ -110,7 +110,7 @@ void CSubProcPerTrade::InitPerTradeDlg(CUIManager* pUIManager)
 	m_pUITradeEditDlg->SetState(UI_STATE_COMMON_NONE);
 
 	// 일단은 돈 아이콘으로 픽스.. ^^
-	m_pUITradeEditDlg->m_pArea = (CN3UIArea *)m_pUITradeEditDlg->GetChildByID("area_trade_icon");	__ASSERT(m_pUITradeEditDlg->m_pArea, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pUITradeEditDlg->m_pArea, m_pUITradeEditDlg->GetChildByID<CN3UIArea >("area_trade_icon"));
 
 	m_pUITradeEditDlg->m_pImageOfIcon = new CN3UIImage;
 	m_pUITradeEditDlg->m_pImageOfIcon->Init(m_pUITradeEditDlg);
@@ -199,15 +199,19 @@ void CSubProcPerTrade::SecureCodeBegin()
 	// 5.인풋을 막는다..	-> 해당 부분..	ok	(키입력과 메시지..)
 
 	// 6.거래창의 편집 Control의 값을 Clear..
-	CN3UIString* pStrMy = (CN3UIString* )m_pUIPerTradeDlg->GetChildByID("string_money_my");			__ASSERT(pStrMy, "NULL UI Component!!");
-	CN3UIString* pStrOther = (CN3UIString* )m_pUIPerTradeDlg->GetChildByID("string_money_other");	__ASSERT(pStrOther, "NULL UI Component!!");
+	CN3UIString* pStrMy = nullptr, *pStrOther = nullptr;
+	N3_VERIFY_UI_COMPONENT(pStrMy, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_my"));
 	pStrMy->SetString("0");
+
+	N3_VERIFY_UI_COMPONENT(pStrOther, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_other"));
 	pStrOther->SetString("0");
 
 	// 7.개인 거래 창의 처크 버튼들 원래대로..
-	CN3UIButton* pButtonMy = (CN3UIButton* )m_pUIPerTradeDlg->GetChildByID("btn_trade_my");			__ASSERT(pButtonMy, "NULL UI Component!!");
+	CN3UIButton* pButtonMy = nullptr, *pButtonOther = nullptr;
+	N3_VERIFY_UI_COMPONENT(pButtonMy, m_pUIPerTradeDlg->GetChildByID<CN3UIButton>("btn_trade_my"));
 	pButtonMy->SetState(UI_STATE_BUTTON_NORMAL);
-	CN3UIButton* pButtonOther = (CN3UIButton* )m_pUIPerTradeDlg->GetChildByID("btn_trade_other");	__ASSERT(pButtonOther, "NULL UI Component!!");
+
+	N3_VERIFY_UI_COMPONENT(pButtonOther, m_pUIPerTradeDlg->GetChildByID<CN3UIButton>("btn_trade_other"));
 	pButtonOther->SetState(UI_STATE_BUTTON_NORMAL);
 
 	// 8.상대방 거래 버튼은 Click할 수 없다. uif 자체 기능..
@@ -286,7 +290,8 @@ void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..
 	{
 		// 먼저 돈을 검사 한다..
 		// 거래 창의 내 현재 돈을 얻어 온다..
-		CN3UIString* pStrMy = (CN3UIString* )m_pUIPerTradeDlg->GetChildByID("string_money_my");		__ASSERT(pStrMy, "NULL UI Component!!");
+		CN3UIString* pStrMy = nullptr;
+		N3_VERIFY_UI_COMPONENT(pStrMy, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_my"));
 		str = pStrMy->GetString();
 		iGold = atoi(str.c_str());
 
@@ -523,7 +528,8 @@ void CSubProcPerTrade::ItemCountEditOK()
 		iMyMoney;		// 인벤토리의 값..
 
 	// 거래 창의 내 현재 돈을 얻어 온다..
-	CN3UIString* pStrMy = (CN3UIString* )m_pUIPerTradeDlg->GetChildByID("string_money_my");	 __ASSERT(pStrMy, "NULL UI Component!!");
+	CN3UIString* pStrMy = nullptr;
+	N3_VERIFY_UI_COMPONENT(pStrMy, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_my"));
 	str = pStrMy->GetString();
 	iGold = atoi(str.c_str());
 
@@ -625,7 +631,8 @@ void CSubProcPerTrade::SecureJobStuffByMyDecision()
 
 void CSubProcPerTrade::PerTradeOtherDecision()						// 다른 사람이 거래를 결정 했다..
 {
-	CN3UIButton* pButtonOther = (CN3UIButton* )m_pUIPerTradeDlg->GetChildByID("btn_trade_other");	 __ASSERT(pButtonOther, "NULL UI Component!!");
+	CN3UIButton* pButtonOther = nullptr;
+	N3_VERIFY_UI_COMPONENT(pButtonOther, m_pUIPerTradeDlg->GetChildByID<CN3UIButton>("btn_trade_other"));
 	pButtonOther->SetState(UI_STATE_BUTTON_DISABLE);
 }
 
@@ -672,7 +679,8 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 				case PER_TRADE_ITEM_MONEY:
 					{
 						// 거래 창의 내 현재 돈을 얻어 온다..
-						CN3UIString* pStrMy = (CN3UIString* )m_pUIPerTradeDlg->GetChildByID("string_money_my");	 __ASSERT(pStrMy, "NULL UI Component!!");
+						CN3UIString* pStrMy = nullptr;
+						N3_VERIFY_UI_COMPONENT(pStrMy, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_my"));
 						str = pStrMy->GetString();
 						iGold = atoi(str.c_str());
 
@@ -821,7 +829,8 @@ void CSubProcPerTrade::ReceiveMsgPerTradeOtherAdd(int iItemID, int iCount, int i
 	if ( iItemID == dwGold )
 	{
 		// 거래 창의 다른 사람의 현재 돈을 얻어 온다..
-		CN3UIString* pStrOther = (CN3UIString* )m_pUIPerTradeDlg->GetChildByID("string_money_other");	 __ASSERT(pStrOther, "NULL UI Component!!");
+		CN3UIString* pStrOther = nullptr;
+		N3_VERIFY_UI_COMPONENT(pStrOther, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_other"));
 		str = pStrOther->GetString();
 		iGold = atoi(str.c_str());
 		

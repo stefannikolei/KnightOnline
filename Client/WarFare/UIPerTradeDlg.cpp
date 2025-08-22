@@ -219,7 +219,7 @@ void CUIPerTradeDlg::InitIconWnd(e_UIWND eWnd)
 	pButton = (CN3UIButton* )GetChildButtonByName(szFN);
 	if(pButton) pButton->SetState(UI_STATE_BUTTON_NORMAL);
 
-	m_pStrMyGold    = (CN3UIString* )GetChildByID("string_money_inv"); __ASSERT(m_pStrMyGold, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pStrMyGold, GetChildByID<CN3UIString>("string_money_inv"));
 	if(m_pStrMyGold)
 		m_pStrMyGold->SetString("0");
 }

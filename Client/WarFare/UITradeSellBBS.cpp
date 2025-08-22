@@ -69,28 +69,27 @@ bool CUITradeSellBBS::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-//	m_pList_Infos			= (CN3UIList*)(this->GetChildByID("List_Friends"));		__ASSERT(m_pList_Infos, "NULL UI Component!!!");
-	m_pBtn_PageUp			= (CN3UIButton*)(this->GetChildByID("btn_page_up"));	__ASSERT(m_pBtn_PageUp, "NULL UI Component!!!");
-	m_pBtn_PageDown			= (CN3UIButton*)(this->GetChildByID("btn_page_down"));	__ASSERT(m_pBtn_PageDown, "NULL UI Component!!!");
-	m_pBtn_Refresh			= (CN3UIButton*)(this->GetChildByID("btn_refresh"));	__ASSERT(m_pBtn_Refresh, "NULL UI Component!!!");
-	m_pBtn_Close			= (CN3UIButton*)(this->GetChildByID("btn_exit"));		__ASSERT(m_pBtn_Close, "NULL UI Component!!!");
-	m_pBtn_Register			= (CN3UIButton*)(this->GetChildByID("btn_add"));		__ASSERT(m_pBtn_Register, "NULL UI Component!!!");
-	m_pBtn_Whisper			= (CN3UIButton*)(this->GetChildByID("btn_whisper"));	__ASSERT(m_pBtn_Whisper, "NULL UI Component!!!");
-	m_pBtn_Trade			= (CN3UIButton*)(this->GetChildByID("btn_sale"));		__ASSERT(m_pBtn_Trade, "NULL UI Component!!!");
-	m_pBtn_RegisterCancel	= (CN3UIButton*)(this->GetChildByID("btn_delete"));		__ASSERT(m_pBtn_RegisterCancel, "NULL UI Component!!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_PageUp, GetChildByID<CN3UIButton>("btn_page_up"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_PageDown, GetChildByID<CN3UIButton>("btn_page_down"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Refresh, GetChildByID<CN3UIButton>("btn_refresh"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Close, GetChildByID<CN3UIButton>("btn_exit"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Register, GetChildByID<CN3UIButton>("btn_add"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Whisper, GetChildByID<CN3UIButton>("btn_whisper"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Trade, GetChildByID<CN3UIButton>("btn_sale"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_RegisterCancel, GetChildByID<CN3UIButton>("btn_delete"));
 
-	m_pImage_Sell			= (CN3UIImage*)(this->GetChildByID("img_sell gold"));	__ASSERT(m_pImage_Sell, "NULL UI Component!!!");
-	m_pImage_Buy			= (CN3UIImage*)(this->GetChildByID("img_buy gold"));	__ASSERT(m_pImage_Buy, "NULL UI Component!!!");
-	m_pImage_Sell_Title		= (CN3UIImage*)(this->GetChildByID("img_sell"));		__ASSERT(m_pImage_Sell_Title, "NULL UI Component!!!");
-	m_pImage_Buy_Title		= (CN3UIImage*)(this->GetChildByID("img_buy"));			__ASSERT(m_pImage_Buy_Title, "NULL UI Component!!!");
+	N3_VERIFY_UI_COMPONENT(m_pImage_Sell, GetChildByID<CN3UIImage>("img_sell gold"));
+	N3_VERIFY_UI_COMPONENT(m_pImage_Buy, GetChildByID<CN3UIImage>("img_buy gold"));
+	N3_VERIFY_UI_COMPONENT(m_pImage_Sell_Title, GetChildByID<CN3UIImage>("img_sell"));
+	N3_VERIFY_UI_COMPONENT(m_pImage_Buy_Title, GetChildByID<CN3UIImage>("img_buy"));
 
-	m_pString_Page			= (CN3UIString*)(this->GetChildByID("string_page"));	__ASSERT(m_pString_Page, "NULL UI Component!!!");
+	N3_VERIFY_UI_COMPONENT(m_pString_Page, GetChildByID<CN3UIString>("string_page"));
 
 	std::string szID;
 	for(int i = 0; i < TRADE_BBS_MAXSTRING; i++)
 	{
 		szID = fmt::format("text_{:02}", i);
-		m_pText[i] = (CN3UIString*) GetChildByID(szID);
+		N3_VERIFY_UI_COMPONENT(m_pText[i], GetChildByID<CN3UIString>(szID));
 	}
 
 	m_iCurPage = 0; // 현재 페이지..

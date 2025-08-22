@@ -57,13 +57,13 @@ bool CUIMessageBox::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 	
-	m_pBtn_OK = (CN3UIButton*)GetChildByID("Btn_OK"); __ASSERT(m_pBtn_OK, "NULL UI Component!!");
-	m_pBtn_Yes = (CN3UIButton*)GetChildByID("Btn_Yes"); __ASSERT(m_pBtn_Yes, "NULL UI Component!!");
-	m_pBtn_No = (CN3UIButton*)GetChildByID("Btn_No"); __ASSERT(m_pBtn_No, "NULL UI Component!!");
-	m_pBtn_Cancel = (CN3UIButton*)GetChildByID("Btn_Cancel"); __ASSERT(m_pBtn_Cancel, "NULL UI Component!!");
-	m_pText_Message = (CN3UIString*)GetChildByID("Text_Message"); __ASSERT(m_pText_Message, "NULL UI Component!!");
-	m_pText_Title = (CN3UIString*)GetChildByID("Text_Title"); __ASSERT(m_pText_Title, "NULL UI Component!!");
-	m_pEdit_Common = (CN3UIEdit*)GetChildByID("Edit_Common"); __ASSERT(m_pEdit_Common, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_OK, GetChildByID<CN3UIButton>("Btn_OK"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Yes, GetChildByID<CN3UIButton>("Btn_Yes"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_No, GetChildByID<CN3UIButton>("Btn_No"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Cancel, GetChildByID<CN3UIButton>("Btn_Cancel"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Message, GetChildByID<CN3UIString>("Text_Message"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Title, GetChildByID<CN3UIString>("Text_Title"));
+	N3_VERIFY_UI_COMPONENT(m_pEdit_Common, GetChildByID<CN3UIEdit>("Edit_Common"));
 
 	return true;
 }

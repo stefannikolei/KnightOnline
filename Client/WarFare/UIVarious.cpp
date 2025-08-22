@@ -131,47 +131,47 @@ bool CUIState::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-	m_pText_ID			= (CN3UIString*)GetChildByID("Text_ID");			__ASSERT(m_pText_ID	, "NULL UI Component!!");
-	m_pText_Level		= (CN3UIString*)GetChildByID("Text_Level");			__ASSERT(m_pText_Level	, "NULL UI Component!!");
-	m_pText_RealmPoint	= (CN3UIString*)GetChildByID("Text_RealmPoint");	__ASSERT(m_pText_RealmPoint, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pText_ID, GetChildByID<CN3UIString>("Text_ID"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Level, GetChildByID<CN3UIString>("Text_Level"));
+	N3_VERIFY_UI_COMPONENT(m_pText_RealmPoint, GetChildByID<CN3UIString>("Text_RealmPoint"));
 
-	m_pText_Class		= (CN3UIString*)GetChildByID("Text_Class");		__ASSERT(m_pText_Class	, "NULL UI Component!!");
-	m_pText_Race		= (CN3UIString*)GetChildByID("Text_Race");		__ASSERT(m_pText_Race		, "NULL UI Component!!");
-	m_pText_Nation		= (CN3UIString*)GetChildByID("Text_Nation");	__ASSERT(m_pText_Nation	, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pText_Class, GetChildByID<CN3UIString>("Text_Class"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Race, GetChildByID<CN3UIString>("Text_Race"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Nation, GetChildByID<CN3UIString>("Text_Nation"));
 
-	m_pText_HP			= (CN3UIString*)GetChildByID("Text_HP");		__ASSERT(m_pText_HP		, "NULL UI Component!!");
-	m_pText_MP			= (CN3UIString*)GetChildByID("Text_MP");		__ASSERT(m_pText_MP		, "NULL UI Component!!");
-	m_pText_Exp			= (CN3UIString*)GetChildByID("Text_Exp");		__ASSERT(m_pText_Exp		, "NULL UI Component!!");
-	m_pText_AP			= (CN3UIString*)GetChildByID("Text_AP");		__ASSERT(m_pText_AP		, "NULL UI Component!!");
-	m_pText_GP			= (CN3UIString*)GetChildByID("Text_GP");		__ASSERT(m_pText_GP		, "NULL UI Component!!");
-	m_pText_Weight		= (CN3UIString*)GetChildByID("Text_Weight");	__ASSERT(m_pText_Weight	, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pText_HP, GetChildByID<CN3UIString>("Text_HP"));
+	N3_VERIFY_UI_COMPONENT(m_pText_MP, GetChildByID<CN3UIString>("Text_MP"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Exp, GetChildByID<CN3UIString>("Text_Exp"));
+	N3_VERIFY_UI_COMPONENT(m_pText_AP, GetChildByID<CN3UIString>("Text_AP"));
+	N3_VERIFY_UI_COMPONENT(m_pText_GP, GetChildByID<CN3UIString>("Text_GP"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Weight, GetChildByID<CN3UIString>("Text_Weight"));
 
-	m_pText_BonusPoint		= (CN3UIString*)GetChildByID("Text_BonusPoint"); __ASSERT(m_pText_BonusPoint	, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pText_BonusPoint, GetChildByID<CN3UIString>("Text_BonusPoint"));
 
-	m_pBtn_Strength		= (CN3UIButton*)GetChildByID("Btn_Strength");		__ASSERT(m_pBtn_Strength	, "NULL UI Component!!");
-	m_pBtn_Stamina		= (CN3UIButton*)GetChildByID("Btn_Stamina");		__ASSERT(m_pBtn_Stamina	, "NULL UI Component!!");
-	m_pBtn_Dexterity	= (CN3UIButton*)GetChildByID("Btn_Dexterity");		__ASSERT(m_pBtn_Dexterity	, "NULL UI Component!!");
-	m_pBtn_MagicAttak	= (CN3UIButton*)GetChildByID("Btn_MagicAttack");	__ASSERT(m_pBtn_MagicAttak	, "NULL UI Component!!");
-	m_pBtn_Intelligence	= (CN3UIButton*)GetChildByID("Btn_Intelligence");	__ASSERT(m_pBtn_Intelligence, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Strength, GetChildByID<CN3UIButton>("Btn_Strength"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Stamina, GetChildByID<CN3UIButton>("Btn_Stamina"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Dexterity, GetChildByID<CN3UIButton>("Btn_Dexterity"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_MagicAttak, GetChildByID<CN3UIButton>("Btn_MagicAttack"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Intelligence, GetChildByID<CN3UIButton>("Btn_Intelligence"));
 
-	m_pText_Strength	= (CN3UIString*)GetChildByID("Text_Strength");		__ASSERT(m_pText_Strength	, "NULL UI Component!!");
-	m_pText_Stamina		= (CN3UIString*)GetChildByID("Text_Stamina");		__ASSERT(m_pText_Stamina	, "NULL UI Component!!");
-	m_pText_Dexterity	= (CN3UIString*)GetChildByID("Text_Dexterity");		__ASSERT(m_pText_Dexterity, "NULL UI Component!!");
-	m_pText_MagicAttak	= (CN3UIString*)GetChildByID("Text_MagicAttack");	__ASSERT(m_pText_MagicAttak, "NULL UI Component!!");
-	m_pText_Intelligence = (CN3UIString*)GetChildByID("Text_Intelligence");	__ASSERT(m_pText_Intelligence, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pText_Strength, GetChildByID<CN3UIString>("Text_Strength"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Stamina, GetChildByID<CN3UIString>("Text_Stamina"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Dexterity, GetChildByID<CN3UIString>("Text_Dexterity"));
+	N3_VERIFY_UI_COMPONENT(m_pText_MagicAttak, GetChildByID<CN3UIString>("Text_MagicAttack"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Intelligence, GetChildByID<CN3UIString>("Text_Intelligence"));
 
-	m_pText_RegistFire	= (CN3UIString*)GetChildByID("Text_RegistFire");	__ASSERT(m_pText_RegistFire, "NULL UI Component!!");
-	m_pText_RegistMagic	= (CN3UIString*)GetChildByID("Text_RegistMagic");	__ASSERT(m_pText_RegistMagic, "NULL UI Component!!");
-	m_pText_RegistIce	= (CN3UIString*)GetChildByID("Text_RegistIce");		__ASSERT(m_pText_RegistIce, "NULL UI Component!!");
-	m_pText_RegistCurse	= (CN3UIString*)GetChildByID("Text_RegistCurse");	__ASSERT(m_pText_RegistCurse, "NULL UI Component!!");
-	m_pText_RegistLight  = (CN3UIString*)GetChildByID("Text_RegistLightR");	__ASSERT(m_pText_RegistLight , "NULL UI Component!!");
-	m_pText_RegistPoison = (CN3UIString*)GetChildByID("Text_RegistPoison");	__ASSERT(m_pText_RegistPoison, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pText_RegistFire, GetChildByID<CN3UIString>("Text_RegistFire"));
+	N3_VERIFY_UI_COMPONENT(m_pText_RegistMagic, GetChildByID<CN3UIString>("Text_RegistMagic"));
+	N3_VERIFY_UI_COMPONENT(m_pText_RegistIce, GetChildByID<CN3UIString>("Text_RegistIce"));
+	N3_VERIFY_UI_COMPONENT(m_pText_RegistCurse, GetChildByID<CN3UIString>("Text_RegistCurse"));
+	N3_VERIFY_UI_COMPONENT(m_pText_RegistLight, GetChildByID<CN3UIString>("Text_RegistLightR"));
+	N3_VERIFY_UI_COMPONENT(m_pText_RegistPoison, GetChildByID<CN3UIString>("Text_RegistPoison"));
 
-	m_pImg_Str  = GetChildByID("img_str");	__ASSERT(m_pImg_Str, "NULL UI Component!!");
-	m_pImg_Sta	= GetChildByID("img_sta");	__ASSERT(m_pImg_Sta, "NULL UI Component!!");
-	m_pImg_Dex  = GetChildByID("img_dex");	__ASSERT(m_pImg_Dex , "NULL UI Component!!");
-	m_pImg_Int	= GetChildByID("img_int");	__ASSERT(m_pImg_Int, "NULL UI Component!!");
-	m_pImg_MAP	= GetChildByID("img_map");	__ASSERT(m_pImg_MAP, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pImg_Str, GetChildByID("img_str"));
+	N3_VERIFY_UI_COMPONENT(m_pImg_Sta, GetChildByID("img_sta"));
+	N3_VERIFY_UI_COMPONENT(m_pImg_Dex, GetChildByID("img_dex"));
+	N3_VERIFY_UI_COMPONENT(m_pImg_Int, GetChildByID("img_int"));
+	N3_VERIFY_UI_COMPONENT(m_pImg_MAP, GetChildByID("img_map"));
 
 	return true;
 }
@@ -1040,17 +1040,17 @@ bool CUIFriends::Load(HANDLE hFile)
 {
 	if(false == CN3UIBase::Load(hFile)) return false;
 
-	m_pList_Friends		= (CN3UIList*)this->GetChildByID("List_Friends");		__ASSERT(m_pList_Friends, "NULL UI Component!!");
-	m_pText_Page		= (CN3UIString*)this->GetChildByID("String_Page");		__ASSERT(m_pText_Page, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pList_Friends, GetChildByID<CN3UIList>("List_Friends"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Page, GetChildByID<CN3UIString>("String_Page"));
 
-	m_pBtn_NextPage		= (CN3UIButton*)(this->GetChildByID("Btn_Page_Down"));	__ASSERT(m_pBtn_NextPage, "NULL UI Component!!");
-	m_pBtn_PrevPage		= (CN3UIButton*)(this->GetChildByID("Btn_Page_Up"));	__ASSERT(m_pBtn_PrevPage, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_NextPage, GetChildByID<CN3UIButton>("Btn_Page_Down"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_PrevPage, GetChildByID<CN3UIButton>("Btn_Page_Up"));
 	
-	m_pBtn_Refresh		= (CN3UIButton*)this->GetChildByID("Btn_Refresh");	__ASSERT(m_pBtn_Refresh, "NULL UI Component!!");
-	m_pBtn_Party		= (CN3UIButton*)this->GetChildByID("Btn_Party");	__ASSERT(m_pBtn_Party, "NULL UI Component!!");
-	m_pBtn_Whisper		= (CN3UIButton*)this->GetChildByID("Btn_Whisper");	__ASSERT(m_pBtn_Whisper, "NULL UI Component!!");
-	m_pBtn_Add			= (CN3UIButton*)this->GetChildByID("Btn_Add");		__ASSERT(m_pBtn_Add, "NULL UI Component!!");
-	m_pBtn_Delete		= (CN3UIButton*)this->GetChildByID("Btn_Delete");	__ASSERT(m_pBtn_Delete, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Refresh, GetChildByID<CN3UIButton>("Btn_Refresh"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Party, GetChildByID<CN3UIButton>("Btn_Party"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Whisper, GetChildByID<CN3UIButton>("Btn_Whisper"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Add, GetChildByID<CN3UIButton>("Btn_Add"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Delete, GetChildByID<CN3UIButton>("Btn_Delete"));
 
 	std::string szFN = CGameProcedure::s_szAccount + "_" + CGameProcedure::s_szServer + ".txt"; // 파일이름은 계정_서버.txt 로 한다.
 	FILE* pFile = fopen(szFN.c_str(), "r");
@@ -1428,11 +1428,11 @@ bool CUIVarious::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-	m_pBtn_Knights = (CN3UIButton*)(this->GetChildByID("btn_clan"));		__ASSERT(m_pBtn_Knights, "NULL UI Component!!");
-	m_pBtn_State =	(CN3UIButton*)(this->GetChildByID("Btn_State"));		__ASSERT(m_pBtn_State, "NULL UI Component!!");
-	m_pBtn_Quest =	(CN3UIButton*)(this->GetChildByID("Btn_Quest"));		__ASSERT(m_pBtn_Quest, "NULL UI Component!!");
-	m_pBtn_Friends = (CN3UIButton*)(this->GetChildByID("Btn_Friends"));		__ASSERT(m_pBtn_Friends, "NULL UI Component!!");
-	m_pBtn_Close =	(CN3UIButton*)(this->GetChildByID("Btn_Close"));		__ASSERT(m_pBtn_Close, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Knights, GetChildByID<CN3UIButton>("btn_clan"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_State, GetChildByID<CN3UIButton>("Btn_State"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Quest, GetChildByID<CN3UIButton>("Btn_Quest"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Friends, GetChildByID<CN3UIButton>("Btn_Friends"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Close, GetChildByID<CN3UIButton>("Btn_Close"));
 
 	// 아직 UI 가 안되어 있으니 막자..
 	if(m_pBtn_Quest) m_pBtn_Quest->SetState(UI_STATE_BUTTON_DISABLE);

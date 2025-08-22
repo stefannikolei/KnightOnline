@@ -201,7 +201,7 @@ void CUICharacterSelect::DisplayChrInfo(__CharacterSelectInfo* pCSInfo)
 void CUICharacterSelect::DontDisplayInfo()
 {
 	CN3UIBase*	m_pUserInfoStr;
-	m_pUserInfoStr = GetChildByID("text00"); __ASSERT(m_pUserInfoStr, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pUserInfoStr, GetChildByID("text00"));
 
 	if ( m_pUserInfoStr ) m_pUserInfoStr->SetVisible(false);
 }
