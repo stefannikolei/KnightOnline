@@ -42,15 +42,8 @@ void CBirdMng::LoadFromFile(const std::string& szFN)
 
 	if(szFN.empty()) return;
 	FILE* stream = fopen(szFN.c_str(), "r"); //text파일로 만든다 
-
-	if(nullptr == stream)
-	{
-#if _DEBUG
-		std::string szErr = fmt::format("failed to open file - {}", szFN);
-		__ASSERT(stream, szErr.c_str());
-#endif
+	if (stream == nullptr)
 		return;
-	}
 
 	int i;
 	char szRrcName[_MAX_PATH];

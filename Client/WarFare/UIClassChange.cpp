@@ -30,16 +30,12 @@ CUIClassChange::CUIClassChange()
 {
 	m_pBtn_Ok		= nullptr;
 	m_pBtn_Cancel	= nullptr;
-	m_pBtn_Class0		= nullptr;
-	m_pBtn_Class1		= nullptr;
+	m_pBtn_Class	= nullptr;
 
 	m_pText_Warning	= nullptr;
-	m_pText_Info0		= nullptr;
-	m_pText_Info1		= nullptr;
+	m_pText_Info	= nullptr;
 	m_pText_Title	= nullptr;
 	m_pText_Message	= nullptr;
-
-	m_eClassChangeState	= UISTATE_NORMAL;
 }
 
 CUIClassChange::~CUIClassChange()
@@ -47,23 +43,17 @@ CUIClassChange::~CUIClassChange()
 
 }
 
-void CUIClassChange::Release()
-{
-	CN3UIBase::Release();
-}
-
 bool CUIClassChange::Load(HANDLE hFile)
 {
-	if(CN3UIBase::Load(hFile)==false) return false;
+	if (!CN3UIBase::Load(hFile))
+		return false;
 
 	N3_VERIFY_UI_COMPONENT(m_pBtn_Ok, GetChildByID<CN3UIButton>("Btn_Ok"));
 	N3_VERIFY_UI_COMPONENT(m_pBtn_Cancel, GetChildByID<CN3UIButton>("Btn_Cancel"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Class0, GetChildByID<CN3UIButton>("Btn_Class0"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Class1, GetChildByID<CN3UIButton>("Btn_Class1"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Class, GetChildByID<CN3UIButton>("Btn_Class"));
 
 	N3_VERIFY_UI_COMPONENT(m_pText_Warning, GetChildByID<CN3UIString>("Text_Waring"));
-	N3_VERIFY_UI_COMPONENT(m_pText_Info0, GetChildByID<CN3UIString>("Text_info0"));
-	N3_VERIFY_UI_COMPONENT(m_pText_Info1, GetChildByID<CN3UIString>("Text_info1"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Info, GetChildByID<CN3UIString>("Text_info"));
 	N3_VERIFY_UI_COMPONENT(m_pText_Message, GetChildByID<CN3UIString>("Text_Message"));
 
 	return true;
@@ -71,12 +61,10 @@ bool CUIClassChange::Load(HANDLE hFile)
 
 void CUIClassChange::Open(int iCode)
 {
-	m_eClassChangeState	= UISTATE_NORMAL;
-
 	SetVisible(true);
 
-	__InfoPlayerBase*	pInfoBase = &(CGameBase::s_pPlayer->m_InfoBase);
-	__InfoPlayerMySelf*	pInfoExt = &(CGameBase::s_pPlayer->m_InfoExt);
+	__InfoPlayerBase*	pInfoBase = &CGameBase::s_pPlayer->m_InfoBase;
+	__InfoPlayerMySelf*	pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
 
 	std::string szSuccess, szNotYet, szAlready, szItemInSlot;
 	szSuccess = fmt::format_text_resource(IDS_CLASS_CHANGE_SUCCESS);
@@ -86,12 +74,10 @@ void CUIClassChange::Open(int iCode)
 
 	m_pBtn_Ok->SetVisible(false);
 	m_pBtn_Cancel->SetVisible(false);
-	m_pBtn_Class0->SetVisible(false);
-	m_pBtn_Class1->SetVisible(false);
+	m_pBtn_Class->SetVisible(false);
 
 	m_pText_Warning->SetVisible(false);
-	m_pText_Info0->SetVisible(false);
-	m_pText_Info1->SetVisible(false);
+	m_pText_Info->SetVisible(false);
 	m_pText_Message->SetVisible(true);
 
 	std::string szClassTmp;
@@ -100,47 +86,37 @@ void CUIClassChange::Open(int iCode)
 	{
 		case N3_SP_CLASS_CHANGE_SUCCESS:
 			m_pText_Message->SetString(szSuccess);
-			m_pBtn_Class0->SetVisible(true);
-			m_pBtn_Class1->SetVisible(true);
+			m_pBtn_Class->SetVisible(true);
 			m_pBtn_Cancel->SetVisible(true);
 
-			m_pText_Info0->SetVisible(true);
-			m_pText_Info1->SetVisible(true);
+			m_pText_Info->SetVisible(true);
 
 			m_eClass = pInfoBase->eClass;
 			switch ( pInfoBase->eClass )
 			{
 				case CLASS_KA_WARRIOR:
-					CGameBase::GetTextByClass(CLASS_KA_BERSERKER, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameBase::GetTextByClass(CLASS_KA_GUARDIAN, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_BERSERKER, szClassTmp); m_pText_Info->SetString(szClassTmp);
 					break;
 				case CLASS_KA_ROGUE:
-					CGameBase::GetTextByClass(CLASS_KA_HUNTER, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameBase::GetTextByClass(CLASS_KA_PENETRATOR, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_HUNTER, szClassTmp); m_pText_Info->SetString(szClassTmp);
 					break;
 				case CLASS_KA_WIZARD:
-					CGameBase::GetTextByClass(CLASS_KA_SORCERER, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameBase::GetTextByClass(CLASS_KA_NECROMANCER, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_SORCERER, szClassTmp); m_pText_Info->SetString(szClassTmp);
 					break;
 				case CLASS_KA_PRIEST:
-					CGameBase::GetTextByClass(CLASS_KA_SHAMAN, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameBase::GetTextByClass(CLASS_KA_DARKPRIEST, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_SHAMAN, szClassTmp); m_pText_Info->SetString(szClassTmp);
 					break;
 				case CLASS_EL_WARRIOR:
-					CGameBase::GetTextByClass(CLASS_EL_BLADE, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameBase::GetTextByClass(CLASS_EL_PROTECTOR, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_BLADE, szClassTmp); m_pText_Info->SetString(szClassTmp);
 					break;
 				case CLASS_EL_ROGUE:
-					CGameBase::GetTextByClass(CLASS_EL_RANGER, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameBase::GetTextByClass(CLASS_EL_ASSASIN, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_RANGER, szClassTmp); m_pText_Info->SetString(szClassTmp);
 					break;
 				case CLASS_EL_WIZARD:
-					CGameBase::GetTextByClass(CLASS_EL_MAGE, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameBase::GetTextByClass(CLASS_EL_ENCHANTER, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_MAGE, szClassTmp); m_pText_Info->SetString(szClassTmp);
 					break;
 				case CLASS_EL_PRIEST:
-					CGameBase::GetTextByClass(CLASS_EL_CLERIC, szClassTmp); m_pText_Info0->SetString(szClassTmp);
-					CGameBase::GetTextByClass(CLASS_EL_DRUID, szClassTmp); m_pText_Info1->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_CLERIC, szClassTmp); m_pText_Info->SetString(szClassTmp);
 					break;
 			}
 			break;
@@ -169,20 +145,14 @@ bool CUIClassChange::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 	if (dwMsg == UIMSG_BUTTON_CLICK)					
 	{
-		if(pSender == m_pBtn_Ok)
+		if (pSender == m_pBtn_Ok
+			|| pSender == m_pBtn_Cancel)
 		{
-			if (m_eClassChangeState == UISTATE_NORMAL)
-				Close();
-			else
-				ChangeToNormalState();
-		}
-
-		else if(pSender == m_pBtn_Cancel)
 			Close();
-
-		else if(pSender == m_pBtn_Class0)
+		}
+		else if (pSender == m_pBtn_Class)
 		{
-			switch ( pInfoBase->eClass )
+			switch (pInfoBase->eClass)
 			{
 				case CLASS_KA_WARRIOR:
 					pInfoBase->eClass = CLASS_KA_BERSERKER;
@@ -216,7 +186,7 @@ bool CUIClassChange::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			int iOffset = 0;
 			CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_CLASS_CHANGE);
 			CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_CLASS_CHANGE_REQ);
-			CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)pInfoBase->eClass);
+			CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t) pInfoBase->eClass);
 			CGameProcedure::s_pSocket->Send(byBuff, iOffset);
 
 			CGameProcedure::s_pProcMain->m_pUISkillTreeDlg->InitIconUpdate();
@@ -225,11 +195,6 @@ bool CUIClassChange::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			CGameProcedure::s_pProcMain->m_pUIHotKeyDlg->ClassChangeHotkeyFlush();
 			Close();
 		}
-
-		else if(pSender == m_pBtn_Class1)
-		{
-			ChangeToWarningState();
-		}
 	}
 
 	return true;
@@ -237,15 +202,13 @@ bool CUIClassChange::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 void CUIClassChange::Close()
 {
-	m_eClassChangeState	= UISTATE_NORMAL;
-
 	SetVisible(false);
 }
 
 void CUIClassChange::RestorePrevClass()
 {
-	__InfoPlayerBase*	pInfoBase = &(CGameBase::s_pPlayer->m_InfoBase);
-	__InfoPlayerMySelf*	pInfoExt = &(CGameBase::s_pPlayer->m_InfoExt);
+	__InfoPlayerBase*	pInfoBase = &CGameBase::s_pPlayer->m_InfoBase;
+	__InfoPlayerMySelf*	pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
 
 	pInfoBase->eClass = m_eClass;
 	CGameProcedure::s_pProcMain->m_pUISkillTreeDlg->InitIconUpdate();
@@ -253,42 +216,13 @@ void CUIClassChange::RestorePrevClass()
 	CGameProcedure::s_pProcMain->m_pUIVar->UpdateAllStates(pInfoBase, pInfoExt); // 상태창 수치를 모두 적용
 }
 
-void CUIClassChange::ChangeToWarningState()
-{
-	m_eClassChangeState	= UISTATE_WARNING;
-
-	m_pBtn_Ok->SetVisible(true);
-	m_pBtn_Cancel->SetVisible(false);
-	m_pBtn_Class0->SetVisible(false);
-	m_pBtn_Class1->SetVisible(false);
-
-	m_pText_Warning->SetVisible(true);
-	m_pText_Info0->SetVisible(false);
-	m_pText_Info1->SetVisible(false);
-	m_pText_Message->SetVisible(false);
-}
-
 void CUIClassChange::ChangeToNormalState()
 {
-	m_eClassChangeState	= UISTATE_NORMAL;
-
 	m_pBtn_Ok->SetVisible(false);
 	m_pBtn_Cancel->SetVisible(true);
-	m_pBtn_Class0->SetVisible(true);
-	m_pBtn_Class1->SetVisible(true);
+	m_pBtn_Class->SetVisible(true);
 
 	m_pText_Warning->SetVisible(false);
-	m_pText_Info0->SetVisible(true);
-	m_pText_Info1->SetVisible(true);
+	m_pText_Info->SetVisible(true);
 	m_pText_Message->SetVisible(true);
 }
-
-
-//this_ui_add_start
-void CUIClassChange::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFocus)
-{
-	CN3UIBase::SetVisibleWithNoSound(bVisible, bWork, bReFocus);
-
-	m_eClassChangeState	= UISTATE_NORMAL;
-}
-//this_ui_add_end

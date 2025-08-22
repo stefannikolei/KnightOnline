@@ -14,7 +14,7 @@
 class CUIHelp : public CN3UIBase  
 {
 public:
-	static constexpr int MAX_HELP_PAGE = 4;
+	static constexpr int MAX_HELP_PAGE = 3;
 
 	CN3UIBase* m_pPages[MAX_HELP_PAGE];
 
