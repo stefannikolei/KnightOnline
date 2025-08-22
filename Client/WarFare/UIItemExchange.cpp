@@ -188,16 +188,16 @@ void CUIItemExchange::IconRestore()
 {
 	CN3UIArea* pArea;
 
-	switch ( CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict )
+	switch ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict )
 	{
 		case UIWND_DISTRICT_EX_RE_INV:
-			if ( m_pMyInvWnd[CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder] != NULL )
+			if ( m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != NULL )
 			{
-				pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_REPAIR_INV, CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder);
+				pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_REPAIR_INV, CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder);
 				if ( pArea )
 				{
-					m_pMyInvWnd[CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
-					m_pMyInvWnd[CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
+					m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
+					m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
 				}
 			}
 			break;
@@ -223,9 +223,9 @@ bool CUIItemExchange::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 	if (!m_bVisible) return false;
 
 	// 내가 가졌던 아이콘이 아니면..
-	if ( CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd != m_eUIWnd )
+	if ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd != m_eUIWnd )
 		FAIL_RETURN
-	if ( CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_EX_RE_INV )
+	if ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_EX_RE_INV )
 		FAIL_RETURN
 
 	// 내가 가졌던 아이콘이면.. npc영역인지 검사한다..
@@ -257,7 +257,7 @@ bool CUIItemExchange::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 	if (!bFound)	FAIL_RETURN
 
 	// 받아들인다..
-	m_pMyInvWnd[CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder] = NULL;
+	m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] = NULL;
 
 	spItem->pUIIcon->SetRegion(pArea->GetRegion());
 	spItem->pUIIcon->SetMoveRect(pArea->GetRegion());
@@ -265,7 +265,7 @@ bool CUIItemExchange::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 	m_pMyNpcWnd[i] = spItem;
 
 	// 백업 정보..
-	m_pMyNpcWndOriginIndex[i] = CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder;
+	m_pMyNpcWndOriginIndex[i] = CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder;
 
 	// 수리비용 업그레이드..
 	m_pTotalPrice += CalcRepairGold(spItem);
@@ -344,14 +344,14 @@ bool CUIItemExchange::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			if ( (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) || (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL) ) FAIL_CODE
 
 			// Save Select Info..
-			CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd = UIWND_EXCHANGE_REPAIR;
+			CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd = UIWND_EXCHANGE_REPAIR;
 			eUIWnd = GetWndDistrict(spItem);
 			if ( eUIWnd != UIWND_DISTRICT_EX_RE_INV )	FAIL_CODE
-			CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict = UIWND_DISTRICT_EX_RE_INV;
+			CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict = UIWND_DISTRICT_EX_RE_INV;
 			iOrder = GetItemiOrder(spItem, UIWND_DISTRICT_EX_RE_INV);
 			if (iOrder == -1) FAIL_CODE
-			CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder = iOrder;
-			CN3UIWndBase::m_sSelectedIconInfo.pItemSelect = spItem;
+			CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder = iOrder;
+			CN3UIWndBase::s_sSelectedIconInfo.pItemSelect = spItem;
 			// Do Ops..
 			((CN3UIIcon* )pSender)->SetRegion(GetSampleRect());
 			break;
@@ -359,14 +359,14 @@ bool CUIItemExchange::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		case UIMSG_ICON_DOWN:
 			if ( GetState()  == UI_STATE_ICON_MOVING )
 			{
-				CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(GetSampleRect());
-				CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(GetSampleRect());
+				CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(GetSampleRect());
+				CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(GetSampleRect());
 			}
 			break;
 
 		case UIMSG_ICON_UP:
 			// 아이콘 매니저 윈도우들을 돌아 다니면서 검사..
-			if ( !CGameProcedure::s_pUIMgr->BroadcastIconDropMsg(CN3UIWndBase::m_sSelectedIconInfo.pItemSelect) )
+			if ( !CGameProcedure::s_pUIMgr->BroadcastIconDropMsg(CN3UIWndBase::s_sSelectedIconInfo.pItemSelect) )
 				// 아이콘 위치 원래대로..
 				IconRestore();				
 			break;
@@ -383,10 +383,10 @@ uint32_t CUIItemExchange::MouseProc(uint32_t dwFlags, const POINT& ptCur, const 
 
 	// 드래그 되는 아이콘 갱신..
 	if ( (GetState() == UI_STATE_ICON_MOVING) && 
-			(CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd == UIWND_EXCHANGE_REPAIR) )
+			(CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd == UIWND_EXCHANGE_REPAIR) )
 	{
-		CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(GetSampleRect());
-		CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(GetSampleRect());
+		CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(GetSampleRect());
+		CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(GetSampleRect());
 	}
 
 	return CN3UIWndBase::MouseProc(dwFlags, ptCur, ptOld);

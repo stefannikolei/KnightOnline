@@ -104,8 +104,8 @@ void CUIWareHouseDlg::Render()
 		CN3UIBase* pChild = (*itor);
 		if (GetState() == UI_STATE_ICON_MOVING
 			&& pChild->UIType() == UI_TYPE_ICON
-			&& m_sSelectedIconInfo.pItemSelect != nullptr
-			&& pChild == m_sSelectedIconInfo.pItemSelect->pUIIcon)
+			&& s_sSelectedIconInfo.pItemSelect != nullptr
+			&& pChild == s_sSelectedIconInfo.pItemSelect->pUIIcon)
 			continue;
 
 		pChild->Render();
@@ -131,7 +131,7 @@ void CUIWareHouseDlg::Render()
 			if (pStr != nullptr)
 			{
 				if ((GetState() == UI_STATE_ICON_MOVING)
-					&& (spItemWare == m_sSelectedIconInfo.pItemSelect))
+					&& (spItemWare == s_sSelectedIconInfo.pItemSelect))
 				{
 					pStr->SetVisible(false);
 				}
@@ -167,7 +167,7 @@ void CUIWareHouseDlg::Render()
 			if (pStr != nullptr)
 			{
 				if ((GetState() == UI_STATE_ICON_MOVING)
-					&& (spItemInv == m_sSelectedIconInfo.pItemSelect))
+					&& (spItemInv == s_sSelectedIconInfo.pItemSelect))
 				{
 					pStr->SetVisible(false);
 				}
@@ -193,8 +193,8 @@ void CUIWareHouseDlg::Render()
 	}
 
 	if (GetState() == UI_STATE_ICON_MOVING
-		&& m_sSelectedIconInfo.pItemSelect != nullptr)
-		m_sSelectedIconInfo.pItemSelect->pUIIcon->Render();
+		&& s_sSelectedIconInfo.pItemSelect != nullptr)
+		s_sSelectedIconInfo.pItemSelect->pUIIcon->Render();
 
 	if (bTooltipRender
 		&& spItem != nullptr)
@@ -328,10 +328,10 @@ uint32_t CUIWareHouseDlg::MouseProc(uint32_t dwFlags, const POINT& ptCur, const 
 
 	// 드래그 되는 아이콘 갱신..
 	if (GetState() == UI_STATE_ICON_MOVING
-		&& m_sSelectedIconInfo.UIWndSelect.UIWnd == UIWND_WARE_HOUSE)
+		&& s_sSelectedIconInfo.UIWndSelect.UIWnd == UIWND_WARE_HOUSE)
 	{
-		m_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(GetSampleRect());
-		m_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(GetSampleRect());
+		s_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(GetSampleRect());
+		s_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(GetSampleRect());
 	}
 
 	return CN3UIWndBase::MouseProc(dwFlags, ptCur, ptOld);
@@ -353,14 +353,14 @@ bool CUIWareHouseDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		if (pSender == m_pBtnGold)
 		{
 			// 인벤토리만 떠 있을때..
-			m_pCountableItemEdit->Open(UIWND_WARE_HOUSE, UIWND_DISTRICT_TRADE_MY, true, true);
+			s_pCountableItemEdit->Open(UIWND_WARE_HOUSE, UIWND_DISTRICT_TRADE_MY, true, true);
 			return true;
 		}
 
 		if (pSender == m_pBtnGoldWareHouse)
 		{
 			// 인벤토리만 떠 있을때..
-			m_pCountableItemEdit->Open(UIWND_WARE_HOUSE, UIWND_DISTRICT_TRADE_NPC, true, true);
+			s_pCountableItemEdit->Open(UIWND_WARE_HOUSE, UIWND_DISTRICT_TRADE_NPC, true, true);
 			return true;
 		}
 
@@ -453,18 +453,18 @@ bool CUIWareHouseDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			spItem = GetHighlightIconItem((CN3UIIcon*) pSender);
 
 			// Save Select Info..
-			m_sSelectedIconInfo.UIWndSelect.UIWnd = UIWND_WARE_HOUSE;
+			s_sSelectedIconInfo.UIWndSelect.UIWnd = UIWND_WARE_HOUSE;
 			eUIWnd = GetWndDistrict(spItem);
 			if (eUIWnd == UIWND_DISTRICT_UNKNOWN)
 				FAIL_CODE
 
-			m_sSelectedIconInfo.UIWndSelect.UIWndDistrict = eUIWnd;
+			s_sSelectedIconInfo.UIWndSelect.UIWndDistrict = eUIWnd;
 			iOrder = GetItemiOrder(spItem, eUIWnd);
 			if (iOrder == -1)
 				FAIL_CODE
 
-			m_sSelectedIconInfo.UIWndSelect.iOrder = iOrder;
-			m_sSelectedIconInfo.pItemSelect = spItem;
+			s_sSelectedIconInfo.UIWndSelect.iOrder = iOrder;
+			s_sSelectedIconInfo.pItemSelect = spItem;
 
 			// Do Ops..
 			pSender->SetRegion(GetSampleRect());
@@ -478,19 +478,19 @@ bool CUIWareHouseDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		case UIMSG_ICON_UP:
 			// 아이콘 매니저 윈도우들을 돌아 다니면서 검사..
 			// 아이콘 위치 원래대로..
-			if (!CGameProcedure::s_pUIMgr->BroadcastIconDropMsg(m_sSelectedIconInfo.pItemSelect))
+			if (!CGameProcedure::s_pUIMgr->BroadcastIconDropMsg(s_sSelectedIconInfo.pItemSelect))
 				IconRestore();
 
 			// Sound..
-			if (m_sSelectedIconInfo.pItemSelect != nullptr)
-				PlayItemSound(m_sSelectedIconInfo.pItemSelect->pItemBasic);
+			if (s_sSelectedIconInfo.pItemSelect != nullptr)
+				PlayItemSound(s_sSelectedIconInfo.pItemSelect->pItemBasic);
 			break;
 
 		case UIMSG_ICON_DOWN:
 			if (GetState() == UI_STATE_ICON_MOVING)
 			{
-				m_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(GetSampleRect());
-				m_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(GetSampleRect());
+				s_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(GetSampleRect());
+				s_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(GetSampleRect());
 			}
 			break;
 	}
@@ -636,28 +636,28 @@ __IconItemSkill* CUIWareHouseDlg::GetHighlightIconItem(CN3UIIcon* pUIIcon)
 
 void CUIWareHouseDlg::IconRestore()
 {
-	switch (m_sSelectedIconInfo.UIWndSelect.UIWndDistrict)
+	switch (s_sSelectedIconInfo.UIWndSelect.UIWndDistrict)
 	{
 		case UIWND_DISTRICT_TRADE_NPC:
-			if (m_pMyWare[m_iCurPage][m_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr)
+			if (m_pMyWare[m_iCurPage][s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr)
 			{
-				CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_NPC, m_sSelectedIconInfo.UIWndSelect.iOrder);
+				CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_NPC, s_sSelectedIconInfo.UIWndSelect.iOrder);
 				if (pArea != nullptr)
 				{
-					m_pMyWare[m_iCurPage][m_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
-					m_pMyWare[m_iCurPage][m_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
+					m_pMyWare[m_iCurPage][s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
+					m_pMyWare[m_iCurPage][s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
 				}
 			}
 			break;
 
 		case UIWND_DISTRICT_TRADE_MY:
-			if (m_pMyWareInv[m_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr)
+			if (m_pMyWareInv[s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr)
 			{
-				CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_MY, m_sSelectedIconInfo.UIWndSelect.iOrder);
+				CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_MY, s_sSelectedIconInfo.UIWndSelect.iOrder);
 				if (pArea != nullptr)
 				{
-					m_pMyWareInv[m_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
-					m_pMyWareInv[m_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
+					m_pMyWareInv[s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
+					m_pMyWareInv[s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
 				}
 			}
 			break;
@@ -679,11 +679,11 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 		return false;
 
 	// 내가 가졌던 아이콘이 아니면..
-	if (m_sSelectedIconInfo.UIWndSelect.UIWnd != m_eUIWnd)
+	if (s_sSelectedIconInfo.UIWndSelect.UIWnd != m_eUIWnd)
 		FAIL_RETURN
 
-	if (m_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_TRADE_NPC
-		&& m_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_TRADE_MY)
+	if (s_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_TRADE_NPC
+		&& s_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_TRADE_MY)
 		FAIL_RETURN
 
 	// 내가 가졌던 아이콘이면.. npc영역인지 검사한다..
@@ -720,27 +720,27 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 
 	// 본격적으로 Recovery Info를 활용하기 시작한다..
 	// 먼저 WaitFromServer를 On으로 하고.. Select Info를 Recovery Info로 복사.. 이때 Dest는 팰요없다..
-	if (spItem != m_sSelectedIconInfo.pItemSelect)
-		m_sSelectedIconInfo.pItemSelect = spItem;
+	if (spItem != s_sSelectedIconInfo.pItemSelect)
+		s_sSelectedIconInfo.pItemSelect = spItem;
 
 	s_bWaitFromServer									= true;
-	m_sRecoveryJobInfo.pItemSource						= m_sSelectedIconInfo.pItemSelect;
-	m_sRecoveryJobInfo.UIWndSourceStart.UIWnd			= m_sSelectedIconInfo.UIWndSelect.UIWnd;
-	m_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict	= m_sSelectedIconInfo.UIWndSelect.UIWndDistrict;
-	m_sRecoveryJobInfo.UIWndSourceStart.iOrder			= m_sSelectedIconInfo.UIWndSelect.iOrder;
-	m_sRecoveryJobInfo.pItemTarget						= nullptr;
+	s_sRecoveryJobInfo.pItemSource						= s_sSelectedIconInfo.pItemSelect;
+	s_sRecoveryJobInfo.UIWndSourceStart.UIWnd			= s_sSelectedIconInfo.UIWndSelect.UIWnd;
+	s_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict	= s_sSelectedIconInfo.UIWndSelect.UIWndDistrict;
+	s_sRecoveryJobInfo.UIWndSourceStart.iOrder			= s_sSelectedIconInfo.UIWndSelect.iOrder;
+	s_sRecoveryJobInfo.pItemTarget						= nullptr;
 
-	m_sRecoveryJobInfo.UIWndSourceEnd.UIWnd				= UIWND_WARE_HOUSE;
-	m_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict		= eUIWnd;
+	s_sRecoveryJobInfo.UIWndSourceEnd.UIWnd				= UIWND_WARE_HOUSE;
+	s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict		= eUIWnd;
 
-	switch (m_sSelectedIconInfo.UIWndSelect.UIWndDistrict)
+	switch (s_sSelectedIconInfo.UIWndSelect.UIWndDistrict)
 	{
 		case UIWND_DISTRICT_TRADE_NPC:
 			// 빼는 경우..
 			if (eUIWnd == UIWND_DISTRICT_TRADE_MY)
 			{
-				if (m_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
-					|| m_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
+				if (s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
+					|| s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
 				{
 					// 활이나 물약등 아이템인 경우..
 					// 면저 인벤토리에 해당 아이콘이 있는지 알아본다..
@@ -749,12 +749,12 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 					for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 					{
 						if (m_pMyWareInv[i] != nullptr
-							&& m_pMyWareInv[i]->pItemBasic->dwID == m_sSelectedIconInfo.pItemSelect->pItemBasic->dwID
-							&& m_pMyWareInv[i]->pItemExt->dwID == m_sSelectedIconInfo.pItemSelect->pItemExt->dwID)
+							&& m_pMyWareInv[i]->pItemBasic->dwID == s_sSelectedIconInfo.pItemSelect->pItemBasic->dwID
+							&& m_pMyWareInv[i]->pItemExt->dwID == s_sSelectedIconInfo.pItemSelect->pItemExt->dwID)
 						{
 							bFound = true;
 							iDestiOrder = i;
-							m_sRecoveryJobInfo.UIWndSourceEnd.iOrder = iDestiOrder;
+							s_sRecoveryJobInfo.UIWndSourceEnd.iOrder = iDestiOrder;
 							break;
 						}
 					}
@@ -780,17 +780,17 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 							if (!bFound)
 							{
 								s_bWaitFromServer				= false;
-								m_sRecoveryJobInfo.pItemSource	= nullptr;
-								m_sRecoveryJobInfo.pItemTarget	= nullptr;
+								s_sRecoveryJobInfo.pItemSource	= nullptr;
+								s_sRecoveryJobInfo.pItemTarget	= nullptr;
 								FAIL_RETURN
 							}
 						}
 					}
 
-					m_sRecoveryJobInfo.UIWndSourceEnd.iOrder	= iDestiOrder;
+					s_sRecoveryJobInfo.UIWndSourceEnd.iOrder	= iDestiOrder;
 					s_bWaitFromServer							= false;
 
-					m_pCountableItemEdit->Open(UIWND_WARE_HOUSE, m_sSelectedIconInfo.UIWndSelect.UIWndDistrict, false);
+					s_pCountableItemEdit->Open(UIWND_WARE_HOUSE, s_sSelectedIconInfo.UIWndSelect.UIWndDistrict, false);
 					FAIL_RETURN
 				}
 				else
@@ -815,36 +815,36 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 						if (!bFound)
 						{
 							s_bWaitFromServer					= false;
-							m_sRecoveryJobInfo.pItemSource		= nullptr;
-							m_sRecoveryJobInfo.pItemTarget		= nullptr;
+							s_sRecoveryJobInfo.pItemSource		= nullptr;
+							s_sRecoveryJobInfo.pItemTarget		= nullptr;
 							FAIL_RETURN
 						}
 					}
 
-					m_sRecoveryJobInfo.UIWndSourceEnd.iOrder	= iDestiOrder;
+					s_sRecoveryJobInfo.UIWndSourceEnd.iOrder	= iDestiOrder;
 
 					// 무게 체크..
 					__InfoPlayerMySelf* pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
-					if ((pInfoExt->iWeight + m_sRecoveryJobInfo.pItemSource->pItemBasic->siWeight) > pInfoExt->iWeightMax)
+					if ((pInfoExt->iWeight + s_sRecoveryJobInfo.pItemSource->pItemBasic->siWeight) > pInfoExt->iWeightMax)
 					{
 						std::string szMsg = fmt::format_text_resource(IDS_ITEM_WEIGHT_OVERFLOW);
 						CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 
 						s_bWaitFromServer				= false;
-						m_sRecoveryJobInfo.pItemSource	= nullptr;
-						m_sRecoveryJobInfo.pItemTarget	= nullptr;
+						s_sRecoveryJobInfo.pItemSource	= nullptr;
+						s_sRecoveryJobInfo.pItemTarget	= nullptr;
 						FAIL_RETURN
 					}
 
 					SendToServerFromWareMsg(
-						m_sRecoveryJobInfo.pItemSource->pItemBasic->dwID + m_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
+						s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID + s_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
 						m_iCurPage,
-						m_sRecoveryJobInfo.UIWndSourceStart.iOrder,
+						s_sRecoveryJobInfo.UIWndSourceStart.iOrder,
 						iDestiOrder,
-						m_sRecoveryJobInfo.pItemSource->iCount);
+						s_sRecoveryJobInfo.pItemSource->iCount);
 
-					m_pMyWareInv[iDestiOrder] = m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder];
-					m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
+					m_pMyWareInv[iDestiOrder] = m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
+					m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
 
 					pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_MY, iDestiOrder);
 					if (pArea != nullptr)
@@ -859,7 +859,7 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 			{
 				// 이동.. 
 				__IconItemSkill* spItemSource, *spItemTarget = nullptr;
-				spItemSource = m_sRecoveryJobInfo.pItemSource;
+				spItemSource = s_sRecoveryJobInfo.pItemSource;
 
 				pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_NPC, iDestiOrder);
 				if (pArea != nullptr)
@@ -868,30 +868,30 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 					spItemSource->pUIIcon->SetMoveRect(pArea->GetRegion());
 				}
 
-				m_sRecoveryJobInfo.UIWndSourceEnd.iOrder = iDestiOrder;
+				s_sRecoveryJobInfo.UIWndSourceEnd.iOrder = iDestiOrder;
 
 				// 창고 내에서 이동..	(모두 일반 아이템으로 취급한다..)
 				// 해당 위치에 아이콘이 있으면..
 				if (m_pMyWare[m_iCurPage][iDestiOrder] != nullptr)
 				{
 					s_bWaitFromServer				= false;
-					m_sRecoveryJobInfo.pItemSource	= nullptr;
-					m_sRecoveryJobInfo.pItemTarget	= nullptr;
+					s_sRecoveryJobInfo.pItemSource	= nullptr;
+					s_sRecoveryJobInfo.pItemTarget	= nullptr;
 					FAIL_RETURN
 				}
 				else
 				{
-					m_sRecoveryJobInfo.pItemTarget = nullptr;
+					s_sRecoveryJobInfo.pItemTarget = nullptr;
 				}
 
 				m_pMyWare[m_iCurPage][iDestiOrder] = spItemSource;
-				m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItemTarget;
+				m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItemTarget;
 
 				// 이동 메시지를 보낸다..
 				SendToServerWareToWareMsg(
-					m_sRecoveryJobInfo.pItemSource->pItemBasic->dwID + m_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
+					s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID + s_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
 					m_iCurPage,
-					m_sRecoveryJobInfo.UIWndSourceStart.iOrder,
+					s_sRecoveryJobInfo.UIWndSourceStart.iOrder,
 					iDestiOrder);
 
 				FAIL_RETURN
@@ -902,8 +902,8 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 			// 넣는 경우..
 			if (eUIWnd == UIWND_DISTRICT_TRADE_NPC)
 			{
-				if (m_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
-					|| m_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
+				if (s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
+					|| s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
 				{
 					// 활이나 물약등 아이템인 경우..
 					// 면저 Ware에 아이콘이 있는지 알아본다..
@@ -918,13 +918,13 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 						for (int i = 0; i < MAX_ITEM_TRADE; i++)
 						{
 							if (m_pMyWare[iPage][i] != nullptr
-								&& m_pMyWare[iPage][i]->pItemBasic->dwID == m_sSelectedIconInfo.pItemSelect->pItemBasic->dwID
-								&& m_pMyWare[iPage][i]->pItemExt->dwID == m_sSelectedIconInfo.pItemSelect->pItemExt->dwID)
+								&& m_pMyWare[iPage][i]->pItemBasic->dwID == s_sSelectedIconInfo.pItemSelect->pItemBasic->dwID
+								&& m_pMyWare[iPage][i]->pItemExt->dwID == s_sSelectedIconInfo.pItemSelect->pItemExt->dwID)
 							{
 								bFound = true;
 								iDestiOrder = i;
-								m_sRecoveryJobInfo.UIWndSourceEnd.iOrder = iDestiOrder;
-								m_sRecoveryJobInfo.m_iPage = iPage;
+								s_sRecoveryJobInfo.UIWndSourceEnd.iOrder = iDestiOrder;
+								s_sRecoveryJobInfo.m_iPage = iPage;
 								break;
 							}
 						}
@@ -946,8 +946,8 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 								{
 									if (bFound)
 									{
-										m_sRecoveryJobInfo.UIWndSourceEnd.iOrder = iDestiOrder;
-										m_sRecoveryJobInfo.m_iPage = iPage;
+										s_sRecoveryJobInfo.UIWndSourceEnd.iOrder = iDestiOrder;
+										s_sRecoveryJobInfo.m_iPage = iPage;
 										break;
 									}
 
@@ -961,22 +961,22 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 								if (!bFound)	// 빈 슬롯을 찾지 못했으면..
 								{
 									s_bWaitFromServer					= false;
-									m_sRecoveryJobInfo.pItemSource		= nullptr;
-									m_sRecoveryJobInfo.pItemTarget		= nullptr;
+									s_sRecoveryJobInfo.pItemSource		= nullptr;
+									s_sRecoveryJobInfo.pItemTarget		= nullptr;
 									FAIL_RETURN
 								}
 							}
 						}
 						else
 						{
-							m_sRecoveryJobInfo.UIWndSourceEnd.iOrder	= iDestiOrder;
-							m_sRecoveryJobInfo.m_iPage					= m_iCurPage;
+							s_sRecoveryJobInfo.UIWndSourceEnd.iOrder	= iDestiOrder;
+							s_sRecoveryJobInfo.m_iPage					= m_iCurPage;
 						}
 					}
 
 					s_bWaitFromServer = false;
 
-					m_pCountableItemEdit->Open(UIWND_WARE_HOUSE, m_sSelectedIconInfo.UIWndSelect.UIWndDistrict, false);
+					s_pCountableItemEdit->Open(UIWND_WARE_HOUSE, s_sSelectedIconInfo.UIWndSelect.UIWndDistrict, false);
 					FAIL_RETURN
 				}
 				else
@@ -997,8 +997,8 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 							{
 								if (bFound)
 								{
-									m_sRecoveryJobInfo.UIWndSourceEnd.iOrder = iDestiOrder;
-									m_sRecoveryJobInfo.m_iPage = iPage;
+									s_sRecoveryJobInfo.UIWndSourceEnd.iOrder = iDestiOrder;
+									s_sRecoveryJobInfo.m_iPage = iPage;
 									break;
 								}
 
@@ -1014,36 +1014,36 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 						if (!bFound)
 						{
 							s_bWaitFromServer						= false;
-							m_sRecoveryJobInfo.pItemSource			= nullptr;
-							m_sRecoveryJobInfo.pItemTarget			= nullptr;
+							s_sRecoveryJobInfo.pItemSource			= nullptr;
+							s_sRecoveryJobInfo.pItemTarget			= nullptr;
 							FAIL_RETURN
 						}
 					}
 					else
 					{
-						m_sRecoveryJobInfo.UIWndSourceEnd.iOrder	= iDestiOrder;
-						m_sRecoveryJobInfo.m_iPage					= m_iCurPage;
+						s_sRecoveryJobInfo.UIWndSourceEnd.iOrder	= iDestiOrder;
+						s_sRecoveryJobInfo.m_iPage					= m_iCurPage;
 					}
 
 					SendToServerToWareMsg(
-						m_sRecoveryJobInfo.pItemSource->pItemBasic->dwID + m_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
-						m_sRecoveryJobInfo.m_iPage,
-						m_sRecoveryJobInfo.UIWndSourceStart.iOrder,
+						s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID + s_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
+						s_sRecoveryJobInfo.m_iPage,
+						s_sRecoveryJobInfo.UIWndSourceStart.iOrder,
 						iDestiOrder,
-						m_sRecoveryJobInfo.pItemSource->iCount);
+						s_sRecoveryJobInfo.pItemSource->iCount);
 
-					m_pMyWare[m_sRecoveryJobInfo.m_iPage][iDestiOrder] = m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder];
-					m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
+					m_pMyWare[s_sRecoveryJobInfo.m_iPage][iDestiOrder] = m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
+					m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
 
 					pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_NPC, iDestiOrder);
 					if (pArea != nullptr)
 					{
-						m_pMyWare[m_sRecoveryJobInfo.m_iPage][iDestiOrder]->pUIIcon->SetRegion(pArea->GetRegion());
-						m_pMyWare[m_sRecoveryJobInfo.m_iPage][iDestiOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
+						m_pMyWare[s_sRecoveryJobInfo.m_iPage][iDestiOrder]->pUIIcon->SetRegion(pArea->GetRegion());
+						m_pMyWare[s_sRecoveryJobInfo.m_iPage][iDestiOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
 					}
 
-					if (m_sRecoveryJobInfo.m_iPage != m_iCurPage)
-						m_pMyWare[m_sRecoveryJobInfo.m_iPage][iDestiOrder]->pUIIcon->SetVisibleWithNoSound(false);
+					if (s_sRecoveryJobInfo.m_iPage != m_iCurPage)
+						m_pMyWare[s_sRecoveryJobInfo.m_iPage][iDestiOrder]->pUIIcon->SetVisibleWithNoSound(false);
 
 					FAIL_RETURN
 				}
@@ -1052,7 +1052,7 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 			{
 				// 이동.. 
 				__IconItemSkill* spItemSource, *spItemTarget = nullptr;
-				spItemSource = m_sRecoveryJobInfo.pItemSource;
+				spItemSource = s_sRecoveryJobInfo.pItemSource;
 
 				pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_MY, iDestiOrder);
 				if (pArea != nullptr)
@@ -1061,23 +1061,23 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 					spItemSource->pUIIcon->SetMoveRect(pArea->GetRegion());
 				}
 
-				m_sRecoveryJobInfo.UIWndSourceEnd.iOrder = iDestiOrder;
+				s_sRecoveryJobInfo.UIWndSourceEnd.iOrder = iDestiOrder;
 
 				// Inv 내에서 이동..	(모두 일반 아이템으로 취급한다..)
 				// 해당 위치에 아이콘이 있으면..
 				if (m_pMyWareInv[iDestiOrder] != nullptr)
 				{
-					m_sRecoveryJobInfo.pItemTarget = m_pMyWareInv[iDestiOrder];
-					m_sRecoveryJobInfo.UIWndTargetStart.UIWnd = UIWND_WARE_HOUSE;
-					m_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict = UIWND_DISTRICT_TRADE_MY;
-					m_sRecoveryJobInfo.UIWndTargetStart.iOrder = iDestiOrder;
-					m_sRecoveryJobInfo.UIWndTargetEnd.UIWnd = UIWND_WARE_HOUSE;
-					m_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict = UIWND_DISTRICT_TRADE_MY;
-					m_sRecoveryJobInfo.UIWndTargetEnd.iOrder = m_sRecoveryJobInfo.UIWndSourceStart.iOrder;
+					s_sRecoveryJobInfo.pItemTarget = m_pMyWareInv[iDestiOrder];
+					s_sRecoveryJobInfo.UIWndTargetStart.UIWnd = UIWND_WARE_HOUSE;
+					s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict = UIWND_DISTRICT_TRADE_MY;
+					s_sRecoveryJobInfo.UIWndTargetStart.iOrder = iDestiOrder;
+					s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd = UIWND_WARE_HOUSE;
+					s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict = UIWND_DISTRICT_TRADE_MY;
+					s_sRecoveryJobInfo.UIWndTargetEnd.iOrder = s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
 
-					spItemTarget = m_sRecoveryJobInfo.pItemTarget;
+					spItemTarget = s_sRecoveryJobInfo.pItemTarget;
 
-					pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_MY, m_sRecoveryJobInfo.UIWndSourceStart.iOrder);
+					pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_MY, s_sRecoveryJobInfo.UIWndSourceStart.iOrder);
 					if (pArea != nullptr)
 					{
 						spItemTarget->pUIIcon->SetRegion(pArea->GetRegion());
@@ -1086,17 +1086,17 @@ bool CUIWareHouseDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 				}
 				else
 				{
-					m_sRecoveryJobInfo.pItemTarget = nullptr;
+					s_sRecoveryJobInfo.pItemTarget = nullptr;
 				}
 
 				m_pMyWareInv[iDestiOrder] = spItemSource;
-				m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItemTarget;
+				m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItemTarget;
 
 				// 이동 메시지를 보낸다..
 				SendToServerInvToInvMsg(
-					m_sRecoveryJobInfo.pItemSource->pItemBasic->dwID + m_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
+					s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID + s_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
 					m_iCurPage,
-					m_sRecoveryJobInfo.UIWndSourceStart.iOrder,
+					s_sRecoveryJobInfo.UIWndSourceStart.iOrder,
 					iDestiOrder);
 
 				FAIL_RETURN
@@ -1186,7 +1186,7 @@ void CUIWareHouseDlg::ReceiveResultToWareMsg(uint8_t bResult)
 {
 	s_bWaitFromServer = false;
 
-	int iGold = m_pCountableItemEdit->GetQuantity();
+	int iGold = s_pCountableItemEdit->GetQuantity();
 	__IconItemSkill* spItem = nullptr;
 	CN3UIArea* pArea = nullptr;
 
@@ -1200,22 +1200,22 @@ void CUIWareHouseDlg::ReceiveResultToWareMsg(uint8_t bResult)
 		}
 
 		// 활이나 물약등 아이템인 경우..
-		if (m_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
-			|| m_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
+		if (s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
+			|| s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
 		{
 			// Ware Side..
-			if ((m_pMyWare[m_sRecoveryJobInfo.m_iPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount - iGold) > 0)
+			if ((m_pMyWare[s_sRecoveryJobInfo.m_iPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount - iGold) > 0)
 			{
 				//  숫자 업데이트..
-				m_pMyWare[m_sRecoveryJobInfo.m_iPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount -= iGold;
+				m_pMyWare[s_sRecoveryJobInfo.m_iPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount -= iGold;
 			}
 			else
 			{
 				// 아이템 삭제.. 현재 인벤토리 윈도우만.. 
-				spItem = m_pMyWare[m_sRecoveryJobInfo.m_iPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
+				spItem = m_pMyWare[s_sRecoveryJobInfo.m_iPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 
 				// 인벤토리에서도 지운다..
-				m_pMyWare[m_sRecoveryJobInfo.m_iPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
+				m_pMyWare[s_sRecoveryJobInfo.m_iPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
 
 				// iOrder로 내 매니저의 아이템을 리스트에서 삭제한다..
 				RemoveChild(spItem->pUIIcon);
@@ -1230,30 +1230,30 @@ void CUIWareHouseDlg::ReceiveResultToWareMsg(uint8_t bResult)
 
 			// Inv Side..	//////////////////////////////////////////////////////
 
-			if (!m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->IsVisible())
+			if (!m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->IsVisible())
 			{
-				m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->SetVisible(true);
-				m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount = iGold;
+				m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->SetVisible(true);
+				m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount = iGold;
 			}
 			else
 			{
-				m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount += iGold;
+				m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount += iGold;
 			}
 		}
 		// 일반 아이템인 경우..
 		else
 		{
-			m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder]
-				= m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
+			m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder]
+				= m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 
-			pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_MY, m_sRecoveryJobInfo.UIWndSourceStart.iOrder);
+			pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_MY, s_sRecoveryJobInfo.UIWndSourceStart.iOrder);
 			if (pArea != nullptr)
 			{
-				m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
-				m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
+				m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
+				m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
 			}
 
-			m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
+			m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
 		}
 	}
 	// 성공.. 
@@ -1267,14 +1267,14 @@ void CUIWareHouseDlg::ReceiveResultToWareMsg(uint8_t bResult)
 		}
 
 		// 활이나 물약등 아이템인 경우..
-		if ((m_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
-			|| m_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
-			&& !m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->IsVisible())
+		if ((s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
+			|| s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
+			&& !m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->IsVisible())
 		{
-			spItem = m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder];
+			spItem = m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
 
 			// 인벤토리에서도 지운다..
-			m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
+			m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
 
 			// iOrder로 내 매니저의 아이템을 리스트에서 삭제한다..
 			RemoveChild(spItem->pUIIcon);
@@ -1294,7 +1294,7 @@ void CUIWareHouseDlg::ReceiveResultFromWareMsg(uint8_t bResult)
 {
 	s_bWaitFromServer = false;
 
-	int iGold = m_pCountableItemEdit->GetQuantity();
+	int iGold = s_pCountableItemEdit->GetQuantity();
 	__IconItemSkill* spItem = nullptr;
 	CN3UIArea* pArea = nullptr;
 
@@ -1306,22 +1306,22 @@ void CUIWareHouseDlg::ReceiveResultFromWareMsg(uint8_t bResult)
 			return;
 		}
 
-		if (m_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
-			|| m_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
+		if (s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
+			|| s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
 		{
 			// Inv Side..	//////////////////////////////////////////////////////
-			if ((m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount - iGold) > 0)
+			if ((m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount - iGold) > 0)
 			{
 				// 숫자 업데이트..
-				m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount -= iGold;
+				m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount -= iGold;
 			}
 			else
 			{
 				// 아이템 삭제.. 현재 인벤토리 윈도우만.. 
-				spItem = m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
+				spItem = m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 
 				// 인벤토리에서도 지운다..
-				m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
+				m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
 
 				// iOrder로 내 매니저의 아이템을 리스트에서 삭제한다..
 				RemoveChild(spItem->pUIIcon);
@@ -1336,30 +1336,30 @@ void CUIWareHouseDlg::ReceiveResultFromWareMsg(uint8_t bResult)
 
 			// Ware Side..
 
-			if (!m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->IsVisible())
+			if (!m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->IsVisible())
 			{
-				m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->SetVisible(true);
-				m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount = iGold;
+				m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->SetVisible(true);
+				m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount = iGold;
 			}
 			else
 			{
-				m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount += iGold;
+				m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount += iGold;
 			}
 		}
 		else
 		{
 			// 일반 아이템..
-			m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder] =
-				m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
+			m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder] =
+				m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 
-			pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_NPC, m_sRecoveryJobInfo.UIWndSourceStart.iOrder);
+			pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_NPC, s_sRecoveryJobInfo.UIWndSourceStart.iOrder);
 			if (pArea != nullptr)
 			{
-				m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
-				m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
+				m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
+				m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
 			}
 
-			m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
+			m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
 		}
 
 		std::string szMsg = fmt::format_text_resource(IDS_ITEM_TOOMANY_OR_HEAVY);
@@ -1376,14 +1376,14 @@ void CUIWareHouseDlg::ReceiveResultFromWareMsg(uint8_t bResult)
 		}
 
 		// 활이나 물약등 아이템인 경우..
-		if ((m_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
-			|| m_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
-			&& !m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->IsVisible())
+		if ((s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
+			|| s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
+			&& !m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->IsVisible())
 		{
-			spItem = m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder];
+			spItem = m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
 
 			// 인벤토리에서도 지운다..
-			m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
+			m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
 
 			// iOrder로 내 매니저의 아이템을 리스트에서 삭제한다..
 			RemoveChild(spItem->pUIIcon);
@@ -1405,35 +1405,35 @@ void CUIWareHouseDlg::ReceiveResultWareToWareMsg(uint8_t bResult)
 	// 실패..
 	if (bResult != 0x01)
 	{
-		__IconItemSkill* spItemSource = m_sRecoveryJobInfo.pItemSource;
-		__IconItemSkill* spItemTarget = m_sRecoveryJobInfo.pItemTarget;
+		__IconItemSkill* spItemSource = s_sRecoveryJobInfo.pItemSource;
+		__IconItemSkill* spItemTarget = s_sRecoveryJobInfo.pItemTarget;
 
 		if (spItemSource != nullptr)
 		{
-			CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_NPC, m_sRecoveryJobInfo.UIWndSourceStart.iOrder);
+			CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_NPC, s_sRecoveryJobInfo.UIWndSourceStart.iOrder);
 			if (pArea != nullptr)
 			{
 				spItemSource->pUIIcon->SetRegion(pArea->GetRegion());
 				spItemSource->pUIIcon->SetMoveRect(pArea->GetRegion());
 			}
 
-			m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItemSource;
+			m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItemSource;
 		}
 
 		if (spItemTarget != nullptr)
 		{
-			CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_NPC, m_sRecoveryJobInfo.UIWndSourceEnd.iOrder);
+			CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_NPC, s_sRecoveryJobInfo.UIWndSourceEnd.iOrder);
 			if (pArea != nullptr)
 			{
 				spItemTarget->pUIIcon->SetRegion(pArea->GetRegion());
 				spItemTarget->pUIIcon->SetMoveRect(pArea->GetRegion());
 			}
 
-			m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = spItemTarget;
+			m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = spItemTarget;
 		}
 		else
 		{
-			m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
+			m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
 		}
 	}
 
@@ -1448,35 +1448,35 @@ void CUIWareHouseDlg::ReceiveResultInvToInvMsg(uint8_t bResult)
 	// 실패..
 	if (bResult != 0x01)
 	{
-		__IconItemSkill* spItemSource = m_sRecoveryJobInfo.pItemSource;
-		__IconItemSkill* spItemTarget = m_sRecoveryJobInfo.pItemTarget;
+		__IconItemSkill* spItemSource = s_sRecoveryJobInfo.pItemSource;
+		__IconItemSkill* spItemTarget = s_sRecoveryJobInfo.pItemTarget;
 
 		if (spItemSource != nullptr)
 		{
-			CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_MY, m_sRecoveryJobInfo.UIWndSourceStart.iOrder);
+			CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_MY, s_sRecoveryJobInfo.UIWndSourceStart.iOrder);
 			if (pArea != nullptr)
 			{
 				spItemSource->pUIIcon->SetRegion(pArea->GetRegion());
 				spItemSource->pUIIcon->SetMoveRect(pArea->GetRegion());
 			}
 
-			m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItemSource;
+			m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItemSource;
 		}
 
 		if (spItemTarget != nullptr)
 		{
-			CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_MY, m_sRecoveryJobInfo.UIWndSourceEnd.iOrder);
+			CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_MY, s_sRecoveryJobInfo.UIWndSourceEnd.iOrder);
 			if (pArea != nullptr)
 			{
 				spItemTarget->pUIIcon->SetRegion(pArea->GetRegion());
 				spItemTarget->pUIIcon->SetMoveRect(pArea->GetRegion());
 			}
 
-			m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = spItemTarget;
+			m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = spItemTarget;
 		}
 		else
 		{
-			m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
+			m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
 		}
 	}
 
@@ -1486,18 +1486,18 @@ void CUIWareHouseDlg::ReceiveResultInvToInvMsg(uint8_t bResult)
 
 void CUIWareHouseDlg::ItemCountOK()
 {
-	int iGold = m_pCountableItemEdit->GetQuantity();
+	int iGold = s_pCountableItemEdit->GetQuantity();
 	__IconItemSkill* spItem = nullptr;
 	CN3UIArea* pArea = nullptr;
 	float fUVAspect = 45.0f / 64.0f;
 	int iWeight;
 	__InfoPlayerMySelf* pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
 
-	switch (m_pCountableItemEdit->GetCallerWndDistrict())
+	switch (s_pCountableItemEdit->GetCallerWndDistrict())
 	{
 		// 빼는 경우..
 		case UIWND_DISTRICT_TRADE_NPC:
-			spItem = m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder];
+			spItem = m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
 			if (iGold > spItem->iCount)
 				return;
 
@@ -1528,9 +1528,9 @@ void CUIWareHouseDlg::ItemCountOK()
 						return;
 					}
 
-					if (m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] != nullptr)
+					if (m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] != nullptr)
 					{
-						spItem = m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
+						spItem = m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 						if (spItem->iCount + iGold > UIITEM_COUNT_MANY)
 						{
 							std::string szMsg = fmt::format_text_resource(IDS_MANY_COUNTABLE_ITEM_GET_MANY);
@@ -1561,9 +1561,9 @@ void CUIWareHouseDlg::ItemCountOK()
 						return;
 					}
 
-					if (m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] != nullptr)
+					if (m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] != nullptr)
 					{
-						spItem = m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
+						spItem = m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 						if (spItem->iCount + iGold > UIITEM_COUNT_FEW)
 						{
 							std::string szMsg = fmt::format_text_resource(IDS_SMALL_COUNTABLE_ITEM_GET_MANY);
@@ -1583,15 +1583,15 @@ void CUIWareHouseDlg::ItemCountOK()
 					break;
 			}
 
-			spItem = m_pMyWare[m_iCurPage][m_sRecoveryJobInfo.UIWndSourceStart.iOrder];
+			spItem = m_pMyWare[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
 
 			s_bWaitFromServer = true;
 
 			// 해당 위치에 아이콘이 있으면..
-			if (m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] != nullptr)
+			if (m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] != nullptr)
 			{
 				// 숫자 업데이트..
-				m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount += iGold;
+				m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount += iGold;
 			}
 			else	// 없으면 아이콘을 만든다...
 			{
@@ -1609,14 +1609,14 @@ void CUIWareHouseDlg::ItemCountOK()
 				spItemNew->pUIIcon->SetStyle(UISTYLE_ICON_ITEM | UISTYLE_ICON_CERTIFICATION_NEED);
 				spItemNew->pUIIcon->SetVisible(true);
 
-				pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_MY, m_sRecoveryJobInfo.UIWndSourceEnd.iOrder);
+				pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_MY, s_sRecoveryJobInfo.UIWndSourceEnd.iOrder);
 				if (pArea != nullptr)
 				{
 					spItemNew->pUIIcon->SetRegion(pArea->GetRegion());
 					spItemNew->pUIIcon->SetMoveRect(pArea->GetRegion());
 				}
 
-				m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = spItemNew;
+				m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = spItemNew;
 			}
 
 			// 숫자 업데이트..
@@ -1628,20 +1628,20 @@ void CUIWareHouseDlg::ItemCountOK()
 			// 표시는 아이콘 렌더링할때.. Inventory의 Render에서..
 			// 서버에게 보냄..
 			SendToServerFromWareMsg(
-				m_sRecoveryJobInfo.pItemSource->pItemBasic->dwID + m_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
+				s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID + s_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
 				m_iCurPage,
-				m_sRecoveryJobInfo.UIWndSourceStart.iOrder,
-				m_sRecoveryJobInfo.UIWndSourceEnd.iOrder,
+				s_sRecoveryJobInfo.UIWndSourceStart.iOrder,
+				s_sRecoveryJobInfo.UIWndSourceEnd.iOrder,
 				iGold);
 
 			// Sound..
-			if (m_sRecoveryJobInfo.pItemSource != nullptr)
-				PlayItemSound(m_sRecoveryJobInfo.pItemSource->pItemBasic);
+			if (s_sRecoveryJobInfo.pItemSource != nullptr)
+				PlayItemSound(s_sRecoveryJobInfo.pItemSource->pItemBasic);
 			break;
 
 		// 넣는 경우..
 		case UIWND_DISTRICT_TRADE_MY:
-			spItem = m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder];
+			spItem = m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
 			if (iGold > spItem->iCount)
 				return;
 
@@ -1659,9 +1659,9 @@ void CUIWareHouseDlg::ItemCountOK()
 						return;
 					}
 
-					if (m_pMyWare[m_sRecoveryJobInfo.m_iPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] != nullptr)
+					if (m_pMyWare[s_sRecoveryJobInfo.m_iPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] != nullptr)
 					{
-						spItem = m_pMyWare[m_sRecoveryJobInfo.m_iPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
+						spItem = m_pMyWare[s_sRecoveryJobInfo.m_iPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 						if (spItem->iCount + iGold > UIITEM_COUNT_MANY)
 						{
 							std::string szMsg = fmt::format_text_resource(IDS_MANY_COUNTABLE_ITEM_GET_MANY);
@@ -1683,9 +1683,9 @@ void CUIWareHouseDlg::ItemCountOK()
 						return;
 					}
 
-					if (m_pMyWare[m_sRecoveryJobInfo.m_iPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] != nullptr)
+					if (m_pMyWare[s_sRecoveryJobInfo.m_iPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] != nullptr)
 					{
-						spItem = m_pMyWare[m_sRecoveryJobInfo.m_iPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
+						spItem = m_pMyWare[s_sRecoveryJobInfo.m_iPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 						if (spItem->iCount + iGold > UIITEM_COUNT_FEW)
 						{
 							std::string szMsg = fmt::format_text_resource(IDS_SMALL_COUNTABLE_ITEM_GET_MANY);
@@ -1696,15 +1696,15 @@ void CUIWareHouseDlg::ItemCountOK()
 					break;
 			}
 
-			spItem = m_pMyWareInv[m_sRecoveryJobInfo.UIWndSourceStart.iOrder];
+			spItem = m_pMyWareInv[s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
 
 			s_bWaitFromServer = true;
 
 			// 해당 위치에 아이콘이 있으면..
-			if (m_pMyWare[m_sRecoveryJobInfo.m_iPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder])
+			if (m_pMyWare[s_sRecoveryJobInfo.m_iPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder])
 			{
 				// 숫자 업데이트..
-				m_pMyWare[m_sRecoveryJobInfo.m_iPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount += iGold;
+				m_pMyWare[s_sRecoveryJobInfo.m_iPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount += iGold;
 			}
 			// 없으면 아이콘을 만든다..
 			else
@@ -1723,17 +1723,17 @@ void CUIWareHouseDlg::ItemCountOK()
 				spItemNew->pUIIcon->SetStyle(UISTYLE_ICON_ITEM | UISTYLE_ICON_CERTIFICATION_NEED);
 				spItemNew->pUIIcon->SetVisible(true);
 
-				pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_NPC, m_sRecoveryJobInfo.UIWndSourceEnd.iOrder);
+				pArea = GetChildAreaByiOrder(UI_AREA_TYPE_TRADE_NPC, s_sRecoveryJobInfo.UIWndSourceEnd.iOrder);
 				if (pArea != nullptr)
 				{
 					spItemNew->pUIIcon->SetRegion(pArea->GetRegion());
 					spItemNew->pUIIcon->SetMoveRect(pArea->GetRegion());
 				}
 
-				if (m_sRecoveryJobInfo.m_iPage != m_iCurPage)
+				if (s_sRecoveryJobInfo.m_iPage != m_iCurPage)
 					spItemNew->pUIIcon->SetVisibleWithNoSound(false);
 
-				m_pMyWare[m_sRecoveryJobInfo.m_iPage][m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = spItemNew;
+				m_pMyWare[s_sRecoveryJobInfo.m_iPage][s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = spItemNew;
 			}
 
 			//  숫자 업데이트..
@@ -1745,30 +1745,30 @@ void CUIWareHouseDlg::ItemCountOK()
 			// 표시는 아이콘 렌더링할때.. Inventory의 Render에서..
 			// 서버에게 보냄..
 			SendToServerToWareMsg(
-				m_sRecoveryJobInfo.pItemSource->pItemBasic->dwID + m_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
-				m_sRecoveryJobInfo.m_iPage,
-				m_sRecoveryJobInfo.UIWndSourceStart.iOrder,
-				m_sRecoveryJobInfo.UIWndSourceEnd.iOrder,
+				s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID + s_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
+				s_sRecoveryJobInfo.m_iPage,
+				s_sRecoveryJobInfo.UIWndSourceStart.iOrder,
+				s_sRecoveryJobInfo.UIWndSourceEnd.iOrder,
 				iGold);
 
 			break;
 	}
 
-	m_pCountableItemEdit->Close();
+	s_pCountableItemEdit->Close();
 }
 
 void CUIWareHouseDlg::ItemCountCancel()
 {
 	// Sound..
-	if (m_sRecoveryJobInfo.pItemSource != nullptr)
-		PlayItemSound(m_sRecoveryJobInfo.pItemSource->pItemBasic);
+	if (s_sRecoveryJobInfo.pItemSource != nullptr)
+		PlayItemSound(s_sRecoveryJobInfo.pItemSource->pItemBasic);
 
 	// 취소..
 	s_bWaitFromServer				= false;
-	m_sRecoveryJobInfo.pItemSource	= nullptr;
-	m_sRecoveryJobInfo.pItemTarget	= nullptr;
+	s_sRecoveryJobInfo.pItemSource	= nullptr;
+	s_sRecoveryJobInfo.pItemTarget	= nullptr;
 
-	m_pCountableItemEdit->Close();
+	s_pCountableItemEdit->Close();
 }
 
 void CUIWareHouseDlg::ItemMoveFromInvToThis()
@@ -1877,7 +1877,7 @@ void CUIWareHouseDlg::GoldCountToWareOK()
 	std::string str;
 
 	// 돈을 보관함에 보관하는 경우..
-	iGold = m_pCountableItemEdit->GetQuantity();
+	iGold = s_pCountableItemEdit->GetQuantity();
 
 	// Gold Offset Backup..
 	m_iGoldOffsetBackup = iGold;
@@ -1922,7 +1922,7 @@ void CUIWareHouseDlg::GoldCountToWareOK()
 
 	// 상태를 변화시키고.. 창을 닫고..
 	s_bWaitFromServer = true;
-	m_pCountableItemEdit->Close();
+	s_pCountableItemEdit->Close();
 
 	PlayGoldSound();
 }
@@ -1934,7 +1934,7 @@ void CUIWareHouseDlg::GoldCountFromWareOK()
 	std::string str;
 
 	// 돈을 보관함에서 빼는 경우..
-	iGold = m_pCountableItemEdit->GetQuantity();
+	iGold = s_pCountableItemEdit->GetQuantity();
 
 	// Gold Offset Backup..
 	m_iGoldOffsetBackup = iGold;
@@ -1979,7 +1979,7 @@ void CUIWareHouseDlg::GoldCountFromWareOK()
 
 	// 상태를 변화시키고.. 창을 닫고..
 	s_bWaitFromServer = true;
-	m_pCountableItemEdit->Close();
+	s_pCountableItemEdit->Close();
 
 	PlayGoldSound();
 }
@@ -1992,10 +1992,10 @@ void CUIWareHouseDlg::GoldCountToWareCancel()
 
 	// 취소..
 	s_bWaitFromServer = false;
-	m_sRecoveryJobInfo.pItemSource = nullptr;
-	m_sRecoveryJobInfo.pItemTarget = nullptr;
+	s_sRecoveryJobInfo.pItemSource = nullptr;
+	s_sRecoveryJobInfo.pItemTarget = nullptr;
 
-	m_pCountableItemEdit->Close();
+	s_pCountableItemEdit->Close();
 }
 
 void CUIWareHouseDlg::GoldCountFromWareCancel()
@@ -2006,10 +2006,10 @@ void CUIWareHouseDlg::GoldCountFromWareCancel()
 
 	// 취소..
 	s_bWaitFromServer				= false;
-	m_sRecoveryJobInfo.pItemSource	= nullptr;
-	m_sRecoveryJobInfo.pItemTarget	= nullptr;
+	s_sRecoveryJobInfo.pItemSource	= nullptr;
+	s_sRecoveryJobInfo.pItemTarget	= nullptr;
 
-	m_pCountableItemEdit->Close();
+	s_pCountableItemEdit->Close();
 }
 
 void CUIWareHouseDlg::ReceiveResultGoldToWareFail()
@@ -2022,7 +2022,7 @@ void CUIWareHouseDlg::ReceiveResultGoldToWareFail()
 	std::string str;
 
 	// 돈을 보관함에서 빼는 경우..
-	iGold = m_pCountableItemEdit->GetQuantity();
+	iGold = s_pCountableItemEdit->GetQuantity();
 
 	// Gold Offset Backup..
 	m_iGoldOffsetBackup = iGold;
@@ -2064,7 +2064,7 @@ void CUIWareHouseDlg::ReceiveResultGoldFromWareFail()
 	std::string str;
 
 	// 돈을 보관함에 보관하는 경우..
-	iGold = m_pCountableItemEdit->GetQuantity();
+	iGold = s_pCountableItemEdit->GetQuantity();
 
 	// Gold Offset Backup..
 	m_iGoldOffsetBackup = iGold;
@@ -2145,8 +2145,8 @@ void CUIWareHouseDlg::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReF
 
 	if (bWork)
 	{
-		if (m_pCountableItemEdit != nullptr && m_pCountableItemEdit->IsVisible())
-			m_pCountableItemEdit->SetVisibleWithNoSound(bVisible, bWork, bReFocus);
+		if (s_pCountableItemEdit != nullptr && s_pCountableItemEdit->IsVisible())
+			s_pCountableItemEdit->SetVisibleWithNoSound(bVisible, bWork, bReFocus);
 
 		if (GetState() == UI_STATE_ICON_MOVING)
 			IconRestore();

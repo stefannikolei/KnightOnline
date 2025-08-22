@@ -4011,18 +4011,18 @@ void CGameProcMain::InitUI()
 	m_pUIInventory->SetStyle(m_pUIInventory->GetStyle() | UISTYLE_POS_RIGHT);
 
 	// Countable Item Edit Dlg..
-	CN3UIWndBase::m_pCountableItemEdit = new CCountableItemEditDlg;
-	CN3UIWndBase::m_pCountableItemEdit->Init(s_pUIMgr);
-	CN3UIWndBase::m_pCountableItemEdit->LoadFromFile(pTbl->szPersonalTradeEdit);
-	CN3UIWndBase::m_pCountableItemEdit->SetStyle(UISTYLE_ALWAYSTOP);
+	CN3UIWndBase::s_pCountableItemEdit = new CCountableItemEditDlg;
+	CN3UIWndBase::s_pCountableItemEdit->Init(s_pUIMgr);
+	CN3UIWndBase::s_pCountableItemEdit->LoadFromFile(pTbl->szPersonalTradeEdit);
+	CN3UIWndBase::s_pCountableItemEdit->SetStyle(UISTYLE_ALWAYSTOP);
 	// 위치 계산 ..
-	rc = CN3UIWndBase::m_pCountableItemEdit->GetRegion();
+	rc = CN3UIWndBase::s_pCountableItemEdit->GetRegion();
 	iX = (iW - (rc.right - rc.left))/2;
 	iY = (iH - (rc.bottom - rc.top))/2;
-	CN3UIWndBase::m_pCountableItemEdit->SetPos(iX, iY);	
-	CN3UIWndBase::m_pCountableItemEdit->SetVisibleWithNoSound(false);
-	CN3UIWndBase::m_pCountableItemEdit->SetUIType(UI_TYPE_BASE);
-	CN3UIWndBase::m_pCountableItemEdit->SetState(UI_STATE_COMMON_NONE);
+	CN3UIWndBase::s_pCountableItemEdit->SetPos(iX, iY);	
+	CN3UIWndBase::s_pCountableItemEdit->SetVisibleWithNoSound(false);
+	CN3UIWndBase::s_pCountableItemEdit->SetUIType(UI_TYPE_BASE);
+	CN3UIWndBase::s_pCountableItemEdit->SetState(UI_STATE_COMMON_NONE);
 
 	m_pUISkillTreeDlg->Init(s_pUIMgr);
 	m_pUISkillTreeDlg->LoadFromFile(pTbl->szSkillTree);

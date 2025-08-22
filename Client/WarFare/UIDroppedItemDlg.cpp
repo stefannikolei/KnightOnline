@@ -101,7 +101,7 @@ void CUIDroppedItemDlg::Render()
 			if (pStr != nullptr)
 			{
 				if (GetState() == UI_STATE_ICON_MOVING
-					&& m_pMyDroppedItem[i] == m_sSelectedIconInfo.pItemSelect)
+					&& m_pMyDroppedItem[i] == s_sSelectedIconInfo.pItemSelect)
 				{
 					pStr->SetVisible(false);
 				}
@@ -327,7 +327,7 @@ bool CUIDroppedItemDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 		return false;
 
 	// 검사해서 선택된 아이콘을 가진 윈도우에게 결과를 알려줘야 한다..
-	switch (m_sSelectedIconInfo.UIWndSelect.UIWnd)
+	switch (s_sSelectedIconInfo.UIWndSelect.UIWnd)
 	{
 		// 인벤토리 윈도우로부터 온 것이라면..
 		case UIWND_INVENTORY:
@@ -391,7 +391,7 @@ bool CUIDroppedItemDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
 // Temp Define
 #define FAIL_CODE {		\
-				m_sSelectedIconInfo.eIconSelectState = UIICON_SELECT_NONE;	\
+				s_sSelectedIconInfo.eIconSelectState = UIICON_SELECT_NONE;	\
 				return false;	\
 			}
 
@@ -467,13 +467,13 @@ bool CUIDroppedItemDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			CGameProcedure::s_pSocket->Send(byBuff, iOffset);
 
 			// 보낸 아이콘 정보 셋팅..	
-			m_sRecoveryJobInfo.pItemSource						= spItem;
-			m_sRecoveryJobInfo.UIWndSourceStart.UIWnd			= UIWND_DROPITEM;
-			m_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict	= UIWND_DISTRICT_DROPITEM;
-			m_sRecoveryJobInfo.UIWndSourceStart.iOrder			= iOrder;
-			m_sRecoveryJobInfo.UIWndSourceEnd.UIWnd				= UIWND_INVENTORY;
-			m_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict		= UIWND_DISTRICT_INVENTORY_INV;
-			m_sRecoveryJobInfo.UIWndSourceEnd.iOrder			= iOrderInv;
+			s_sRecoveryJobInfo.pItemSource						= spItem;
+			s_sRecoveryJobInfo.UIWndSourceStart.UIWnd			= UIWND_DROPITEM;
+			s_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict	= UIWND_DISTRICT_DROPITEM;
+			s_sRecoveryJobInfo.UIWndSourceStart.iOrder			= iOrder;
+			s_sRecoveryJobInfo.UIWndSourceEnd.UIWnd				= UIWND_INVENTORY;
+			s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict		= UIWND_DISTRICT_INVENTORY_INV;
+			s_sRecoveryJobInfo.UIWndSourceEnd.iOrder			= iOrderInv;
 			break;
 
 		case UIMSG_ICON_DOWN:
@@ -647,7 +647,7 @@ void CUIDroppedItemDlg::GetItemByIDToInventory(
 	// 파티 상태에서 다른 멤버가 아이템을 습득..
 	if (bResult == 4)
 	{
-		spItem = m_pMyDroppedItem[m_sRecoveryJobInfo.UIWndSourceStart.iOrder];
+		spItem = m_pMyDroppedItem[s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
 		if (spItem != nullptr)
 		{
 			// 매니저에서 제거..
@@ -661,7 +661,7 @@ void CUIDroppedItemDlg::GetItemByIDToInventory(
 			spItem = nullptr;
 		}
 
-		m_pMyDroppedItem[m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
+		m_pMyDroppedItem[s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
 
 		if (CGameProcedure::s_pProcMain->m_pUISkillTreeDlg != nullptr)
 			CGameProcedure::s_pProcMain->m_pUISkillTreeDlg->UpdateDisableCheck();
@@ -824,7 +824,7 @@ void CUIDroppedItemDlg::GetItemByIDToInventory(
 			std::string szMsg = fmt::format_text_resource(IDS_ITEM_GET_BY_RULE, pItem->szName);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xff9b9bff);
 
-			spItem = m_pMyDroppedItem[m_sRecoveryJobInfo.UIWndSourceStart.iOrder];
+			spItem = m_pMyDroppedItem[s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
 			if (spItem != nullptr)
 			{
 				// 매니저에서 제거..
@@ -838,7 +838,7 @@ void CUIDroppedItemDlg::GetItemByIDToInventory(
 				spItem = nullptr;
 			}
 
-			m_pMyDroppedItem[m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
+			m_pMyDroppedItem[s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
 		}
 		else
 		{
@@ -854,7 +854,7 @@ void CUIDroppedItemDlg::GetItemByIDToInventory(
 			//TRACE("돈 업데이트 %d \n", iGold);
 			CGameProcedure::s_pProcMain->m_pUIInventory->GoldUpdate();
 
-			spItem = m_sRecoveryJobInfo.pItemSource;
+			spItem = s_sRecoveryJobInfo.pItemSource;
 			if (spItem == nullptr)
 				return;
 
@@ -867,7 +867,7 @@ void CUIDroppedItemDlg::GetItemByIDToInventory(
 			spItem->pUIIcon = nullptr;
 			delete spItem;
 			spItem = nullptr;
-			m_pMyDroppedItem[m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
+			m_pMyDroppedItem[s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
 
 			PlayGoldSound();
 		}
