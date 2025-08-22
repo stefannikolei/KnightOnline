@@ -434,6 +434,8 @@ void CUIHotKeyDlg::InitIconUpdate()
 			spSkill->pUIIcon->SetUIType(UI_TYPE_ICON);
 			spSkill->pUIIcon->SetStyle(UISTYLE_ICON_SKILL);
 
+			SetHotKeyTooltip(spSkill);
+
 			CN3UIArea* pArea = nullptr;
 			pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, HD.column);
 			if ( pArea )
@@ -632,6 +634,8 @@ void CUIHotKeyDlg::SetReceiveSelectedSkill(int iIndex)
 	m_pMyHotkey[m_iCurPage][iIndex]->pUIIcon->SetRegion(pArea->GetRegion());
 	m_pMyHotkey[m_iCurPage][iIndex]->pUIIcon->SetMoveRect(pArea->GetRegion());
 	m_pMyHotkey[m_iCurPage][iIndex]->pUIIcon->SetParent(this);
+
+	SetHotKeyTooltip(m_pMyHotkey[m_iCurPage][iIndex]);
 }
 
 RECT CUIHotKeyDlg::GetSampleRect()
@@ -898,6 +902,8 @@ bool CUIHotKeyDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 		spSkill->pUIIcon->SetUIType(UI_TYPE_ICON);
 		spSkill->pUIIcon->SetStyle(UISTYLE_ICON_SKILL);
 
+		SetHotKeyTooltip(spSkill);
+
 		uint32_t bitMask = UISTYLE_ICON_SKILL;
 		if (!CGameProcedure::s_pProcMain->m_pMagicSkillMng->CheckValidSkillMagic(spSkill->pSkill))
 			bitMask |= UISTYLE_DISABLE_SKILL;
@@ -947,6 +953,8 @@ bool CUIHotKeyDlg::SetReceiveSelectedItem(int iIndex)
 	spSkill->pUIIcon->SetTex(spSkill->szIconFN);
 	spSkill->pUIIcon->SetUVRect(0, 0, 1.0f, 1.0f);
 	spSkill->pUIIcon->SetUIType(UI_TYPE_ICON);
+
+	SetHotKeyTooltip(spSkill);
 
 	uint32_t bitMask = UISTYLE_ICON_SKILL;
 	if (!CGameProcedure::s_pProcMain->m_pMagicSkillMng->CheckValidSkillMagic(spSkill->pSkill))
@@ -1156,3 +1164,15 @@ bool CUIHotKeyDlg::OnKeyPress(int iKey)
 	return CN3UIBase::OnKeyPress(iKey);
 }
 //this_ui_add_end
+
+void CUIHotKeyDlg::SetHotKeyTooltip(__IconItemSkill* spSkill)
+{
+	if (spSkill == nullptr
+		|| spSkill->pSkill == nullptr
+		|| spSkill->pUIIcon == nullptr)
+		return;
+
+	std::string szTooltip = fmt::format("[{}] {}", spSkill->pSkill->szName, spSkill->pSkill->szDesc);
+	spSkill->pUIIcon->SetTooltipText(szTooltip);
+	spSkill->pUIIcon->SetTooltipColor(D3DCOLOR_XRGB(0x80, 0x80, 0xFF));
+}
