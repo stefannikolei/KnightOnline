@@ -19,6 +19,13 @@ constexpr int MAX_LEVEL			= 80;	// 최고렙...
 constexpr int MAX_GOLD			= 2'100'000'000;
 constexpr int VIEW_DISTANCE		= 48;
 
+enum e_ItemSaleType
+{
+	SALE_TYPE_LOW			= 0, // sells lower than purchase price
+	SALE_TYPE_FULL			= 1, // sells equal to purchase price
+	SALE_TYPE_LOW_NO_REPAIR	= 2, // irreparable items sell for lower price than purchase
+};
+
 enum e_NpcState
 {
 	NPC_DEAD = 0,

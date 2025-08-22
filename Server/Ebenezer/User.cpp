@@ -4914,8 +4914,9 @@ void CUser::ItemTrade(char* pBuf)
 		SendItemWeight();
 		ItemLogToAgent(m_pUserData->m_id, pNpc->m_strName, ITEM_LOG_MERCHANT_BUY, m_pUserData->m_sItemArray[SLOT_MAX + pos].nSerialNum, itemid, count, pTable->Durability);
 	}
+	// sell sequence
 	else
-	{		// sell sequence
+	{
 		if (m_pUserData->m_sItemArray[SLOT_MAX + pos].nNum != itemid)
 		{
 			result = 0x02;
@@ -4933,7 +4934,24 @@ void CUser::ItemTrade(char* pBuf)
 		if (pTable->Countable != 0
 			&& count > 0)
 		{
-			m_pUserData->m_iGold += (pTable->SellPrice * count);
+			int64_t salePrice = static_cast<int64_t>(pTable->BuyPrice) * count;
+			if (pTable->SellPrice != SALE_TYPE_FULL)
+			{
+				if (m_pUserData->m_byPremiumType != 0)
+					salePrice /= 6;
+				else
+					salePrice /= 4;
+			}
+
+			if (salePrice < 0
+				|| salePrice > MAX_GOLD)
+			{
+				result = 3;
+				goto fail_return;
+			}
+
+			m_pUserData->m_iGold += static_cast<int>(salePrice);
+
 			m_pUserData->m_sItemArray[SLOT_MAX + pos].sCount -= count;
 
 			if (m_pUserData->m_sItemArray[SLOT_MAX + pos].sCount <= 0)
@@ -4945,7 +4963,24 @@ void CUser::ItemTrade(char* pBuf)
 		}
 		else
 		{
-			m_pUserData->m_iGold += pTable->SellPrice;
+			int64_t salePrice = static_cast<int64_t>(pTable->BuyPrice);
+			if (pTable->SellPrice != SALE_TYPE_FULL)
+			{
+				if (m_pUserData->m_byPremiumType != 0)
+					salePrice /= 6;
+				else
+					salePrice /= 4;
+			}
+
+			if (salePrice < 0
+				|| salePrice > MAX_GOLD)
+			{
+				result = 3;
+				goto fail_return;
+			}
+
+			m_pUserData->m_iGold += static_cast<int>(salePrice);
+
 			m_pUserData->m_sItemArray[SLOT_MAX + pos].nNum = 0;
 			m_pUserData->m_sItemArray[SLOT_MAX + pos].sDuration = 0;
 			m_pUserData->m_sItemArray[SLOT_MAX + pos].sCount = 0;
