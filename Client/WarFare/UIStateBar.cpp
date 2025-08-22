@@ -32,21 +32,21 @@ static char THIS_FILE[]=__FILE__;
 
 CUIStateBar::CUIStateBar()
 {
-	m_pText_Position = NULL;
-	m_pProgress_HP = NULL;
-	m_pProgress_MSP = NULL;
-	m_pProgress_ExpC = NULL;
-	m_pProgress_ExpP = NULL;
+	m_pText_Position = nullptr;
+	m_pProgress_HP = nullptr;
+	m_pProgress_MSP = nullptr;
+	m_pProgress_ExpC = nullptr;
+	m_pProgress_ExpP = nullptr;
 
-	m_pText_FPS = NULL;
+	m_pText_FPS = nullptr;
 
 	// 미니맵...
-	m_pGroup_MiniMap = NULL;
-	m_pImage_Map = NULL;
-	m_pBtn_ZoomIn = NULL;
-	m_pBtn_ZoomOut = NULL;
-	m_pBtn_Quest = NULL;
-	m_pBtn_Power = NULL;
+	m_pGroup_MiniMap = nullptr;
+	m_pImage_Map = nullptr;
+	m_pBtn_ZoomIn = nullptr;
+	m_pBtn_ZoomOut = nullptr;
+	m_pBtn_Quest = nullptr;
+	m_pBtn_Power = nullptr;
 
 	memset(m_vArrows, 0, sizeof(m_vArrows));
 
@@ -95,19 +95,19 @@ void CUIStateBar::Release()
 
 	CN3UIBase::Release();
 
-	m_pText_Position = NULL;
-	m_pProgress_HP = NULL;
-	m_pProgress_MSP = NULL;
-	m_pProgress_ExpC = NULL;
-	m_pProgress_ExpP = NULL;
+	m_pText_Position = nullptr;
+	m_pProgress_HP = nullptr;
+	m_pProgress_MSP = nullptr;
+	m_pProgress_ExpC = nullptr;
+	m_pProgress_ExpP = nullptr;
 
 	// 미니맵...
-	m_pGroup_MiniMap = NULL;
-	m_pImage_Map = NULL;
-	m_pBtn_ZoomIn = NULL;
-	m_pBtn_ZoomOut = NULL; 
-	m_pBtn_Power = NULL;
-	m_pBtn_Quest = NULL;
+	m_pGroup_MiniMap = nullptr;
+	m_pImage_Map = nullptr;
+	m_pBtn_ZoomIn = nullptr;
+	m_pBtn_ZoomOut = nullptr; 
+	m_pBtn_Power = nullptr;
+	m_pBtn_Quest = nullptr;
 
 	memset(m_vArrows, 0, sizeof(m_vArrows));
 
@@ -202,7 +202,7 @@ bool CUIStateBar::LoadMap(const std::string& szMiniMapFN, float fMapSizeX, float
 {
 	m_fMapSizeX = fMapSizeX;
 	m_fMapSizeZ = fMapSizeZ;
-	if(NULL == m_pImage_Map) return false;
+	if(nullptr == m_pImage_Map) return false;
 
 	m_pImage_Map->SetTex(szMiniMapFN);
 	return true;
@@ -319,8 +319,8 @@ void CUIStateBar::Render()
 
 	CN3UIBase::Render();
 
-	if(NULL == m_pGroup_MiniMap || false == m_pGroup_MiniMap->IsVisible()) return; // 미니맵이 안켜져 있음 돌아간다..
-	if(NULL == m_pImage_Map) return;
+	if(nullptr == m_pGroup_MiniMap || false == m_pGroup_MiniMap->IsVisible()) return; // 미니맵이 안켜져 있음 돌아간다..
+	if(nullptr == m_pImage_Map) return;
 	if(m_fMapSizeX <= 0 || m_fMapSizeZ <= 0) return;
 
 	__VertexTransformedColor vPositions[4], vOutLines[4];
@@ -497,7 +497,7 @@ void CUIStateBar::Tick()
 
 void CUIStateBar::TickMiniMap()
 {
-	if (NULL == m_pImage_Map) return;
+	if (nullptr == m_pImage_Map) return;
 	if (m_fMapSizeX <= 0 || m_fMapSizeZ <= 0) return;
 
 	m_vViewPos = m_vPosPlayer;
@@ -567,7 +567,7 @@ void CUIStateBar::TickMagicIcon()
 {
 	int cnt = m_pMagic.size();
 	it_MagicImg it = m_pMagic.begin();
-	__TABLE_UPC_SKILL* pRemoveSkill = NULL;
+	__TABLE_UPC_SKILL* pRemoveSkill = nullptr;
 
 	for (int i = 0; i < cnt; i++, it++)
 	{
@@ -697,7 +697,7 @@ void CUIStateBar::ZoomSet(float fZoom)
 
 bool CUIStateBar::ToggleMiniMap()
 {
-	if(NULL == m_pGroup_MiniMap) return false;
+	if(nullptr == m_pGroup_MiniMap) return false;
 
 	bool bVisible = m_pGroup_MiniMap->IsVisible();
 	m_pGroup_MiniMap->SetVisible(!bVisible);

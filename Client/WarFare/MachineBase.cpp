@@ -18,7 +18,7 @@ CMachineBase::CMachineBase()
 {
 	m_fRotateSpeed = 0.15f;
 	m_fSpeed = 1.0f;
-	m_bSkipCalcPartMtx = NULL;
+	m_bSkipCalcPartMtx = nullptr;
 	Release();
 }
 
@@ -34,7 +34,7 @@ void CMachineBase::Release()
 	m_dwMachineState = MS_STOP;
 	m_fDirRadian = 0.0f;
 	m_szID = "";
-	if (m_bSkipCalcPartMtx) {delete [] m_bSkipCalcPartMtx; m_bSkipCalcPartMtx = NULL;}
+	if (m_bSkipCalcPartMtx) {delete [] m_bSkipCalcPartMtx; m_bSkipCalcPartMtx = nullptr;}
 
 	m_fFireRadian = 0.0f;
 	m_fFireSpeed = 0.0f;
@@ -185,22 +185,22 @@ void CMachineBase::Tick(float fFrm)
 
 CN3SPart* CMachineBase::GetPartByPMeshName(const std::string& szName)
 {
-	if(szName.empty()) return NULL;
+	if(szName.empty()) return nullptr;
 
 	int iPC = m_Parts.size();
 	for(int i = 0; i < iPC; i++)
 	{
 		CN3PMesh* pPMesh = m_Parts[i]->Mesh();
-		if (pPMesh == NULL) continue;
+		if (pPMesh == nullptr) continue;
 		if (pPMesh->m_szName == szName) return m_Parts[i];
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 void CMachineBase::LoadMachine(FILE* stream)
 {
-	if (stream == NULL) return;
+	if (stream == nullptr) return;
 
 	Release();
 	char szSrcName[_MAX_PATH];	// shape source파일 이름
@@ -222,7 +222,7 @@ void CMachineBase::LoadMachine(FILE* stream)
 	// shape load하기
 	this->Load(szSrcName);
 
-	__ASSERT(m_bSkipCalcPartMtx == NULL, "Machine에서 메모리 릭 가능성");
+	__ASSERT(m_bSkipCalcPartMtx == nullptr, "Machine에서 메모리 릭 가능성");
 	int iPartCount = PartCount();
 	if (iPartCount>0) m_bSkipCalcPartMtx = new BOOL[iPartCount];
 	ZeroMemory(m_bSkipCalcPartMtx, sizeof(m_bSkipCalcPartMtx[0])*iPartCount);

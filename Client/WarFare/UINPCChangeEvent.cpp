@@ -25,17 +25,17 @@ static char THIS_FILE[]=__FILE__;
 
 CUINPCChangeEvent::CUINPCChangeEvent()
 {
-	m_pBtn_Change		= NULL; 
-	m_pBtn_Repoint0		= NULL;
-	m_pBtn_Repoint1		= NULL;
-	m_pBtn_Close		= NULL;
+	m_pBtn_Change		= nullptr; 
+	m_pBtn_Repoint0		= nullptr;
+	m_pBtn_Repoint1		= nullptr;
+	m_pBtn_Close		= nullptr;
 
-	m_pDlg				= NULL;
+	m_pDlg				= nullptr;
 }
 
 CUINPCChangeEvent::~CUINPCChangeEvent()
 {
-	if (m_pDlg)	delete m_pDlg; m_pDlg = NULL;
+	if (m_pDlg)	delete m_pDlg; m_pDlg = nullptr;
 }
 
 void CUINPCChangeEvent::Release()
@@ -44,7 +44,7 @@ void CUINPCChangeEvent::Release()
 	{
 		m_pDlg->Release();
 		delete m_pDlg;
-		m_pDlg = NULL;
+		m_pDlg = nullptr;
 	}
 
 	CN3UIBase::Release();

@@ -42,7 +42,7 @@ void CN3UITooltip::Release()
 void CN3UITooltip::Render()
 {
 	if(!m_bVisible || !m_bSetText) return;
-	if (NULL == m_pImageBkGnd)
+	if (nullptr == m_pImageBkGnd)
 	{	// 이미지가 없으면 디폴트로 그려주자
 		static __VertexTransformedColor	pVB[8];
 		static const uint16_t	pIB[16]= {0,1,1,2,2,3,3,0,4,5,5,6,6,7,7,4};
@@ -59,7 +59,7 @@ void CN3UITooltip::Render()
 		pVB[7].Set((float)m_rcRegion.left+1,	(float)m_rcRegion.bottom-1,UI_DEFAULT_Z, UI_DEFAULT_RHW, BorderColorIn);
 
 		// set texture stage state
-		s_lpD3DDev->SetTexture( 0, NULL);
+		s_lpD3DDev->SetTexture( 0, nullptr);
 		s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLOROP,    D3DTOP_SELECTARG1 );
 		s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLORARG1,  D3DTA_DIFFUSE );
 
@@ -85,7 +85,7 @@ void CN3UITooltip::SetText(const std::string& szText, D3DCOLOR crTooltip)
 
 	// 툴팁상자 크기를 조정한다.
 	int iStrLen = szText.size();
-	if (0 == iStrLen || NULL == m_pBuffOutRef) return;
+	if (0 == iStrLen || nullptr == m_pBuffOutRef) return;
 
 	m_pBuffOutRef->ClearOnlyStringBuffer();	//우선 기존에 있던 글씨를 지운다.(정렬하지 않고)
 	SIZE size;

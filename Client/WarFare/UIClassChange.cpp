@@ -28,16 +28,16 @@ static char THIS_FILE[]=__FILE__;
 
 CUIClassChange::CUIClassChange()
 {
-	m_pBtn_Ok		= NULL;
-	m_pBtn_Cancel	= NULL;
-	m_pBtn_Class0		= NULL;
-	m_pBtn_Class1		= NULL;
+	m_pBtn_Ok		= nullptr;
+	m_pBtn_Cancel	= nullptr;
+	m_pBtn_Class0		= nullptr;
+	m_pBtn_Class1		= nullptr;
 
-	m_pText_Warning	= NULL;
-	m_pText_Info0		= NULL;
-	m_pText_Info1		= NULL;
-	m_pText_Title	= NULL;
-	m_pText_Message	= NULL;
+	m_pText_Warning	= nullptr;
+	m_pText_Info0		= nullptr;
+	m_pText_Info1		= nullptr;
+	m_pText_Title	= nullptr;
+	m_pText_Message	= nullptr;
 
 	m_eClassChangeState	= UISTATE_NORMAL;
 }

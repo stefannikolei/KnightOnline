@@ -29,14 +29,14 @@ __InfoSelectedIcon		CN3UIWndBase::s_sSelectedIconInfo;
 __RecoveryJobInfo		CN3UIWndBase::s_sRecoveryJobInfo;
 __SkillSelectInfo		CN3UIWndBase::s_sSkillSelectInfo;
 
-CN3UIImage* CN3UIWndBase::s_pSelectionImage = NULL;
-CCountableItemEditDlg*	CN3UIWndBase::s_pCountableItemEdit = NULL;
+CN3UIImage* CN3UIWndBase::s_pSelectionImage = nullptr;
+CCountableItemEditDlg*	CN3UIWndBase::s_pCountableItemEdit = nullptr;
 
-CN3SndObj* CN3UIWndBase::s_pSnd_Item_Etc = NULL;
-CN3SndObj* CN3UIWndBase::s_pSnd_Item_Weapon = NULL;
-CN3SndObj* CN3UIWndBase::s_pSnd_Item_Armor = NULL;
-CN3SndObj* CN3UIWndBase::s_pSnd_Gold = NULL;
-CN3SndObj* CN3UIWndBase::s_pSnd_Repair = NULL;
+CN3SndObj* CN3UIWndBase::s_pSnd_Item_Etc = nullptr;
+CN3SndObj* CN3UIWndBase::s_pSnd_Item_Weapon = nullptr;
+CN3SndObj* CN3UIWndBase::s_pSnd_Item_Armor = nullptr;
+CN3SndObj* CN3UIWndBase::s_pSnd_Gold = nullptr;
+CN3SndObj* CN3UIWndBase::s_pSnd_Repair = nullptr;
 int CN3UIWndBase::s_iRefCount = 0;
 
 CN3UIWndBase::CN3UIWndBase()

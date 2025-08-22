@@ -27,7 +27,7 @@ CMachineMng::~CMachineMng()
 
 void CMachineMng::Release()
 {
-	CMachineBase*	pMachine = NULL;
+	CMachineBase*	pMachine = nullptr;
 	it_Machine it = m_Machines.begin();
 	int iSize = m_Machines.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -45,7 +45,7 @@ void CMachineMng::ReceiveReplyMsg(ReplyMsg& RPMsg)
 	}
 	else if ( RPMsg.s_iAddressLen == s_pMsgRouter->GetThisClassLevel(ID_MACHINE_MGR) )
 	{
-		CMachineBase* pMachine = NULL;
+		CMachineBase* pMachine = nullptr;
 		switch( RPMsg.s_iGameID )
 		{
 		case ID_MACHINE_IN:
@@ -127,7 +127,7 @@ void CMachineMng::AddMachine(ReplyMsg& RPMsg)
 	FILE* stream = fopen(szFileName, "r"); //text파일로 만든다 
 #if _DEBUG
 	std::string szErr;
-	if(NULL == stream)
+	if(nullptr == stream)
 	{
 		szErr = fmt::format("failed to open file - {}", szFileName);
 		__ASSERT(stream, szErr.c_str());
@@ -136,7 +136,7 @@ void CMachineMng::AddMachine(ReplyMsg& RPMsg)
 
 	char szMachineType[64];		// machine 종류
 	int result = fscanf(stream, "Machine_Type = %s\n", szMachineType);			__ASSERT(result != EOF, "잘못된 Machine 세팅 파일");
-	CMachineBase* pMachine = NULL;
+	CMachineBase* pMachine = nullptr;
 
 	if (lstrcmpi(szMachineType, "catapult") == 0)
 	{
@@ -160,7 +160,7 @@ void CMachineMng::AddMachine(ReplyMsg& RPMsg)
 */
 void CMachineMng::Render()
 {
-	CMachineBase*	pMachine = NULL;
+	CMachineBase*	pMachine = nullptr;
 	it_Machine it = m_Machines.begin();
 	int iSize = m_Machines.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -172,13 +172,13 @@ void CMachineMng::Render()
 
 void CMachineMng::Tick()
 {
-	CMachineBase*	pMachine = NULL;
+	CMachineBase*	pMachine = nullptr;
 	it_Machine it = m_Machines.begin();
 	int iSize = m_Machines.size();
 	for(int i = 0; i < iSize; i++, it++)
 	{
 		pMachine = *it;
-		if(NULL == pMachine) continue;
+		if(nullptr == pMachine) continue;
 
 		pMachine->Tick(-1);
 /*		if(pMachine->GetMachineState()!=MS_STOP)
@@ -194,9 +194,9 @@ void CMachineMng::Tick()
 
 CMachineBase* CMachineMng::GetMachine(const std::string& szID)
 {
-	if(szID.empty()) return NULL;
+	if(szID.empty()) return nullptr;
 
-	CMachineBase*	pMachine = NULL;
+	CMachineBase*	pMachine = nullptr;
 	it_Machine it = m_Machines.begin();
 	int iSize = m_Machines.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -205,6 +205,6 @@ CMachineBase* CMachineMng::GetMachine(const std::string& szID)
 		
 		if (pMachine->m_szID == szID) return pMachine;
 	}
-	return NULL;
+	return nullptr;
 }
 

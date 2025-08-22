@@ -33,14 +33,14 @@ CCountableItemEditDlg::CCountableItemEditDlg()
 {
 	m_eCallerWnd = UIWND_UNKNOWN;
 	m_eCallerWndDistrict = UIWND_DISTRICT_UNKNOWN;
-	m_pArea = NULL;
-	m_pImageOfIcon = NULL;
+	m_pArea = nullptr;
+	m_pImageOfIcon = nullptr;
 	m_bLocked = false;
-	m_pEdit	= NULL;
+	m_pEdit	= nullptr;
 	m_bWareGold = false;
 
-	m_pBtnOk	 = NULL;
-	m_pBtnCancel = NULL;
+	m_pBtnOk	 = nullptr;
+	m_pBtnCancel = nullptr;
 }
 
 CCountableItemEditDlg::~CCountableItemEditDlg()
@@ -56,7 +56,7 @@ void CCountableItemEditDlg::Release()
 
 bool CCountableItemEditDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if(NULL == pSender) return false;
+	if(nullptr == pSender) return false;
 	if(IsVisible() == false) return false;
 	if(m_eCallerWnd == UIWND_UNKNOWN) return false;
 	if(m_eCallerWndDistrict == UIWND_DISTRICT_UNKNOWN) return false;
@@ -159,7 +159,7 @@ void CCountableItemEditDlg::Open(e_UIWND eUW, e_UIWND_DISTRICT eUD, bool bCountG
 	else
 		szMsg = fmt::format_text_resource(IDS_EDIT_BOX_COUNT);
 
-	CN3UIString* pString = NULL;
+	CN3UIString* pString = nullptr;
 	pString = (CN3UIString*)this->GetChildByID("String_PersonTradeEdit_Msg");
 	__ASSERT(pString, "NULL UI Component!!");
 	if (pString)

@@ -29,17 +29,17 @@ static char THIS_FILE[]=__FILE__;
 
 CUIPartyBBS::CUIPartyBBS()
 {
-//	m_pList_Infos			= NULL;		
-	m_pBtn_PageUp			= NULL;
-	m_pBtn_PageDown			= NULL;
-	m_pBtn_Refresh			= NULL;
+//	m_pList_Infos			= nullptr;		
+	m_pBtn_PageUp			= nullptr;
+	m_pBtn_PageDown			= nullptr;
+	m_pBtn_Refresh			= nullptr;
 	
-	m_pBtn_Close			= NULL;
-	m_pBtn_Register			= NULL;
-	m_pBtn_RegisterCancel	= NULL;
-	m_pBtn_Whisper			= NULL;
-	m_pBtn_Party			= NULL;
-	m_pText_Page			= NULL;
+	m_pBtn_Close			= nullptr;
+	m_pBtn_Register			= nullptr;
+	m_pBtn_RegisterCancel	= nullptr;
+	m_pBtn_Whisper			= nullptr;
+	m_pBtn_Party			= nullptr;
+	m_pText_Page			= nullptr;
 
 	m_iCurPage				= 0;
 	m_bProcessing			= false;
@@ -48,7 +48,7 @@ CUIPartyBBS::CUIPartyBBS()
 
 	for(int i = 0 ; i < PARTY_BBS_MAXSTRING ; i++)
 	{
-		m_pText[i] = NULL;
+		m_pText[i] = nullptr;
 	}
 
 }

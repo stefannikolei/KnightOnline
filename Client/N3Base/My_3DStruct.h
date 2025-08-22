@@ -658,7 +658,7 @@ inline void __Matrix44::Direction(const D3DXVECTOR3& vDir)
 	_23 = vDir2.y; // view(1, 2) = view_dir.y;
 	_33 = vDir2.z; // view(2, 2) = view_dir.z;
 
-	D3DXMatrixInverse(this, NULL, this);
+	D3DXMatrixInverse(this, nullptr, this);
 	
 //  view(3, 0) = -DotProduct(right, from);
 //  view(3, 1) = -DotProduct(up, from);
@@ -1146,7 +1146,7 @@ COLORREF		_D3DCOLOR_To_RGB(D3DCOLOR cr);
 COLORREF		_D3DCOLORVALUE_To_RGB(const D3DCOLORVALUE& cr);
 D3DCOLOR		_D3DCOLORVALUE_To_D3DCOLOR(const D3DCOLORVALUE& cr);
 D3DCOLORVALUE	_RGB_To_D3DCOLORVALUE(COLORREF cr, float fAlpha);
-bool			_IntersectTriangle(const __Vector3& vOrig, const __Vector3& vDir , const __Vector3& v0, const __Vector3& v1, const __Vector3& v2, float& fT, float& fU, float& fV, __Vector3* pVCol = NULL);
+bool			_IntersectTriangle(const __Vector3& vOrig, const __Vector3& vDir , const __Vector3& v0, const __Vector3& v1, const __Vector3& v2, float& fT, float& fU, float& fV, __Vector3* pVCol = nullptr);
 bool			_IntersectTriangle(const __Vector3& vOrig, const __Vector3& vDir, const __Vector3& v0, const __Vector3& v1, const __Vector3& v2);
 bool			_CheckCollisionByBox(const __Vector3& vOrig, const __Vector3& vDir, const __Vector3& vMin, const __Vector3& vMax);
 POINT			_Convert3D_To_2DCoordinate(const __Vector3 &vPos, const __Matrix44& mtxView, const __Matrix44& mtxProjection, int nVPW, int nVPH);
@@ -1408,7 +1408,7 @@ inline void _Convert2D_To_3DCoordinate(	int ixScreen, int iyScreen,
 
 	// Transform the screen space pick ray into 3D space
 	__Matrix44 mtxVI;
-	::D3DXMatrixInverse(&mtxVI, NULL, &mtxView);
+	::D3DXMatrixInverse(&mtxVI, nullptr, &mtxView);
 	vDirResult.x  = vTmp.x * mtxVI._11 + vTmp.y * mtxVI._21 + vTmp.z * mtxVI._31;
 	vDirResult.y  = vTmp.x * mtxVI._12 + vTmp.y * mtxVI._22 + vTmp.z * mtxVI._32;
 	vDirResult.z  = vTmp.x * mtxVI._13 + vTmp.y * mtxVI._23 + vTmp.z * mtxVI._33;

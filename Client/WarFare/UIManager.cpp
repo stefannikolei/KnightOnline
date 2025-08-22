@@ -149,7 +149,7 @@ uint32_t CUIManager::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT
 		m_dwMouseFlagsCur |= dwChildRet;
 	}
 
-//	if(UI_MOUSE_LBCLICK & dwFlags) m_pUIFocused = NULL; // 포커스 받은 UI 기록.. 아무것도 안하면.. 널이다..
+//	if(UI_MOUSE_LBCLICK & dwFlags) m_pUIFocused = nullptr; // 포커스 받은 UI 기록.. 아무것도 안하면.. 널이다..
 
 	return m_dwMouseFlagsCur;
 }
@@ -263,7 +263,7 @@ void CUIManager::Render()
 
 void CUIManager::RenderStateSet()
 {
-	if(NULL == s_lpD3DDev) return;
+	if(nullptr == s_lpD3DDev) return;
 
 #ifdef _DEBUG
 	__ASSERT(FALSE == s_sRSFU.bSet, "이전에 RenderStateSet()함수를 호출하고 RenderStateRestore()함수가 호출되지 않은 상태입니다.");
@@ -365,7 +365,7 @@ CN3UIBase* CUIManager::GetTopUI(bool bVisible)
 {
 	if(!bVisible) 
 	{
-		if(m_Children.empty()) return NULL;
+		if(m_Children.empty()) return nullptr;
 		else return *(m_Children.begin());
 	}
 
@@ -376,14 +376,14 @@ CN3UIBase* CUIManager::GetTopUI(bool bVisible)
 		if(pUI->IsVisible()) return pUI;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 void CUIManager::SetFocusedUI(CN3UIBase* pUI)
 {
-	if(NULL == pUI)
+	if(nullptr == pUI)
 	{
-		m_pUIFocused = NULL;
+		m_pUIFocused = nullptr;
 		return;
 	}
 
@@ -410,9 +410,9 @@ CN3UIBase* CUIManager::ReFocusUI()
 
 void CUIManager::SetVisibleFocusedUI(CN3UIBase *pUI)
 {
-	if(NULL == pUI)
+	if(nullptr == pUI)
 	{
-		m_pUIFocused = NULL;
+		m_pUIFocused = nullptr;
 		return;
 	}
 
@@ -422,7 +422,7 @@ void CUIManager::SetVisibleFocusedUI(CN3UIBase *pUI)
 	UIListItor it = m_Children.begin(), itEnd = m_Children.end();
 
 	uint32_t dwUIStyle, dwUIHideStyle;
-	CN3UIBase* pUIHide = NULL;
+	CN3UIBase* pUIHide = nullptr;
 
 	dwUIStyle = pUI->GetStyle();
 	if(dwUIStyle & UISTYLE_SHOW_ME_ALONE)
@@ -430,7 +430,7 @@ void CUIManager::SetVisibleFocusedUI(CN3UIBase *pUI)
 		for(; it != itEnd;)
 		{
 			pUIHide = *it;
-			if(pUIHide == NULL)
+			if(pUIHide == nullptr)
 			{
 				it = m_Children.erase(it);
 				continue;
@@ -448,7 +448,7 @@ void CUIManager::SetVisibleFocusedUI(CN3UIBase *pUI)
 		for(; it != itEnd;)
 		{
 			pUIHide = *it;
-			if(pUIHide == NULL)
+			if(pUIHide == nullptr)
 			{
 				it = m_Children.erase(it);
 				continue;
@@ -496,7 +496,7 @@ CN3UIBase* CUIManager::GetEnableFocusTopUI(bool bVisible)
 {
 	if(!bVisible) 
 	{
-		if(m_Children.empty()) return NULL;
+		if(m_Children.empty()) return nullptr;
 		else return *(m_Children.begin());
 	}
 
@@ -510,7 +510,7 @@ CN3UIBase* CUIManager::GetEnableFocusTopUI(bool bVisible)
 			return pUI;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 void CUIManager::UserMoveHideUIs()
@@ -521,7 +521,7 @@ void CUIManager::UserMoveHideUIs()
 	{
 		CN3UIBase* pUI = *(it);
 
-		if(pUI == NULL) continue;
+		if(pUI == nullptr) continue;
 
 		if(pUI->IsVisible() && (pUI->GetStyle() & UISTYLE_USER_MOVE_HIDE))
 		{

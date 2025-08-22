@@ -33,15 +33,15 @@ static char THIS_FILE[]=__FILE__;
 
 CUIPerTradeDlg::CUIPerTradeDlg()
 {
-	m_pSubProcPerTrade = NULL;
-	for( int i = 0; i < MAX_ITEM_PER_TRADE; i++ )	m_pPerTradeMy[i] = NULL;
-	for( int i = 0; i < MAX_ITEM_PER_TRADE; i++ )	m_pPerTradeOther[i] = NULL;
+	m_pSubProcPerTrade = nullptr;
+	for( int i = 0; i < MAX_ITEM_PER_TRADE; i++ )	m_pPerTradeMy[i] = nullptr;
+	for( int i = 0; i < MAX_ITEM_PER_TRADE; i++ )	m_pPerTradeOther[i] = nullptr;
 	for( int i = 0; i < MAX_ITEM_PER_TRADE; i++ )	m_iBackupiOrder[i] = -1;
-	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )	m_pPerTradeInv[i] = NULL;
+	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )	m_pPerTradeInv[i] = nullptr;
 
 	m_iBackupiCount = 0;
-	m_pUITooltipDlg = NULL;
-	m_pStrMyGold    = NULL;
+	m_pUITooltipDlg = nullptr;
+	m_pStrMyGold    = nullptr;
 
 	this->SetVisible(false);
 }
@@ -59,28 +59,28 @@ void CUIPerTradeDlg::Release()
 
 	for( int i = 0; i < MAX_ITEM_PER_TRADE; i++ )
 	{
-		if ( m_pPerTradeMy[i] != NULL )
+		if ( m_pPerTradeMy[i] != nullptr )
 		{
 			delete m_pPerTradeMy[i];
-			m_pPerTradeMy[i] = NULL;
+			m_pPerTradeMy[i] = nullptr;
 		}
 	}
 
 	for( int i = 0; i < MAX_ITEM_PER_TRADE; i++ )
 	{
-		if ( m_pPerTradeOther[i] != NULL )
+		if ( m_pPerTradeOther[i] != nullptr )
 		{
 			delete m_pPerTradeOther[i];
-			m_pPerTradeOther[i] = NULL;
+			m_pPerTradeOther[i] = nullptr;
 		}
 	}
 
 	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )
 	{
-		if ( m_pPerTradeInv[i] != NULL )
+		if ( m_pPerTradeInv[i] != nullptr )
 		{
 			delete m_pPerTradeInv[i];
-			m_pPerTradeInv[i] = NULL;
+			m_pPerTradeInv[i] = nullptr;
 		}
 	}
 }
@@ -92,7 +92,7 @@ void CUIPerTradeDlg::Render()
 	m_pUITooltipDlg->DisplayTooltipsDisable();
 
 	bool bTooltipRender = false;
-	__IconItemSkill* spItem = NULL;
+	__IconItemSkill* spItem = nullptr;
 
 	for(UIListReverseItor itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
 	{
@@ -232,23 +232,23 @@ __IconItemSkill* CUIPerTradeDlg::GetHighlightIconItem(CN3UIIcon* pUIIcon)
 {
 	for( int i = 0; i < MAX_ITEM_PER_TRADE; i++ )
 	{
-		if ( (m_pPerTradeMy[i] != NULL) && (m_pPerTradeMy[i]->pUIIcon == pUIIcon) )
+		if ( (m_pPerTradeMy[i] != nullptr) && (m_pPerTradeMy[i]->pUIIcon == pUIIcon) )
 			return m_pPerTradeMy[i];
 	}
 
 	for( int i = 0; i < MAX_ITEM_PER_TRADE; i++ )
 	{
-		if ( (m_pPerTradeOther[i] != NULL) && (m_pPerTradeOther[i]->pUIIcon == pUIIcon) )
+		if ( (m_pPerTradeOther[i] != nullptr) && (m_pPerTradeOther[i]->pUIIcon == pUIIcon) )
 			return m_pPerTradeOther[i];
 	}
 
 	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )
 	{
-		if ( (m_pPerTradeInv[i] != NULL) && (m_pPerTradeInv[i]->pUIIcon == pUIIcon) ) 
+		if ( (m_pPerTradeInv[i] != nullptr) && (m_pPerTradeInv[i]->pUIIcon == pUIIcon) ) 
 			return m_pPerTradeInv[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void CUIPerTradeDlg::LeavePerTradeState()
@@ -282,49 +282,49 @@ void CUIPerTradeDlg::EnterPerTradeState()
 
 	for( int i = 0; i < MAX_ITEM_TRADE; i++ )
 	{
-		if ( m_pPerTradeMy[i] != NULL )
+		if ( m_pPerTradeMy[i] != nullptr )
 		{
 			if ( m_pPerTradeMy[i]->pUIIcon )
 			{
 				RemoveChild(m_pPerTradeMy[i]->pUIIcon);
 				m_pPerTradeMy[i]->pUIIcon->Release();
 				delete m_pPerTradeMy[i]->pUIIcon;
-				m_pPerTradeMy[i]->pUIIcon = NULL;
+				m_pPerTradeMy[i]->pUIIcon = nullptr;
 			}
 			delete m_pPerTradeMy[i];	
-			m_pPerTradeMy[i] = NULL;
+			m_pPerTradeMy[i] = nullptr;
 		}
 	}
 
 	for( int i = 0; i < MAX_ITEM_TRADE; i++ )
 	{
-		if ( m_pPerTradeOther[i] != NULL )
+		if ( m_pPerTradeOther[i] != nullptr )
 		{
 			if ( m_pPerTradeOther[i]->pUIIcon )
 			{
 				RemoveChild(m_pPerTradeOther[i]->pUIIcon);
 				m_pPerTradeOther[i]->pUIIcon->Release();
 				delete m_pPerTradeOther[i]->pUIIcon;
-				m_pPerTradeOther[i]->pUIIcon = NULL;
+				m_pPerTradeOther[i]->pUIIcon = nullptr;
 			}
 			delete m_pPerTradeOther[i];	
-			m_pPerTradeOther[i] = NULL;
+			m_pPerTradeOther[i] = nullptr;
 		}
 	}
 
 	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )
 	{
-		if ( m_pPerTradeInv[i] != NULL )
+		if ( m_pPerTradeInv[i] != nullptr )
 		{
 			if ( m_pPerTradeInv[i]->pUIIcon )
 			{
 				RemoveChild(m_pPerTradeInv[i]->pUIIcon);
 				m_pPerTradeInv[i]->pUIIcon->Release();
 				delete m_pPerTradeInv[i]->pUIIcon;
-				m_pPerTradeInv[i]->pUIIcon = NULL;
+				m_pPerTradeInv[i]->pUIIcon = nullptr;
 			}
 			delete m_pPerTradeInv[i];	
-			m_pPerTradeInv[i] = NULL;
+			m_pPerTradeInv[i] = nullptr;
 		}
 	}
 
@@ -351,7 +351,7 @@ void CUIPerTradeDlg::ItemMoveFromInvToThis()
 			__IconItemSkill* spItem = pInven->m_pMyInvWnd[i];
 			spItem->pUIIcon->SetParent(this);
 
-			pInven->m_pMyInvWnd[i] = NULL;
+			pInven->m_pMyInvWnd[i] = nullptr;
 			CN3UIArea* pArea;
 
 			pArea = GetChildAreaByiOrder(UI_AREA_TYPE_PER_TRADE_INV, i);
@@ -379,7 +379,7 @@ void CUIPerTradeDlg::ItemMoveFromThisToInv()
 			__IconItemSkill* spItem = m_pPerTradeInv[i];
 			spItem->pUIIcon->SetParent(pInven);
 
-			m_pPerTradeInv[i] = NULL;
+			m_pPerTradeInv[i] = nullptr;
 
 			CN3UIArea* pArea;
 
@@ -399,7 +399,7 @@ void CUIPerTradeDlg::ItemCountOK()
 {
 	int iGold = CN3UIWndBase::s_pCountableItemEdit->GetQuantity();
 
-	__IconItemSkill* spItem, *spItemNew = NULL;
+	__IconItemSkill* spItem, *spItemNew = nullptr;
 	spItem = m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
 
 	if ( iGold <= 0 ) return;
@@ -436,7 +436,7 @@ void CUIPerTradeDlg::ItemCountOK()
 		spItem = m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
 
 		// 인벤토리에서도 지운다..
-		m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = NULL;
+		m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
 
 		// iOrder로 내 매니저의 아이템을 리스트에서 삭제한다..
 		RemoveChild(spItem->pUIIcon);
@@ -444,16 +444,16 @@ void CUIPerTradeDlg::ItemCountOK()
 		// 아이콘 리소스 삭제...
 		spItem->pUIIcon->Release();
 		delete spItem->pUIIcon;
-		spItem->pUIIcon = NULL;
+		spItem->pUIIcon = nullptr;
 		delete spItem;
-		spItem = NULL;
+		spItem = nullptr;
 	}
 
 	// Server에게 보낸다..	
 	SendToServerItemAddMsg(CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder, 
 		m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->pItemBasic->dwID+
 		m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->pItemExt->dwID, iGold);
-	CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget		= NULL;
+	CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget		= nullptr;
 
 	CN3UIWndBase::s_pCountableItemEdit->Close();
 }
@@ -474,7 +474,7 @@ void CUIPerTradeDlg::ItemCountCancel()
 				spItem = m_pPerTradeMy[i];
 
 				// 인벤토리에서도 지운다..
-				m_pPerTradeMy[i] = NULL;
+				m_pPerTradeMy[i] = nullptr;
 
 				// iOrder로 내 매니저의 아이템을 리스트에서 삭제한다..
 				RemoveChild(spItem->pUIIcon);
@@ -482,9 +482,9 @@ void CUIPerTradeDlg::ItemCountCancel()
 				// 아이콘 리소스 삭제...
 				spItem->pUIIcon->Release();
 				delete spItem->pUIIcon;
-				spItem->pUIIcon = NULL;
+				spItem->pUIIcon = nullptr;
 				delete spItem;
-				spItem = NULL;
+				spItem = nullptr;
 			}
 		}
 	}
@@ -605,7 +605,7 @@ bool CUIPerTradeDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 		// 아이콘이 있는지 없는지 살펴보고.. 
 		if ( !m_pPerTradeMy[iDestiOrder] )
 		{
-			__IconItemSkill *spItemNew = NULL;
+			__IconItemSkill *spItemNew = nullptr;
 			spItem = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect;
 
 			// 아이콘이 없으면 아이콘을 만드록 갯수는 0으로..
@@ -650,7 +650,7 @@ bool CUIPerTradeDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 		// 아이템이 들어갈 수 있는지 확인, 아이템이 들어 가는 자리 계산..
 		for( i = 0; i < MAX_ITEM_PER_TRADE; i++ )
 		{
-			if (m_pPerTradeMy[i] == NULL)	
+			if (m_pPerTradeMy[i] == nullptr)	
 			{
 				bFound = true;
 				break;
@@ -669,13 +669,13 @@ bool CUIPerTradeDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 		// Server에게 보낸다..	현재 아이템 갯수는 1..^^
 		SendToServerItemAddMsg(m_iBackupiOrder[i], CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemBasic->dwID+
 			CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemExt->dwID, 1);
-		CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget		= NULL;
+		CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget		= nullptr;
 	}
 
 	// 내 거래 영역에 세팅하고..
 	m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = spItem;
 	// 영역 윈도우에서 클리어..
-	m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = NULL;
+	m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
 
 	pArea = GetChildAreaByiOrder(UI_AREA_TYPE_PER_TRADE_MY, CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder);
 	if ( pArea )
@@ -709,7 +709,7 @@ void CUIPerTradeDlg::IconRestore()
 	switch ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict )
 	{
 		case UIWND_DISTRICT_PER_TRADE_INV:
-			if ( m_pPerTradeInv[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != NULL )
+			if ( m_pPerTradeInv[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr )
 			{
 				pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_PER_TRADE_INV, CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder);
 				if ( pArea )
@@ -749,7 +749,7 @@ int	CUIPerTradeDlg::GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWnd
 		case UIWND_DISTRICT_PER_TRADE_INV:
 			for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
 			{
-				if ( (m_pPerTradeInv[i] != NULL) && (m_pPerTradeInv[i] == spItem) )
+				if ( (m_pPerTradeInv[i] != nullptr) && (m_pPerTradeInv[i] == spItem) )
 					return i;
 			}
 			break;
@@ -781,15 +781,15 @@ bool CUIPerTradeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				return false;	\
 			}
 
-	if(NULL == pSender) return false;
+	if(nullptr == pSender) return false;
 
-	if ( (dwMsg == UIMSG_BUTTON_CLICK) && (pSender->m_szID == "btn_close") && (m_pSubProcPerTrade != NULL) && 
+	if ( (dwMsg == UIMSG_BUTTON_CLICK) && (pSender->m_szID == "btn_close") && (m_pSubProcPerTrade != nullptr) && 
 		((m_pSubProcPerTrade->m_ePerTradeState == PER_TRADE_STATE_NORMAL) || 
 		(m_pSubProcPerTrade->m_ePerTradeState == PER_TRADE_STATE_MY_TRADE_DECISION_DONE)) )
 			// 정상 상태와 내가 거래 결정 버튼을 누른 상태에서만 취소할 수 있다..
 			m_pSubProcPerTrade->LeavePerTradeState(PER_TRADE_RESULT_MY_CANCEL);
 
-	if ( (dwMsg == UIMSG_BUTTON_CLICK) && (pSender->m_szID == "btn_trade_my") && (m_pSubProcPerTrade != NULL) && 
+	if ( (dwMsg == UIMSG_BUTTON_CLICK) && (pSender->m_szID == "btn_trade_my") && (m_pSubProcPerTrade != nullptr) && 
 		(m_pSubProcPerTrade->m_ePerTradeState == PER_TRADE_STATE_NORMAL) )		// 정상 상태에서만 결정할 수 있다..
 				m_pSubProcPerTrade->PerTradeMyDecision();
 
@@ -802,7 +802,7 @@ bool CUIPerTradeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		}
 	}
 
-	__IconItemSkill* spItem = NULL;
+	__IconItemSkill* spItem = nullptr;
 	int iOrder;
 
 	uint32_t dwBitMask = 0x000f0000;
@@ -861,6 +861,6 @@ CN3UIBase* CUIPerTradeDlg::GetChildButtonByName(const std::string& szFN)
 			return pChild;
 	}
 
-	return NULL;
+	return nullptr;
 }
 

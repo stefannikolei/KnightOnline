@@ -22,8 +22,8 @@ static char THIS_FILE[]=__FILE__;
 
 CUIPartyBBSSelector::CUIPartyBBSSelector()
 {
-	m_pBtn_WantPartyMember	= NULL;
-	m_pBtn_WantParty		= NULL;
+	m_pBtn_WantPartyMember	= nullptr;
+	m_pBtn_WantParty		= nullptr;
 }
 
 CUIPartyBBSSelector::~CUIPartyBBSSelector()

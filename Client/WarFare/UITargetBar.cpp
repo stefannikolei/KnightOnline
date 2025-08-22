@@ -8,8 +8,8 @@
 
 CUITargetBar::CUITargetBar()
 {
-	m_pProgressHP = NULL;
-	m_pStringID = NULL;
+	m_pProgressHP = nullptr;
+	m_pStringID = nullptr;
 	m_fTimeSendPacketLast = 0;
 }
 
@@ -21,8 +21,8 @@ void CUITargetBar::Release()
 {
 	CN3UIBase::Release();
 
-	m_pProgressHP = NULL;
-	m_pStringID = NULL;
+	m_pProgressHP = nullptr;
+	m_pStringID = nullptr;
 	m_fTimeSendPacketLast = 0;
 }
 
@@ -30,7 +30,7 @@ void CUITargetBar::UpdateHP(int iHP, int iHPMax, bool bUpdateImmediately)
 {
 	__ASSERT(iHPMax > 0, "Invalid Max HP");
 	if(iHP < 0 || iHPMax <= 0) return;
-	if(NULL == m_pProgressHP) return;
+	if(nullptr == m_pProgressHP) return;
 
 	int iPercentage = iHP * 100 / iHPMax;
 

@@ -24,9 +24,9 @@ static char THIS_FILE[]=__FILE__;
 
 CUILoading::CUILoading()
 {
-	m_pText_Info = NULL;
-	m_pText_Version = NULL;
-	m_pProgress_Loading = NULL;
+	m_pText_Info = nullptr;
+	m_pText_Version = nullptr;
+	m_pProgress_Loading = nullptr;
 }
 
 CUILoading::~CUILoading()
@@ -38,9 +38,9 @@ void CUILoading::Release()
 {
 	CN3UIBase::Release();
 
-	m_pText_Info = NULL;
-	m_pText_Version = NULL;
-	m_pProgress_Loading = NULL;
+	m_pText_Info = nullptr;
+	m_pText_Version = nullptr;
+	m_pProgress_Loading = nullptr;
 }
 
 bool CUILoading::Load(HANDLE hFile)

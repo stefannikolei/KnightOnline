@@ -992,7 +992,7 @@ void CServerDlg::ResumeAI()
 /*	m_EventNpcThreadArray[0]->m_ThreadInfo.hWndMsg = this->GetSafeHwnd();
 	for(j = 0; j < NPC_NUM; j++)
 	{
-		m_EventNpcThreadArray[0]->m_ThreadInfo.pNpc[j] = nullptr;	// 초기 소환 몹이 당연히 없으므로 NULL로 작동을 안시킴
+		m_EventNpcThreadArray[0]->m_ThreadInfo.pNpc[j] = nullptr;	// 초기 소환 몹이 당연히 없으므로 nullptr로 작동을 안시킴
 		m_EventNpcThreadArray[0]->m_ThreadInfo.m_byNpcUsed[j] = 0;
 	}
 	m_EventNpcThreadArray[0]->m_ThreadInfo.pIOCP = &m_Iocport;
