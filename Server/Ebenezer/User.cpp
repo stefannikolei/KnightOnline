@@ -4845,6 +4845,14 @@ void CUser::ItemTrade(char* pBuf)
 			goto fail_return;
 		}
 
+		// Non-stackable items should only ever have a stack of 1.
+		if (pTable->Countable == 0
+			&& count != 1)
+		{
+			result = 2;
+			goto fail_return;
+		}
+
 		if (m_pUserData->m_sItemArray[SLOT_MAX + pos].nNum != 0)
 		{
 			if (m_pUserData->m_sItemArray[SLOT_MAX + pos].nNum == itemid)
@@ -4869,9 +4877,18 @@ void CUser::ItemTrade(char* pBuf)
 				goto fail_return;
 			}
 		}
-		if (m_pUserData->m_iGold < (pTable->BuyPrice * count))
+
+		int64_t buyPrice = static_cast<int64_t>(pTable->BuyPrice) * count;
+		if (buyPrice < 0
+			|| buyPrice > MAX_GOLD)
 		{
-			result = 0x03;
+			result = 3;
+			goto fail_return;
+		}
+
+		if (m_pUserData->m_iGold < buyPrice)
+		{
+			result = 3;
 			goto fail_return;
 		}
 
@@ -4897,17 +4914,17 @@ void CUser::ItemTrade(char* pBuf)
 		m_pUserData->m_sItemArray[SLOT_MAX + pos].nNum = itemid;
 		m_pUserData->m_sItemArray[SLOT_MAX + pos].sDuration = pTable->Durability;
 
+		m_pUserData->m_iGold -= static_cast<int>(buyPrice);
+
 		// count 개념이 있는 아이템
 		if (pTable->Countable
 			&& count > 0)
 		{
 			m_pUserData->m_sItemArray[SLOT_MAX + pos].sCount += count;
-			m_pUserData->m_iGold -= (pTable->BuyPrice * count);
 		}
 		else
 		{
 			m_pUserData->m_sItemArray[SLOT_MAX + pos].sCount = 1;
-			m_pUserData->m_iGold -= pTable->BuyPrice;
 			m_pUserData->m_sItemArray[SLOT_MAX + pos].nSerialNum = m_pMain->GenerateItemSerial();
 		}
 
