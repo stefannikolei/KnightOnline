@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/SolutionFolder/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path=".gitignore" />
+    <File Path="..\OpenKO_WebDB.sql" />
+  </Folder>
+  <Project Path="src\OpenKO.Web\OpenKO.Web.csproj" Type="Classic C#" />
+</Solution>
