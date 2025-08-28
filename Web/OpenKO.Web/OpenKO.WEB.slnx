@@ -6,5 +6,10 @@
     <File Path=".gitignore" />
     <File Path="..\OpenKO_WebDB.sql" />
   </Folder>
-  <Project Path="src\OpenKO.Web\OpenKO.Web.csproj" Type="Classic C#" />
+  <Folder Name="/src/">
+    <Project Path="src\OpenKO.Web\OpenKO.Web.csproj" Type="Classic C#" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests\OpenKO.Web.Tests\OpenKO.Web.Tests.csproj" Type="Classic C#" />
+  </Folder>
 </Solution>
