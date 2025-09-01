@@ -1,0 +1,18 @@
+{
+  "Port": 15001,
+  "MaxConnections": 1000,
+  "Database": {
+    "Server": "localhost",
+    "Database": "KnightOnline",
+    "Username": "",
+    "Password": "",
+    "IntegratedSecurity": true,
+    "ConnectionTimeout": 30,
+    "CommandTimeout": 30
+  },
+  "AutoSaveInterval": 360000,
+  "DbProcessTimeout": 10,
+  "EnableDebugLogging": true,
+  "EnablePacketLogging": false,
+  "LogFilePath": null
+}

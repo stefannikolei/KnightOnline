@@ -1,0 +1,22 @@
+{
+  "Port": 15000,
+  "UdpPort": 8888,
+  "MaxUsers": 3000,
+  "DatabaseServer": {
+    "Host": "localhost",
+    "Port": 15001,
+    "ReconnectInterval": 5000
+  },
+  "AIServers": {
+    "KarusPort": 10020,
+    "ElmoradPort": 10030,
+    "BattlePort": 10040,
+    "MaxConnections": 10
+  },
+  "ServerName": "Knight Online Server",
+  "EnableDebugLogging": true,
+  "EnablePacketLogging": false,
+  "GameTimeMultiplier": 1.0,
+  "WeatherUpdateInterval": 300,
+  "AutoSaveInterval": 300
+}

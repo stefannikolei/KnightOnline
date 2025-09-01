@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnightOnline.Shared", "KnightOnline.Shared\KnightOnline.Shared.csproj", "{BC4DB58E-91BC-4F7A-9D2F-A4F6BAB852D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnightOnline.VersionManager", "KnightOnline.VersionManager\KnightOnline.VersionManager.csproj", "{31DBB314-C97E-4569-8188-4F6D75FAF737}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnightOnline.Aujard", "KnightOnline.Aujard\KnightOnline.Aujard.csproj", "{6625881E-A4C5-4C3D-8F15-36FDE39EBE16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnightOnline.Ebenezer", "KnightOnline.Ebenezer\KnightOnline.Ebenezer.csproj", "{0DA5DA21-8B4C-4945-9EFA-5BAB160391B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnightOnline.AIServer", "KnightOnline.AIServer\KnightOnline.AIServer.csproj", "{E3186A85-3696-4EFD-BFF9-0B1EDA24F110}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnightOnline.ItemManager", "KnightOnline.ItemManager\KnightOnline.ItemManager.csproj", "{535CA46D-ACA5-4031-9F3F-06ABB3B9E102}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BC4DB58E-91BC-4F7A-9D2F-A4F6BAB852D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC4DB58E-91BC-4F7A-9D2F-A4F6BAB852D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC4DB58E-91BC-4F7A-9D2F-A4F6BAB852D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC4DB58E-91BC-4F7A-9D2F-A4F6BAB852D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31DBB314-C97E-4569-8188-4F6D75FAF737}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31DBB314-C97E-4569-8188-4F6D75FAF737}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31DBB314-C97E-4569-8188-4F6D75FAF737}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31DBB314-C97E-4569-8188-4F6D75FAF737}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6625881E-A4C5-4C3D-8F15-36FDE39EBE16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6625881E-A4C5-4C3D-8F15-36FDE39EBE16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6625881E-A4C5-4C3D-8F15-36FDE39EBE16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6625881E-A4C5-4C3D-8F15-36FDE39EBE16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DA5DA21-8B4C-4945-9EFA-5BAB160391B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DA5DA21-8B4C-4945-9EFA-5BAB160391B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DA5DA21-8B4C-4945-9EFA-5BAB160391B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DA5DA21-8B4C-4945-9EFA-5BAB160391B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3186A85-3696-4EFD-BFF9-0B1EDA24F110}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3186A85-3696-4EFD-BFF9-0B1EDA24F110}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3186A85-3696-4EFD-BFF9-0B1EDA24F110}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3186A85-3696-4EFD-BFF9-0B1EDA24F110}.Release|Any CPU.Build.0 = Release|Any CPU
+		{535CA46D-ACA5-4031-9F3F-06ABB3B9E102}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{535CA46D-ACA5-4031-9F3F-06ABB3B9E102}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{535CA46D-ACA5-4031-9F3F-06ABB3B9E102}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{535CA46D-ACA5-4031-9F3F-06ABB3B9E102}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

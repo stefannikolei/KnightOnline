@@ -1,0 +1,8 @@
+{
+  "Port": 15100,
+  "MaxUsers": 3000,
+  "FtpUrl": "ftp://your-server.com/updates/",
+  "FtpPath": "/client/updates/",
+  "LastVersion": 1,
+  "News": "Welcome to Knight Online! Server is running in C#."
+}
