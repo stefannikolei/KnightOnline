@@ -5,22 +5,22 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace KnightOnline.Aujard;
+namespace KnightOnline.Ebenezer;
 
 /// <summary>
-/// Main entry point for the Knight Online Database Server (Aujard)
+/// Main entry point for the Knight Online Game Server (Ebenezer)
 /// </summary>
 public class Program
 {
-    private static AujardServer? _server;
+    private static EbenezerServer? _server;
     private static readonly CancellationTokenSource _cancellationTokenSource = new();
 
     public static async Task Main(string[] args)
     {
-        Console.Title = "Knight Online - Database Server (Aujard)";
-        Console.WriteLine("Knight Online Database Server (Aujard) v1.0");
+        Console.Title = "Knight Online - Game Server (Ebenezer)";
+        Console.WriteLine("Knight Online Game Server (Ebenezer) v1.0");
         Console.WriteLine("Cross-platform C# implementation");
-        Console.WriteLine("==========================================");
+        Console.WriteLine("=====================================");
 
         // Handle Ctrl+C gracefully
         Console.CancelKeyPress += (sender, e) =>
@@ -36,10 +36,10 @@ public class Program
             var config = LoadConfiguration();
             
             // Create and start the server
-            _server = new AujardServer(config);
+            _server = new EbenezerServer(config);
             await _server.StartAsync(_cancellationTokenSource.Token);
 
-            Console.WriteLine($"Database server started on port {config.Port}");
+            Console.WriteLine($"Game server started on port {config.Port}");
             Console.WriteLine("Press Ctrl+C to shutdown...");
 
             // Wait for cancellation
@@ -61,31 +61,31 @@ public class Program
         {
             if (_server != null)
             {
-                Console.WriteLine("Stopping database server...");
+                Console.WriteLine("Stopping game server...");
                 await _server.StopAsync();
                 _server.Dispose();
             }
-            Console.WriteLine("Database server stopped.");
+            Console.WriteLine("Game server stopped.");
         }
     }
 
-    private static AujardConfig LoadConfiguration()
+    private static EbenezerConfig LoadConfiguration()
     {
-        const string configFile = "aujard_config.json";
+        const string configFile = "ebenezer_config.json";
         
         if (!File.Exists(configFile))
         {
             Console.WriteLine($"Configuration file '{configFile}' not found. Creating default configuration...");
-            var defaultConfig = new AujardConfig();
+            var defaultConfig = new EbenezerConfig();
             var defaultJson = JsonSerializer.Serialize(defaultConfig, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(configFile, defaultJson);
-            Console.WriteLine($"Default configuration created in '{configFile}'. Please edit it with your database settings.");
+            Console.WriteLine($"Default configuration created in '{configFile}'. Please edit it with your settings.");
         }
 
         try
         {
             var json = File.ReadAllText(configFile);
-            var config = JsonSerializer.Deserialize<AujardConfig>(json);
+            var config = JsonSerializer.Deserialize<EbenezerConfig>(json);
             if (config == null)
             {
                 throw new InvalidOperationException("Failed to deserialize configuration");
@@ -98,7 +98,7 @@ public class Program
         {
             Console.WriteLine($"Error loading configuration: {ex.Message}");
             Console.WriteLine("Using default configuration...");
-            return new AujardConfig();
+            return new EbenezerConfig();
         }
     }
 }
