@@ -1,0 +1,8 @@
+{
+  "Port": 15100,
+  "MaxUsers": 3000,
+  "FtpUrl": "",
+  "FtpPath": "",
+  "LastVersion": 1,
+  "News": "Welcome to Knight Online!"
+}

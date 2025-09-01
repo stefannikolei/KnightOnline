@@ -1,0 +1,89 @@
+{
+  "version": 3,
+  "targets": {
+    "net8.0": {
+      "KnightOnline.Shared/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/KnightOnline.Shared.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/KnightOnline.Shared.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "KnightOnline.Shared/1.0.0": {
+      "type": "project",
+      "path": "../KnightOnline.Shared/KnightOnline.Shared.csproj",
+      "msbuildProject": "../KnightOnline.Shared/KnightOnline.Shared.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net8.0": [
+      "KnightOnline.Shared >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "/home/runner/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/home/runner/work/KnightOnline/KnightOnline/ServerCS/KnightOnline.VersionManager/KnightOnline.VersionManager.csproj",
+      "projectName": "KnightOnline.VersionManager",
+      "projectPath": "/home/runner/work/KnightOnline/KnightOnline/ServerCS/KnightOnline.VersionManager/KnightOnline.VersionManager.csproj",
+      "packagesPath": "/home/runner/.nuget/packages/",
+      "outputPath": "/home/runner/work/KnightOnline/KnightOnline/ServerCS/KnightOnline.VersionManager/obj/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/home/runner/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "projectReferences": {
+            "/home/runner/work/KnightOnline/KnightOnline/ServerCS/KnightOnline.Shared/KnightOnline.Shared.csproj": {
+              "projectPath": "/home/runner/work/KnightOnline/KnightOnline/ServerCS/KnightOnline.Shared/KnightOnline.Shared.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net8.0": {
+        "targetAlias": "net8.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.119/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
