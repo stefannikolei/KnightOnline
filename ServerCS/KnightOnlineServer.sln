@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnightOnline.Shared", "Knig
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnightOnline.VersionManager", "KnightOnline.VersionManager\KnightOnline.VersionManager.csproj", "{31DBB314-C97E-4569-8188-4F6D75FAF737}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnightOnline.Aujard", "KnightOnline.Aujard\KnightOnline.Aujard.csproj", "{6625881E-A4C5-4C3D-8F15-36FDE39EBE16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{31DBB314-C97E-4569-8188-4F6D75FAF737}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31DBB314-C97E-4569-8188-4F6D75FAF737}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31DBB314-C97E-4569-8188-4F6D75FAF737}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6625881E-A4C5-4C3D-8F15-36FDE39EBE16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6625881E-A4C5-4C3D-8F15-36FDE39EBE16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6625881E-A4C5-4C3D-8F15-36FDE39EBE16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6625881E-A4C5-4C3D-8F15-36FDE39EBE16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

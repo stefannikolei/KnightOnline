@@ -1,0 +1,22 @@
+# C# Build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.user
+*.suo
+*.userprefs
+*.cache
+.vs/
+
+# Configuration files (some may contain sensitive data)
+*_config.json
+!*_config.example.json
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
