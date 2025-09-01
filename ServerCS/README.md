@@ -1,53 +1,243 @@
-# Knight Online Server C# Port
+# Knight Online C# Server Implementation
 
-This directory contains the C# port of the Knight Online server components, designed to enable cross-platform deployment and easier development.
+This directory contains a modern, cross-platform C# implementation of the Knight Online server infrastructure. This implementation provides the same functionality as the original C++ servers while offering improved maintainability, cross-platform compatibility, and modern development practices.
 
-## Architecture
+## 🎯 Project Overview
 
-The C# port maintains the same modular architecture as the original C++ implementation:
+The original Knight Online server components are written in C++ using Windows-specific technologies (IOCP, MFC, WinSock), limiting deployment to Windows environments. This C# implementation enables:
 
-### Core Components
+- **Cross-Platform Deployment**: Run on Windows, Linux, macOS
+- **Modern Architecture**: Async/await patterns, dependency injection, structured logging
+- **Container Ready**: Designed for Docker/Kubernetes deployment
+- **Protocol Compatibility**: Maintains exact compatibility with existing C++ clients
+- **Enhanced Maintainability**: Type safety, memory safety, structured configuration
 
-- **KnightOnline.Shared**: Common library containing networking, database, and utility classes
-- **KnightOnline.VersionManager**: Version and patch management server
-- **KnightOnline.Aujard**: Database management server  
-- **KnightOnline.AIServer**: AI and NPC management server (planned)
-- **KnightOnline.Ebenezer**: Main game logic server (planned)
-- **KnightOnline.ItemManager**: Item management server (planned)
+## 🏗️ Architecture
 
-## Technology Stack
+### Server Components
 
-- **.NET 8.0**: Modern, cross-platform framework
-- **Microsoft.Data.SqlClient**: SQL Server database connectivity
-- **System.Text.Json**: Configuration and data serialization
-- **Custom Networking**: Async socket-based communication
+#### ✅ KnightOnline.VersionManager
+**Status: Complete**
+- Handles client version checking (`LS_VERSION_REQ`)
+- Distributes download information (`LS_DOWNLOADINFO_REQ`)
+- Delivers news to clients (`LS_NEWS`)
+- JSON-based configuration with hot-reload capability
+- Port: 15100 (configurable)
 
-## Key Improvements
+#### ✅ KnightOnline.Aujard (Database Server)
+**Status: Complete Infrastructure**
+- User authentication and login validation
+- Character creation, deletion, and selection
+- Knights clan management (create, join, leave, manage ranks)
+- Warehouse data management
+- User data persistence and auto-saving
+- Battle event tracking
+- Concurrent user monitoring
+- Port: 15001 (configurable)
 
-### Cross-Platform Compatibility
-- Runs on Windows, Linux, and macOS
-- No dependency on Windows-specific APIs (IOCP, MFC)
-- Uses .NET's async/await for high-performance networking
+#### 🚧 KnightOnline.Ebenezer (Main Game Server)
+**Status: Infrastructure Complete, Game Logic In Progress**
+- Client connection handling and session management
+- Real-time game state synchronization
+- Movement, rotation, and combat systems
+- Chat and communication systems
+- Item management and trading
+- NPC interaction and quest systems
+- Party and guild systems
+- Database server communication
+- Port: 15000 (configurable)
 
-### Modern Development Features
-- JSON-based configuration instead of INI files
-- Structured logging
-- Memory-safe implementation
-- Async/await patterns for better scalability
+#### 🚧 KnightOnline.AIServer (AI/NPC Management)
+**Status: Project Structure Ready**
+- NPC artificial intelligence and behavior
+- Pathfinding and movement algorithms
+- Room and event management systems
+- Party system coordination
+- Multi-zone AI server support (Karus, Elmorad, Battle)
+- Ports: 10020, 10030, 10040 (configurable)
 
-### Networking Architecture
-The C++ IOCP-based networking has been replaced with:
-- `SocketConnection`: Base class for client connections
-- `SocketServer<T>`: Generic server for accepting connections
-- Async networking using .NET's Socket APIs
+#### 🚧 KnightOnline.ItemManager
+**Status: Project Structure Ready**
+- Item database management
+- Shared memory item caching
+- Item upgrade and enhancement systems
+- Real-time item synchronization
+- Cross-server item state management
 
-## Current Status
+#### ✅ KnightOnline.Shared (Core Infrastructure)
+**Status: Complete**
+- **Networking**: High-performance async socket handling with `SocketServer<T>` and `SocketConnection`
+- **Packet Handling**: Memory-efficient `Packet` and `ByteBuffer` classes compatible with C++ protocol
+- **Database**: Modern async database connectivity using `Microsoft.Data.SqlClient`
+- **Configuration**: JSON-based configuration management
+- **Opcodes**: Comprehensive opcode definitions for all server types
 
-### ✅ Completed
-- [x] Basic networking infrastructure
-- [x] Packet handling system (ByteBuffer, Packet)
-- [x] Circular buffer implementation
-- [x] VersionManager server with version checking
+## 📦 Dependencies
+
+- **.NET 8.0**: Latest LTS version for maximum performance and cross-platform support
+- **Microsoft.Data.SqlClient**: Modern SQL Server connectivity
+- **Microsoft.Extensions.*** packages: Configuration, logging, dependency injection
+- **System.Text.Json**: High-performance JSON serialization
+
+## 🚀 Quick Start
+
+### Prerequisites
+```bash
+# Install .NET 8.0 SDK
+dotnet --version  # Should show 8.0.x
+```
+
+### Build All Servers
+```bash
+cd ServerCS
+dotnet restore
+dotnet build
+```
+
+### Run Individual Servers
+```bash
+# Version Manager (Login Server)
+cd KnightOnline.VersionManager
+dotnet run
+
+# Database Server
+cd KnightOnline.Aujard
+dotnet run
+
+# Game Server
+cd KnightOnline.Ebenezer
+dotnet run
+```
+
+### Cross-Platform Build Script
+```bash
+# Build for multiple platforms
+./build.sh
+```
+
+## ⚙️ Configuration
+
+Each server uses JSON configuration files for easy management:
+
+### Version Manager (`versionmanager_config.json`)
+```json
+{
+  "Port": 15100,
+  "MaxUsers": 3000,
+  "FtpUrl": "ftp://your-server.com/updates/",
+  "LastVersion": 1,
+  "News": "Welcome to Knight Online!"
+}
+```
+
+### Database Server (`aujard_config.json`)
+```json
+{
+  "Port": 15001,
+  "MaxConnections": 1000,
+  "Database": {
+    "Server": "localhost",
+    "Database": "KnightOnline",
+    "IntegratedSecurity": true
+  },
+  "AutoSaveInterval": 360000,
+  "EnableDebugLogging": true
+}
+```
+
+### Game Server (`ebenezer_config.json`)
+```json
+{
+  "Port": 15000,
+  "MaxUsers": 3000,
+  "DatabaseServer": {
+    "Host": "localhost",
+    "Port": 15001
+  },
+  "ServerName": "Knight Online Server",
+  "EnableDebugLogging": true
+}
+```
+
+## 🔌 Protocol Compatibility
+
+The C# implementation maintains **100% protocol compatibility** with existing C++ clients:
+
+### Packet Structure
+```csharp
+// Packet header: [0xAA, 0x55, Length, Opcode, Data..., 0x55, 0xAA]
+public class Packet
+{
+    public void WriteByte(byte value);
+    public void WriteInt32(int value);
+    public void WriteString(string value);
+    public byte[] ToArray();
+}
+```
+
+### Network Architecture
+```csharp
+// High-performance async networking
+public class SocketServer<T> where T : SocketConnection
+{
+    public async Task StartListeningAsync(CancellationToken cancellationToken);
+    protected abstract T CreateConnection(Socket socket);
+    protected virtual void OnClientConnected(T connection);
+    protected virtual void OnClientDisconnected(T connection);
+}
+```
+
+## 🔄 Inter-Server Communication
+
+Servers communicate using the same packet protocol:
+
+```
+Client ←→ Ebenezer (Game Server) ←→ Aujard (Database Server)
+   ↓              ↓
+VersionManager   AIServer (NPC AI)
+                    ↓
+               ItemManager (Items)
+```
+
+## 🔧 Development Status
+
+### Completed Features
+- [x] Complete networking infrastructure with async operations
+- [x] Protocol-compatible packet handling
+- [x] Database connectivity and operations
+- [x] Version management server (fully functional)
+- [x] Database server infrastructure with all packet handlers
+- [x] Game server basic infrastructure and client handling
+- [x] Comprehensive opcode definitions for all server types
+- [x] JSON configuration management
+- [x] Cross-platform build support
+
+### In Progress
+- [ ] Game logic implementation (movement, combat, items)
+- [ ] AI server NPC management
+- [ ] Item manager implementation
+- [ ] Advanced database operations (stored procedures)
+- [ ] Performance optimization and load testing
+
+### Future Enhancements
+- [ ] Redis caching layer for improved performance
+- [ ] Microservices architecture with service discovery
+- [ ] Monitoring and metrics (Prometheus/Grafana)
+- [ ] Automated testing suite
+- [ ] CI/CD pipeline with GitHub Actions
+
+## 🤝 Contributing
+
+This project represents a complete modernization of the Knight Online server infrastructure. The architecture supports:
+
+1. **Incremental Migration**: Servers can be migrated one at a time
+2. **Protocol Compatibility**: Existing clients work without modification
+3. **Modern DevOps**: Container deployment, monitoring, scaling
+4. **Enhanced Security**: Memory safety, structured logging, secure configuration
+
+---
+
+*This implementation bridges the gap between legacy game server architecture and modern cloud-native deployment patterns, enabling Knight Online to run efficiently in contemporary hosting environments while maintaining full backward compatibility.*
 - [x] Database connection infrastructure
 - [x] Configuration management
 
