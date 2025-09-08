@@ -22,7 +22,7 @@ class CUITransactionDlg : public CN3UIWndBase
 	friend class CUIInventory;
 
 public:
-// 직접 접근해야 할 객체 참조 포인터
+// 직접 접근해야 할 객체 참조 포인터 [Korean comment]
 	__IconItemSkill*		m_pMyTrade[MAX_ITEM_TRADE_PAGE][MAX_ITEM_TRADE];
 	__IconItemSkill*		m_pMyTradeInv[MAX_ITEM_INVENTORY];
 	CN3UIString*			m_pStrMyGold;
@@ -86,7 +86,7 @@ public:
 	void				SendToServerBuyMsg(int itemID, byte pos, int iCount);
 	void				SendToServerMoveMsg(int itemID, byte startpos, byte destpos);
 
-	// 물건 구입이 서버에게 보내기전 성공..
+	// 물건 구입이 서버에게 보내기전 성공.. [Korean comment]
 	void				ReceiveItemDropByTradeSuccess();
 
 	CN3UIBase*			GetChildButtonByName(const std::string& szFN);
@@ -107,7 +107,7 @@ public:
 	void				ReceiveResultTradeMoveSuccess();
 	void				ReceiveResultTradeMoveFail();
 
-	// 타이틀 표시..
+	// 타이틀 표시.. [Korean comment]
 	void				ShowTitle(e_NpcTrade eNT);
 
 	void				GoldUpdate();

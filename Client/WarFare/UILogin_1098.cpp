@@ -44,7 +44,7 @@ CUILogIn_1098::CUILogIn_1098()
 
 	m_pList_Server = nullptr;
 
-	m_bOpenningNow = false; // 위에서 아래로 스르륵...열려야 한다면..
+	m_bOpenningNow = false; // 위에서 아래로 스르륵...열려야 한다면.. [Korean comment]
 	m_fMoveDelta = 0;
 
 	m_bLogIn = false;
@@ -70,15 +70,15 @@ bool CUILogIn_1098::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		}
 		else if (pSender == m_pBtn_Connect)
 		{
-			CGameProcedure::s_pProcLogIn->ConnectToGameServer(); // 고른 게임 서버에 접속
+			CGameProcedure::s_pProcLogIn->ConnectToGameServer(); // 고른 게임 서버에 접속 [Korean comment]
 			return true;
 		}
 		else if (pSender == m_pBtn_Cancel)
 		{
-			PostQuitMessage(0);	// 종료...
+			PostQuitMessage(0);	// 종료... [Korean comment]
 			return true;
 		}
-		else if (pSender == m_pBtn_Option) // 옵션..
+		else if (pSender == m_pBtn_Option) // 옵션.. [Korean comment]
 		{
 			std::string szMsg = fmt::format_text_resource(IDS_CONFIRM_EXECUTE_OPTION);
 			CGameProcedure::MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_EXECUTE_OPTION);
@@ -96,7 +96,7 @@ bool CUILogIn_1098::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 	}
 	else if (UIMSG_LIST_DBLCLK == dwMsg)
 	{
-		CGameProcedure::s_pProcLogIn->ConnectToGameServer(); // 고른 게임 서버에 접속
+		CGameProcedure::s_pProcLogIn->ConnectToGameServer(); // 고른 게임 서버에 접속 [Korean comment]
 		return true;
 	}
 	else if (dwMsg == UIMSG_EDIT_RETURN)
@@ -285,7 +285,7 @@ void CUILogIn_1098::Tick()
 
 	if (m_pGroup_ServerList != nullptr)
 	{
-		// 위에서 아래로 스르륵...열려야 한다면..
+		// 위에서 아래로 스르륵...열려야 한다면.. [Korean comment]
 		if (m_bOpenningNow)
 		{
 			POINT ptCur = m_pGroup_ServerList->GetPos();
@@ -300,7 +300,7 @@ void CUILogIn_1098::Tick()
 
 			int iYLimit = 0;
 			ptCur.y = (int) (m_fMoveDelta - fHeight);
-			if (ptCur.y >= iYLimit) // 다열렸다!!
+			if (ptCur.y >= iYLimit) // 다열렸다!! [Korean comment]
 			{
 				ptCur.y = iYLimit;
 				m_bOpenningNow = false;
@@ -317,7 +317,7 @@ void CUILogIn_1098::OpenServerList()
 		|| m_pGroup_ServerList == nullptr)
 		return;
 
-	// 스르륵 열린다!!
+	// 스르륵 열린다!! [Korean comment]
 	m_pGroup_ServerList->SetVisible(true);
 	RECT rc = m_pGroup_ServerList->GetRegion();
 	m_pGroup_ServerList->SetPos(0, -(rc.bottom - rc.top));
@@ -328,7 +328,7 @@ void CUILogIn_1098::OpenServerList()
 
 void CUILogIn_1098::SetVisibleLogInUIs(bool bEnable)
 {
-	// 로그인을 숨긴다..
+	// 로그인을 숨긴다.. [Korean comment]
 	if (m_pGroup_LogIn != nullptr)
 		m_pGroup_LogIn->SetVisible(bEnable);
 
@@ -349,7 +349,7 @@ void CUILogIn_1098::SetVisibleLogInUIs(bool bEnable)
 			if (m_pText_Rights != nullptr
 				&& m_pImg_MGameLogo != nullptr)
 			{
-				// 아래쪽 중단으로 맞춘다..
+				// 아래쪽 중단으로 맞춘다.. [Korean comment]
 				RECT rcView = { 0, 0, (int) s_CameraData.vp.Width, (int) s_CameraData.vp.Height };
 				int iX = (rcView.right - (m_pText_Rights->GetWidth() + m_pImg_MGameLogo->GetWidth())) / 2;
 				int iY = rcView.bottom - m_pText_Rights->GetHeight() - 20;
@@ -367,7 +367,7 @@ void CUILogIn_1098::SetVisibleLogInUIs(bool bEnable)
 			if (m_pText_Rights != nullptr
 				&& m_pImg_DaumLogo != nullptr)
 			{
-				// 아래쪽 중단으로 맞춘다..
+				// 아래쪽 중단으로 맞춘다.. [Korean comment]
 				RECT rcView = { 0, 0, (int) s_CameraData.vp.Width, (int) s_CameraData.vp.Height };
 				int iX = (rcView.right - (m_pText_Rights->GetWidth() + m_pImg_DaumLogo->GetWidth())) / 2;
 				int iY = rcView.bottom - m_pText_Rights->GetHeight() - 20;
@@ -397,7 +397,7 @@ void CUILogIn_1098::SetVisibleLogInUIs(bool bEnable)
 
 void CUILogIn_1098::RecalcGradePos()
 {
-	// 이용등급 표시
+	// 이용등급 표시 [Korean comment]
 	if (m_pImg_GradeLogo != nullptr)
 	{
 		RECT rc = m_pImg_GradeLogo->GetRegion();

@@ -52,7 +52,7 @@ void CN3FXMgr::TriggerBundle(int SourceID, int SourceJoint, int FXID, int Target
 	
 	stlMAP_BUNDLEORIGIN_IT itOrigin = m_OriginBundle.find(strTmp);
 	
-	if(itOrigin != m_OriginBundle.end())	//같은 효과가 있다..
+	if(itOrigin != m_OriginBundle.end())	//같은 효과가 있다.. [Korean comment]
 	{
 		LPFXBUNDLEORIGIN pSrc = itOrigin->second;
 		
@@ -70,7 +70,7 @@ void CN3FXMgr::TriggerBundle(int SourceID, int SourceJoint, int FXID, int Target
 		m_ListBundle.push_back(pBundle);
 		pSrc->iNum++;
 	}
-	else	//같은 효과가 없다..
+	else	//같은 효과가 없다.. [Korean comment]
 	{
 		LPFXBUNDLEORIGIN pSrc = new FXBUNDLEORIGIN;
 		pSrc->pBundle = new CN3FXBundleGame;
@@ -108,7 +108,7 @@ void CN3FXMgr::TriggerBundle(int SourceID, int SourceJoint, int FXID, __Vector3 
 
 	stlMAP_BUNDLEORIGIN_IT itOrigin = m_OriginBundle.find(strTmp);
 
-	if(itOrigin != m_OriginBundle.end())	//같은 효과가 있다..
+	if(itOrigin != m_OriginBundle.end())	//같은 효과가 있다.. [Korean comment]
 	{
 		LPFXBUNDLEORIGIN pSrc = itOrigin->second;		
 		CN3FXBundleGame* pBundle = new CN3FXBundleGame;
@@ -124,7 +124,7 @@ void CN3FXMgr::TriggerBundle(int SourceID, int SourceJoint, int FXID, __Vector3 
 		m_ListBundle.push_back(pBundle);
 		pSrc->iNum++;
 	}
-	else	//같은 효과가 없다..
+	else	//같은 효과가 없다.. [Korean comment]
 	{
 		LPFXBUNDLEORIGIN pSrc = new FXBUNDLEORIGIN;
 		pSrc->pBundle = new CN3FXBundleGame;
@@ -275,7 +275,7 @@ void CN3FXMgr::Tick()
 		if(pBundle->m_dwState==FX_BUNDLE_STATE_DEAD)
 		{
 			stlMAP_BUNDLEORIGIN_IT itOrigin = m_OriginBundle.find(pBundle->FileName());
-			if(itOrigin!=m_OriginBundle.end())	//같은 효과가 있다..
+			if(itOrigin!=m_OriginBundle.end())	//같은 효과가 있다.. [Korean comment]
 			{
 				LPFXBUNDLEORIGIN pSrc = itOrigin->second;
 				pSrc->iNum--;
@@ -290,11 +290,11 @@ void CN3FXMgr::Tick()
 			continue;
 		}		
 		
-		//내가 쏜 것이고..
-		//pBundle->m_iMoveType과 살아있는지를 체크한 다음
+		//내가 쏜 것이고.. [Korean comment]
+		//pBundle->m_iMoveType과 살아있는지를 체크한 다음 Check
 		//시야권 검사는 보류....만약 한다면...view frustum으로 하는게 아니라...
 		//player와 obj의 거리를 구해서 일정거리 이상이면 없애는 걸로해라..
-		//충돌검사
+		//충돌검사 Check
 /*	
 		if(pBundle->m_iMoveType != FX_BUNDLE_MOVE_NONE &&
 			pBundle->m_dwState==FX_BUNDLE_STATE_LIVE &&
@@ -321,7 +321,7 @@ void CN3FXMgr::Tick()
 				__Vector3 vCol;
 				float fHeight = 0.5f;
 
-				// npc or player와 충돌체크..
+				// npc or player와 충돌체크.. Check
 				bool bCol = false;
 				it_UPC it = s_pOPMgr->m_UPCs.begin();
 				it_UPC itEnd = s_pOPMgr->m_UPCs.end();
@@ -354,7 +354,7 @@ void CN3FXMgr::Tick()
 						CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 						CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 						
-						CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..	
+						CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..	 [Korean comment]
 
 						iOffset=0;
 						CAPISocket::MP_AddByte(byBuff, iOffset, (uint8_t)WIZ_MAGIC_PROCESS);
@@ -371,7 +371,7 @@ void CN3FXMgr::Tick()
 						CAPISocket::MP_AddShort(byBuff, iOffset, pBundle->m_iIdx);
 						CAPISocket::MP_AddShort(byBuff, iOffset, 0);					
 						
-						CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+						CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 
 						break;
 					}
@@ -382,7 +382,7 @@ void CN3FXMgr::Tick()
 					pUPC = it->second;
 					if(dwToMe == 1 && pUPC->m_InfoBase.eNation==s_pPlayer->m_InfoBase.eNation) continue;
 					
-					if((pBundle->m_vPos - pUPC->Position()).Magnitude() > 16.0f) continue; // 16 미터 이상 떨어져 있음 지나간다..
+					if((pBundle->m_vPos - pUPC->Position()).Magnitude() > 16.0f) continue; // 16 미터 이상 떨어져 있음 지나간다.. [Korean comment]
 
 					__Vector3 vCp = pUPC->Center();
 					//if( true == CheckCollisionSphere(pBundle->m_vPos, pBundle->m_vPos + pBundle->m_vDir*pBundle->m_fVelocity*CN3Base::s_fSecPerFrm, vCp, pUPC->Radius(), &vCol) )
@@ -409,7 +409,7 @@ void CN3FXMgr::Tick()
 						CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 						CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 						
-						CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..	
+						CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..	 [Korean comment]
 
 						iOffset=0;
 						CAPISocket::MP_AddByte(byBuff, iOffset, (uint8_t)WIZ_MAGIC_PROCESS);
@@ -426,7 +426,7 @@ void CN3FXMgr::Tick()
 						CAPISocket::MP_AddShort(byBuff, iOffset, pBundle->m_iIdx);
 						CAPISocket::MP_AddShort(byBuff, iOffset, 0);					
 						
-						CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+						CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 
 						break;
 					}
@@ -447,7 +447,7 @@ void CN3FXMgr::Tick()
 						if(dwToMe == 1 && pNPC->m_InfoBase.eNation==s_pPlayer->m_InfoBase.eNation) continue;
 						else if(pSNPC && dwToMe == 2 && pSNPC->m_InfoBase.eNation == pNPC->m_InfoBase.eNation) continue;
 
-						if((pBundle->m_vPos - pNPC->Position()).Magnitude() > 16.0f) continue; // 16 미터 이상 떨어져 있음 지나간다..
+						if((pBundle->m_vPos - pNPC->Position()).Magnitude() > 16.0f) continue; // 16 미터 이상 떨어져 있음 지나간다.. [Korean comment]
 
 						if(pNPC->IDNumber()==pBundle->m_iTargetID && pNPC->m_pShapeExtraRef)
 						{
@@ -479,7 +479,7 @@ void CN3FXMgr::Tick()
 								CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 								CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 								
-								CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+								CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 								
 								iOffset=0;
 								CAPISocket::MP_AddByte(byBuff, iOffset, (uint8_t)WIZ_MAGIC_PROCESS);
@@ -496,7 +496,7 @@ void CN3FXMgr::Tick()
 								CAPISocket::MP_AddShort(byBuff, iOffset, pBundle->m_iIdx);
 								CAPISocket::MP_AddShort(byBuff, iOffset, 0);					
 								
-								CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+								CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 
 								break;
 							}
@@ -527,7 +527,7 @@ void CN3FXMgr::Tick()
 							CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 							CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 							
-							CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+							CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 							
 							iOffset=0;
 							CAPISocket::MP_AddByte(byBuff, iOffset, (uint8_t)WIZ_MAGIC_PROCESS);
@@ -544,14 +544,14 @@ void CN3FXMgr::Tick()
 							CAPISocket::MP_AddShort(byBuff, iOffset, pBundle->m_iIdx);
 							CAPISocket::MP_AddShort(byBuff, iOffset, 0);					
 							
-							CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+							CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 
 							break;						
 						}
 					}
 				}
 				
-				// Object 와 충돌 체크..
+				// Object 와 충돌 체크.. Check
 				if(bCol == false &&
 					true == ACT_WORLD->CheckCollisionWithShape(pBundle->m_vPos, pBundle->m_vDir, pBundle->m_fVelocity * CN3Base::s_fSecPerFrm, &vCol))
 				{
@@ -578,7 +578,7 @@ void CN3FXMgr::Tick()
 					CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 					CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 
-					CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+					CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 
 					iOffset=0;
 					CAPISocket::MP_AddByte(byBuff, iOffset, (uint8_t)WIZ_MAGIC_PROCESS);
@@ -595,14 +595,14 @@ void CN3FXMgr::Tick()
 					CAPISocket::MP_AddShort(byBuff, iOffset, pBundle->m_iIdx);
 					CAPISocket::MP_AddShort(byBuff, iOffset, 0);	
 					
-					CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..			
+					CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..			 [Korean comment]
 				}
-				// 지형과 충돌체크..
+				// 지형과 충돌체크.. Check
 				if(bCol == false &&
 					ACT_WORLD->CheckCollisionWithTerrain(pBundle->m_vPos, pBundle->m_vDir, pBundle->m_fVelocity, &vCol))
 				{
-					//충돌...
-					//여기서 패킷 날려야 겠구만...
+					//충돌... [Korean comment]
+					//여기서 패킷 날려야 겠구만... [Korean comment]
 					bCol = true;
 					pBundle->m_vPos = vCol;
 					pBundle->Stop();
@@ -625,7 +625,7 @@ void CN3FXMgr::Tick()
 					CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 					CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 
-					CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+					CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 
 					iOffset=0;
 					CAPISocket::MP_AddByte(byBuff, iOffset, (uint8_t)WIZ_MAGIC_PROCESS);
@@ -642,7 +642,7 @@ void CN3FXMgr::Tick()
 					CAPISocket::MP_AddShort(byBuff, iOffset, pBundle->m_iIdx);
 					CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 								
-					CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+					CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 				}
 			}
 		}			

@@ -74,11 +74,11 @@ public:
 	virtual float GetHeightWithShape(float fX, float fZ, __Vector3* pvNormal = nullptr) = 0; 
 	virtual CN3Shape* ShapeGetByIDWithShape(int iID) = 0;
 	virtual CN3Shape* PickWithShape(int iXScreen, int iYScreen, bool bMustHaveEvent, __Vector3* pvPick = nullptr) = 0;
-	virtual bool CheckCollisionWithShape(	const __Vector3& vPos,			// 충돌 위치
-														const __Vector3& vDir,					    // 방향 벡터
-														float fSpeedPerSec,							 // 초당 움직이는 속도
-														__Vector3* pvCol = nullptr,				  // 충돌 지점
-														__Vector3* pvNormal = nullptr,				// 충돌한면의 법선벡터
+	virtual bool CheckCollisionWithShape(	const __Vector3& vPos,			// 충돌 위치 Position
+														const __Vector3& vDir,					    // 방향 벡터 [Korean comment]
+														float fSpeedPerSec,							 // 초당 움직이는 속도 [Korean comment]
+														__Vector3* pvCol = nullptr,				  // 충돌 지점 [Korean comment]
+														__Vector3* pvNormal = nullptr,				// 충돌한면의 법선벡터 [Korean comment]
 														__Vector3* pVec = nullptr) = 0;			// 충돌한 면 의 폴리곤 __Vector3[3]
 
 	// Sky..

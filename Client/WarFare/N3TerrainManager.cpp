@@ -74,12 +74,12 @@ void CN3TerrainManager::InitWorld(int iZoneID, const __Vector3& vPosPlayer)
 	else*/ m_pTerrain->LoadFromFile(pZone->szTerrainFN);//, N3FORMAT_VER_1298);
 
 
-	m_pTerrain->LoadColorMap(pZone->szColorMapFN);		// 컬러맵 로드..
+	m_pTerrain->LoadColorMap(pZone->szColorMapFN);		// 컬러맵 로드.. Load
 	m_pShapes->Release();
 
 
 	/*if(iZoneID == 1) m_pShapes->LoadFromFile(pZone->szObjectPostDataFN, N3FORMAT_VER_1068);
-	else*/ m_pShapes->LoadFromFile(pZone->szObjectPostDataFN);//, N3FORMAT_VER_1298);//, pZone->dwVersion);	// 오브젝트 데이터 로드..
+	else*/ m_pShapes->LoadFromFile(pZone->szObjectPostDataFN);//, N3FORMAT_VER_1298);//, pZone->dwVersion);	// 오브젝트 데이터 로드.. Load
 	
 
 	char szFName[_MAX_PATH];
@@ -91,8 +91,8 @@ void CN3TerrainManager::InitWorld(int iZoneID, const __Vector3& vPosPlayer)
 	m_pBirdMng->LoadFromFile(szFullPathName);
 
 //	m_pGrasses->Init(vPosPlayer);
-	m_pSky->LoadFromFile(pZone->szSkySetting); // 하늘, 구름, 태양, 날씨 변화등 정보 및 텍스처 로딩..
-	m_pSky->SunAndMoonDirectionFixByHour(pZone->iFixedSundDirection); // 해, 달 방향을 고정하든가 혹은 0 이면 고정하지 않는다.
+	m_pSky->LoadFromFile(pZone->szSkySetting); // 하늘, 구름, 태양, 날씨 변화등 정보 및 텍스처 로딩.. Info
+	m_pSky->SunAndMoonDirectionFixByHour(pZone->iFixedSundDirection); // 해, 달 방향을 고정하든가 혹은 0 이면 고정하지 않는다. [Korean comment]
 }
 
 void CN3TerrainManager::Tick()
@@ -255,11 +255,11 @@ CN3Shape* CN3TerrainManager::PickWithShape(int iXScreen, int iYScreen, bool bMus
 		return nullptr;
 }
 
-bool CN3TerrainManager::CheckCollisionWithShape(	  const __Vector3& vPos,				 // 충돌 위치
-																						const __Vector3& vDir,				   // 방향 벡터
-																						float fSpeedPerSec,					    // 초당 움직이는 속도
-																						__Vector3* pvCol,						 // 충돌 지점
-																						__Vector3* pvNormal,				  // 충돌한면의 법선벡터
+bool CN3TerrainManager::CheckCollisionWithShape(	  const __Vector3& vPos,				 // 충돌 위치 Position
+																						const __Vector3& vDir,				   // 방향 벡터 [Korean comment]
+																						float fSpeedPerSec,					    // 초당 움직이는 속도 [Korean comment]
+																						__Vector3* pvCol,						 // 충돌 지점 [Korean comment]
+																						__Vector3* pvNormal,				  // 충돌한면의 법선벡터 [Korean comment]
 																						__Vector3* pVec)						// 충돌한 면 의 폴리곤 __Vector3[3]
 {
 	if (m_pShapes) 

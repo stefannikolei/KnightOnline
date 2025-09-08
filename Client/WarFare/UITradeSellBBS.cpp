@@ -92,7 +92,7 @@ bool CUITradeSellBBS::Load(HANDLE hFile)
 		N3_VERIFY_UI_COMPONENT(m_pText[i], GetChildByID<CN3UIString>(szID));
 	}
 
-	m_iCurPage = 0; // 현재 페이지..
+	m_iCurPage = 0; // 현재 페이지.. [Korean comment]
 
 	__TABLE_UI_RESRC*	pTblUI	= nullptr;
 	pTblUI = CGameBase::s_pTbl_UI.Find(NATION_ELMORAD);
@@ -124,7 +124,7 @@ bool CUITradeSellBBS::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		{
 			float fTime = CN3Base::TimeGet();
 			if( fTime - m_fTime < 3.0f )
-				return true;//너무 자주 새데이터 요청을 못하게 함 3초에 한번정도로 제약을 둠.
+				return true;//너무 자주 새데이터 요청을 못하게 함 3초에 한번정도로 제약을 둠. Data
 			m_fTime = fTime;
 
 			this->MsgSend_RefreshData(m_iCurPage);
@@ -210,15 +210,15 @@ void CUITradeSellBBS::MsgRecv_TradeBBS(Packet& pkt)
 
 			switch (bySubResult)
 			{
-				case 1://1: 일반적인 실패
+				case 1://1: 일반적인 실패 [Korean comment]
 					szMsg = fmt::format_text_resource(IDS_TRADE_BBS_FAIL1);
 					break;
 
-				case 2://2: 돈이 없어서 실패
+				case 2://2: 돈이 없어서 실패 [Korean comment]
 					szMsg = fmt::format_text_resource(IDS_TRADE_BBS_FAIL2);
 					break;
 
-				case 3://3: 항목이 없어서 실패
+				case 3://3: 항목이 없어서 실패 [Korean comment]
 					szMsg = fmt::format_text_resource(IDS_TRADE_BBS_FAIL4);
 					break;
 			}
@@ -239,20 +239,20 @@ void CUITradeSellBBS::MsgRecv_TradeBBS(Packet& pkt)
 
 			switch (bySubResult)
 			{
-				case 1://1: 일반적인 실패
+				case 1://1: 일반적인 실패 [Korean comment]
 					szMsg = fmt::format_text_resource(IDS_TRADE_BBS_FAIL5);
 					break;
-				case 2://2: 돈이 없어서 실패
+				case 2://2: 돈이 없어서 실패 [Korean comment]
 					szMsg = fmt::format_text_resource(IDS_TRADE_BBS_FAIL2);
 					break;
-				case 3://3: 항목이 없어서 실패
+				case 3://3: 항목이 없어서 실패 [Korean comment]
 					szMsg = fmt::format_text_resource(IDS_TRADE_BBS_FAIL4);
 					break;
 			}
 
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff0000);
 		}
-		return; //실패했다면
+		return; //실패했다면 [Korean comment]
 	}
 
 	if (bySubType == N3_SP_TYPE_BBS_OPEN)
@@ -317,8 +317,8 @@ void CUITradeSellBBS::MsgRecv_RefreshData(Packet& pkt)
 		if(iLen>0) pkt.readString(Info.szTitle, iLen);
 		iLen = pkt.read<int16_t>();
 		if(iLen>0) pkt.readString(Info.szExplanation, iLen);
-		Info.iPrice = pkt.read<uint32_t>();		//아이템에 제시한 가격
-		Info.sIndex = pkt.read<int16_t>();		//등록된 인덱스
+		Info.iPrice = pkt.read<uint32_t>();		//아이템에 제시한 가격 [Korean comment]
+		Info.sIndex = pkt.read<int16_t>();		//등록된 인덱스 Index
 
 		if( Info.sID != -1 )
 			m_Datas.push_back(Info);
@@ -338,7 +338,7 @@ void CUITradeSellBBS::MsgRecv_RefreshData(Packet& pkt)
 
 void CUITradeSellBBS::RefreshPage()
 {
-	if(m_pString_Page) m_pString_Page->SetStringAsInt(m_iCurPage+1); // 페이지 표시..
+	if(m_pString_Page) m_pString_Page->SetStringAsInt(m_iCurPage+1); // 페이지 표시.. [Korean comment]
 
 	ResetContent();
 
@@ -356,7 +356,7 @@ void CUITradeSellBBS::RefreshPage()
 
 void CUITradeSellBBS::MsgSend_RefreshData(int iCurPage)
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
+	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면 [Korean comment]
 
 	uint8_t byBuff[10];
 	int iOffset=0;
@@ -373,7 +373,7 @@ void CUITradeSellBBS::MsgSend_RefreshData(int iCurPage)
 
 void CUITradeSellBBS::MsgSend_Register()
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
+	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면 [Korean comment]
 	if(!CGameProcedure::s_pProcMain->m_pUITradeBBSEdit) return;
 	int16_t sLen = 0;
 	std::string szTitle;
@@ -407,7 +407,7 @@ void CUITradeSellBBS::MsgSend_Register()
 
 void CUITradeSellBBS::MsgSend_RegisterCancel(int16_t sIndex)
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
+	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면 [Korean comment]
 
 	uint8_t byBuff[10];
 	int iOffset=0;
@@ -466,7 +466,7 @@ void CUITradeSellBBS::CallBackProc(int iID, uint32_t dwFlag)
 
 void CUITradeSellBBS::OnButtonRegister()
 {
-	// 전에 보낸 패킷 응답이 없으면
+	// 전에 보낸 패킷 응답이 없으면 [Korean comment]
 	if (m_bProcessing)
 		return;
 
@@ -494,7 +494,7 @@ void CUITradeSellBBS::OnButtonRegister()
 
 void CUITradeSellBBS::OnButtonRegisterCancel()
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
+	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면 [Korean comment]
 	if(m_iCurIndex <= -1) return;
 
 	it_TradeSellBBS it = m_Datas.begin();
@@ -507,12 +507,12 @@ void CUITradeSellBBS::OnButtonRegisterCancel()
 			__InfoTradeSellBBS ITSB = (*it);
 
 			if (lstrcmpi(ITSB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) == 0)
-			{//자기것만 등록해제하게..
+			{//자기것만 등록해제하게.. [Korean comment]
 				MsgSend_RegisterCancel(ITSB.sIndex);
 				break;
 			}
 			else if (CGameProcedure::s_pProcMain->s_pPlayer->m_InfoBase.iAuthority == AUTHORITY_MANAGER)
-			{//운영자에게는 해제 권한을 준다...(도배나 욕설등의 게시물 삭제를 위해서...)
+			{//운영자에게는 해제 권한을 준다...(도배나 욕설등의 게시물 삭제를 위해서...) Delete
 				MsgSend_RegisterCancel(ITSB.sIndex);
 				break;
 			}
@@ -532,7 +532,7 @@ void CUITradeSellBBS::OnButtonWhisper()
 		if( i == m_iCurIndex )
 		{
 			__InfoTradeSellBBS ITSB = (*it);
-			//나 자신에게는 귓속말을 못하게 한다...
+			//나 자신에게는 귓속말을 못하게 한다... [Korean comment]
 			if (lstrcmpi(ITSB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) != 0)
 				CGameProcedure::s_pProcMain->MsgSend_ChatSelectTarget(ITSB.szID);
 			break;
@@ -551,7 +551,7 @@ void CUITradeSellBBS::SetVisible(bool bVisible)
 
 void CUITradeSellBBS::OnButtonTrade()
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
+	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면 [Korean comment]
 
 	if(m_iCurIndex <= -1) return;
 
@@ -633,11 +633,11 @@ void CUITradeSellBBS::OnListExplanation()
 
 void CUITradeSellBBS::MsgSend_PerTrade()
 {
-	// 전에 보낸 패킷 응답이 없으면
+	// 전에 보낸 패킷 응답이 없으면 [Korean comment]
 	if (m_bProcessing)
 		return;
 
-	// 자기 자신에게는 거래를 하지 못하게
+	// 자기 자신에게는 거래를 하지 못하게 [Korean comment]
 	if (lstrcmpi(m_ITSB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) == 0)
 		return;
 

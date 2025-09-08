@@ -23,9 +23,9 @@ const int SKILL_DEF_SPECIAL3 = 4;
 class CUISkillTreeDlg : public CN3UIWndBase
 {
 protected:
-	bool		m_bOpenningNow; // 열리고 있다..
-	bool		m_bClosingNow;	// 닫히고 있다..
-	float		m_fMoveDelta; // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
+	bool		m_bOpenningNow; // 열리고 있다.. [Korean comment]
+	bool		m_bClosingNow;	// 닫히고 있다.. [Korean comment]
+	float		m_fMoveDelta; // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다.. Calculate
 
 	int			m_iRBtnDownOffs;
 
@@ -40,9 +40,9 @@ public:
 	int					m_iCurKindOf;
 	int					m_iCurSkillPage;
 
-	int					m_iSkillInfo[MAX_SKILL_FROM_SERVER];										// 서버로 받는 슬롯 정보..	
-	__IconItemSkill*	m_pMySkillTree[MAX_SKILL_KIND_OF][MAX_SKILL_PAGE_NUM][MAX_SKILL_IN_PAGE];	// 총 스킬 정보..
-	int					m_iCurInPageOffset[MAX_SKILL_KIND_OF];										// 스킬당 현재 페이지 옵셋..
+	int					m_iSkillInfo[MAX_SKILL_FROM_SERVER];										// 서버로 받는 슬롯 정보..	 Info
+	__IconItemSkill*	m_pMySkillTree[MAX_SKILL_KIND_OF][MAX_SKILL_PAGE_NUM][MAX_SKILL_IN_PAGE];	// 총 스킬 정보.. Info
+	int					m_iCurInPageOffset[MAX_SKILL_KIND_OF];										// 스킬당 현재 페이지 옵셋.. [Korean comment]
 
 protected:
 	void				AllClearImageByName(std::string_view svHeaderID, bool bVisible, std::string_view svCategoryID = {});
@@ -73,8 +73,8 @@ public:
 
 	void				AddSkillToPage(__TABLE_UPC_SKILL* pUSkill, int iOffset = 0, bool bHasLevelToUse = true);
 
-	void				SetPageInIconRegion(int iKindOf, int iPageNum);		// 아이콘 역역에서 현재 페이지 설정..
-	void				SetPageInCharRegion();								// 문자 역역에서 현재 페이지 설정..
+	void				SetPageInIconRegion(int iKindOf, int iPageNum);		// 아이콘 역역에서 현재 페이지 설정.. Set
+	void				SetPageInCharRegion();								// 문자 역역에서 현재 페이지 설정.. Set
 
 	CN3UIImage*			GetChildImageByName(const std::string& szID);
 	CN3UIButton*		GetChildButtonByName(const std::string& szID);

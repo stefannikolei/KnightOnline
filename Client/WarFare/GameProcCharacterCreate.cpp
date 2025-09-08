@@ -74,17 +74,17 @@ void CGameProcCharacterCreate::Init()
 
 void CGameProcCharacterCreate::Render()
 {
-	s_pEng->Clear(0); // 클리어..
-	s_pEng->s_lpD3DDev->BeginScene();			// 씬 렌더 ㅅ작...
+	s_pEng->Clear(0); // 클리어.. [Korean comment]
+	s_pEng->s_lpD3DDev->BeginScene();			// 씬 렌더 ㅅ작... [Korean comment]
 
 	s_pUIMgr->Render();
 
-	s_pPlayer->InventoryChrRender(m_rcChr); // 캐릭터 그리기..
+	s_pPlayer->InventoryChrRender(m_rcChr); // 캐릭터 그리기.. Character
 
-	s_pMsgBoxMgr->Render(); //MessageBox를 그려준다.
+	s_pMsgBoxMgr->Render(); //MessageBox를 그려준다. [Korean comment]
 	if(s_pGameCursor) s_pGameCursor->Render();
 
-	s_pEng->s_lpD3DDev->EndScene();			// 씬 렌더 시작...
+	s_pEng->s_lpD3DDev->EndScene();			// 씬 렌더 시작... [Korean comment]
 	s_pEng->Present(CN3Base::s_hWndBase);
 }
 
@@ -92,13 +92,13 @@ void CGameProcCharacterCreate::SetChr()
 {
 	__InfoPlayerBase*	pInfoBase = &(s_pPlayer->m_InfoBase);
 
-	__TABLE_PLAYER_LOOKS* pLooks = s_pTbl_UPC_Looks.Find(s_pPlayer->m_InfoBase.eRace);	// User Player Character Skin 구조체 포인터..;
+	__TABLE_PLAYER_LOOKS* pLooks = s_pTbl_UPC_Looks.Find(s_pPlayer->m_InfoBase.eRace);	// User Player Character Skin 구조체 포인터..; [Korean comment]
 	if(nullptr == pLooks) return;
 
 	s_pPlayer->InitChr(pLooks);
-	s_pPlayer->m_ChrInv.ScaleSet(1,1,1); // 스케일을 원래대로 돌린다.
+	s_pPlayer->m_ChrInv.ScaleSet(1,1,1); // 스케일을 원래대로 돌린다. [Korean comment]
 
-	if(pLooks) // 파트 세팅..
+	if(pLooks) // 파트 세팅.. [Korean comment]
 	{
 		for(int i = 0; i < PART_POS_COUNT; i++)
 		{
@@ -141,7 +141,7 @@ void CGameProcCharacterCreate::SetStats()
 
 void CGameProcCharacterCreate::Tick()
 {
-//	s_pLocalInput->Tick(); // 키보드와 마우스로부터 입력을 받는다.
+//	s_pLocalInput->Tick(); // 키보드와 마우스로부터 입력을 받는다. [Korean comment]
 //	if(dwMouseFlags & MOUSE_LBDOWN) SetCursor(s_hCursorClick);
 //	else SetCursor(s_hCursorNormal);
 
@@ -180,7 +180,7 @@ bool CGameProcCharacterCreate::MsgSendCharacterCreate()
 	{
 		eErrCode = ERROR_CHARACTER_CREATE_INVALID_RACE;
 	}
-//	else if(RACE_KA_WRINKLETUAREK == s_pPlayer->m_InfoBase.eRace) // 마법사는 선택 불가능..
+//	else if(RACE_KA_WRINKLETUAREK == s_pPlayer->m_InfoBase.eRace) // 마법사는 선택 불가능.. Select
 //	{
 //		eErrCode = ERROR_CHARACTER_CREATE_NOT_SUPPORTED_RACE;
 //	}
@@ -194,7 +194,7 @@ bool CGameProcCharacterCreate::MsgSendCharacterCreate()
 	}
 	else
 	{
-		// 이름에 빈칸이나 특수문자가 들어 있는지 확인
+		// 이름에 빈칸이나 특수문자가 들어 있는지 확인 Name
 		bool bHasSpecialLetter = false;
 		for(int i = 0; i < iIDLength; i++)
 		{
@@ -245,7 +245,7 @@ bool CGameProcCharacterCreate::MsgSendCharacterCreate()
 
 			uint8_t byBuff[64];
 			int iOffset = 0;
-			CAPISocket::MP_AddByte(byBuff, iOffset,  WIZ_NEW_CHAR);					// 커멘드.
+			CAPISocket::MP_AddByte(byBuff, iOffset,  WIZ_NEW_CHAR);					// 커멘드. [Korean comment]
 			CAPISocket::MP_AddByte(byBuff, iOffset, CGameProcedure::s_iChrSelectIndex);	// 캐릭터 인덱스 b
 			CAPISocket::MP_AddShort(byBuff, iOffset, iIDLength);						// Id 길이 s
 			CAPISocket::MP_AddString(byBuff, iOffset, s_pPlayer->IDString());			// ID 문자열 str
@@ -259,7 +259,7 @@ bool CGameProcCharacterCreate::MsgSendCharacterCreate()
 			CAPISocket::MP_AddByte(byBuff, iOffset, pInfoExt->iIntelligence);			// 지능 b
 			CAPISocket::MP_AddByte(byBuff, iOffset, pInfoExt->iMagicAttak);				// 마력 b
 
-			s_pSocket->Send(byBuff, iOffset);								// 보낸다
+			s_pSocket->Send(byBuff, iOffset);								// 보낸다 [Korean comment]
 			
 			s_pUIMgr->EnableOperationSet(false); // 패킷이 들어올때까지 UI 를 Disable 시킨다...
 			
@@ -267,7 +267,7 @@ bool CGameProcCharacterCreate::MsgSendCharacterCreate()
 		}
 	}
 
-	ReportErrorCharacterCreate(eErrCode); // 에러 보고...
+	ReportErrorCharacterCreate(eErrCode); // 에러 보고... [Korean comment]
 
 	return false;
 }
@@ -311,20 +311,20 @@ bool CGameProcCharacterCreate::ProcessPacket(Packet& pkt)
 
 	pkt.rpos(rpos);
 
-	int iCmd = pkt.read<uint8_t>();	// 커멘드 파싱..
-	switch ( iCmd )										// 커멘드에 다라서 분기..
+	int iCmd = pkt.read<uint8_t>();	// 커멘드 파싱.. [Korean comment]
+	switch ( iCmd )										// 커멘드에 다라서 분기.. [Korean comment]
 	{
-		case WIZ_NEW_CHAR:				// 캐릭터 선택 메시지..
+		case WIZ_NEW_CHAR:				// 캐릭터 선택 메시지.. Character
 		{
-			uint8_t bySuccess = pkt.read<uint8_t>();	// 커멘드 파싱..
+			uint8_t bySuccess = pkt.read<uint8_t>();	// 커멘드 파싱.. [Korean comment]
 			if(0 == bySuccess) 
 			{
-				ProcActiveSet((CGameProcedure*)s_pProcCharacterSelect); // 캐릭터 선택창으로 가기..
+				ProcActiveSet((CGameProcedure*)s_pProcCharacterSelect); // 캐릭터 선택창으로 가기.. Window
 			}
-			else // 실패하면.. 이유가 0 이 아닌 값으로 온다..
+			else // 실패하면.. 이유가 0 이 아닌 값으로 온다.. [Korean comment]
 			{
-				this->ReportErrorCharacterCreate((e_ErrorCharacterCreate)bySuccess); // 에러 메시지 띄움..
-				s_pUIMgr->EnableOperationSet(false); // UI 조작 가능하게 한다... 다시 캐릭터 만들어야 한다..
+				this->ReportErrorCharacterCreate((e_ErrorCharacterCreate)bySuccess); // 에러 메시지 띄움.. Mesh
+				s_pUIMgr->EnableOperationSet(false); // UI 조작 가능하게 한다... 다시 캐릭터 만들어야 한다.. Character
 			}
 			s_pUIMgr->EnableOperationSet(false); // 패킷이 들어올때까지 UI 를 Disable 시킨다...
 		}

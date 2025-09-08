@@ -200,7 +200,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 		std::string szStr = fmt::format_text_resource(IDS_TOOLTIP_GOLD);
 		if ( spItem->pItemBasic->szName == szStr )
 		{
-			// 돈이면 흰색..
+			// 돈이면 흰색.. Color
 			m_pStr[iIndex]->SetColor(m_CWhite);
 			m_pstdstr[iIndex] = fmt::format("{}  {}", spItem->iCount, spItem->pItemBasic->szName);
 			iIndex++;			
@@ -258,7 +258,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	{
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
 		e_ItemClass eIC = (e_ItemClass) (spItem->pItemBasic->byClass);
-		CGameBase::GetTextByItemClass(eIC, m_pstdstr[iIndex]); // 아이템 종류에 따라 문자열 만들기..
+		CGameBase::GetTextByItemClass(eIC, m_pstdstr[iIndex]); // 아이템 종류에 따라 문자열 만들기.. Type
 		m_pStr[iIndex]->SetColor(m_CWhite);
 		iIndex++;
 	}
@@ -267,7 +267,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	if (eRace != RACE_ALL)
 	{
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
-		CGameBase::GetTextByRace(eRace, m_pstdstr[iIndex]); // 아이템을 찰수 있는 종족에 따른 문자열 만들기.
+		CGameBase::GetTextByRace(eRace, m_pstdstr[iIndex]); // 아이템을 찰수 있는 종족에 따른 문자열 만들기. [Korean comment]
 		if (SetTooltipTextColor(CGameBase::s_pPlayer->m_InfoBase.eRace, eRace))
 			m_pStr[iIndex]->SetColor(m_CWhite);
 		else
@@ -280,7 +280,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	{
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
 		e_Class eClass = (e_Class) spItem->pItemBasic->byNeedClass;
-		CGameBase::GetTextByClass(eClass, m_pstdstr[iIndex]); // 아이템을 찰수 있는 종족에 따른 문자열 만들기.
+		CGameBase::GetTextByClass(eClass, m_pstdstr[iIndex]); // 아이템을 찰수 있는 종족에 따른 문자열 만들기. [Korean comment]
 
 		switch (eClass)
 		{
@@ -500,7 +500,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	// 공격시간 감소 없어짐..
+	// 공격시간 감소 없어짐.. Time
 
 	if (spItem->pItemBasic->siAttackRange != 0)
 	{
@@ -641,7 +641,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->byDamageFire != 0)	// 화염속성
+	if( spItem->pItemExt->byDamageFire != 0)	// 화염속성 [Korean comment]
 	{
 		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC1,
 			spItem->pItemExt->byDamageFire);
@@ -1083,7 +1083,7 @@ exceptions:;
 	for (int i = iIndex; i < MAX_TOOLTIP_COUNT; i++)
 		m_pstdstr[iIndex].clear();
 
-	return iIndex;	// 임시..	반드시 1보다 크다..
+	return iIndex;	// 임시..	반드시 1보다 크다.. [Korean comment]
 }
 
 void CUIImageTooltipDlg::DisplayTooltipsEnable(int xpos, int ypos, __IconItemSkill* spItem, bool bPrice, bool bBuy)

@@ -47,7 +47,7 @@ void CItemRepairMgr::Tick()
 
 	POINT ptCur			= CGameProcedure::s_pLocalInput->MouseGetPos();
 
-	// 위치를 구해서 
+	// 위치를 구해서  Position
 	int i;	int iArm = 0x00; int iOrder = -1; __IconItemSkill* spItem = nullptr;
 	for (i = 0; i < ITEM_SLOT_COUNT; i++)
 	{
@@ -80,13 +80,13 @@ void CItemRepairMgr::Tick()
 		}
 	}
 
-	// 아이콘 위에 있으면..  
+	// 아이콘 위에 있으면..   [Korean comment]
 	int iRepairGold = 0;
 	if (spItem)
 	{
 		iRepairGold = CalcRepairGold(spItem);
 
-		// 수리 가격 툴팁 표시..
+		// 수리 가격 툴팁 표시.. [Korean comment]
 		if (pDlg)
 		{
 			pDlg->m_bBRender		= true;
@@ -96,23 +96,23 @@ void CItemRepairMgr::Tick()
 			pDlg->m_iBRequiredGold	= iRepairGold;
 		}
 
-		// 내가 가진 돈 보다 수리 비용이 비싸면.. 
+		// 내가 가진 돈 보다 수리 비용이 비싸면..  [Korean comment]
 		if (iRepairGold > s_pPlayer->m_InfoExt.iGold)
 		{
-			// 빨갛게 표시.. 
+			// 빨갛게 표시..  [Korean comment]
 			if (pDlg)
 				pDlg->m_bBHaveEnough = false;
 		}
 		else
 		{
-			//아이면 원래 색깔..
+			//아이면 원래 색깔.. Color
 			if (pDlg)
 				pDlg->m_bBHaveEnough = true;
 		}
 	}
 
 	uint32_t dwMouseFlags	= CGameProcedure::s_pLocalInput->MouseGetFlag();	// 마우스 버튼 플래그 - LocalInput.h 참조
-	if (dwMouseFlags & MOUSE_LBCLICK)		// 왼쪽 버튼을 누르면..
+	if (dwMouseFlags & MOUSE_LBCLICK)		// 왼쪽 버튼을 누르면.. Button
 	{
 		m_pspItemBack	= spItem;
 		m_iArm			= iArm;
@@ -123,28 +123,28 @@ void CItemRepairMgr::Tick()
 		if (m_pspItemBack && spItem && (m_pspItemBack == spItem) )
 		{
 			// Send To Server..
-			if (iRepairGold > 0)										// 수리 가격이 있으면..
+			if (iRepairGold > 0)										// 수리 가격이 있으면.. [Korean comment]
 			{
-				// 내가 가진 돈 보다 수리 비용이 비싸면.. 
+				// 내가 가진 돈 보다 수리 비용이 비싸면..  [Korean comment]
 				if (iRepairGold > s_pPlayer->m_InfoExt.iGold)
 				{
-					// 서버에게 보내지 않고 메시지 표시.. 
+					// 서버에게 보내지 않고 메시지 표시..  Mesh
 					std::string szMsg = fmt::format_text_resource(IDS_REPAIR_LACK_GOLD);
 					CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff00ff);
 				}
 				else
 				{
-					uint8_t byBuff[8];															// 패킷 버퍼..
-					int iOffset=0;															// 패킷 오프셋..
+					uint8_t byBuff[8];															// 패킷 버퍼.. [Korean comment]
+					int iOffset=0;															// 패킷 오프셋.. [Korean comment]
 
-					CAPISocket::MP_AddByte(byBuff, iOffset,  WIZ_ITEM_REPAIR);			// 게임 스타트 패킷 커멘드..
-					CAPISocket::MP_AddByte(byBuff, iOffset,  iArm);							// 아이디 길이 패킷에 넣기..
-					CAPISocket::MP_AddByte(byBuff, iOffset,  iOrder);							// 아이디 길이 패킷에 넣기..
-					CAPISocket::MP_AddDword(byBuff, iOffset, spItem->pItemBasic->dwID+spItem->pItemExt->dwID);	// 아이디 문자열 패킷에 넣기..
+					CAPISocket::MP_AddByte(byBuff, iOffset,  WIZ_ITEM_REPAIR);			// 게임 스타트 패킷 커멘드.. [Korean comment]
+					CAPISocket::MP_AddByte(byBuff, iOffset,  iArm);							// 아이디 길이 패킷에 넣기.. [Korean comment]
+					CAPISocket::MP_AddByte(byBuff, iOffset,  iOrder);							// 아이디 길이 패킷에 넣기.. [Korean comment]
+					CAPISocket::MP_AddDword(byBuff, iOffset, spItem->pItemBasic->dwID+spItem->pItemExt->dwID);	// 아이디 문자열 패킷에 넣기.. [Korean comment]
 
 					CGameProcedure::s_pSocket->Send(byBuff, iOffset);	
 
-					// 응답을 기다림..
+					// 응답을 기다림.. [Korean comment]
 					CN3UIBase::s_bWaitFromServer = true;
 
 					// Change To Cursor..
@@ -169,12 +169,12 @@ void CItemRepairMgr::ReceiveResultFromServer(int iResult, int iUserGold)
 
 		switch (m_iArm)
 		{
-			case 0x01: // 장착하고 있는 아이템
+			case 0x01: // 장착하고 있는 아이템 [Korean comment]
 				pInv->m_pMySlot[m_iiOrder] = m_pspItemBack;
-				s_pPlayer->DurabilitySet((e_ItemSlot)m_iiOrder, m_pspItemBack->iDurability); // 내구력을 복구 해준다..
+				s_pPlayer->DurabilitySet((e_ItemSlot)m_iiOrder, m_pspItemBack->iDurability); // 내구력을 복구 해준다.. [Korean comment]
 				break;
 
-			case 0x02: // 인벤토리에 있는 아이템..
+			case 0x02: // 인벤토리에 있는 아이템.. [Korean comment]
 				pInv->m_pMyInvWnd[m_iiOrder] = m_pspItemBack;
 				break;
 		}
@@ -186,10 +186,10 @@ void CItemRepairMgr::ReceiveResultFromServer(int iResult, int iUserGold)
 		pInv->PlayRepairSound();
 	}
 
-	// 돈 업데이트..
+	// 돈 업데이트.. Update
 	UpdateUserTotalGold(iUserGold);
 
-	// 응답 기다림 해제..
+	// 응답 기다림 해제.. [Korean comment]
 	CN3UIBase::s_bWaitFromServer = false;
 
 	// Change To Cursor..
@@ -198,7 +198,7 @@ void CItemRepairMgr::ReceiveResultFromServer(int iResult, int iUserGold)
 
 void CItemRepairMgr::UpdateUserTotalGold(int iGold)
 {
-	// 돈 업데이트..
+	// 돈 업데이트.. Update
 	s_pPlayer->m_InfoExt.iGold = iGold;
 	CGameProcedure::s_pProcMain->m_pUIInventory->GoldUpdate();
 }

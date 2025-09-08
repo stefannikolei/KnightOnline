@@ -26,7 +26,7 @@ public:
 	virtual ~CUITradeEditDlg();
 
 	int					GetQuantity();
-	void				SetQuantity(int iQuantity); // "edit_trade" Edit Control 에서 정수값을 문자열로 세팅한다..
+	void				SetQuantity(int iQuantity); // "edit_trade" Edit Control 에서 정수값을 문자열로 세팅한다.. [Korean comment]
 
 	virtual void		Release();
 	virtual bool		ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg);

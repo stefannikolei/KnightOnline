@@ -66,14 +66,14 @@ void CBird::Tick()
 	m_fFactorY2 += (m_fFactorYSpeed2*s_fSecPerFrm);
 	if (m_fFactorY2 > 2*D3DX_PI) m_fFactorY2 -= (2*D3DX_PI);
 
-	// 위치계산
+	// 위치계산 Calculate
 	__Vector3 vPos;
 	 vPos.Set(	sinf(m_fFactor1)*m_fRadius*cosf(m_fRadian),
 				m_fRadiusY*(sinf(m_fFactorY1)+cosf(m_fFactorY2))/2.0f,
 				sinf(m_fFactor2)*m_fRadius*sinf(m_fRadian));
 
-	 // 각도 계산
-	 // 미분식을 이용하여 기울기 구하기
+	 // 각도 계산 Calculate
+	 // 미분식을 이용하여 기울기 구하기 [Korean comment]
 	float x = (m_fFactorSpeed1*cosf(m_fFactor1)*cosf(m_fRadian) - 
 		 m_fRadianSpeed*sinf(m_fFactor1)*sinf(m_fRadian));
 	float z = (m_fFactorSpeed2*cosf(m_fFactor2)*sinf(m_fRadian) + 
@@ -108,7 +108,7 @@ void CBird::Render()
 int CBird::LoadBird(const std::string& szFN)
 {
 	Release();
-	FILE* stream = fopen(szFN.c_str(), "r"); //text파일로 만든다 
+	FILE* stream = fopen(szFN.c_str(), "r"); //text파일로 만든다  File
 	if(nullptr == stream)
 	{
 #if _DEBUG

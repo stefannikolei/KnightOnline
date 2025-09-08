@@ -136,7 +136,7 @@ uint32_t CUIDead::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& p
 	if (!m_bVisible)
 		return dwRet;
 
-	// UI 움직이는 코드
+	// UI 움직이는 코드 [Korean comment]
 	if (UI_STATE_COMMON_MOVE == m_eState)
 	{
 		if (dwFlags & UI_MOUSE_LBCLICKED)
@@ -148,28 +148,28 @@ uint32_t CUIDead::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& p
 		return dwRet;
 	}
 
-	// 영역 밖이면
+	// 영역 밖이면 [Korean comment]
 	if (!IsIn(ptCur.x, ptCur.y))
 	{
-		// 이전 좌표도 영역 밖이면 
+		// 이전 좌표도 영역 밖이면  [Korean comment]
 		if (!IsIn(ptOld.x, ptOld.y))
 			return dwRet;
 
-		dwRet |= UI_MOUSEPROC_PREVINREGION;	// 이전 좌표는 영역 안이었다.
+		dwRet |= UI_MOUSEPROC_PREVINREGION;	// 이전 좌표는 영역 안이었다. [Korean comment]
 	}
 	else
 	{
-		// tool tip 관련
+		// tool tip 관련 [Korean comment]
 		if (s_pTooltipCtrl != nullptr)
 			s_pTooltipCtrl->SetText(m_szToolTip, m_crToolTip);
 	}
 
-	dwRet |= UI_MOUSEPROC_INREGION;	// 이번 좌표는 영역 안이다.
+	dwRet |= UI_MOUSEPROC_INREGION;	// 이번 좌표는 영역 안이다. [Korean comment]
 
 	if (m_pChildUI != nullptr && m_pChildUI->IsVisible())
 		return dwRet;
 
-	// child에게 메세지 전달
+	// child에게 메세지 전달 [Korean comment]
 	for (UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
@@ -185,19 +185,19 @@ uint32_t CUIDead::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& p
 				dwChildRet |= UI_MOUSEPROC_DONESOMETHING;
 		}
 
-		// 이경우에는 먼가 포커스를 받은 경우이다.
+		// 이경우에는 먼가 포커스를 받은 경우이다. [Korean comment]
 		if (UI_MOUSEPROC_DONESOMETHING & dwChildRet)
 		{
 			// (아래 코드는 dialog를 관리하는 곳에서 해야 한다. 따라서 막아놓음)
-//			m_Children.erase(itor);			// 우선 리스트에서 지우고
-//			m_Children.push_front(pChild);	// 맨앞에 넣는다. 그리는 순서를 맨 나중에 그리도록 하려고
+//			m_Children.erase(itor);			// 우선 리스트에서 지우고 [Korean comment]
+//			m_Children.push_front(pChild);	// 맨앞에 넣는다. 그리는 순서를 맨 나중에 그리도록 하려고 [Korean comment]
 
 			dwRet |= (UI_MOUSEPROC_CHILDDONESOMETHING | UI_MOUSEPROC_DONESOMETHING);
 			return dwRet;
 		}
 	}
 
-	// UI 움직이는 코드
+	// UI 움직이는 코드 [Korean comment]
 	if (UI_STATE_COMMON_MOVE != m_eState
 		&& PtInRect(&m_rcMovable, ptCur)
 		&& (dwFlags & UI_MOUSE_LBCLICK))
@@ -233,7 +233,7 @@ void CUIDead::MsgSend_Revival(uint8_t byType)
 	if (m_bProcessing)
 		return;
 
-	// 한번 보내면 다시 죽을때까지 안보내는 플래그
+	// 한번 보내면 다시 죽을때까지 안보내는 플래그 [Korean comment]
 	if (CGameBase::s_pPlayer->m_iSendRegeneration >= 2)
 		return;
 
@@ -242,10 +242,10 @@ void CUIDead::MsgSend_Revival(uint8_t byType)
 
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_REGENE);
 	CAPISocket::MP_AddByte(byBuff, iOffset, byType);
-	CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+	CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 
 	CLogWriter::Write("Send Regeneration");
-	CGameBase::s_pPlayer->m_iSendRegeneration = 2; // 한번 보내면 다시 죽을때까지 안보내는 플래그
+	CGameBase::s_pPlayer->m_iSendRegeneration = 2; // 한번 보내면 다시 죽을때까지 안보내는 플래그 [Korean comment]
 	//TRACE("보냄 - 다시 살아나기\n");
 
 	m_bProcessing = true;
@@ -260,21 +260,21 @@ void CUIDead::MsgRecv_Revival(Packet& pkt)
 	vPosPlayer.z = static_cast<float>(pkt.read<uint16_t>()) / 10.0f;
 	vPosPlayer.y = static_cast<float>(pkt.read<int16_t>()) / 10.0f;
 
-	// 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다.
+	// 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다. Initialize
 	CGameProcedure::s_pProcMain->InitPlayerPosition(vPosPlayer);
 
-	// 충돌 메시를 다시 만든다..
+	// 충돌 메시를 다시 만든다.. Mesh
 	CGameBase::s_pPlayer->RegenerateCollisionMesh();
 
-	// 한번 보내면 다시 죽을때까지 안보내는 플래그
+	// 한번 보내면 다시 죽을때까지 안보내는 플래그 [Korean comment]
 	CGameBase::s_pPlayer->m_iSendRegeneration = 0;
 
-	// 한번 보내면 다시 죽을때까지 안보내는 플래그
+	// 한번 보내면 다시 죽을때까지 안보내는 플래그 [Korean comment]
 	CGameBase::s_pPlayer->m_fTimeAfterDeath = 0;
 
 	// TRACE("받음 - 다시 살아나기(%.1f, %.1f)\n", vPosPlayer.x, vPosPlayer.z);
 
-	// 마법 & 효과 초기화..
+	// 마법 & 효과 초기화.. Initialize
 	if (CGameProcedure::s_pProcMain->m_pUIStateBarAndMiniMap != nullptr)
 		CGameProcedure::s_pProcMain->m_pUIStateBarAndMiniMap->ClearMagic();
 

@@ -261,7 +261,7 @@ bool CN3FXBundleGame::Tick()
 					m_vPos += m_vDir*CN3Base::s_fSecPerFrm*m_fVelocity;
 					
 					float fTerrainY = s_pTerrain->GetHeight(m_vPos.x, m_vPos.z);
-					if(m_vPos.y <= fTerrainY) m_vPos.y = fTerrainY + 0.3f;	//땅을 타고 날라가라..
+					if(m_vPos.y <= fTerrainY) m_vPos.y = fTerrainY + 0.3f;	//땅을 타고 날라가라.. [Korean comment]
 					break;
 					*/
 				}
@@ -299,7 +299,7 @@ bool CN3FXBundleGame::Tick()
 				m_vPos += m_vDir*CN3Base::s_fSecPerFrm*m_fVelocity;
 
 				//float fTerrainY = s_pTerrain->GetHeight(m_vPos.x, m_vPos.z);
-				//if(m_vPos.y <= fTerrainY) m_vPos.y = fTerrainY + 0.3f;	//땅을 타고 날라가라..
+				//if(m_vPos.y <= fTerrainY) m_vPos.y = fTerrainY + 0.3f;	//땅을 타고 날라가라.. [Korean comment]
 				break;
 			}
 
@@ -323,7 +323,7 @@ bool CN3FXBundleGame::Tick()
 			}
 		case FX_BUNDLE_REGION_POISON:
 			{
-				CN3Camera* pCamera = CGameProcedure::s_pEng->CameraGetActive();		// 활성화된 카메라 얻기..
+				CN3Camera* pCamera = CGameProcedure::s_pEng->CameraGetActive();		// 활성화된 카메라 얻기.. [Korean comment]
 
 				__Vector3 vEyePos = pCamera->EyePos();
 				__Vector3 vEyeAt  = pCamera->AtPos();

@@ -16,14 +16,14 @@
 
 #include <list>
 
-struct __InfoTradeSellBBS // 파티 지원 게시판 구조체..
+struct __InfoTradeSellBBS // 파티 지원 게시판 구조체.. [Korean comment]
 {
-	std::string szID;			// 파티 이름 문자열
-	std::string szTitle;		// 제목
-	std::string szExplanation;	// 설명
-	int			iPrice;			// 가격
-	int16_t		sIndex;			// 등록 인덱스
-	int16_t		sID;			// 캐릭터 아이디
+	std::string szID;			// 파티 이름 문자열 Name
+	std::string szTitle;		// 제목 [Korean comment]
+	std::string szExplanation;	// 설명 [Korean comment]
+	int			iPrice;			// 가격 [Korean comment]
+	int16_t		sIndex;			// 등록 인덱스 Index
+	int16_t		sID;			// 캐릭터 아이디 Character
 
 	void Init()
 	{
@@ -71,8 +71,8 @@ protected:
 	std::list<__InfoTradeSellBBS>	m_Datas;
 	__InfoTradeSellBBS				m_ITSB;
 
-	int			m_iCurPage; // 현재 페이지..
-	int			m_iMaxPage;	// 총 페이지..
+	int			m_iCurPage; // 현재 페이지.. [Korean comment]
+	int			m_iMaxPage;	// 총 페이지.. [Korean comment]
 	bool		m_bProcessing;
 	uint8_t		m_byBBSKind;
 	int			m_iCurIndex;

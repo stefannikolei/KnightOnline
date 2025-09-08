@@ -103,7 +103,7 @@ enum e_ChatCmd
 	CMD_COUNT,
 	CMD_UNKNOWN = 0xffffffff
 };
-static std::string s_szCmdMsg[CMD_COUNT]; // 게임상 명령어
+static std::string s_szCmdMsg[CMD_COUNT]; // 게임상 명령어 [Korean comment]
 
 
 
@@ -111,7 +111,7 @@ static std::string s_szCmdMsg[CMD_COUNT]; // 게임상 명령어
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CGameProcMain::CGameProcMain()				// r기본 생성자.. 각 변수의 역활은 헤더 참조..
+CGameProcMain::CGameProcMain()				// r기본 생성자.. 각 변수의 역활은 헤더 참조.. Constructor
 {	
 	m_fMBRotateTime = -1.0f;
 	m_fExitTimer = -1.0f;
@@ -153,8 +153,8 @@ CGameProcMain::CGameProcMain()				// r기본 생성자.. 각 변수의 역활은
 	m_pUICmdListDlg = new CUICmdList();
 	m_pUICmdEditDlg = new CUICmdEdit();
 	m_pUIHotKeyDlg = new CUIHotKeyDlg();
-	m_pUIKnightsOp = new CUIKnightsOperation();			// 기사단 리스트 보기, 가입, 등...
-	m_pUIPartyBBS = new CUIPartyBBS(); // 파티 지원 시스템 게시판??..
+	m_pUIKnightsOp = new CUIKnightsOperation();			// 기사단 리스트 보기, 가입, 등... [Korean comment]
+	m_pUIPartyBBS = new CUIPartyBBS(); // 파티 지원 시스템 게시판??.. [Korean comment]
 	m_pUIWareHouseDlg = new CUIWareHouseDlg();
 	m_pUINpcChange = new CUINPCChangeEvent();	
 	m_pUIWarp = new CUIWarp();
@@ -171,7 +171,7 @@ CGameProcMain::CGameProcMain()				// r기본 생성자.. 각 변수의 역활은
 
 	m_pSubProcPerTrade = new CSubProcPerTrade();
 	m_pMagicSkillMng = new CMagicSkillMng(this);
-	m_pTargetSymbol = new CN3Shape(); // 플레이어가 타겟으로 잡은 캐릭터의 위치위에 그리면 된다..
+	m_pTargetSymbol = new CN3Shape(); // 플레이어가 타겟으로 잡은 캐릭터의 위치위에 그리면 된다.. Character
 	m_pWarMessage = new CWarMessage;
 
 	m_pLightMgr = new CLightMgr;
@@ -222,7 +222,7 @@ CGameProcMain::~CGameProcMain()
 	delete m_pSubProcPerTrade;
 	delete m_pMagicSkillMng;
 	delete m_pWarMessage;
-	delete m_pTargetSymbol; // 플레이어가 타겟으로 잡은 캐릭터의 위치위에 그리면 된다..
+	delete m_pTargetSymbol; // 플레이어가 타겟으로 잡은 캐릭터의 위치위에 그리면 된다.. Character
 
 	delete m_pLightMgr;
 }
@@ -262,7 +262,7 @@ void CGameProcMain::ReleaseUIs()
 	m_pUICmdListDlg->Release();
 	m_pUICmdEditDlg->Release();
 	m_pUIHotKeyDlg->Release();
-	m_pUIKnightsOp->Release();			// 기사단 리스트 보기, 가입, 등...
+	m_pUIKnightsOp->Release();			// 기사단 리스트 보기, 가입, 등... [Korean comment]
 	m_pUIPartyBBS->Release();
 	m_pUIWareHouseDlg->Release();
 	m_pUINpcChange->Release();
@@ -309,7 +309,7 @@ void CGameProcMain::Init()
 
 	if(m_pWarMessage) m_pWarMessage->InitFont();
 	this->InitUI(); // 국가에 따라 다른 UI 로딩...
-	this->InitZone(s_pPlayer->m_InfoExt.iZoneCur, s_pPlayer->Position()); // 존 로딩..
+	this->InitZone(s_pPlayer->m_InfoExt.iZoneCur, s_pPlayer->Position()); // 존 로딩.. [Korean comment]
 
 	//sound obj...
 	if(m_pSnd_Battle==nullptr)
@@ -334,15 +334,15 @@ void CGameProcMain::Init()
 
 	if(s_pUILoading) s_pUILoading->Render("Loading Character Data...", 0);
 
-	// 경로 기억..
+	// 경로 기억.. [Korean comment]
 	char szPathOld[_MAX_PATH], szPathFind[_MAX_PATH];
 	::GetCurrentDirectory(_MAX_PATH, szPathOld);
 
 	_finddata_t fi;
 	long hFind = -1;
 
-	// 리소스 다 읽기..
-	// 에니메이션 다 읽기..
+	// 리소스 다 읽기.. Load
+	// 에니메이션 다 읽기.. Load
 	lstrcpy(szPathFind, szPathOld);
 	lstrcat(szPathFind, "\\Chr");
 	::SetCurrentDirectory(szPathFind);
@@ -363,8 +363,8 @@ void CGameProcMain::Init()
 
 	if(s_pUILoading) s_pUILoading->Render("Loading Character Data... 10 %", 10);
 
-	// 리소스 다 읽기..
-	// 텍스처 다 읽기..
+	// 리소스 다 읽기.. Load
+	// 텍스처 다 읽기.. Load
 	lstrcpy(szPathFind, szPathOld);
 	lstrcat(szPathFind, "\\Item");
 	::SetCurrentDirectory(szPathFind);
@@ -385,8 +385,8 @@ void CGameProcMain::Init()
 
 	if(s_pUILoading) s_pUILoading->Render("Loading Character Data... 25 %", 25);
 	
-	// 리소스 다 읽기..
-	// 조인트 다 읽기..
+	// 리소스 다 읽기.. Load
+	// 조인트 다 읽기.. Load
 	lstrcpy(szPathFind, szPathOld);
 	lstrcat(szPathFind, "\\Chr");
 	::SetCurrentDirectory(szPathFind);
@@ -407,8 +407,8 @@ void CGameProcMain::Init()
 
 	if(s_pUILoading) s_pUILoading->Render("Loading Character Data... 50 %", 50);
 
-	// 리소스 다 읽기..
-	// 스킨 읽기..
+	// 리소스 다 읽기.. Load
+	// 스킨 읽기.. Load
 	lstrcpy(szPathFind, szPathOld);
 	lstrcat(szPathFind, "\\Item");
 	::SetCurrentDirectory(szPathFind);
@@ -429,8 +429,8 @@ void CGameProcMain::Init()
 
 	if(s_pUILoading) s_pUILoading->Render("Loading Character Data... 75 %", 75);
 	
-	// 리소스 다 읽기..
-	// PMesh 읽기..
+	// 리소스 다 읽기.. Load
+	// PMesh 읽기.. Load
 	lstrcpy(szPathFind, szPathOld);
 	lstrcat(szPathFind, "\\Item");
 	::SetCurrentDirectory(szPathFind);
@@ -453,18 +453,18 @@ void CGameProcMain::Init()
 
 	this->MsgSend_GameStart();
 
-	// 경로 돌리기..
+	// 경로 돌리기.. [Korean comment]
 	::SetCurrentDirectory(szPathOld);
 }
 
-void CGameProcMain::InitPlayerPosition(const __Vector3& vPos) // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다.
+void CGameProcMain::InitPlayerPosition(const __Vector3& vPos) // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다. Initialize
 {
 	__Vector3 vPosFinal = vPos;
-	float fYTerrain = ACT_WORLD->GetHeightWithTerrain(vPos.x, vPos.z);	// 지형의 높이값 얻기..
-	float fYObject = ACT_WORLD->GetHeightNearstPosWithShape(vPos, 1.0f); // 오브젝트에서 가장 가까운 높이값 얻기..
+	float fYTerrain = ACT_WORLD->GetHeightWithTerrain(vPos.x, vPos.z);	// 지형의 높이값 얻기.. [Korean comment]
+	float fYObject = ACT_WORLD->GetHeightNearstPosWithShape(vPos, 1.0f); // 오브젝트에서 가장 가까운 높이값 얻기.. Object
 	if (!s_pWorldMgr->IsIndoor())
 	{
-		if (std::abs(vPos.y - fYObject) < std::abs(vPos.y - fYTerrain)) vPosFinal.y = fYObject; // 좀더 가까운 곳에 놓는다..
+		if (std::abs(vPos.y - fYObject) < std::abs(vPos.y - fYTerrain)) vPosFinal.y = fYObject; // 좀더 가까운 곳에 놓는다.. [Korean comment]
 		else vPosFinal.y = fYTerrain;
 	}
 	else
@@ -475,23 +475,23 @@ void CGameProcMain::InitPlayerPosition(const __Vector3& vPos) // 플레이어 �
 			vPosFinal.y = fYTerrain;
 	}
 
-	s_pPlayer->PositionSet(vPosFinal, true);	// 캐릭터 위치 셋팅..	
+	s_pPlayer->PositionSet(vPosFinal, true);	// 캐릭터 위치 셋팅..	 Character
 	s_pPlayer->m_vPosFromServer = vPos;
-	m_vPlayerPosSended = vPos;					// 최근에 보낸 위치 세팅..
-	m_fMsgSendTimeMove = 0;						// 시간을 기록한다..
+	m_vPlayerPosSended = vPos;					// 최근에 보낸 위치 세팅.. Position
+	m_fMsgSendTimeMove = 0;						// 시간을 기록한다.. Time
 
-	this->CommandSitDown(false, false, true); // 일으켜 세운다.. 앉아있는 상태에서 워프하면.. 버그가 있다..
-	this->TargetSelect(-1, false); // 타겟 해제..
-	this->UpdateCameraAndLight(); // 카메라와 라이트 다시 계산..
+	this->CommandSitDown(false, false, true); // 일으켜 세운다.. 앉아있는 상태에서 워프하면.. 버그가 있다.. Status
+	this->TargetSelect(-1, false); // 타겟 해제.. [Korean comment]
+	this->UpdateCameraAndLight(); // 카메라와 라이트 다시 계산.. Calculate
 
-	s_pPlayer->Action(PSA_BASIC, true, nullptr, true); // 강제로 기본 자세..
+	s_pPlayer->Action(PSA_BASIC, true, nullptr, true); // 강제로 기본 자세.. [Korean comment]
 }
 
 void CGameProcMain::Tick()
 {
-	CGameProcedure::Tick();	// 키, 마우스 입력 등등..
+	CGameProcedure::Tick();	// 키, 마우스 입력 등등.. [Korean comment]
 
-	if ( FALSE == m_bLoadComplete ) return;				// 로딩이 안되었으면.. 돌아간다.
+	if ( FALSE == m_bLoadComplete ) return;				// 로딩이 안되었으면.. 돌아간다. [Korean comment]
 	if(!s_pSocket->IsConnected()) return;
 
 #ifdef _DEBUG
@@ -520,11 +520,11 @@ void CGameProcMain::Tick()
 	uint32_t dwMouseFlags = s_pLocalInput->MouseGetFlag();	// 마우스 버튼 플래그 - LocalInput.h 참조
 	this->ProcessLocalInput(dwMouseFlags);					// 키보드나 마우스 입력은 UI 다음에 처리...
 
-	MsgSend_Continous();									// 일정 시간마다 움직임과 회전값, 공격등을 체크해서 패킷 만들어 보냄..
+	MsgSend_Continous();									// 일정 시간마다 움직임과 회전값, 공격등을 체크해서 패킷 만들어 보냄.. Check
 
-	s_pPlayer->Tick();									// 플레이어 틱(갱신)
+	s_pPlayer->Tick();									// 플레이어 틱(갱신) [Korean comment]
 	s_pWorldMgr->Tick();
-	s_pOPMgr->Tick(s_pPlayer->Position());				// 다른 유저 관리자 틱(갱신)
+	s_pOPMgr->Tick(s_pPlayer->Position());				// 다른 유저 관리자 틱(갱신) [Korean comment]
 //	s_pFX->Tick(); //내부에서 카메라 값을 쓸 경우 위치가 오차가 생겨 Render()함수 안으로 옮김...
 
 	__Vector3 ListenerPos = s_pPlayer->Position();
@@ -535,17 +535,17 @@ void CGameProcMain::Tick()
 	CN3SndObj::SetListenerPos(&ListenerPos);
 	CN3SndObj::SetListenerOrientation(&ListenerDir, &ListenerUp);
 
-	this->UpdateUI_MiniMap(); // 미니맵 업데이트..
-	this->UpdateUI_TargetBar(); // 타겟바 처리..
-	this->UpdateBGM(); // 배경음악을 상황에 따라 처리..
-	this->UpdateCameraAndLight(); // 카메라와 라이트 처리..
+	this->UpdateUI_MiniMap(); // 미니맵 업데이트.. Update
+	this->UpdateUI_TargetBar(); // 타겟바 처리.. Process
+	this->UpdateBGM(); // 배경음악을 상황에 따라 처리.. Process
+	this->UpdateCameraAndLight(); // 카메라와 라이트 처리.. Process
 	
-//	ProcessPlayerInclination();							// 경사 처리..(가만히 있어도 경사가 급하면 미끄러짐..).
+//	ProcessPlayerInclination();							// 경사 처리..(가만히 있어도 경사가 급하면 미끄러짐..). Process
 #ifdef _N3_64GRID_
-	m_SMesh.Tick(s_pPlayer, &m_Terrain);				// 서버 메시 틱.(갱신)
+	m_SMesh.Tick(s_pPlayer, &m_Terrain);				// 서버 메시 틱.(갱신) Mesh
 #endif
 
-	m_pUIStateBarAndMiniMap->UpdatePosition(s_pPlayer->Position(), s_pPlayer->Yaw()); // 위치 업데이트.
+	m_pUIStateBarAndMiniMap->UpdatePosition(s_pPlayer->Position(), s_pPlayer->Yaw()); // 위치 업데이트. Update
 
 	if(m_pMagicSkillMng) m_pMagicSkillMng->Tick();
 	if(m_pWarMessage) m_pWarMessage->Tick();
@@ -605,45 +605,45 @@ void CGameProcMain::Tick()
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////
-	// 타이머 비슷한 루틴..
+	// 타이머 비슷한 루틴.. [Korean comment]
 	static float fInterval2 = 0, fInterval3 = 0, fInterval4 = 0, fInterval5 = 0;
 	fInterval2 += fTime - fTimePrev;
 	fInterval3 += fTime - fTimePrev;
 	fInterval4 += fTime - fTimePrev;
 	fInterval5 += fTime - fTimePrev;
 	m_fRequestGameSave += fTime - fTimePrev;
-	if(fInterval2 > 1200.0f) // 저장 요청..
+	if(fInterval2 > 1200.0f) // 저장 요청.. Save
 	{
-		uint8_t byBuff[4];												// 버퍼.. 
-		int iOffset=0;												// 옵셋..
-		s_pSocket->MP_AddByte(byBuff, iOffset, WIZ_DATASAVE);	// 저장 요청 커멘드..
-		s_pSocket->Send(byBuff, iOffset);				// 보냄..
+		uint8_t byBuff[4];												// 버퍼..  [Korean comment]
+		int iOffset=0;												// 옵셋.. [Korean comment]
+		s_pSocket->MP_AddByte(byBuff, iOffset, WIZ_DATASAVE);	// 저장 요청 커멘드.. Save
+		s_pSocket->Send(byBuff, iOffset);				// 보냄.. [Korean comment]
 
 		fInterval2 = 0.0f;
 	}
-	if(fInterval3 > 10.0f) // 스피드핵 체크.. 
+	if(fInterval3 > 10.0f) // 스피드핵 체크..  Check
 	{
-		MsgSend_SpeedCheck();										// 스피드핵 체크 하기
+		MsgSend_SpeedCheck();										// 스피드핵 체크 하기 Check
 
 		fInterval3 = 0.0f;
 	}
-	if(s_pPlayer->m_InfoBase.iLevel < 12 && fInterval4 > 20.0f) // 시간이 지나면 팁 하나씩 표시..
+	if(s_pPlayer->m_InfoBase.iLevel < 12 && fInterval4 > 20.0f) // 시간이 지나면 팁 하나씩 표시.. Time
 	{
 		std::string szMsg = fmt::format_text_resource(IDS_HELP_TIP_ALL);
 		m_pUIMsgDlg->AddMsg(szMsg, 0xffffff00);
 
 		szMsg = fmt::format_text_resource(IDS_HELP_TIP1 + (rand() % 33));
-		m_pUIMsgDlg->AddMsg(szMsg, 0xffffff00); // 헬프 표시..
+		m_pUIMsgDlg->AddMsg(szMsg, 0xffffff00); // 헬프 표시.. [Korean comment]
 		fInterval4 = 0;
 	}
-	if(fInterval5 > 5.0f) // 시간이 지나면 팁 하나씩 표시..
+	if(fInterval5 > 5.0f) // 시간이 지나면 팁 하나씩 표시.. Time
 	{
-//		m_pUIChatDlg->ChangeChattingMode(N3_CHAT_CONTINUE); // 채팅모드 강제로 바꾸기...
+//		m_pUIChatDlg->ChangeChattingMode(N3_CHAT_CONTINUE); // 채팅모드 강제로 바꾸기... Mode
 		m_pUIChatDlg->ShowContinueMsg();
 		fInterval5 = 0;
 	}
 	fTimePrev = fTime;
-	// 타이머 비슷한 루틴..
+	// 타이머 비슷한 루틴.. [Korean comment]
 	////////////////////////////////////////////////////////////////////////////////////
 
 	if (m_fMBRotateTime >= 0.0f
@@ -672,14 +672,14 @@ void CGameProcMain::Tick()
 
 void CGameProcMain::Render()
 {
-	if ( FALSE == m_bLoadComplete )	return; 		// 로딩이 끝났냐??
+	if ( FALSE == m_bLoadComplete )	return; 		// 로딩이 끝났냐?? [Korean comment]
 
 	D3DCOLOR crSky = ACT_WORLD->GetSkyColorWithSky();
-	s_pEng->Clear(crSky); // 안개 색깔을 넣어서 클리어.. -> 하늘색깔로 클리어 해야 하늘이 제대로 나온다..
-	s_pEng->s_lpD3DDev->BeginScene();			// 씬 렌더 ㅅ작...
+	s_pEng->Clear(crSky); // 안개 색깔을 넣어서 클리어.. -> 하늘색깔로 클리어 해야 하늘이 제대로 나온다.. Color
+	s_pEng->s_lpD3DDev->BeginScene();			// 씬 렌더 ㅅ작... [Korean comment]
 	
-	ACT_WORLD->RenderSky();								// 하늘 렌더링..
-	float fSunAngle = ACT_WORLD->GetSunAngleByRadinWithSky(); // 해의 각도를 가져오고..
+	ACT_WORLD->RenderSky();								// 하늘 렌더링.. Rendering
+	float fSunAngle = ACT_WORLD->GetSunAngleByRadinWithSky(); // 해의 각도를 가져오고.. [Korean comment]
 
 	uint32_t dwFilter = D3DTEXF_LINEAR;
 	CN3Base::s_lpD3DDev->SetSamplerState(0, D3DSAMP_MINFILTER, dwFilter);
@@ -689,32 +689,32 @@ void CGameProcMain::Render()
 	CN3Base::s_lpD3DDev->SetSamplerState(1, D3DSAMP_MAGFILTER, dwFilter);
 	CN3Base::s_lpD3DDev->SetSamplerState(1, D3DSAMP_MIPFILTER, dwFilter);
 
-	ACT_WORLD->RenderTerrain();						// 지형 렌더..
-	ACT_WORLD->RenderShape();						// 물체 렌더..
-	s_pOPMgr->Render(fSunAngle);				// 다른 플레이어 렌더..
-	s_pPlayer->Render(fSunAngle);			// 플레이어 렌더..
+	ACT_WORLD->RenderTerrain();						// 지형 렌더.. [Korean comment]
+	ACT_WORLD->RenderShape();						// 물체 렌더.. [Korean comment]
+	s_pOPMgr->Render(fSunAngle);				// 다른 플레이어 렌더.. [Korean comment]
+	s_pPlayer->Render(fSunAngle);			// 플레이어 렌더.. [Korean comment]
 
 	// NOTE(srmeier): uncomment to render the collision meshes
 #ifdef _DEBUG
-	ACT_WORLD->RenderCollisionWithShape(s_pPlayer->Position());				// 충돌 메쉬 렌더..
+	ACT_WORLD->RenderCollisionWithShape(s_pPlayer->Position());				// 충돌 메쉬 렌더.. [Korean comment]
 #endif
 
 #ifdef _N3_64GRID_
-	m_SMesh.Render();							// 서버 메쉬 렌더..
+	m_SMesh.Render();							// 서버 메쉬 렌더.. [Korean comment]
 #endif
 
-	this->RenderTarget();						// 타겟으로 잡은 캐릭터 혹은 오브젝트 렌더링..
+	this->RenderTarget();						// 타겟으로 잡은 캐릭터 혹은 오브젝트 렌더링.. Rendering
 
 	ACT_WORLD->RenderGrass();						//	풀 렌더 (asm)
 	s_pFX->Tick();
 	s_pFX->Render();
 	ACT_WORLD->RenderBirdMgr();
 
-	CN3Base::s_AlphaMgr.Render(); // 알파 정렬된 폴리곤들 렌더링..
+	CN3Base::s_AlphaMgr.Render(); // 알파 정렬된 폴리곤들 렌더링.. Rendering
 	
-	ACT_WORLD->RenderSkyWeather();							// 하늘 렌더링..
+	ACT_WORLD->RenderSkyWeather();							// 하늘 렌더링.. Rendering
 	
-	CGameProcedure::Render(); // UI 나 그밖의 기본적인 것들 렌더링..
+	CGameProcedure::Render(); // UI 나 그밖의 기본적인 것들 렌더링.. Rendering
 	if(m_pWarMessage) m_pWarMessage->RenderMessage();
 	if(s_pGameCursor) s_pGameCursor->Render();
 
@@ -726,8 +726,8 @@ void CGameProcMain::RenderTarget()
 {
 	if(nullptr == m_pTargetSymbol) return;
 
-	// 플레이어가 타겟으로 잡은 캐릭터의 위치위에 그리면 된다..
-	CPlayerBase* pTarget = s_pOPMgr->CharacterGetByID(s_pPlayer->m_iIDTarget, false);//시체로 판정되기 전까지의 캐릭은 포커스를 준다.
+	// 플레이어가 타겟으로 잡은 캐릭터의 위치위에 그리면 된다.. Character
+	CPlayerBase* pTarget = s_pOPMgr->CharacterGetByID(s_pPlayer->m_iIDTarget, false);//시체로 판정되기 전까지의 캐릭은 포커스를 준다. [Korean comment]
 	if(nullptr == pTarget && nullptr == s_pPlayer->m_pObjectTarget) return;
 
 	float fScale = 1;
@@ -752,7 +752,7 @@ void CGameProcMain::RenderTarget()
 	m_pTargetSymbol->ScaleSet(fScale, fYScale, fScale);
 	m_pTargetSymbol->PosSet(vPos);
 	m_pTargetSymbol->Tick();
-	if(m_pTargetSymbol->Part(1)) // 바닥의 심벌을 땅바닥 위로 맞춘다..
+	if(m_pTargetSymbol->Part(1)) // 바닥의 심벌을 땅바닥 위로 맞춘다.. [Korean comment]
 	{
 		CN3PMesh* pPMesh = m_pTargetSymbol->Part(1)->Mesh();
 		if(pPMesh && pPMesh->GetMaxNumVertices() == 4)
@@ -784,9 +784,9 @@ bool CGameProcMain::ProcessPacket(Packet& pkt)
 
 	pkt.rpos(rpos);
 
-	int iCmd = pkt.read<uint8_t>();		// 커멘드 파싱..
+	int iCmd = pkt.read<uint8_t>();		// 커멘드 파싱.. [Korean comment]
 
-	switch ( iCmd )										// 커멘드에 다라서 분기..
+	switch ( iCmd )										// 커멘드에 다라서 분기.. [Korean comment]
 	{
 #ifdef _DEBUG
 	case WIZ_TEST_PACKET:
@@ -853,7 +853,7 @@ bool CGameProcMain::ProcessPacket(Packet& pkt)
 
 		} return true;
 
-		case WIZ_MYINFO:									// 나의 정보 메시지..
+		case WIZ_MYINFO:									// 나의 정보 메시지.. Info
 			this->MsgRecv_MyInfo_All(pkt);
 			return true;
 		case WIZ_HP_CHANGE:
@@ -874,7 +874,7 @@ bool CGameProcMain::ProcessPacket(Packet& pkt)
 		case WIZ_POINT_CHANGE:
 			this->MsgRecv_MyInfo_PointChange(pkt);
 			return true;
-		case WIZ_CHAT:														// 채팅 메시지..	
+		case WIZ_CHAT:														// 채팅 메시지..	 Mesh
 			this->MsgRecv_Chat(pkt);
 			return true;
 		case WIZ_WARP:
@@ -885,7 +885,7 @@ bool CGameProcMain::ProcessPacket(Packet& pkt)
 				float fY = ACT_WORLD->GetHeightWithTerrain(fX, fZ, true);
 				float fYObject = ACT_WORLD->GetHeightWithShape(fX, fZ);
 				if(fYObject > fY) fY = fYObject;
-				this->InitPlayerPosition(__Vector3(fX, fY, fZ)); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다.
+				this->InitPlayerPosition(__Vector3(fX, fY, fZ)); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다. Initialize
 				s_pFX->TriggerBundle(
 					s_pPlayer->IDNumber(),
 					-1,
@@ -900,7 +900,7 @@ bool CGameProcMain::ProcessPacket(Packet& pkt)
 		case WIZ_MOVE:
 			this->MsgRecv_UserMove(pkt);
 			return true;
-		case WIZ_ROTATE:												// 회전 커멘드..
+		case WIZ_ROTATE:												// 회전 커멘드.. Rotate
 			this->MsgRecv_Rotation(pkt);
 			return true;
 		case WIZ_REGENE:
@@ -921,35 +921,35 @@ bool CGameProcMain::ProcessPacket(Packet& pkt)
 		case WIZ_WEATHER:
 			this->MsgRecv_Weather(pkt);
 			return true;
-		case WIZ_USER_INOUT:												// 다른 유저 인/아웃..
+		case WIZ_USER_INOUT:												// 다른 유저 인/아웃.. [Korean comment]
 			this->MsgRecv_UserInOut(pkt);
 			return true;
-		case WIZ_REGIONCHANGE:										// 첨에 로그온하면 그 주변 지역의 캐릭터들 업데이트...
+		case WIZ_REGIONCHANGE:										// 첨에 로그온하면 그 주변 지역의 캐릭터들 업데이트... Update
 			this->MsgRecv_UserInAndRequest(pkt);
 			return true;
 		case WIZ_REQ_USERIN:										// 서버에 요청한 UserIn 에 대한 자세한 정보 받기..
 			this->MsgRecv_UserInRequested(pkt);						// 
 			return true;
-		case WIZ_NPC_REGION:										// 첨에 로그온하면 그 주변 지역의 캐릭터들 업데이트...
+		case WIZ_NPC_REGION:										// 첨에 로그온하면 그 주변 지역의 캐릭터들 업데이트... Update
 			this->MsgRecv_NPCInAndRequest(pkt);
 			return true;
 		case WIZ_REQ_NPCIN:											// 서버에 요청한 UserIn 에 대한 자세한 정보 받기..
 			this->MsgRecv_NPCInRequested(pkt);						// 
 			return true;
-		case WIZ_NPC_INOUT:												// NPC 인/아웃..
+		case WIZ_NPC_INOUT:												// NPC 인/아웃.. [Korean comment]
 			this->MsgRecv_NPCInOut(pkt);
 			return true;
 		case WIZ_ATTACK:
 			this->MsgRecv_Attack(pkt);
 			return true;
-		case WIZ_NPC_MOVE:												// NPC 움직임 패킷..
+		case WIZ_NPC_MOVE:												// NPC 움직임 패킷.. [Korean comment]
 			this->MsgRecv_NPCMove(pkt);
 			return true;
 		case WIZ_TARGET_HP:
 			this->MsgRecv_TargetHP(pkt);
 			return true;
 		case WIZ_ITEM_MOVE:
-			this->MsgRecv_ItemMove(pkt);				// Item Move에 대한 응답..
+			this->MsgRecv_ItemMove(pkt);				// Item Move에 대한 응답.. [Korean comment]
 			return true;
 		case WIZ_ITEM_DROP:
 			this->MsgRecv_ItemBundleDrop(pkt);
@@ -964,7 +964,7 @@ bool CGameProcMain::ProcessPacket(Packet& pkt)
 			this->MsgRecv_ItemTradeResult(pkt);
 			return true;
 		case WIZ_ITEM_GET:
-			this->MsgRecv_ItemDroppedGetResult(pkt);					// 땅에 떨어진 아이템 먹기 결과..
+			this->MsgRecv_ItemDroppedGetResult(pkt);					// 땅에 떨어진 아이템 먹기 결과.. [Korean comment]
 			return true;
 		case WIZ_REPAIR_NPC:
 			this->MsgRecv_NpcEvent(pkt);
@@ -1036,9 +1036,9 @@ bool CGameProcMain::ProcessPacket(Packet& pkt)
 				m_pUIChatDlg->ChangeChattingMode(eCM); 
 			}
 			return true;
-		case WIZ_CONCURRENTUSER: // 동시 접속자수 ...
+		case WIZ_CONCURRENTUSER: // 동시 접속자수 ... [Korean comment]
 			{
-				int iUserCount = pkt.read<int16_t>();		// ID 문자열 길이..
+				int iUserCount = pkt.read<int16_t>();		// ID 문자열 길이.. [Korean comment]
 
 				std::string szMsg = fmt::format_text_resource(IDS_FMT_CONCURRENT_USER_COUNT,
 					iUserCount);
@@ -1054,11 +1054,11 @@ bool CGameProcMain::ProcessPacket(Packet& pkt)
 		case WIZ_KNIGHTS_LIST:
 			this->MsgRecv_KnightsListBasic(pkt);
 			return true;
-		case WIZ_CONTINOUS_PACKET: // 압축된 데이터 이다... 한번 더 파싱해야 한다!!!
+		case WIZ_CONTINOUS_PACKET: // 압축된 데이터 이다... 한번 더 파싱해야 한다!!! Data
 			this->MsgRecv_ContinousPacket(pkt);
 			return true;
-		case WIZ_WAREHOUSE:	// 보관함..
-			this->MsgRecv_WareHouse(pkt);			// 보관함 관련 패킷..
+		case WIZ_WAREHOUSE:	// 보관함.. [Korean comment]
+			this->MsgRecv_WareHouse(pkt);			// 보관함 관련 패킷.. [Korean comment]
 			return true;
 		case WIZ_FRIEND_PROCESS:
 			if(m_pUIVar->m_pPageFriends) m_pUIVar->m_pPageFriends->MsgRecv_MemberInfo(pkt);
@@ -1075,7 +1075,7 @@ bool CGameProcMain::ProcessPacket(Packet& pkt)
 //		case WIZ_ZONE_CONCURRENT:
 //			this->MsgRecv_ConcurrentUserCountAndSendServerCheck(pkt);
 //			return true;
-		case WIZ_CORPSE: //regen을 하여 주위 유저에게 시체임을 알린다.
+		case WIZ_CORPSE: //regen을 하여 주위 유저에게 시체임을 알린다. [Korean comment]
 			this->MsgRecv_Corpse(pkt);
 			return true;
 		case WIZ_PARTY_BBS:
@@ -1120,10 +1120,10 @@ bool CGameProcMain::ProcessPacket(Packet& pkt)
 	return false;
 }
 
-// 키보드와 마우스 눌린것을 처리한다..
+// 키보드와 마우스 눌린것을 처리한다.. Process
 void CGameProcMain::ProcessLocalInput(uint32_t dwMouseFlags)
 {
-	// Loading이 된 후..
+	// Loading이 된 후.. [Korean comment]
 	if ( FALSE == m_bLoadComplete ) return; 
 
 	if (m_pSubProcPerTrade->m_ePerTradeState != PER_TRADE_STATE_NONE)
@@ -1202,29 +1202,29 @@ void CGameProcMain::ProcessLocalInput(uint32_t dwMouseFlags)
 	{
 		m_pUIHotKeyDlg->EffectTriggerByHotKey(iHotKey);
 	}
-	// 핫키
+	// 핫키 [Korean comment]
 	//////////////////////////////////////////
 
-	if(s_pLocalInput->IsKeyPress(KM_CAMERA_CHANGE))												// 시점 변환..
+	if(s_pLocalInput->IsKeyPress(KM_CAMERA_CHANGE))												// 시점 변환.. [Korean comment]
 	{
-		this->CommandCameraChange(); // 카메라 시점 바꾸기..
+		this->CommandCameraChange(); // 카메라 시점 바꾸기.. [Korean comment]
 	}
 
-	// 삼인칭일때 홈, 엔드키로 카메로 올리고 내리기..
+	// 삼인칭일때 홈, 엔드키로 카메로 올리고 내리기.. [Korean comment]
 	if(s_pEng->ViewPoint() == VP_THIRD_PERSON)
 	{
 		float fPitch = 0;
-		if(s_pLocalInput->IsKeyDown(DIK_HOME)) fPitch = D3DXToRadian(45.0f);		// home 키가 눌리면..
-		else if(s_pLocalInput->IsKeyDown(DIK_END)) fPitch = D3DXToRadian(-45.0f);	// End 키가 눌리면..
+		if(s_pLocalInput->IsKeyDown(DIK_HOME)) fPitch = D3DXToRadian(45.0f);		// home 키가 눌리면.. [Korean comment]
+		else if(s_pLocalInput->IsKeyDown(DIK_END)) fPitch = D3DXToRadian(-45.0f);	// End 키가 눌리면.. [Korean comment]
 		if(fPitch) s_pEng->CameraPitchAdd(fPitch);
 	}
 
-	if (!IsUIKeyOperated() && nullptr == CN3UIBase::GetFocusedEdit() )			// 채팅모드가 아닐때 
+	if (!IsUIKeyOperated() && nullptr == CN3UIBase::GetFocusedEdit() )			// 채팅모드가 아닐때  Mode
 	{
-		if(s_pPlayer->m_InfoBase.iAuthority == AUTHORITY_MANAGER) //게임 운영자는 이 기능을 사용할수 있다.
+		if(s_pPlayer->m_InfoBase.iAuthority == AUTHORITY_MANAGER) //게임 운영자는 이 기능을 사용할수 있다. [Korean comment]
 		{
-			if ( s_pLocalInput->IsKeyDown(DIK_Q) ) s_pPlayer->m_bTempMoveTurbo = true; // 엄청 빨리 움직이게 한다..  // 임시 함수.. 나중에 없애자..
-			else s_pPlayer->m_bTempMoveTurbo = false; // 엄청 빨리 움직이게 한다..  // 임시 함수.. 나중에 없애자..
+			if ( s_pLocalInput->IsKeyDown(DIK_Q) ) s_pPlayer->m_bTempMoveTurbo = true; // 엄청 빨리 움직이게 한다..  // 임시 함수.. 나중에 없애자.. Function
+			else s_pPlayer->m_bTempMoveTurbo = false; // 엄청 빨리 움직이게 한다..  // 임시 함수.. 나중에 없애자.. Function
 		}
 
 		if (s_pLocalInput->IsKeyPress(KM_TOGGLE_ATTACK))
@@ -1241,23 +1241,23 @@ void CGameProcMain::ProcessLocalInput(uint32_t dwMouseFlags)
 			}
 		}
 		if (s_pLocalInput->IsKeyPress(KM_TOGGLE_RUN))
-			CommandToggleWalkRun();				// 걷기 / 뛰기 토글	
+			CommandToggleWalkRun();				// 걷기 / 뛰기 토글	 [Korean comment]
 		if (s_pLocalInput->IsKeyPress(KM_TARGET_NEAREST_ENEMY))
-			CommandTargetSelect_NearestEnemy();	// 가장 가까운 적 타겟 잡기..
+			CommandTargetSelect_NearestEnemy();	// 가장 가까운 적 타겟 잡기.. [Korean comment]
 		if (s_pLocalInput->IsKeyPress(KM_TARGET_NEAREST_PARTY))
-			CommandTargetSelect_NearestOurForce(); // 가장 가까운 파티 타겟잡기..
+			CommandTargetSelect_NearestOurForce(); // 가장 가까운 파티 타겟잡기.. [Korean comment]
 		if (s_pLocalInput->IsKeyPress(KM_TARGET_NEAREST_NPC)) // target nearest NPC with 'B'
 			CommandTargetSelect_NearestNPC();
 
-		float fRotKeyDelta = D3DXToRadian(60); // 초당 60 도 돌기..
+		float fRotKeyDelta = D3DXToRadian(60); // 초당 60 도 돌기.. [Korean comment]
 		if(s_pLocalInput->IsKeyDown(KM_ROTATE_LEFT) || s_pLocalInput->IsKeyDown(DIK_LEFT))	
 		{
-			if(s_pPlayer->IsAlive()) s_pPlayer->RotAdd(-fRotKeyDelta); // 초당 180 도 왼쪽으로 돌기.
+			if(s_pPlayer->IsAlive()) s_pPlayer->RotAdd(-fRotKeyDelta); // 초당 180 도 왼쪽으로 돌기. [Korean comment]
 			if(m_pUIDroppedItemDlg->IsVisible()) m_pUIDroppedItemDlg->LeaveDroppedState();	
 		}
 		if(s_pLocalInput->IsKeyDown(KM_ROTATE_RIGHT) || s_pLocalInput->IsKeyDown(DIK_RIGHT))	
 		{
-			if(s_pPlayer->IsAlive()) s_pPlayer->RotAdd(fRotKeyDelta); // 초당 180 도 오른쪽으로 돌기.
+			if(s_pPlayer->IsAlive()) s_pPlayer->RotAdd(fRotKeyDelta); // 초당 180 도 오른쪽으로 돌기. [Korean comment]
 			if(m_pUIDroppedItemDlg->IsVisible()) m_pUIDroppedItemDlg->LeaveDroppedState();	
 		}
 		
@@ -1274,9 +1274,9 @@ void CGameProcMain::ProcessLocalInput(uint32_t dwMouseFlags)
 						CommandToggleAttackContinous();
 				}
 				else
-					bStart = true;// 누르는 순간이면
+					bStart = true;// 누르는 순간이면 [Korean comment]
 			}
-			this->CommandMove(MD_FORWARD, bStart); // 앞으로 이동..
+			this->CommandMove(MD_FORWARD, bStart); // 앞으로 이동.. Move
 		}
 		else if(s_pLocalInput->IsKeyDown(KM_MOVE_BACKWARD) || s_pLocalInput->IsKeyDown(DIK_DOWN))
 		{
@@ -1291,9 +1291,9 @@ void CGameProcMain::ProcessLocalInput(uint32_t dwMouseFlags)
 						CommandToggleAttackContinous();
 				}
 				else
-					bStart = true;// 누르는 순간이면
+					bStart = true;// 누르는 순간이면 [Korean comment]
 			}
-			this->CommandMove(MD_BACKWARD, bStart); // 뒤로 이동..
+			this->CommandMove(MD_BACKWARD, bStart); // 뒤로 이동.. Move
 		}
 		else if(s_pLocalInput->IsKeyPress(KM_TOGGLE_MOVE_CONTINOUS))
 		{
@@ -1301,7 +1301,7 @@ void CGameProcMain::ProcessLocalInput(uint32_t dwMouseFlags)
 		}
 
 		if(	s_pLocalInput->IsKeyPressed(KM_MOVE_FOWARD) || s_pLocalInput->IsKeyPressed(DIK_UP) || 
-			s_pLocalInput->IsKeyPressed(KM_MOVE_BACKWARD) || s_pLocalInput->IsKeyPressed(DIK_DOWN) ) // 전진/후진 키를 떼는 순간. 
+			s_pLocalInput->IsKeyPressed(KM_MOVE_BACKWARD) || s_pLocalInput->IsKeyPressed(DIK_DOWN) ) // 전진/후진 키를 떼는 순간.  [Korean comment]
 		{
 			this->CommandMove(MD_STOP, true);
 		}
@@ -1348,14 +1348,14 @@ void CGameProcMain::ProcessLocalInput(uint32_t dwMouseFlags)
 
 	} // end of if ( !m_UIChatDlg.IsChatMode() )
 
-	// ..... 나머지 키보드 처리..
+	// ..... 나머지 키보드 처리.. Process
 #if _DEBUG
-	if(s_pLocalInput->IsKeyPress(DIK_F12)) // 디버깅 테스트..
-		s_pEng->Lightning(); // 번개 치기..
+	if(s_pLocalInput->IsKeyPress(DIK_F12)) // 디버깅 테스트.. [Korean comment]
+		s_pEng->Lightning(); // 번개 치기.. [Korean comment]
 #endif
 }
 
-void CGameProcMain::ProcessPlayerInclination()											// 경사에 서 있을때..
+void CGameProcMain::ProcessPlayerInclination()											// 경사에 서 있을때.. [Korean comment]
 {
 /*	float fFrm = GetIndepTimeFrame();
 
@@ -1378,20 +1378,20 @@ void CGameProcMain::ProcessPlayerInclination()											// 경사에 서 있을
 // 
 //////////////////////////////////////////////////////////////////////
 
-void CGameProcMain::MsgSend_Continous()						// 특정 조건(?)하에서 서버에게 정기적으로 메시지를 보냄..
+void CGameProcMain::MsgSend_Continous()						// 특정 조건(?)하에서 서버에게 정기적으로 메시지를 보냄.. Mesh
 {
 	float fTime = s_pEng->TimeGet();
 
-	if ( fTime >= m_fMsgSendTimeMove + PACKET_INTERVAL_MOVE )					// 1초가 지났으면..	
+	if ( fTime >= m_fMsgSendTimeMove + PACKET_INTERVAL_MOVE )					// 1초가 지났으면..	 [Korean comment]
 	{
 		__Vector3 vPos = s_pPlayer->Position();
-		if(m_vPlayerPosSended != vPos) this->MsgSend_Move(true, true); // 조금이라도 움직였으면 움직임 패킷 보냄..
+		if(m_vPlayerPosSended != vPos) this->MsgSend_Move(true, true); // 조금이라도 움직였으면 움직임 패킷 보냄.. [Korean comment]
 	}
 
-	if( false == s_pPlayer->m_bMoveContinous && fTime >= m_fMsgSendTimeRot + PACKET_INTERVAL_ROTATE ) // 플레이어가 정지해 있고.. 2초가 지났으면..
+	if( false == s_pPlayer->m_bMoveContinous && fTime >= m_fMsgSendTimeRot + PACKET_INTERVAL_ROTATE ) // 플레이어가 정지해 있고.. 2초가 지났으면.. [Korean comment]
 	{
 		float fYaw = s_pPlayer->Yaw();
-		if( fYaw != m_fPlayerYawSended ) MsgSend_Rotation(); // 조금이라도 회전했으면 회전 패킷 보냄
+		if( fYaw != m_fPlayerYawSended ) MsgSend_Rotation(); // 조금이라도 회전했으면 회전 패킷 보냄 Rotate
 	}
 }
 
@@ -1401,26 +1401,26 @@ void CGameProcMain::MsgSend_Continous()						// 특정 조건(?)하에서 서버
 // 
 //////////////////////////////////////////////////////////////////////
 
-void CGameProcMain::MsgSend_Attack(int iTargetID, float fInterval, float fDistance) // 공격 패킷 날리기 - 테이블의 공격 주기를 같이 줘서 해킹을 막는다.
+void CGameProcMain::MsgSend_Attack(int iTargetID, float fInterval, float fDistance) // 공격 패킷 날리기 - 테이블의 공격 주기를 같이 줘서 해킹을 막는다. [Korean comment]
 {
-	if(s_pPlayer->m_fTimeAfterDeath > 0 || s_pPlayer->IsDead())	return; // 죽은 넘이다..
+	if(s_pPlayer->m_fTimeAfterDeath > 0 || s_pPlayer->IsDead())	return; // 죽은 넘이다.. [Korean comment]
 
-	uint8_t byBuff[32];												// 버퍼.. 
-	int iOffset=0;													// 옵셋..
+	uint8_t byBuff[32];												// 버퍼..  [Korean comment]
+	int iOffset=0;													// 옵셋.. [Korean comment]
 
 	uint8_t bySuccess = true;
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_ATTACK);						// 공격 커멘드..
-	CAPISocket::MP_AddByte(byBuff, iOffset, 0x01);							// ??? 데미지??
-	CAPISocket::MP_AddByte(byBuff, iOffset, bySuccess);						// 성공 여부.. - 일단 성공으로 보낸다.
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_ATTACK);						// 공격 커멘드.. [Korean comment]
+	CAPISocket::MP_AddByte(byBuff, iOffset, 0x01);							// ??? 데미지?? [Korean comment]
+	CAPISocket::MP_AddByte(byBuff, iOffset, bySuccess);						// 성공 여부.. - 일단 성공으로 보낸다. [Korean comment]
 
 	fInterval += 0.1f;
 
-	CAPISocket::MP_AddShort(byBuff, iOffset, iTargetID );					// 상대방 아이디..
-	CAPISocket::MP_AddShort(byBuff, iOffset, (int)(fInterval * 100));	// 공격한 시간
-	CAPISocket::MP_AddShort(byBuff, iOffset, (int)(fDistance * 10));	// 공격한 거리
+	CAPISocket::MP_AddShort(byBuff, iOffset, iTargetID );					// 상대방 아이디.. [Korean comment]
+	CAPISocket::MP_AddShort(byBuff, iOffset, (int)(fInterval * 100));	// 공격한 시간 Time
+	CAPISocket::MP_AddShort(byBuff, iOffset, (int)(fDistance * 10));	// 공격한 거리 [Korean comment]
 
-	s_pSocket->Send(byBuff, iOffset);										// 보냄..
+	s_pSocket->Send(byBuff, iOffset);										// 보냄.. [Korean comment]
 }
 
 void CGameProcMain::MsgSend_Move(bool bMove, bool bContinous)
@@ -1430,14 +1430,14 @@ void CGameProcMain::MsgSend_Move(bool bMove, bool bContinous)
 	
 	uint8_t byMoveFlag = 0;
 
-	if(true == bMove) // 움직이기 시작할때나 움직일때는
+	if(true == bMove) // 움직이기 시작할때나 움직일때는 [Korean comment]
 	{
-		if(s_pPlayer->m_fTimeAfterDeath > 0 || s_pPlayer->IsDead())	return; // 죽은 넘이다..
+		if(s_pPlayer->m_fTimeAfterDeath > 0 || s_pPlayer->IsDead())	return; // 죽은 넘이다.. [Korean comment]
 
-		vPos = s_pPlayer->NextPos(PACKET_INTERVAL_MOVE); // 다음 1초후의 위치를 계산해서.
+		vPos = s_pPlayer->NextPos(PACKET_INTERVAL_MOVE); // 다음 1초후의 위치를 계산해서. Calculate
 		byMoveFlag |= 0x01;
 	}
-	else // 정지시에는 
+	else // 정지시에는  [Korean comment]
 	{
 		s_pPlayer->m_bTargetOrPosMove	= false;
 		s_pPlayer->m_iMoveTarget		= -1;
@@ -1445,43 +1445,43 @@ void CGameProcMain::MsgSend_Move(bool bMove, bool bContinous)
 		fSpeed = 0;
 	}
 
-	if(true == bContinous) // 정기적으로 움직이는 거라면..
+	if(true == bContinous) // 정기적으로 움직이는 거라면.. [Korean comment]
 	{
 		byMoveFlag |= 0x02;
 	}
 
-	uint8_t byBuff[64];											// 버퍼 설정..
-	int iOffset=0;											// 옵셋..
+	uint8_t byBuff[64];											// 버퍼 설정.. Set
+	int iOffset=0;											// 옵셋.. [Korean comment]
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_MOVE);			// 커멘드..
-	CAPISocket::MP_AddWord(byBuff, iOffset, (uint16_t)(vPos.x*10));			// 다음 위치
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_MOVE);			// 커멘드.. [Korean comment]
+	CAPISocket::MP_AddWord(byBuff, iOffset, (uint16_t)(vPos.x*10));			// 다음 위치 Position
 	CAPISocket::MP_AddWord(byBuff, iOffset, (uint16_t)(vPos.z*10));
 	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)(vPos.y*10));
-	CAPISocket::MP_AddWord(byBuff, iOffset, (uint16_t)(fSpeed*10));			// 속도 
-	CAPISocket::MP_AddByte(byBuff, iOffset, byMoveFlag );		// 움직임 플래그..
-	s_pSocket->Send(byBuff, iOffset);							// 패킷을 보냄..
+	CAPISocket::MP_AddWord(byBuff, iOffset, (uint16_t)(fSpeed*10));			// 속도  [Korean comment]
+	CAPISocket::MP_AddByte(byBuff, iOffset, byMoveFlag );		// 움직임 플래그.. [Korean comment]
+	s_pSocket->Send(byBuff, iOffset);							// 패킷을 보냄.. [Korean comment]
 
-	m_vPlayerPosSended = s_pPlayer->Position(); // 최근에 보낸 위치 세팅..
+	m_vPlayerPosSended = s_pPlayer->Position(); // 최근에 보낸 위치 세팅.. Position
 	
-	if(true == bMove) m_fMsgSendTimeMove = CN3Base::TimeGet(); // 시간을 기록한다..
+	if(true == bMove) m_fMsgSendTimeMove = CN3Base::TimeGet(); // 시간을 기록한다.. Time
 }
 
 void CGameProcMain::MsgSend_Rotation()
 {
-	if(s_pPlayer->IsDead()) return; // 죽은 넘이 어딜 감히!!
+	if(s_pPlayer->IsDead()) return; // 죽은 넘이 어딜 감히!! [Korean comment]
 
 	uint8_t byBuff[8];
 	int iOffset=0;
 
-	float fYaw = s_pPlayer->Yaw(); // 방향..
+	float fYaw = s_pPlayer->Yaw(); // 방향.. [Korean comment]
 	
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_ROTATE);
 	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)(fYaw*100));
 
 	s_pSocket->Send(byBuff, iOffset);
 
-	m_fPlayerYawSended = fYaw; // 회전값을 기록
-	m_fMsgSendTimeRot = CN3Base::TimeGet(); // 시간을 기록한다..
+	m_fPlayerYawSended = fYaw; // 회전값을 기록 Rotate
+	m_fMsgSendTimeRot = CN3Base::TimeGet(); // 시간을 기록한다.. Time
 }
 
 
@@ -1499,7 +1499,7 @@ void CGameProcMain::MsgSend_Chat(e_ChatMode eMode, const std::string& szChat)
 	CAPISocket::MP_AddString(byBuff, iOffset, szChat);
 
 	__ASSERT(iOffset<512, "Send Buffer OverFlow");
-	s_pSocket->Send(byBuff, iOffset); // 보낸다..
+	s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 }
 
 void CGameProcMain::MsgSend_ChatSelectTarget(const std::string& szTargetID)
@@ -1522,19 +1522,19 @@ void CGameProcMain::MsgSend_ChatSelectTarget(const std::string& szTargetID)
 
 void CGameProcMain::MsgSend_Regen()
 {
-	if(s_pPlayer->m_iSendRegeneration >= 2) return; // 한번 보내면 다시 죽을때까지 안보내는 플래그
+	if(s_pPlayer->m_iSendRegeneration >= 2) return; // 한번 보내면 다시 죽을때까지 안보내는 플래그 [Korean comment]
 
 	uint8_t byBuff[4];
 	int iOffset=0;
 
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_REGENE);
-	CAPISocket::MP_AddByte(byBuff, iOffset, 1); //1: 마을로 살아나기..
+	CAPISocket::MP_AddByte(byBuff, iOffset, 1); //1: 마을로 살아나기.. [Korean comment]
 	
 	CLogWriter::Write("Send Regeneration");
 
-	s_pSocket->Send(byBuff, iOffset); // 보낸다..
+	s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 
-	s_pPlayer->m_iSendRegeneration = 2; // 한번 보내면 다시 죽을때까지 안보내는 플래그
+	s_pPlayer->m_iSendRegeneration = 2; // 한번 보내면 다시 죽을때까지 안보내는 플래그 [Korean comment]
 	//TRACE("보냄 - 다시 살아나기\n");
 }
 
@@ -1548,7 +1548,7 @@ bool CGameProcMain::MsgSend_RequestItemBundleOpen(CPlayerNPC* pCorpse)
 	int iItemBundleID = pCorpse->m_iDroppedItemID;
 	m_pUIDroppedItemDlg->m_iItemBundleID = pCorpse->m_iDroppedItemID;
 		
-	s_pOPMgr->CorpseRemove(pCorpse, false); // 점점 투명하게 없앤다..
+	s_pOPMgr->CorpseRemove(pCorpse, false); // 점점 투명하게 없앤다.. [Korean comment]
 	
 	uint8_t byBuff[8];
 	int iOffset=0;
@@ -1556,7 +1556,7 @@ bool CGameProcMain::MsgSend_RequestItemBundleOpen(CPlayerNPC* pCorpse)
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_BUNDLE_OPEN_REQ);
 	CAPISocket::MP_AddDword(byBuff, iOffset, iItemBundleID);
 
-	s_pSocket->Send(byBuff, iOffset); // 보낸다..
+	s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 
 	return true;
 }
@@ -1571,7 +1571,7 @@ void CGameProcMain::MsgSend_PartyOrForcePermit(int iPartyOrForce, bool bYesNo)
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_PARTY_OR_FORCE_PERMIT);
 	CAPISocket::MP_AddByte(byBuff, iOffset, bYesNo);
 
-	s_pSocket->Send(byBuff, iOffset); // 보낸다..
+	s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 }
 
 bool CGameProcMain::MsgSend_PartyOrForceCreate(int iPartyOrForce, const std::string& szID)
@@ -1582,7 +1582,7 @@ bool CGameProcMain::MsgSend_PartyOrForceCreate(int iPartyOrForce, const std::str
 	int iMemberIndex = -1;
 	CPlayerBase* pTarget = nullptr;
 	this->PartyOrForceConditionGet(bIAmLeader, bIAmMember, iMemberIndex, pTarget);
-	if(true == bIAmMember && false == bIAmLeader) return false; // 내가 파티에 들어 있고 리더가 아니면 실패..
+	if(true == bIAmMember && false == bIAmLeader) return false; // 내가 파티에 들어 있고 리더가 아니면 실패.. [Korean comment]
 
 	uint8_t byBuff[32];
 	int iOffset=0;
@@ -1601,9 +1601,9 @@ bool CGameProcMain::MsgSend_PartyOrForceCreate(int iPartyOrForce, const std::str
 	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)szID.size());
 	CAPISocket::MP_AddString(byBuff, iOffset, szID);
 
-	s_pSocket->Send(byBuff, iOffset); // 보낸다..
+	s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 	
-	if(m_pUIPartyOrForce->MemberCount() <= 0) // 처음 생성하는 경우...
+	if(m_pUIPartyOrForce->MemberCount() <= 0) // 처음 생성하는 경우... Create
 	{
 		m_pUIPartyOrForce->MemberAdd(
 			s_pPlayer->IDNumber(),
@@ -1613,7 +1613,7 @@ bool CGameProcMain::MsgSend_PartyOrForceCreate(int iPartyOrForce, const std::str
 			s_pPlayer->m_InfoBase.iHP, 
 			s_pPlayer->m_InfoBase.iHPMax,
 			s_pPlayer->m_InfoExt.iMSP,
-			s_pPlayer->m_InfoExt.iMSPMax);  // 내건 미리 넣어 놓는다..
+			s_pPlayer->m_InfoExt.iMSPMax);  // 내건 미리 넣어 놓는다.. [Korean comment]
 	}
 
 	//TRACE ("Party or Force 생성 신청 - Target ID(%s)\n", szID.c_str());
@@ -1623,7 +1623,7 @@ bool CGameProcMain::MsgSend_PartyOrForceCreate(int iPartyOrForce, const std::str
 
 void CGameProcMain::MsgSend_PartyOrForceLeave(int iPartyOrForce)
 {
-	if(m_pUIPartyOrForce->MemberCount() <= 0) return; // 파티원이 없다..
+	if(m_pUIPartyOrForce->MemberCount() <= 0) return; // 파티원이 없다.. [Korean comment]
 
 	CPlayerBase* pTarget = nullptr;
 	bool bIAmLeader, bIAmMember;
@@ -1635,24 +1635,24 @@ void CGameProcMain::MsgSend_PartyOrForceLeave(int iPartyOrForce)
 
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_PARTY);
 //	CAPISocket::MP_AddByte(byBuff, iOffset, iPartyOrForce);
-	if(bIAmLeader) // 내가 리더일경우..
+	if(bIAmLeader) // 내가 리더일경우.. [Korean comment]
 	{
-		if(iMemberIndex > 0 && pTarget) // 파티원이다.. 쫓아내자..
+		if(iMemberIndex > 0 && pTarget) // 파티원이다.. 쫓아내자.. [Korean comment]
 		{
 			CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_PARTY_OR_FORCE_REMOVE);
 			CAPISocket::MP_AddShort(byBuff, iOffset, pTarget->IDNumber());
 		}
-		else // 타겟이 파티원이 아니면 파티 뽀개기..
+		else // 타겟이 파티원이 아니면 파티 뽀개기.. [Korean comment]
 		{
 			CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_PARTY_OR_FORCE_DESTROY);
 		}
 	}
-	else if(bIAmMember) // 리더가 아니면 탈퇴 메시지를 보낸다..
+	else if(bIAmMember) // 리더가 아니면 탈퇴 메시지를 보낸다.. Mesh
 	{
 		CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_PARTY_OR_FORCE_REMOVE);
 		CAPISocket::MP_AddShort(byBuff, iOffset, s_pPlayer->IDNumber());
 	}
-	s_pSocket->Send(byBuff, iOffset); // 보낸다..
+	s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 }
 
 void CGameProcMain::MsgSend_ObjectEvent(int iEventID, int iNPCID)
@@ -1664,7 +1664,7 @@ void CGameProcMain::MsgSend_ObjectEvent(int iEventID, int iNPCID)
 	CAPISocket::MP_AddShort(byBuff, iOffset, iEventID);	// Index
 	CAPISocket::MP_AddShort(byBuff, iOffset, iNPCID);	// Parameter
 
-	s_pSocket->Send(byBuff, iOffset); // 보낸다..
+	s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 }
 
 void CGameProcMain::MsgSend_Weather(int iWeather, int iPercent)
@@ -1677,7 +1677,7 @@ void CGameProcMain::MsgSend_Weather(int iWeather, int iPercent)
 
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_WEATHER); // -> byte - 기후.... 0x01 - 맑음.. 0x02 -  비 0x03
 	CAPISocket::MP_AddByte(byBuff, iOffset, iWeather); // -> byte - 기후.... 0x01 - 맑음.. 0x02 -  비 0x03
-	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)iPercent); // int16_t -> 맑은날 안개, 비, 눈 의 양 퍼센트로 
+	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)iPercent); // int16_t -> 맑은날 안개, 비, 눈 의 양 퍼센트로  [Korean comment]
 
 	s_pSocket->Send(byBuff, iOffset);
 }
@@ -1704,7 +1704,7 @@ void CGameProcMain::MsgSend_Administrator(e_SubPacket_Administrator eSP, const s
 	uint8_t byBuff[64];
 	int iOffset=0;
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_OPERATOR); // 관리자 전용패킷..
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_OPERATOR); // 관리자 전용패킷.. [Korean comment]
 	CAPISocket::MP_AddByte(byBuff, iOffset, eSP);
 	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)szID.size());
 	CAPISocket::MP_AddString(byBuff, iOffset, szID);	
@@ -1717,7 +1717,7 @@ void CGameProcMain::MsgSend_KnightsJoinReq(bool bJoin)
 	uint8_t byBuff[8];
 	int iOffset=0;
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_KNIGHTS_PROCESS); // 관리자 전용패킷..
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_KNIGHTS_PROCESS); // 관리자 전용패킷.. [Korean comment]
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_KNIGHTS_JOIN_REQ);
 	CAPISocket::MP_AddByte(byBuff, iOffset, (uint8_t)bJoin);
 	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)m_iJoinReqClanRequierID);
@@ -1731,7 +1731,7 @@ void CGameProcMain::MsgSend_KnightsJoin(int iTargetID)
 	uint8_t byBuff[4];
 	int iOffset=0;
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_KNIGHTS_PROCESS); // 관리자 전용패킷..
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_KNIGHTS_PROCESS); // 관리자 전용패킷.. [Korean comment]
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_KNIGHTS_JOIN);
 	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)iTargetID);
 	
@@ -1745,10 +1745,10 @@ void CGameProcMain::MsgSend_KnightsLeave(std::string& szName)
 
 	int iLen = szName.size();
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_KNIGHTS_PROCESS); // 관리자 전용패킷..
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_KNIGHTS_PROCESS); // 관리자 전용패킷.. [Korean comment]
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_KNIGHTS_MEMBER_REMOVE);
 	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)iLen);
-	CAPISocket::MP_AddString(byBuff, iOffset, szName);	// 아이디 문자열 패킷에 넣기..
+	CAPISocket::MP_AddString(byBuff, iOffset, szName);	// 아이디 문자열 패킷에 넣기.. [Korean comment]
 	s_pSocket->Send(byBuff, iOffset);
 }
 
@@ -1769,17 +1769,17 @@ void CGameProcMain::MsgSend_KnightsAppointViceChief(std::string& szName)
 
 	int iLen = szName.size();
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_KNIGHTS_PROCESS); // 관리자 전용패킷..
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_KNIGHTS_PROCESS); // 관리자 전용패킷.. [Korean comment]
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_KNIGHTS_APPOINT_VICECHIEF);
 	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)iLen);
-	CAPISocket::MP_AddString(byBuff, iOffset, szName);	// 아이디 문자열 패킷에 넣기..
+	CAPISocket::MP_AddString(byBuff, iOffset, szName);	// 아이디 문자열 패킷에 넣기.. [Korean comment]
 	s_pSocket->Send(byBuff, iOffset);
 }
 
 bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 {
 	int iZone = s_pPlayer->m_InfoExt.iZoneCur;
-	s_pPlayer->Release(); // 일단 몽창 다 해제 하고....
+	s_pPlayer->Release(); // 일단 몽창 다 해제 하고.... Window
 	s_pPlayer->m_InfoExt.iZoneCur = iZone;
 
 	int iID = pkt.read<int16_t>();
@@ -1787,7 +1787,7 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 
 	std::string szID;
 	pkt.readString(szID, iLen);
-	s_pPlayer->IDSet(iID, szID, D3DCOLOR_XRGB(100, 210, 255)); // 밝은 파란색과 하늘색 중간..
+	s_pPlayer->IDSet(iID, szID, D3DCOLOR_XRGB(100, 210, 255)); // 밝은 파란색과 하늘색 중간.. Color
 
 	float fX = (pkt.read<uint16_t>())/10.0f;
 	float fZ = (pkt.read<uint16_t>())/10.0f;
@@ -1796,23 +1796,23 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 	s_pPlayer->m_InfoBase.eNation = (e_Nation)pkt.read<uint8_t>();
 	s_pPlayer->m_InfoBase.eRace = (e_Race)pkt.read<uint8_t>();
 	s_pPlayer->m_InfoBase.eClass = (e_Class)pkt.read<int16_t>();
-	s_pPlayer->m_InfoExt.iFace = pkt.read<uint8_t>(); // 얼굴 모양..
-	s_pPlayer->m_InfoExt.iHair = pkt.read<uint8_t>(); // 머리카락
+	s_pPlayer->m_InfoExt.iFace = pkt.read<uint8_t>(); // 얼굴 모양.. [Korean comment]
+	s_pPlayer->m_InfoExt.iHair = pkt.read<uint8_t>(); // 머리카락 [Korean comment]
 
-	__TABLE_PLAYER_LOOKS* pLooks = s_pTbl_UPC_Looks.Find(s_pPlayer->m_InfoBase.eRace);	// User Player Character Skin 구조체 포인터..
+	__TABLE_PLAYER_LOOKS* pLooks = s_pTbl_UPC_Looks.Find(s_pPlayer->m_InfoBase.eRace);	// User Player Character Skin 구조체 포인터.. [Korean comment]
 	if (pLooks == nullptr)
 	{
 		CLogWriter::Write("CGameProcMain::MsgRecv_MyInfo_All : failed find character resource data (Race : {})",
 			static_cast<int>(s_pPlayer->m_InfoBase.eRace));
 	}
 	__ASSERT(pLooks, "failed find character resource data");
-	s_pPlayer->InitChr(pLooks); // 관절 세팅..
+	s_pPlayer->InitChr(pLooks); // 관절 세팅.. [Korean comment]
 
 	s_pPlayer->m_InfoExt.iRank = pkt.read<uint8_t>();
 	s_pPlayer->m_InfoExt.iTitle = pkt.read<uint8_t>();
 	s_pPlayer->m_InfoBase.iLevel = pkt.read<uint8_t>();
 	s_pPlayer->m_InfoExt.iLevelPrev = s_pPlayer->m_InfoBase.iLevel;
-	s_pPlayer->m_InfoExt.iBonusPointRemain = pkt.read<uint8_t>(); // 남은 보너스 포인트..
+	s_pPlayer->m_InfoExt.iBonusPointRemain = pkt.read<uint8_t>(); // 남은 보너스 포인트.. [Korean comment]
 
 	s_pPlayer->m_InfoExt.iExpNext = pkt.read<uint32_t>(); 
 	s_pPlayer->m_InfoExt.iExp = pkt.read<uint32_t>(); 
@@ -1825,23 +1825,23 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 	
 	std::string szKnightsName = "";
 	int iKnightsID = pkt.read<int16_t>(); // 소속 기사단 ID
-	e_KnightsDuty eKnightsDuty = (e_KnightsDuty)pkt.read<uint8_t>(); // 기사단에서의 권한..
+	e_KnightsDuty eKnightsDuty = (e_KnightsDuty)pkt.read<uint8_t>(); // 기사단에서의 권한.. [Korean comment]
 	
 	// NOTE(srmeier): adding alliance ID and knight's byFlag
 	int iAllianceID = pkt.read<int16_t>();
 	uint8_t byFlag = pkt.read<uint8_t>();
 	
-	int iKnightNameLen = pkt.read<uint8_t>(); // 소속 기사단 이름 길이.
+	int iKnightNameLen = pkt.read<uint8_t>(); // 소속 기사단 이름 길이. Name
 	pkt.readString(szKnightsName, iKnightNameLen);
-	int iKnightsGrade = pkt.read<uint8_t>(); // 소속 기사단 등급
-	int	iKnightsRank = pkt.read<uint8_t>(); // 소속 기사단 순위
+	int iKnightsGrade = pkt.read<uint8_t>(); // 소속 기사단 등급 [Korean comment]
+	int	iKnightsRank = pkt.read<uint8_t>(); // 소속 기사단 순위 [Korean comment]
 	
 	// NOTE(srmeier): adding mark version and cape ID
 	int16_t sMarkVersion = pkt.read<int16_t>();
 	int16_t sCapeID = pkt.read<int16_t>();
 
-	// 기사단 관련 세팅..
-	s_pPlayer->m_InfoExt.eKnightsDuty = eKnightsDuty; // 기사단에서의 권한..
+	// 기사단 관련 세팅.. [Korean comment]
+	s_pPlayer->m_InfoExt.eKnightsDuty = eKnightsDuty; // 기사단에서의 권한.. [Korean comment]
 	s_pPlayer->KnightsInfoSet(iKnightsID, szKnightsName, iKnightsGrade, iKnightsRank);
 	m_pUIVar->UpdateKnightsInfo();
 	
@@ -1875,7 +1875,7 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 	s_pPlayer->m_InfoExt.iRegistPoison = pkt.read<uint8_t>();
 
 	s_pPlayer->m_InfoExt.iGold = pkt.read<uint32_t>();
-	s_pPlayer->m_InfoBase.iAuthority = pkt.read<uint8_t>(); //권한.. 
+	s_pPlayer->m_InfoBase.iAuthority = pkt.read<uint8_t>(); //권한..  [Korean comment]
 
 	// NOTE(srmeier): adding national rank and leader rank
 	uint8_t bKnightsRank = pkt.read<uint8_t>();
@@ -1888,14 +1888,14 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 	}
 	m_pUISkillTreeDlg->InitIconUpdate();
 	m_pUIHotKeyDlg->ReleaseItem();
-	m_pUIHotKeyDlg->InitIconUpdate();			// 핫키가 유효한지 검사하고 유효하면 레지스트리에서 읽어온다..
+	m_pUIHotKeyDlg->InitIconUpdate();			// 핫키가 유효한지 검사하고 유효하면 레지스트리에서 읽어온다.. Check
 
-	// 장착하고 있는 거..
+	// 장착하고 있는 거.. [Korean comment]
 	int iItemIDInSlots[ITEM_SLOT_COUNT]; memset(iItemIDInSlots, -1, sizeof(iItemIDInSlots));
 	int iItemDurabilityInSlots[ITEM_SLOT_COUNT]; memset(iItemDurabilityInSlots, -1, sizeof(iItemDurabilityInSlots));
 	int iItemCountInSlots[ITEM_SLOT_COUNT]; memset(iItemCountInSlots, -1, sizeof(iItemCountInSlots));
 
-	for ( int i = 0; i < ITEM_SLOT_COUNT; i++ )				// 슬롯 갯수마큼..
+	for ( int i = 0; i < ITEM_SLOT_COUNT; i++ )				// 슬롯 갯수마큼.. [Korean comment]
 	{
 		iItemIDInSlots[i] = pkt.read<uint32_t>();
 		iItemDurabilityInSlots[i] = pkt.read<int16_t>();
@@ -1906,33 +1906,33 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 		int16_t sRemainingRentalTime = pkt.read<int16_t>();
 	}
 
-	m_fMsgSendTimeMove		= 0;						// Network ReQuest 타이머 초기화..
+	m_fMsgSendTimeMove		= 0;						// Network ReQuest 타이머 초기화.. Initialize
 	m_fMsgSendTimeRot		= 0;
 	m_fPlayerYawSended		= 0;						// 최근에 메시지를 보낸 시점의 플레이어 y 축 회전값.
-	m_vPlayerPosSended		= s_pPlayer->Position();	// 최근에 메시지를 보낸 시점의 플레이어 위치.
+	m_vPlayerPosSended		= s_pPlayer->Position();	// 최근에 메시지를 보낸 시점의 플레이어 위치. Position
 
-	// 상태창 수치를 모두 적용
-	if(m_pUIVar->m_pPageState) m_pUIVar->m_pPageState->UpdateID(szID); // 이름 적용.
+	// 상태창 수치를 모두 적용 Window
+	if(m_pUIVar->m_pPageState) m_pUIVar->m_pPageState->UpdateID(szID); // 이름 적용. Name
 	m_pUIVar->UpdateAllStates(&(s_pPlayer->m_InfoBase), &(s_pPlayer->m_InfoExt));
 
 	//__KnightsInfoBase* pKIB = m_pUIKnightsOp->KnightsInfoFind(s_pPlayer->m_InfoExt.iKnightsID);
 	//if(pKIB) m_pUIVar->m_pPageKnights->UpdateKnightsName(pKIB->szName);
 	
-	// 상태 바 갱신
+	// 상태 바 갱신 Status
 	m_pUIStateBarAndMiniMap->UpdateExp(s_pPlayer->m_InfoExt.iExp, s_pPlayer->m_InfoExt.iExpNext, true);
 	m_pUIStateBarAndMiniMap->UpdateHP(s_pPlayer->m_InfoBase.iHP, s_pPlayer->m_InfoBase.iHPMax, true);
 	m_pUIStateBarAndMiniMap->UpdateMSP(s_pPlayer->m_InfoExt.iMSP, s_pPlayer->m_InfoExt.iMSPMax, true);
 
-	m_pUIPartyOrForce->MemberInfoReInit(); // 파티 창.. 갱신..
+	m_pUIPartyOrForce->MemberInfoReInit(); // 파티 창.. 갱신.. Window
 	
-	__TABLE_ITEM_BASIC* pItem = nullptr;								// 아이템 테이블 구조체 포인터..	
-	__TABLE_ITEM_EXT* pItemExt = nullptr;								// 아이템 테이블 구조체 포인터..	
+	__TABLE_ITEM_BASIC* pItem = nullptr;								// 아이템 테이블 구조체 포인터..	 [Korean comment]
+	__TABLE_ITEM_EXT* pItemExt = nullptr;								// 아이템 테이블 구조체 포인터..	 [Korean comment]
 
 	int iItemIDInInventorys[MAX_ITEM_INVENTORY]; memset(iItemIDInInventorys, -1, sizeof(iItemIDInInventorys));
 	int iItemCountInInventorys[MAX_ITEM_INVENTORY]; memset(iItemCountInInventorys, -1, sizeof(iItemCountInInventorys));
 	int iItemDurabilityInInventorys[MAX_ITEM_INVENTORY]; memset(iItemDurabilityInInventorys, -1, sizeof(iItemDurabilityInInventorys));
 
-	for ( int i = 0; i < MAX_ITEM_INVENTORY; i++ )				// 슬롯 갯수마큼..
+	for ( int i = 0; i < MAX_ITEM_INVENTORY; i++ )				// 슬롯 갯수마큼.. [Korean comment]
 	{
 		iItemIDInInventorys[i] = pkt.read<uint32_t>();
 		iItemDurabilityInInventorys[i] = pkt.read<int16_t>();
@@ -1956,13 +1956,13 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 	m_pUIInventory->ReleaseItem();
 
 	std::string szResrcFN, szIconFN;
-	for ( int i = 0; i < ITEM_SLOT_COUNT; i++ )				// 슬롯 갯수마큼..
+	for ( int i = 0; i < ITEM_SLOT_COUNT; i++ )				// 슬롯 갯수마큼.. [Korean comment]
 	{
 		if(0 == iItemIDInSlots[i]) continue;
 
-		pItem = s_pTbl_Items_Basic.Find(iItemIDInSlots[i]/1000*1000);	// 열 데이터 얻기..
+		pItem = s_pTbl_Items_Basic.Find(iItemIDInSlots[i]/1000*1000);	// 열 데이터 얻기.. Data
 		if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
-			pItemExt = s_pTbl_Items_Exts[pItem->byExtIndex].Find(iItemIDInSlots[i]%1000);	// 열 데이터 얻기..
+			pItemExt = s_pTbl_Items_Exts[pItem->byExtIndex].Find(iItemIDInSlots[i]%1000);	// 열 데이터 얻기.. Data
 		else
 			pItemExt = nullptr;
 
@@ -1970,12 +1970,12 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 		{
 			__ASSERT(0, "NULL Item!!!");
 			CLogWriter::Write("MyInfo - slot - Unknown Item {}, IDNumber", iItemIDInSlots[i]);
-			continue; // 아이템이 없으면..
+			continue; // 아이템이 없으면.. [Korean comment]
 		}
 
 		e_PartPosition ePart;
 		e_PlugPosition ePlug;
-		e_ItemType eType = MakeResrcFileNameForUPC(pItem, pItemExt, &szResrcFN, &szIconFN, ePart, ePlug, s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+		e_ItemType eType = MakeResrcFileNameForUPC(pItem, pItemExt, &szResrcFN, &szIconFN, ePart, ePlug, s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서 File
 		if(ITEM_TYPE_UNKNOWN == eType) CLogWriter::Write("MyInfo - slot - Unknown Item");
 		__ASSERT(ITEM_TYPE_UNKNOWN != eType, "Unknown Item Type");
 		e_ItemSlot eSlot = (e_ItemSlot)i;
@@ -1992,19 +1992,19 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 				__ASSERT(ITEM_TYPE_ICONONLY == eType, "Invalid Item");
 			}
 			break;
-		case ITEM_SLOT_UPPER: // Parts - 상체
-		case ITEM_SLOT_LOWER: // Parts - 하체
-		case ITEM_SLOT_GLOVES: // 장갑
-		case ITEM_SLOT_SHOES: // 신발
-		case ITEM_SLOT_HEAD: // 머리카락 ?? -> 투구 ??
+		case ITEM_SLOT_UPPER: // Parts - 상체 [Korean comment]
+		case ITEM_SLOT_LOWER: // Parts - 하체 [Korean comment]
+		case ITEM_SLOT_GLOVES: // 장갑 [Korean comment]
+		case ITEM_SLOT_SHOES: // 신발 [Korean comment]
+		case ITEM_SLOT_HEAD: // 머리카락 ?? -> 투구 ?? [Korean comment]
 			{
 				if(ITEM_TYPE_PART != eType)  CLogWriter::Write("MyInfo - slot - Invalid Item");
 				__ASSERT(ITEM_TYPE_PART == eType, "Invalid Item");
-				s_pPlayer->PartSet(ePart, szResrcFN, pItem, pItemExt);	// 파트를 셋팅..
+				s_pPlayer->PartSet(ePart, szResrcFN, pItem, pItemExt);	// 파트를 셋팅.. [Korean comment]
 			}
 			break;
-		case ITEM_SLOT_HAND_RIGHT: // 오른손
-		case ITEM_SLOT_HAND_LEFT: // 왼손
+		case ITEM_SLOT_HAND_RIGHT: // 오른손 [Korean comment]
+		case ITEM_SLOT_HAND_LEFT: // 왼손 [Korean comment]
 			{
 				if(ITEM_TYPE_PLUG != eType) CLogWriter::Write("MyInfo - slot - Invalid Item");
 				__ASSERT(ITEM_TYPE_PLUG == eType, "Invalid Item");
@@ -2012,10 +2012,10 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 				e_PlugPosition ePlugPos;
 				if(ITEM_SLOT_HAND_RIGHT == eSlot) ePlugPos = PLUG_POS_RIGHTHAND;
 				else ePlugPos = PLUG_POS_LEFTHAND;
-				s_pPlayer->PlugSet(ePlugPos, szResrcFN, pItem, pItemExt);	// 파트를 셋팅..
+				s_pPlayer->PlugSet(ePlugPos, szResrcFN, pItem, pItemExt);	// 파트를 셋팅.. [Korean comment]
 			}
 			break;
-		case ITEM_SLOT_SHOULDER: // 망토
+		case ITEM_SLOT_SHOULDER: // 망토 [Korean comment]
 			{
 			}
 			break;
@@ -2025,47 +2025,47 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 			break;
 		}
 
-		s_pPlayer->DurabilitySet(eSlot, iItemDurabilityInSlots[eSlot]);	// 무기 낡음 처리..
+		s_pPlayer->DurabilitySet(eSlot, iItemDurabilityInSlots[eSlot]);	// 무기 낡음 처리.. Process
 
 		__IconItemSkill* spItem = new __IconItemSkill;
 		spItem->pItemBasic	= pItem;
 		spItem->pItemExt	= pItemExt;
-		spItem->szIconFN	= szIconFN; // 아이콘 파일 이름 복사..
+		spItem->szIconFN	= szIconFN; // 아이콘 파일 이름 복사.. File
 		spItem->iCount		= iItemCountInSlots[i];
 		spItem->iDurability = iItemDurabilityInSlots[i];
 
-		// 인벤토리 슬롯에 넣는다.
+		// 인벤토리 슬롯에 넣는다. [Korean comment]
 		m_pUIInventory->m_pMySlot[i] = spItem;
 		//TRACE("Init Inv Msg Slot %d \n", iItemIDInSlots[i]);
 	}
 
-	// 인벤토리..
+	// 인벤토리.. [Korean comment]
 	int iItemCount = 0;
-	for ( int i = 0; i < MAX_ITEM_INVENTORY; i++ )				// 인벤토리 갯수만큼..	
+	for ( int i = 0; i < MAX_ITEM_INVENTORY; i++ )				// 인벤토리 갯수만큼..	 [Korean comment]
 	{
 		if(!iItemIDInInventorys[i]) continue;
 
-		pItem = s_pTbl_Items_Basic.Find(iItemIDInInventorys[i]/1000*1000);	// 열 데이터 얻기..
+		pItem = s_pTbl_Items_Basic.Find(iItemIDInInventorys[i]/1000*1000);	// 열 데이터 얻기.. Data
 		pItemExt = nullptr;
 		if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
-			pItemExt = s_pTbl_Items_Exts[pItem->byExtIndex].Find(iItemIDInInventorys[i]%1000);	// 열 데이터 얻기..
+			pItemExt = s_pTbl_Items_Exts[pItem->byExtIndex].Find(iItemIDInInventorys[i]%1000);	// 열 데이터 얻기.. Data
 		if ( nullptr == pItem || nullptr == pItemExt )
 		{
 			__ASSERT(0, "NULL Item");
 			CLogWriter::Write("MyInfo - Inv - Unknown Item {}, IDNumber", iItemIDInInventorys[i]);
-			continue; // 아이템이 없으면..
+			continue; // 아이템이 없으면.. [Korean comment]
 		}
 
 		e_PartPosition ePart;
 		e_PlugPosition ePlug;
-		e_ItemType eType = MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+		e_ItemType eType = MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서 File
 		if(ITEM_TYPE_UNKNOWN == eType) CLogWriter::Write("MyInfo - slot - Unknown Item");
 		__ASSERT(ITEM_TYPE_UNKNOWN != eType, "Unknown Item");
 		
 		__IconItemSkill* spItem = new __IconItemSkill;
 		spItem->pItemBasic	= pItem;
 		spItem->pItemExt	= pItemExt;
-		spItem->szIconFN = szIconFN; // 아이콘 파일 이름 복사..
+		spItem->szIconFN = szIconFN; // 아이콘 파일 이름 복사.. File
 		spItem->iCount	= iItemCountInInventorys[i];
 		spItem->iDurability = iItemDurabilityInInventorys[i];
 
@@ -2079,17 +2079,17 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 	if (m_pUISkillTreeDlg) m_pUISkillTreeDlg->UpdateDisableCheck();
 	if (m_pUIHotKeyDlg) m_pUIHotKeyDlg->UpdateDisableCheck();
 
-	if(s_pPlayer->Part(PART_POS_UPPER)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다..
-		s_pPlayer->PartSet(PART_POS_UPPER, pLooks->szPartFNs[PART_POS_UPPER], nullptr, nullptr);	// 상체..
-	if(s_pPlayer->Part(PART_POS_LOWER)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다..
-		s_pPlayer->PartSet(PART_POS_LOWER, pLooks->szPartFNs[PART_POS_LOWER], nullptr, nullptr);	// 하체..
-	if(s_pPlayer->Part(PART_POS_HANDS)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다..
-		s_pPlayer->PartSet(PART_POS_HANDS,  pLooks->szPartFNs[PART_POS_HANDS], nullptr, nullptr);	// 팔..
-	if(s_pPlayer->Part(PART_POS_FEET)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다..
-		s_pPlayer->PartSet(PART_POS_FEET,  pLooks->szPartFNs[PART_POS_FEET], nullptr, nullptr);	// 다리..
-	if(s_pPlayer->Part(PART_POS_FACE)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다..
+	if(s_pPlayer->Part(PART_POS_UPPER)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다.. File
+		s_pPlayer->PartSet(PART_POS_UPPER, pLooks->szPartFNs[PART_POS_UPPER], nullptr, nullptr);	// 상체.. [Korean comment]
+	if(s_pPlayer->Part(PART_POS_LOWER)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다.. File
+		s_pPlayer->PartSet(PART_POS_LOWER, pLooks->szPartFNs[PART_POS_LOWER], nullptr, nullptr);	// 하체.. [Korean comment]
+	if(s_pPlayer->Part(PART_POS_HANDS)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다.. File
+		s_pPlayer->PartSet(PART_POS_HANDS,  pLooks->szPartFNs[PART_POS_HANDS], nullptr, nullptr);	// 팔.. [Korean comment]
+	if(s_pPlayer->Part(PART_POS_FEET)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다.. File
+		s_pPlayer->PartSet(PART_POS_FEET,  pLooks->szPartFNs[PART_POS_FEET], nullptr, nullptr);	// 다리.. [Korean comment]
+	if(s_pPlayer->Part(PART_POS_FACE)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다.. File
 		s_pPlayer->InitFace();
-	if(s_pPlayer->Part(PART_POS_HAIR_HELMET)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다..
+	if(s_pPlayer->Part(PART_POS_HAIR_HELMET)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다.. File
 		s_pPlayer->InitHair();
 
 	s_pPlayer->InventoryChrAnimationInitialize();
@@ -2098,41 +2098,41 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 //	s_pPlayer->SettingCollisionCheckPoint();
 
 	////////////////////////////////////////////////////////////
-	// 기본값 읽기..
+	// 기본값 읽기.. Load
 	int iRun = 1;
-//	if(false == CGameProcedure::RegGetSetting("UserRun", &iRun, 4)) iRun = 1; // 걷고 뛰는 상태를 레지스트리에서 읽고.. 기본값은 뛰는 상태이다..
+//	if(false == CGameProcedure::RegGetSetting("UserRun", &iRun, 4)) iRun = 1; // 걷고 뛰는 상태를 레지스트리에서 읽고.. 기본값은 뛰는 상태이다.. Status
 //	if(1 == iRun)
-	this->CommandToggleWalkRun(); // 뛰게 만든다..
+	this->CommandToggleWalkRun(); // 뛰게 만든다.. [Korean comment]
 
 	e_ViewPoint eVP = VP_THIRD_PERSON;
-	if(false == CGameProcedure::RegGetSetting("CameraMode", &eVP, 4)) eVP = VP_THIRD_PERSON; // 카메라 상태 기록
+	if(false == CGameProcedure::RegGetSetting("CameraMode", &eVP, 4)) eVP = VP_THIRD_PERSON; // 카메라 상태 기록 Status
 	s_pEng->ViewPointChange(eVP);
-	// 기본값 읽기..
+	// 기본값 읽기.. Load
 	////////////////////////////////////////////////////////////
 
-	this->InitPlayerPosition(__Vector3(fX, fY, fZ)); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다.
+	this->InitPlayerPosition(__Vector3(fX, fY, fZ)); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다. Initialize
 
 	// berserk temp
-	//s_pPlayer->PlugSet(PLUG_POS_BACK, "item/babacloak.n3cplug_cloak", nullptr);	// 파트를 셋팅..
+	//s_pPlayer->PlugSet(PLUG_POS_BACK, "item/babacloak.n3cplug_cloak", nullptr);	// 파트를 셋팅.. [Korean comment]
 	// end berserk temp
 
 	// berserk
 	//s_pPlayer->AttachCloak();
 
 	//..
-	s_pOPMgr->Release();							// 다른 유저 관리 클래스 초기화..
+	s_pOPMgr->Release();							// 다른 유저 관리 클래스 초기화.. Initialize
 	
-	m_bLoadComplete = TRUE;						// 로딩 끝..
+	m_bLoadComplete = TRUE;						// 로딩 끝.. [Korean comment]
 
 	return true;
 }
 
 bool CGameProcMain::MsgRecv_Chat(Packet& pkt)
 {
-	std::string szChat;				// 버퍼..
-	e_ChatMode eCM	=	(e_ChatMode)pkt.read<uint8_t>();	// 채팅 타입
-	e_Nation eNation =	(e_Nation)pkt.read<uint8_t>();	// 보낸사람 국가
-	int iID =			pkt.read<int16_t>();			// 보낸사람
+	std::string szChat;				// 버퍼.. [Korean comment]
+	e_ChatMode eCM	=	(e_ChatMode)pkt.read<uint8_t>();	// 채팅 타입 Type
+	e_Nation eNation =	(e_Nation)pkt.read<uint8_t>();	// 보낸사람 국가 [Korean comment]
+	int iID =			pkt.read<int16_t>();			// 보낸사람 [Korean comment]
 
 	std::string szName;
 	int iNameLen = pkt.read<uint8_t>();
@@ -2150,12 +2150,12 @@ bool CGameProcMain::MsgRecv_Chat(Packet& pkt)
 	int iChatLen = szChat.size();
 	
 	if(eCM == N3_CHAT_CONTINUE_DELETE)
-	{//지속 공지 삭제...
+	{//지속 공지 삭제... Delete
 		m_pUIChatDlg->DeleteContinueMsg();
 		return true;
 	}
 	else if(eCM == N3_CHAT_TITLE_DELETE)
-	{//타이틀 공지 삭제...
+	{//타이틀 공지 삭제... Delete
 		m_pUIChatDlg->SetNoticeTitle("", 0xffffffff);
 		return true;
 	}
@@ -2206,14 +2206,14 @@ bool CGameProcMain::MsgRecv_Chat(Packet& pkt)
 			bool bIamManager = (0 == s_pPlayer->m_InfoBase.iAuthority) ? true : false;
 			bool bTalkerIsManager = (pTalker && 0 == pTalker->m_InfoBase.iAuthority)  ? true : false;
 				
-			if(!(bIamManager || bTalkerIsManager)) // 내가 운영자가 아니고 상대방도 운영자가 아니면
+			if(!(bIamManager || bTalkerIsManager)) // 내가 운영자가 아니고 상대방도 운영자가 아니면 [Korean comment]
 			{
 				int i = szChat.find(':');
 				if(i >= 0)
 				{
 					for(; i < iChatLen; i++)
 					{
-						szChat[i] = '!' + rand()%10; // 이상한 말로 바꾼다..
+						szChat[i] = '!' + rand()%10; // 이상한 말로 바꾼다.. [Korean comment]
 					}
 				}
 			}
@@ -2221,15 +2221,15 @@ bool CGameProcMain::MsgRecv_Chat(Packet& pkt)
 		*/
 	}
 	
-	// 풍선말 넣기..
+	// 풍선말 넣기.. [Korean comment]
 	CPlayerBase* pBPC = nullptr;
 	if(iID == s_pPlayer->IDNumber()) pBPC = s_pPlayer;
 	else pBPC = s_pOPMgr->CharacterGetByID(iID, false);
 	if(pBPC && s_pPlayer->Distance(pBPC->Position()) < 4.0f &&
-		(N3_CHAT_NORMAL == eCM || N3_CHAT_SHOUT == eCM) ) // 보통 채팅 혹은 외치기일때만..
+		(N3_CHAT_NORMAL == eCM || N3_CHAT_SHOUT == eCM) ) // 보통 채팅 혹은 외치기일때만.. [Korean comment]
 		pBPC->BalloonStringSet(szChat, crChat);
 
-	// 채팅창에 넣기..
+	// 채팅창에 넣기.. Window
 	m_pUIChatDlg->AddChatMsg(eCM, szChat, crChat);
 
 	return true;
@@ -2238,52 +2238,52 @@ bool CGameProcMain::MsgRecv_Chat(Packet& pkt)
 bool CGameProcMain::MsgRecv_UserMove(Packet& pkt)
 {
 	int iID			= pkt.read<int16_t>();
-	float fX		= (pkt.read<uint16_t>())/10.0f; // 출발하거나 이동중일때에는 다음 위치. 정지할때는 현재 위치를 받는다.
+	float fX		= (pkt.read<uint16_t>())/10.0f; // 출발하거나 이동중일때에는 다음 위치. 정지할때는 현재 위치를 받는다. Position
 	float fZ		= (pkt.read<uint16_t>())/10.0f;
 	float fY		= (pkt.read<int16_t>())/10.0f;
-	float fSpeed	= (pkt.read<int16_t>())/10.0f; // 출발하거나 이동중일때에는 움직이는 속도. 정지할때는 0 이 온다.
-	uint8_t byMoveFlag = pkt.read<uint8_t>(); // 움직이는 플래그.. 0 정지 1 출발, 2 계속 움직임
+	float fSpeed	= (pkt.read<int16_t>())/10.0f; // 출발하거나 이동중일때에는 움직이는 속도. 정지할때는 0 이 온다. Move
+	uint8_t byMoveFlag = pkt.read<uint8_t>(); // 움직이는 플래그.. 0 정지 1 출발, 2 계속 움직임 [Korean comment]
 
-	// 함수가 와야 할 부분.. ^^
+	// 함수가 와야 할 부분.. ^^ Function
 	// 아이디, 플레이어 상태 1, 플레이어 상태 2, 현재 xzy 위치, 현재 xzy 방향, 1초뒤 x, z, y dnlcl..
 
-	if(0xff == byMoveFlag) // 강제위치 업데이트 패킷이다..
+	if(0xff == byMoveFlag) // 강제위치 업데이트 패킷이다.. Update
 	{
-		if(iID == s_pPlayer->IDNumber())	// 내 매시지면..
+		if(iID == s_pPlayer->IDNumber())	// 내 매시지면.. [Korean comment]
 		{
-			this->InitPlayerPosition(__Vector3(fX, fY, fZ)); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다.
+			this->InitPlayerPosition(__Vector3(fX, fY, fZ)); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다. Initialize
 		}
 		else
 		{
-			CPlayerNPC* pBPC = s_pOPMgr->CharacterGetByID(iID, true);	// 다른 플레이어를 얻어서..
+			CPlayerNPC* pBPC = s_pOPMgr->CharacterGetByID(iID, true);	// 다른 플레이어를 얻어서.. [Korean comment]
 			if (nullptr == pBPC)
 			{
-				this->MsgSend_UserInRequest(iID); // User 정보가 없을 경우 요청한다..
+				this->MsgSend_UserInRequest(iID); // User 정보가 없을 경우 요청한다.. Info
 				return false;
 			}
 			else if(pBPC->IsDead())
 				return false;
 			
-			pBPC->MoveTo(fX, fY, fZ, 0, 0);	// 현재 위치..
+			pBPC->MoveTo(fX, fY, fZ, 0, 0);	// 현재 위치.. Position
 			pBPC->PositionSet(__Vector3(fX, fY, fZ), true);
 		}
 		return false;
 	}
 
-	if(iID == s_pPlayer->IDNumber())	// 내 매시지면..
+	if(iID == s_pPlayer->IDNumber())	// 내 매시지면.. [Korean comment]
 	{
 		s_pPlayer->m_vPosFromServer.Set(fX, fY, fZ);
 		return false;
 	}
 
-	CPlayerOther* pUPC = s_pOPMgr->UPCGetByID(iID, true);	// 다른 플레이어를 얻어서..
+	CPlayerOther* pUPC = s_pOPMgr->UPCGetByID(iID, true);	// 다른 플레이어를 얻어서.. [Korean comment]
 	if (nullptr == pUPC) return false;
 
 //	if(0.0f != fSpeed) TRACE("Move - %4.1f ( %d : Mode %d ) %.2f초\n", fSpeed, iID, byMoveFlag, CN3Base::TimeGet());
 //	else TRACE("Stop - %4.1f ( %d : Mode %d )  %.2f초\n", fSpeed, iID, byMoveFlag, CN3Base::TimeGet());
 
-	//	서버로 부터터 받은 정보로 업데이트..
-	pUPC->MoveTo(fX, fY, fZ, fSpeed, byMoveFlag);	// 현재 위치..
+	//	서버로 부터터 받은 정보로 업데이트.. Update
+	pUPC->MoveTo(fX, fY, fZ, fSpeed, byMoveFlag);	// 현재 위치.. Position
 
 	return true;
 }
@@ -2296,7 +2296,7 @@ bool CGameProcMain::MsgRecv_Rotation(Packet& pkt)
 	if(s_pPlayer->IDNumber() == iID) return false;
 
 	CPlayerNPC* pBPC = nullptr;
-	pBPC = s_pOPMgr->CharacterGetByID(iID, true);	// 다른 유저 얻어서..
+	pBPC = s_pOPMgr->CharacterGetByID(iID, true);	// 다른 유저 얻어서.. [Korean comment]
 	if ( nullptr == pBPC ) return false;
 
 	pBPC->RotateTo(fYaw, false);	// 서버로 부터 받은 x, y, z값으로 
@@ -2312,12 +2312,12 @@ bool CGameProcMain::MsgRecv_Dead(Packet& pkt)
 
 	if ( iID == s_pPlayer->IDNumber() )
 	{
-		s_pPlayer->Action(PSA_PRE_DYING, true, nullptr, true); // 플레이어 죽이기.
+		s_pPlayer->Action(PSA_PRE_DYING, true, nullptr, true); // 플레이어 죽이기. [Korean comment]
 	}
 	else
 	{
-		CPlayerOther* pReadyToDead = s_pOPMgr->PlayerGetByID(iID, true); // 살아 있는 넘들중에서 검색해보고..
-		if(pReadyToDead) // 있으면 죽기직전으로 만든다.
+		CPlayerOther* pReadyToDead = s_pOPMgr->PlayerGetByID(iID, true); // 살아 있는 넘들중에서 검색해보고.. Color
+		if(pReadyToDead) // 있으면 죽기직전으로 만든다. [Korean comment]
 		{
 			pReadyToDead->Acttion(PSA_PRE_DYING, true, nullptr, true);
 		}
@@ -2335,15 +2335,15 @@ bool CGameProcMain::MsgRecv_Regen(Packet& pkt)
 	vPosPlayer.z = (pkt.read<uint16_t>())/10.0f;
 	vPosPlayer.y = (pkt.read<int16_t>())/10.0f;
 	
-	this->InitPlayerPosition(vPosPlayer); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다.
-	s_pPlayer->RegenerateCollisionMesh(); // 충돌 메시를 다시 만든다..
+	this->InitPlayerPosition(vPosPlayer); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다. Initialize
+	s_pPlayer->RegenerateCollisionMesh(); // 충돌 메시를 다시 만든다.. Mesh
 
-	s_pPlayer->m_iSendRegeneration = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그
-	s_pPlayer->m_fTimeAfterDeath = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그
+	s_pPlayer->m_iSendRegeneration = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그 [Korean comment]
+	s_pPlayer->m_fTimeAfterDeath = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그 [Korean comment]
 	//TRACE("받음 - 다시 살아나기(%.1f, %.1f)\n", vPosPlayer.x, vPosPlayer.z);
 
 	//
-	//마법 & 효과 초기화..
+	//마법 & 효과 초기화.. Initialize
 	if(m_pUIStateBarAndMiniMap) m_pUIStateBarAndMiniMap->ClearMagic();
 	if(m_pMagicSkillMng) m_pMagicSkillMng->ClearDurationalMagic();
 	if(CGameProcedure::s_pFX) s_pFX->StopMine();
@@ -2372,12 +2372,12 @@ bool CGameProcMain::MsgRecv_Time(Packet& pkt)
 bool CGameProcMain::MsgRecv_Weather(Packet& pkt)
 {
 	int iWeather = pkt.read<uint8_t>(); // -> byte - 기후.... 0x01 - 맑음.. 0x02 -  비 0x03
-	int iPercent = pkt.read<int16_t>(); // int16_t -> 맑은날 안개, 비, 눈 의 양 퍼센트로 
+	int iPercent = pkt.read<int16_t>(); // int16_t -> 맑은날 안개, 비, 눈 의 양 퍼센트로  [Korean comment]
 
 	
 	////////////////////////////////////////////////////
-	// 스피드 핵 체크용 시간....
-/*	float fTimeFromServer = pkt.read<float>(); // float -> 정기적으로 주는 시간...
+	// 스피드 핵 체크용 시간.... Check
+/*	float fTimeFromServer = pkt.read<float>(); // float -> 정기적으로 주는 시간... Time
 	float fTimeLocal = CN3Base::TimeGet();
 	
 	static float fTimeFromServerPrev = fTimeFromServer;
@@ -2386,10 +2386,10 @@ bool CGameProcMain::MsgRecv_Weather(Packet& pkt)
 	if(fTimeFromServer != 0.0f)
 	{
 		float fTDS = fTimeFromServer - fTimeFromServerPrev;
-		if(fTDS > 355.0f && fTDS < 365.0f) // 6분에 한번 주게끔 되어 있다..
+		if(fTDS > 355.0f && fTDS < 365.0f) // 6분에 한번 주게끔 되어 있다.. [Korean comment]
 		{
 			float fTDL = fTimeLocal - fTimeLocalPrev;
-			if(fTDL < (fTDS * 0.8f) || fTDL > (fTDS * 1.2f)) // 로컬 타임이 서버 타임보다 20퍼센트 이상 크면..
+			if(fTDL < (fTDS * 0.8f) || fTDL > (fTDS * 1.2f)) // 로컬 타임이 서버 타임보다 20퍼센트 이상 크면.. [Korean comment]
 			{
 				iTSH++; // Try Speed Hacking ... ++
 			}
@@ -2398,13 +2398,13 @@ bool CGameProcMain::MsgRecv_Weather(Packet& pkt)
 				iTSH = 0;
 			}
 
-			if(iTSH >= 3) CGameProcedure::s_bUseSpeedHack = true; // 스피드 해킹....
+			if(iTSH >= 3) CGameProcedure::s_bUseSpeedHack = true; // 스피드 해킹.... [Korean comment]
 		}
 
 		fTimeFromServerPrev = fTimeFromServer;
 		fTimeLocalPrev = fTimeLocal;
 	}
-	// 스피드 핵 체크용 시간....
+	// 스피드 핵 체크용 시간.... Check
 	////////////////////////////////////////////////////
 */
 	
@@ -2412,20 +2412,20 @@ bool CGameProcMain::MsgRecv_Weather(Packet& pkt)
 	if(iPercent > 100) iPercent = 100;
 	float fPercent = iPercent / 100.0f;
 
-//enum {	GEW_CLEAR=0,		// 맑음
-//		GEW_DRIZZLE_RAIN=1,		// 가랑비
-//		GEW_RAINY=2,			// 적당량의 비
-//		GEW_HEAVY_RAIN=3,		// 폭우
-//		GEW_SNOW1=11,			// 포근한 눈
-//		GEW_SNOW2=12,			// 적당한 눈
-//		GEW_HEAVY_SNOW=13		// 폭설
+//enum {	GEW_CLEAR=0,		// 맑음 [Korean comment]
+//		GEW_DRIZZLE_RAIN=1,		// 가랑비 [Korean comment]
+//		GEW_RAINY=2,			// 적당량의 비 [Korean comment]
+//		GEW_HEAVY_RAIN=3,		// 폭우 [Korean comment]
+//		GEW_SNOW1=11,			// 포근한 눈 [Korean comment]
+//		GEW_SNOW2=12,			// 적당한 눈 [Korean comment]
+//		GEW_HEAVY_SNOW=13		// 폭설 [Korean comment]
 	//TRACE("받음 - 날씨(%d - %d)\n", iWeather, iPercent);
 
-	ACT_WORLD->SetWeatherWithSky((CN3SkyMng::eSKY_WEATHER)iWeather,iPercent);	// 하늘 변화하기
+	ACT_WORLD->SetWeatherWithSky((CN3SkyMng::eSKY_WEATHER)iWeather,iPercent);	// 하늘 변화하기 [Korean comment]
 	float fDelta = 1.0f;
-	if(0x1 == iWeather) fDelta = 0.5f + (1.0f-fPercent)*0.5f; // 맑은 날씨. 퍼센트는 안개...
-	else if(0x02 == iWeather) fDelta = 0.25f + (1.0f - fPercent)*0.75f; // 비옴 .
-	else if(0x03 == iWeather) fDelta = 0.25f + (1.0f - fPercent)*0.75f; // 눈옴..
+	if(0x1 == iWeather) fDelta = 0.5f + (1.0f-fPercent)*0.5f; // 맑은 날씨. 퍼센트는 안개... [Korean comment]
+	else if(0x02 == iWeather) fDelta = 0.25f + (1.0f - fPercent)*0.75f; // 비옴 . [Korean comment]
+	else if(0x03 == iWeather) fDelta = 0.25f + (1.0f - fPercent)*0.75f; // 눈옴.. [Korean comment]
 
 	s_pEng->FarPlaneDeltaSet(fDelta, false);
 
@@ -2436,9 +2436,9 @@ bool CGameProcMain::MsgRecv_UserInOut(Packet& pkt)
 {
 	int iType = pkt.read<uint8_t>();//pkt.read<uint8_t>();
 
-	if ( 0x01 == iType ) // 유저 들어올때.(원래 게임상의 유저 지역 업뎃하면서 갱신..)
+	if ( 0x01 == iType ) // 유저 들어올때.(원래 게임상의 유저 지역 업뎃하면서 갱신..) [Korean comment]
 		this->MsgRecv_UserIn(pkt, false);
-	else if ( 0x02 == iType ) // User 나갈때.
+	else if ( 0x02 == iType ) // User 나갈때. [Korean comment]
 		this->MsgRecv_UserOut(pkt);
 	else if ( 0x03 == iType ) // 유저 들어올때 (죽었다 살아나거나, game start하는 유저들.)
 		this->MsgRecv_UserIn(pkt, true);
@@ -2456,48 +2456,48 @@ bool CGameProcMain::MsgRecv_UserIn(Packet& pkt, bool bWithFX)
 	int iNameLen	= pkt.read<uint8_t>();
 	pkt.readString(szName, iNameLen );
 
-	e_Nation eNation =				(e_Nation)pkt.read<uint8_t>(); // 소속 국가. 0 이면 없다. 1
+	e_Nation eNation =				(e_Nation)pkt.read<uint8_t>(); // 소속 국가. 0 이면 없다. 1 [Korean comment]
 
-	// 기사단 관련
+	// 기사단 관련 [Korean comment]
 	int iKnightsID =					pkt.read<int16_t>(); // 기사단 ID
-	e_KnightsDuty eKnightsDuty =	(e_KnightsDuty)pkt.read<uint8_t>(); // 소속 국가. 0 이면 없다. 1
+	e_KnightsDuty eKnightsDuty =	(e_KnightsDuty)pkt.read<uint8_t>(); // 소속 국가. 0 이면 없다. 1 [Korean comment]
 
 	// NOTE(srmeier): adding alliance ID
 	int16_t sAllianceID = pkt.read<int16_t>();
 
-	int iKnightNameLen = pkt.read<uint8_t>(); // 소속 기사단 이름 길이.
+	int iKnightNameLen = pkt.read<uint8_t>(); // 소속 기사단 이름 길이. Name
 	std::string szKnightsName;
 	pkt.readString(szKnightsName, iKnightNameLen);
-	int iKnightsGrade = pkt.read<uint8_t>();			// 등급
-	int iKnightsRank = pkt.read<uint8_t>();			// 순위
+	int iKnightsGrade = pkt.read<uint8_t>();			// 등급 [Korean comment]
+	int iKnightsRank = pkt.read<uint8_t>();			// 순위 [Korean comment]
 
 	// NOTE(srmeier): adding mark version and cape ID
 	int16_t sMarkVersion = pkt.read<int16_t>();
 	int16_t sCapeID = pkt.read<int16_t>();
 
-	int iLevel =					pkt.read<uint8_t>(); // 레벨...
+	int iLevel =					pkt.read<uint8_t>(); // 레벨... [Korean comment]
 	e_Race eRace =					(e_Race)pkt.read<uint8_t>();
 	e_Class eClass =				(e_Class)pkt.read<int16_t>();
 	float fXPos	=					(pkt.read<uint16_t>())/10.0f;
 	float fZPos	=					(pkt.read<uint16_t>())/10.0f;
 	float fYPos	=					(pkt.read<int16_t>())/10.0f;
 	
-	float fYTerrain = ACT_WORLD->GetHeightWithTerrain(fXPos, fZPos);	// 지형의 높이값 얻기..
-	float fYObject = ACT_WORLD->GetHeightNearstPosWithShape(__Vector3(fXPos, fYPos, fZPos), 1.0f); // 오브젝트에서 가장 가까운 높이값 얻기..
+	float fYTerrain = ACT_WORLD->GetHeightWithTerrain(fXPos, fZPos);	// 지형의 높이값 얻기.. [Korean comment]
+	float fYObject = ACT_WORLD->GetHeightNearstPosWithShape(__Vector3(fXPos, fYPos, fZPos), 1.0f); // 오브젝트에서 가장 가까운 높이값 얻기.. Object
 	if (fYObject > fYTerrain) fYPos = fYObject;
 	else fYPos = fYTerrain;
 
-	int iFace = pkt.read<uint8_t>(); // 머리카락..
-	int iHair = pkt.read<uint8_t>(); // 얼굴 모양
+	int iFace = pkt.read<uint8_t>(); // 머리카락.. [Korean comment]
+	int iHair = pkt.read<uint8_t>(); // 얼굴 모양 [Korean comment]
 
-	int iStatus = pkt.read<uint8_t>(); // 1 - 서있기.. 2 - 앉아있기.. 3 ... 죽어있다..
+	int iStatus = pkt.read<uint8_t>(); // 1 - 서있기.. 2 - 앉아있기.. 3 ... 죽어있다.. [Korean comment]
 
 	// NOTE(srmeier): updating status
-	//int iStatusSize = pkt.read<uint8_t>(); // 0 - 보통 크기, 1 - 커져 있다. 2 - 작아졌다..
+	//int iStatusSize = pkt.read<uint8_t>(); // 0 - 보통 크기, 1 - 커져 있다. 2 - 작아졌다.. Size
 	int iStatusSize = pkt.read<uint32_t>();
 
-	int iRecruitParty = pkt.read<uint8_t>(); // 1 - 보통. 2 - 파티 구함..
-	uint8_t byAuthority = pkt.read<uint8_t>(); // 권한...
+	int iRecruitParty = pkt.read<uint8_t>(); // 1 - 보통. 2 - 파티 구함.. [Korean comment]
+	uint8_t byAuthority = pkt.read<uint8_t>(); // 권한... [Korean comment]
 
 	// NOTE(srmeier): adding is party leader, invisibilitytype, direction, chicken, rank, knight rank, personal rank
 	bool bPartyLeader = pkt.read<bool>();
@@ -2510,22 +2510,22 @@ bool CGameProcMain::MsgRecv_UserIn(Packet& pkt, bool bWithFX)
 
 
 	uint32_t	dwItemIDs[MAX_ITEM_SLOT_OPC];  // 착용 아이템 - 다른 플레이어(NPC 포함) 0 ~ 4 상체,하체,헬멧,팔,발 5 망토 6 오른손 7 왼손
-	int			iItemDurabilities[MAX_ITEM_SLOT_OPC]; // 착용 아이템의 내구력..
+	int			iItemDurabilities[MAX_ITEM_SLOT_OPC]; // 착용 아이템의 내구력.. [Korean comment]
 	uint8_t		byItemFlags[MAX_ITEM_SLOT_OPC];
 	for(int i = 0; i < MAX_ITEM_SLOT_OPC; i++)
 	{
 		dwItemIDs[i] = pkt.read<uint32_t>();			// 착용하고 있는 아이템들의 ID
-		iItemDurabilities[i] = pkt.read<int16_t>();	// 착용하고 있는 아이템들의 현재 내구력
+		iItemDurabilities[i] = pkt.read<int16_t>();	// 착용하고 있는 아이템들의 현재 내구력 [Korean comment]
 
 		// NOTE(srmeier): adding bFlag, probably the rental thing
 		byItemFlags[i] = pkt.read<uint8_t>();
 	}
 
 	if ( iID == s_pPlayer->IDNumber()) 
-		return false; 									// 내 패킷이면 .. // 무시한다..
+		return false; 									// 내 패킷이면 .. // 무시한다.. [Korean comment]
 
 	CPlayerOther* pUPC = s_pOPMgr->UPCGetByID(iID, false);
-	if(pUPC) // 이미 아이디 같은 캐릭이 있으면..
+	if(pUPC) // 이미 아이디 같은 캐릭이 있으면.. [Korean comment]
 	{
 		CLogWriter::Write("User In - Duplicated ID ({}, {}) Pos({:.2f},{:.2f},{:.2f})",
 			iID, szName, fXPos, fYPos, fZPos);
@@ -2536,14 +2536,14 @@ bool CGameProcMain::MsgRecv_UserIn(Packet& pkt, bool bWithFX)
 
 		// NOTE(srmeier): probably shouldn't be requesting this player's info if it's already in the manager...
 
-		//pUPC->Action(PSA_BASIC, true, nullptr, true); // 강제로 살리고..
+		//pUPC->Action(PSA_BASIC, true, nullptr, true); // 강제로 살리고.. [Korean comment]
 		//pUPC->m_fTimeAfterDeath = 0;
 		//pUPC->PositionSet(__Vector3(fXPos, fYPos, fZPos), true);
 
 		return false;
 	}
 	
-	D3DCOLOR crID = (eNation != s_pPlayer->m_InfoBase.eNation) ? D3DCOLOR_XRGB(255,96,96) : D3DCOLOR_XRGB(128,128,255); // 국가에 따라 다른색 적용
+	D3DCOLOR crID = (eNation != s_pPlayer->m_InfoBase.eNation) ? D3DCOLOR_XRGB(255,96,96) : D3DCOLOR_XRGB(128,128,255); // 국가에 따라 다른색 적용 Color
 
 	pUPC = new CPlayerOther();
 	pUPC->IDSet(iID, szName, crID);
@@ -2558,10 +2558,10 @@ bool CGameProcMain::MsgRecv_UserIn(Packet& pkt, bool bWithFX)
 	//__KnightsInfoBase* pKIB = m_pUIKnightsOp->KnightsInfoFind(iKightsID);
 	//if(pKIB) pUPC->KnightsNameSet(pKIB->szName, 0xffff0000);
 
-	pUPC->PositionSet(__Vector3(fXPos, fYPos, fZPos), true);			// 다른 플레이어 현재 위치 셋팅..
-	pUPC->MoveTo(fXPos, fYPos, fZPos, 0, 0);					// 현재 위치..
+	pUPC->PositionSet(__Vector3(fXPos, fYPos, fZPos), true);			// 다른 플레이어 현재 위치 셋팅.. Position
+	pUPC->MoveTo(fXPos, fYPos, fZPos, 0, 0);					// 현재 위치.. Position
 	pUPC->RotateTo(D3DXToRadian(rand()%360), true);
-	s_pOPMgr->UPCAdd(pUPC);										// 캐릭터 추가...
+	s_pOPMgr->UPCAdd(pUPC);										// 캐릭터 추가... Character
 
 	//if(bWithFX)
 	if(bWithFX && pUPC->m_InfoBase.iAuthority != AUTHORITY_MANAGER)
@@ -2570,36 +2570,36 @@ bool CGameProcMain::MsgRecv_UserIn(Packet& pkt, bool bWithFX)
 		else if(eNation==NATION_ELMORAD) CGameProcedure::s_pFX->TriggerBundle(iID, -1, FXID_REGEN_ELMORAD, iID, -1);
 	}
 
-	// 앉아 있기.., 서있기 결정..
-	if(1 == iStatus) // 서있기..
+	// 앉아 있기.., 서있기 결정.. [Korean comment]
+	if(1 == iStatus) // 서있기.. [Korean comment]
 	{
 		pUPC->Action(PSA_BASIC, true, nullptr, true);
 		pUPC->ActionMove(PSM_STOP);
 	}
-	else if(2 == iStatus) // 앉아 있기..
+	else if(2 == iStatus) // 앉아 있기.. [Korean comment]
 	{
 		pUPC->Action(PSA_SITDOWN, true, nullptr, true);
 		pUPC->ActionMove(PSM_STOP);
 	}
-	else if(3 == iStatus) // 죽어 있다..
+	else if(3 == iStatus) // 죽어 있다.. [Korean comment]
 	{
-		s_pOPMgr->MoveToCorpsesForcely(pUPC, false); // 시체로 옮긴다..
+		s_pOPMgr->MoveToCorpsesForcely(pUPC, false); // 시체로 옮긴다.. [Korean comment]
 	}
 
 	if(0x01 == iStatusSize)
 	{
-		pUPC->ScaleSetGradually(1.0f); // 보통 크기..
-		pUPC->FlickerFactorSet(1.0f); // 부활되서 반투명.. 깜박거린다..
+		pUPC->ScaleSetGradually(1.0f); // 보통 크기.. Size
+		pUPC->FlickerFactorSet(1.0f); // 부활되서 반투명.. 깜박거린다.. [Korean comment]
 	}
-	else if(0x02 == iStatusSize) pUPC->ScaleSetGradually(2.0f); // 커졌다..
-	else if(0x03 == iStatusSize) pUPC->ScaleSetGradually(0.5f);// 작아졌다.
-	else if(0x04 == iStatusSize) pUPC->FlickerFactorSet(0.7f); // 부활되서 반투명.. 깜박거린다..
+	else if(0x02 == iStatusSize) pUPC->ScaleSetGradually(2.0f); // 커졌다.. [Korean comment]
+	else if(0x03 == iStatusSize) pUPC->ScaleSetGradually(0.5f);// 작아졌다. [Korean comment]
+	else if(0x04 == iStatusSize) pUPC->FlickerFactorSet(0.7f); // 부활되서 반투명.. 깜박거린다.. [Korean comment]
 
 	if(1 == iRecruitParty)
 	{
 		pUPC->InfoStringSet("", 0);
 	}
-	else if(2 == iRecruitParty) // 파티 구함..
+	else if(2 == iRecruitParty) // 파티 구함.. [Korean comment]
 	{
 		int iLevel = pUPC->m_InfoBase.iLevel;
 		int iLMin = iLevel - 8;
@@ -2619,7 +2619,7 @@ bool CGameProcMain::MsgRecv_UserOut(Packet& pkt)
 {
 	int iID	= pkt.read<int16_t>();
 
-	//죽은 상태의 캐릭터를 시체로 만든다.
+	//죽은 상태의 캐릭터를 시체로 만든다. Character
 	CPlayerNPC* pUPC = s_pOPMgr->UPCGetByID(iID, false);
 	if( pUPC == nullptr ) return false;
 	if( pUPC->IsDead() )
@@ -2628,10 +2628,10 @@ bool CGameProcMain::MsgRecv_UserOut(Packet& pkt)
 		return true;
 	}
 
-	return s_pOPMgr->UPCDelete(iID);					// 캐릭터 제거...	
+	return s_pOPMgr->UPCDelete(iID);					// 캐릭터 제거...	 Character
 }
 
-// 주위 영역의 모든 아이디를 카운트만큼 받는다... 글구.. 업데이트가 필요한 것만 서버에게 요청..
+// 주위 영역의 모든 아이디를 카운트만큼 받는다... 글구.. 업데이트가 필요한 것만 서버에게 요청.. Update
 bool CGameProcMain::MsgRecv_UserInAndRequest(Packet& pkt)
 {
 	int iUPCCountReceived = pkt.read<int16_t>();
@@ -2647,7 +2647,7 @@ bool CGameProcMain::MsgRecv_UserInAndRequest(Packet& pkt)
 	}
 
 	int iID = 0;
-	m_SetUPCID.clear(); // 싹 지우고...
+	m_SetUPCID.clear(); // 싹 지우고... [Korean comment]
 	it_ID itID, itIDEnd = m_SetUPCID.end();
 	pair_ID pairID;
 
@@ -2655,12 +2655,12 @@ bool CGameProcMain::MsgRecv_UserInAndRequest(Packet& pkt)
 	{
 		iID = pkt.read<int16_t>();
 //		TRACE("               ID : %d\n", iID);
-		if(iID == s_pPlayer->IDNumber()) continue; // 내 아이디이다.. 고로 넣으면 안된다.
+		if(iID == s_pPlayer->IDNumber()) continue; // 내 아이디이다.. 고로 넣으면 안된다. [Korean comment]
 
 		pairID = m_SetUPCID.insert(iID);
 	}
 
-	if(m_SetUPCID.empty()) // 새로 받은게 한개도 없다면 몽땅 날린다..
+	if(m_SetUPCID.empty()) // 새로 받은게 한개도 없다면 몽땅 날린다.. [Korean comment]
 	{
 		s_pOPMgr->ReleaseUPCs();
 		return false;
@@ -2675,12 +2675,12 @@ bool CGameProcMain::MsgRecv_UserInAndRequest(Packet& pkt)
 		iID = pUPC->IDNumber();
 		
 		itID = m_SetUPCID.find(iID);
-		if(itID != itIDEnd) // 새로 들어온 리스트에 있으면.. 
+		if(itID != itIDEnd) // 새로 들어온 리스트에 있으면..  [Korean comment]
 		{
-			m_SetUPCID.erase(itID); // 요청할 리스트에서 빼고..
+			m_SetUPCID.erase(itID); // 요청할 리스트에서 빼고.. [Korean comment]
 			itUPC++;
 		}
-		else  // 새로 들어온곳에 없으면 지운다..
+		else  // 새로 들어온곳에 없으면 지운다.. [Korean comment]
 		{
 //			TRACE("           delete : %d\n", iID);
 
@@ -2697,24 +2697,24 @@ bool CGameProcMain::MsgRecv_UserInAndRequest(Packet& pkt)
 	}
 
 	////////////////////////////////////////////////////////////////////////////
-	// 바로 요청 패킷을 만들어 보낸다..
+	// 바로 요청 패킷을 만들어 보낸다.. [Korean comment]
 	int iNewUPCCount = m_SetUPCID.size();
 	if(iNewUPCCount > 0)
 	{
-		int iOffset=0;														// 버퍼의 오프셋..
-		std::vector<uint8_t> byBuff(iNewUPCCount * 2 + 10, 0);					// 패킷 버퍼..
-		CAPISocket::MP_AddByte(&(byBuff[0]), iOffset, WIZ_REQ_USERIN);	// 커멘드.
-		CAPISocket::MP_AddShort(&(byBuff[0]), iOffset, iNewUPCCount);		// 아이디 갯수..
+		int iOffset=0;														// 버퍼의 오프셋.. [Korean comment]
+		std::vector<uint8_t> byBuff(iNewUPCCount * 2 + 10, 0);					// 패킷 버퍼.. [Korean comment]
+		CAPISocket::MP_AddByte(&(byBuff[0]), iOffset, WIZ_REQ_USERIN);	// 커멘드. [Korean comment]
+		CAPISocket::MP_AddShort(&(byBuff[0]), iOffset, iNewUPCCount);		// 아이디 갯수.. [Korean comment]
 		
 		itID = m_SetUPCID.begin(); itIDEnd = m_SetUPCID.end();
 		for(int i = 0; itID != itIDEnd; itID++, i++)
 		{
 			iID = *itID;
-			CAPISocket::MP_AddShort(&(byBuff[0]), iOffset, iID);			// 자세한 정보가 필요한 아이디들..
+			CAPISocket::MP_AddShort(&(byBuff[0]), iOffset, iID);			// 자세한 정보가 필요한 아이디들.. Info
 		}
-		s_pSocket->Send(&(byBuff[0]), iOffset); // 보낸다
+		s_pSocket->Send(&(byBuff[0]), iOffset); // 보낸다 [Korean comment]
 	}
-	// 바로 요청 패킷을 만들어 보낸다..
+	// 바로 요청 패킷을 만들어 보낸다.. [Korean comment]
 	////////////////////////////////////////////////////////////////////////////
 
 	return true;
@@ -2740,7 +2740,7 @@ bool CGameProcMain::MsgRecv_UserInRequested(Packet& pkt)
 	//	int iOffset2 = iOffset;
 	for ( int i = 0; i < iPlayerCount; i++ )
 	{
-		this->MsgRecv_UserIn(pkt); // 플레이어 갯수 만큼 유저 인...
+		this->MsgRecv_UserIn(pkt); // 플레이어 갯수 만큼 유저 인... [Korean comment]
 	}
 
 #ifdef _DEBUG
@@ -2754,11 +2754,11 @@ bool CGameProcMain::MsgRecv_UserInRequested(Packet& pkt)
 bool CGameProcMain::MsgRecv_NPCInOut(Packet& pkt)
 {
 	uint8_t byType		= pkt.read<uint8_t>();
-	if ( byType == 0x01 ) // NPC 들어올때
+	if ( byType == 0x01 ) // NPC 들어올때 [Korean comment]
 	{
-		return this->MsgRecv_NPCIn(pkt); // NPC In 처리
+		return this->MsgRecv_NPCIn(pkt); // NPC In 처리 Process
 	}
-	else // NPC 나갈때.
+	else // NPC 나갈때. [Korean comment]
 	{
 		return this->MsgRecv_NPCOut(pkt);
 	}
@@ -2770,30 +2770,30 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 {
 	int		iID			= pkt.read<int16_t>(); // Server에서 관리하는 고유 ID
 	int		iIDResrc	= pkt.read<int16_t>(); // 리소스 ID
-	int		iType		= pkt.read<uint8_t>();	// NPC Type - 0x05 : 상인
+	int		iType		= pkt.read<uint8_t>();	// NPC Type - 0x05 : 상인 [Korean comment]
 	int		iItemTrdeID	= pkt.read<uint32_t>();	// 아이템 거래할 그룹 ID 서버에 요청할 ID
-	int		iScale		= pkt.read<int16_t>(); // 스케일 100 은 1.0 
+	int		iScale		= pkt.read<int16_t>(); // 스케일 100 은 1.0  [Korean comment]
 	int		iItemID0	= pkt.read<uint32_t>(); // 리소스 ID
 	int		iItemID1	= pkt.read<uint32_t>(); // 리소스 ID
 	int 	iNameLen	= pkt.read<uint8_t>();
-	std::string szName;									// NPC 아이디..
+	std::string szName;									// NPC 아이디.. [Korean comment]
 	if(iNameLen > 0) pkt.readString(szName, iNameLen );
 	else szName = "";
 
 #ifdef _DEBUG
 	CLogWriter::Write("NPC In - ID({}) Name({}) Time({:.1f})",
-		iID, szName, CN3Base::TimeGet()); // 캐릭 세팅..
+		iID, szName, CN3Base::TimeGet()); // 캐릭 세팅.. [Korean comment]
 #endif
 
-	e_Nation eNation = (e_Nation)pkt.read<uint8_t>(); // 소속 국가. 0 이면 없다. 1
+	e_Nation eNation = (e_Nation)pkt.read<uint8_t>(); // 소속 국가. 0 이면 없다. 1 [Korean comment]
 	int iLevel		= pkt.read<uint8_t>();
 
 	float fXPos	= (pkt.read<uint16_t>())/10.0f;
 	float fZPos	= (pkt.read<uint16_t>())/10.0f;
 	float fYPos	= (pkt.read<int16_t>())/10.0f;
 
-	float fYTerrain = ACT_WORLD->GetHeightWithTerrain(fXPos, fZPos);	// 지형의 높이값 얻기..
-	float fYObject = ACT_WORLD->GetHeightNearstPosWithShape(__Vector3(fXPos, fYPos, fZPos), 1.0f); // 오브젝트에서 가장 가까운 높이값 얻기..
+	float fYTerrain = ACT_WORLD->GetHeightWithTerrain(fXPos, fZPos);	// 지형의 높이값 얻기.. [Korean comment]
+	float fYObject = ACT_WORLD->GetHeightNearstPosWithShape(__Vector3(fXPos, fYPos, fZPos), 1.0f); // 오브젝트에서 가장 가까운 높이값 얻기.. Object
 	if (fYObject > fYTerrain) fYPos = fYObject;
 	else fYPos = fYTerrain;
 
@@ -2808,12 +2808,12 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 
 
 	CPlayerNPC* pNPC = s_pOPMgr->NPCGetByID(iID, false);
-	if(pNPC) // 이미 아이디 같은 캐릭이 있으면..
+	if(pNPC) // 이미 아이디 같은 캐릭이 있으면.. [Korean comment]
 	{
 		CLogWriter::Write("NPC In - Duplicated ID ({}, {}) Pos({:.2f},{:.2f},{:.2f})",
 			iID, szName, fXPos, fYPos, fZPos);
 		//TRACE("NPC In - Duplicated ID (%d, %s) Pos(%.2f,%.2f,%.2f)\n", iID, szName.c_str(), fXPos, fYPos, fZPos);
-		pNPC->Action(PSA_BASIC, true, nullptr, true); // 강제로 살리고..
+		pNPC->Action(PSA_BASIC, true, nullptr, true); // 강제로 살리고.. [Korean comment]
 		pNPC->m_fTimeAfterDeath = 0;
 		pNPC->PositionSet(__Vector3(fXPos, fYPos, fZPos), true);
 		return false;
@@ -2824,19 +2824,19 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 	pNPC = new CPlayerNPC();
 	pNPC->IDSet(iID, szName, crID);				// 초기화.. 및 ID 세팅.
 	pNPC->m_InfoBase.eNation = eNation;
-	pNPC->m_InfoBase.eRace = RACE_NPC;			// NPC 라는 걸 알린다.
+	pNPC->m_InfoBase.eRace = RACE_NPC;			// NPC 라는 걸 알린다. [Korean comment]
 	pNPC->m_InfoBase.iLevel = iLevel;
 	pNPC->m_InfoBase.iAuthority = AUTHORITY_NPC;// 권한 NPC는 권한이 없고..
 	
-	s_pOPMgr->NPCAdd(pNPC);						// 캐릭터 추가...
+	s_pOPMgr->NPCAdd(pNPC);						// 캐릭터 추가... Character
 
-	// 이제 패킷에 따라 캐릭터를 치장..(?) 시켜준다.. 아이템장착, 무기 장착등...
+	// 이제 패킷에 따라 캐릭터를 치장..(?) 시켜준다.. 아이템장착, 무기 장착등... Character
 	CN3Shape* pShape = nullptr;
 	__TABLE_PLAYER_LOOKS* pLooks = nullptr;
 	if(0 == dwType)
 	{
-		pLooks = s_pTbl_NPC_Looks.Find(iIDResrc);	// 기본 스킨..
-		if(nullptr == pLooks) // 캐릭터 기본 모습 테이블이 없으면... 
+		pLooks = s_pTbl_NPC_Looks.Find(iIDResrc);	// 기본 스킨.. [Korean comment]
+		if(nullptr == pLooks) // 캐릭터 기본 모습 테이블이 없으면...  Character
 		{
 			pLooks = s_pTbl_NPC_Looks.GetIndexedData(0);
 
@@ -2848,7 +2848,7 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 	}
 	else
 	{
-		pShape = ACT_WORLD->ShapeGetByIDWithShape(iIDResrc); // Object NPC 에서 찾아 본다...
+		pShape = ACT_WORLD->ShapeGetByIDWithShape(iIDResrc); // Object NPC 에서 찾아 본다... [Korean comment]
 		if(nullptr == pShape)
 		{
 			std::string szMsg = fmt::format("Object NPC In : [Name({}), ResourceID({})]",
@@ -2862,7 +2862,7 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 		
 	if(pLooks)
 	{
-		pNPC->InitChr(pLooks);	// 관절 세팅..
+		pNPC->InitChr(pLooks);	// 관절 세팅.. [Korean comment]
 		pNPC->ScaleSet(iScale / 100.0f);
 
 		std::string szPartFN;
@@ -2877,7 +2877,7 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 			__TABLE_ITEM_BASIC* pItem0 = s_pTbl_Items_Basic.Find(iItemID0/1000*1000);
 			__TABLE_ITEM_EXT* pItemExt0 = nullptr;
 			if(pItem0 && pItem0->byExtIndex >= 0 && pItem0->byExtIndex < MAX_ITEM_EXTENSION)
-				pItemExt0 = s_pTbl_Items_Exts[pItem0->byExtIndex].Find(iItemID0%1000);	// 열 데이터 얻기..
+				pItemExt0 = s_pTbl_Items_Exts[pItem0->byExtIndex].Find(iItemID0%1000);	// 열 데이터 얻기.. Data
 			if(pItem0 && pItemExt0)
 			{
 				e_PartPosition ePart;
@@ -2897,7 +2897,7 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 			__TABLE_ITEM_BASIC* pItem1 = s_pTbl_Items_Basic.Find(iItemID1/1000*1000);
 			__TABLE_ITEM_EXT* pItemExt1 = nullptr;
 			if(pItem1 && pItem1->byExtIndex >= 0 && pItem1->byExtIndex < MAX_ITEM_EXTENSION)
-				pItemExt1 = s_pTbl_Items_Exts[pItem1->byExtIndex].Find(iItemID1%1000);	// 열 데이터 얻기..
+				pItemExt1 = s_pTbl_Items_Exts[pItem1->byExtIndex].Find(iItemID1%1000);	// 열 데이터 얻기.. Data
 			if(pItem1 && pItemExt1)
 			{
 				e_PartPosition ePart;
@@ -2915,15 +2915,15 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 	else if(pShape && (pShape->Type() & OBJ_SHAPE_EXTRA))
 	{
 		CN3ShapeExtra* pSE = (CN3ShapeExtra*)pShape;
-		pNPC->m_pShapeExtraRef = pSE; // 참조 오브젝트 세팅..
-		pSE->m_bVisible = true; // 강제로 렌더링하지 않게 하는 플래그 해제..
+		pNPC->m_pShapeExtraRef = pSE; // 참조 오브젝트 세팅.. Object
+		pSE->m_bVisible = true; // 강제로 렌더링하지 않게 하는 플래그 해제.. Rendering
 		
 		bool bShouldBeRotate = true;
 		__Vector3 vAxis(0,1,0);
 		float fRadian = 0, fRadian2 = 0;
 		bool bVisible = false;
 
-		if(OBJECT_TYPE_DOOR_LEFTRIGHT == pSE->m_iEventType) // 좌우열림 성문
+		if(OBJECT_TYPE_DOOR_LEFTRIGHT == pSE->m_iEventType) // 좌우열림 성문 [Korean comment]
 		{
 			vAxis.Set(0,1,0);
 			fRadian = D3DXToRadian(80);
@@ -2934,38 +2934,38 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 			vAxis.Set(0,0,1);
 			fRadian = D3DXToRadian(90);
 			fRadian2 = 0;
-		} // 상하열림 성문
+		} // 상하열림 성문 [Korean comment]
 		else if(OBJECT_TYPE_LEVER_TOPDOWN == pSE->m_iEventType)
 		{
 			vAxis.Set(1,0,0);
 			fRadian = D3DXToRadian(45);
 			fRadian2 = D3DXToRadian(-45);
-		} // 상하 레버
+		} // 상하 레버 [Korean comment]
 		else if(OBJECT_TYPE_FLAG == pSE->m_iEventType)
 		{
 			bShouldBeRotate = false;
 		}
 
-		if(0x01 == dwStatus) // 보이게 만들거나 좌우로 열려 있는 경우..
+		if(0x01 == dwStatus) // 보이게 만들거나 좌우로 열려 있는 경우.. [Korean comment]
 		{
-			if(bShouldBeRotate) // 열기
+			if(bShouldBeRotate) // 열기 [Korean comment]
 			{
-				pSE->RotateTo(0, vAxis, fRadian, 1, true); // 바로 열기.
-				pSE->RotateTo(1, vAxis, -fRadian, 1, true); // 바로 열기.
+				pSE->RotateTo(0, vAxis, fRadian, 1, true); // 바로 열기. [Korean comment]
+				pSE->RotateTo(1, vAxis, -fRadian, 1, true); // 바로 열기. [Korean comment]
 			}
-			else // 보이기
+			else // 보이기 [Korean comment]
 			{
 				pSE->m_bVisible = true;
 			}
 		}
-		else if(0x00 == dwStatus) // 안보이게 만들거나 닫혀있다..
+		else if(0x00 == dwStatus) // 안보이게 만들거나 닫혀있다.. [Korean comment]
 		{
-			if(bShouldBeRotate) // 닫기
+			if(bShouldBeRotate) // 닫기 [Korean comment]
 			{
-				pSE->RotateTo(0, vAxis, fRadian2, 1, true); // 바로 열기.
-				pSE->RotateTo(1, vAxis, -fRadian2, 1, true); // 바로 열기.
+				pSE->RotateTo(0, vAxis, fRadian2, 1, true); // 바로 열기. [Korean comment]
+				pSE->RotateTo(1, vAxis, -fRadian2, 1, true); // 바로 열기. [Korean comment]
 			}
-			else // 안보이기.
+			else // 안보이기. [Korean comment]
 			{
 				pSE->m_bVisible = false;
 			}
@@ -2978,8 +2978,8 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 		CLogWriter::Write(szMsg);
 	}
 
-	pNPC->PositionSet(__Vector3(fXPos, fYPos, fZPos), true);	// 현재 위치 셋팅..
-	pNPC->MoveTo(fXPos, fYPos, fZPos, 0, 0);					// 현재 위치..
+	pNPC->PositionSet(__Vector3(fXPos, fYPos, fZPos), true);	// 현재 위치 셋팅.. Position
+	pNPC->MoveTo(fXPos, fYPos, fZPos, 0, 0);					// 현재 위치.. Position
 	pNPC->RotateTo(D3DXToRadian(rand()%360), false);
 	pNPC->Action(PSA_BASIC, true, nullptr, true);
 	pNPC->ActionMove(PSM_STOP);
@@ -2990,11 +2990,11 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 bool CGameProcMain::MsgRecv_NPCOut(Packet& pkt)
 {
 	int  iID		= pkt.read<int16_t>(); // Server에서 관리하는 고유 ID
-	return s_pOPMgr->NPCDelete(iID);										// 캐릭터 제거...	
+	return s_pOPMgr->NPCDelete(iID);										// 캐릭터 제거...	 Character
 }
 
 
-// 주위 영역의 모든 아이디를 카운트만큼 받는다... 글구.. 업데이트가 필요한 것만 서버에게 요청..
+// 주위 영역의 모든 아이디를 카운트만큼 받는다... 글구.. 업데이트가 필요한 것만 서버에게 요청.. Update
 bool CGameProcMain::MsgRecv_NPCInAndRequest(Packet& pkt)
 {
 	int iNPCCountReceived = pkt.read<int16_t>();
@@ -3010,7 +3010,7 @@ bool CGameProcMain::MsgRecv_NPCInAndRequest(Packet& pkt)
 	}
 
 	int iID = 0;
-	m_SetNPCID.clear(); // 싹 지우고...
+	m_SetNPCID.clear(); // 싹 지우고... [Korean comment]
 	it_ID itID, itIDEnd = m_SetNPCID.end();
 	pair_ID pairID;
 
@@ -3021,7 +3021,7 @@ bool CGameProcMain::MsgRecv_NPCInAndRequest(Packet& pkt)
 		//TRACE("               ID : %d\n", iID);
 	}
 
-	if(m_SetNPCID.empty()) // 새로 받은게 한개도 없다면 몽땅 날린다..
+	if(m_SetNPCID.empty()) // 새로 받은게 한개도 없다면 몽땅 날린다.. [Korean comment]
 	{
 		s_pOPMgr->ReleaseNPCs();
 		return false;
@@ -3036,12 +3036,12 @@ bool CGameProcMain::MsgRecv_NPCInAndRequest(Packet& pkt)
 		iID = pNPC->IDNumber();
 		
 		itID = m_SetNPCID.find(iID);
-		if(itID != itIDEnd) // 새로 들어온 리스트에 있으면.. 
+		if(itID != itIDEnd) // 새로 들어온 리스트에 있으면..  [Korean comment]
 		{
-			m_SetNPCID.erase(itID); // 요청할 리스트에서 빼고..
+			m_SetNPCID.erase(itID); // 요청할 리스트에서 빼고.. [Korean comment]
 			itNPC++;
 		}
-		else  // 새로 들어온곳에 없으면 지운다..
+		else  // 새로 들어온곳에 없으면 지운다.. [Korean comment]
 		{
 			//TRACE("           delete : %d\n", iID);
 
@@ -3058,24 +3058,24 @@ bool CGameProcMain::MsgRecv_NPCInAndRequest(Packet& pkt)
 	}
 
 	////////////////////////////////////////////////////////////////////////////
-	// 바로 요청 패킷을 만들어 보낸다..
+	// 바로 요청 패킷을 만들어 보낸다.. [Korean comment]
 	int iNewNPCCount = m_SetNPCID.size();
 	if(iNewNPCCount > 0)
 	{
-		int iOffset=0;														// 버퍼의 오프셋..
-		std::vector<uint8_t> byBuff(iNewNPCCount * 2 + 10, 0);					// 패킷 버퍼..
-		CAPISocket::MP_AddByte(&(byBuff[0]), iOffset, WIZ_REQ_NPCIN);	// 커멘드.
-		CAPISocket::MP_AddShort(&(byBuff[0]), iOffset, iNewNPCCount);		// 아이디 갯수..
+		int iOffset=0;														// 버퍼의 오프셋.. [Korean comment]
+		std::vector<uint8_t> byBuff(iNewNPCCount * 2 + 10, 0);					// 패킷 버퍼.. [Korean comment]
+		CAPISocket::MP_AddByte(&(byBuff[0]), iOffset, WIZ_REQ_NPCIN);	// 커멘드. [Korean comment]
+		CAPISocket::MP_AddShort(&(byBuff[0]), iOffset, iNewNPCCount);		// 아이디 갯수.. [Korean comment]
 		
 		itID = m_SetNPCID.begin(); itIDEnd = m_SetNPCID.end();
 		for(int i = 0; itID != itIDEnd; itID++, i++)
 		{
 			iID = *itID;
-			CAPISocket::MP_AddShort(&(byBuff[0]), iOffset, iID);			// 자세한 정보가 필요한 아이디들..
+			CAPISocket::MP_AddShort(&(byBuff[0]), iOffset, iID);			// 자세한 정보가 필요한 아이디들.. Info
 		}
-		s_pSocket->Send(&(byBuff[0]), iOffset); // 보낸다
+		s_pSocket->Send(&(byBuff[0]), iOffset); // 보낸다 [Korean comment]
 	}
-	// 바로 요청 패킷을 만들어 보낸다..
+	// 바로 요청 패킷을 만들어 보낸다.. [Korean comment]
 	////////////////////////////////////////////////////////////////////////////
 
 	return true;
@@ -3100,7 +3100,7 @@ bool CGameProcMain::MsgRecv_NPCInRequested(Packet& pkt)
 
 	for ( int i = 0; i < iNPCCount; i++ )
 	{
-		this->MsgRecv_NPCIn(pkt); // 플레이어 갯수 만큼 유저 인...
+		this->MsgRecv_NPCIn(pkt); // 플레이어 갯수 만큼 유저 인... [Korean comment]
 	}
 	
 #ifdef _DEBUG
@@ -3118,7 +3118,7 @@ bool CGameProcMain::MsgRecv_NPCMove(Packet& pkt)
 	float fYPos		= (pkt.read<int16_t>())/10.0f;
 	float fSpeed	= (pkt.read<int16_t>())/10.0f;
 
-	// 함수가 와야 할 부분.. ^^
+	// 함수가 와야 할 부분.. ^^ Function
 	CPlayerNPC* pNPC = nullptr;
 	pNPC = s_pOPMgr->NPCGetByID(iID, true);				// NPC을 ID로서 얻고..
 	if ( nullptr == pNPC )
@@ -3127,9 +3127,9 @@ bool CGameProcMain::MsgRecv_NPCMove(Packet& pkt)
 		return false;		// 살아있는 NPC가 있으면..
 	}
 
-	float fY = ACT_WORLD->GetHeightWithTerrain(fXPos, fZPos);		// 지형 높이값..
+	float fY = ACT_WORLD->GetHeightWithTerrain(fXPos, fZPos);		// 지형 높이값.. [Korean comment]
 	int iMoveMode = (fSpeed > 0) ? 2 : 0;
-	pNPC->MoveTo(fXPos, fY, fZPos, fSpeed, iMoveMode);	// NPC 위치 갱신..
+	pNPC->MoveTo(fXPos, fY, fZPos, fSpeed, iMoveMode);	// NPC 위치 갱신.. Position
 
 	__ASSERT(!(iMoveMode && fSpeed == 0), "Invalid NPC Move Packet");
 
@@ -3140,59 +3140,59 @@ bool CGameProcMain::MsgRecv_Attack(Packet& pkt)
 {
 	int iType		= pkt.read<uint8_t>(); // 0x01 - 물리적인 공격, 0x02 마법 공격 0x03, 지속 마법 공격
 	int iResult		= pkt.read<uint8_t>(); // 0x00 실패, 0x01 성공
-	int iIDAttacker = pkt.read<int16_t>(); // 공격한 넘
-	int iIDTarget	= pkt.read<int16_t>(); // 타겟이 되서 공격당한넘.
+	int iIDAttacker = pkt.read<int16_t>(); // 공격한 넘 [Korean comment]
+	int iIDTarget	= pkt.read<int16_t>(); // 타겟이 되서 공격당한넘. [Korean comment]
 
-	if ( iIDAttacker == iIDTarget ) return false;		// 공격자와 피해자가 같은 경우????
+	if ( iIDAttacker == iIDTarget ) return false;		// 공격자와 피해자가 같은 경우???? [Korean comment]
 
 	bool bIAmTarget = (iIDTarget == s_pPlayer->IDNumber()) ? true : false;
 	bool bIAmAttacker = (iIDAttacker == s_pPlayer->IDNumber()) ? true : false;
 	
 	CPlayerBase* pAttacker = nullptr;
-	if ( bIAmAttacker ) pAttacker = s_pPlayer;	// 공격하는 넘이 내 자신이면
+	if ( bIAmAttacker ) pAttacker = s_pPlayer;	// 공격하는 넘이 내 자신이면 [Korean comment]
 	else pAttacker = s_pOPMgr->CharacterGetByID(iIDAttacker, true);
-	if(nullptr == pAttacker) // 어라 공격하는 넘이 없네??
+	if(nullptr == pAttacker) // 어라 공격하는 넘이 없네?? [Korean comment]
 	{
-		if(iIDAttacker > 10000) // NPC 는 1000 이상이다.
-			this->MsgSend_NPCInRequest(iIDAttacker); // NPC 정보가 없을 경우 요청한다..
+		if(iIDAttacker > 10000) // NPC 는 1000 이상이다. [Korean comment]
+			this->MsgSend_NPCInRequest(iIDAttacker); // NPC 정보가 없을 경우 요청한다.. Info
 		else if(iIDAttacker < 3000)
-			this->MsgSend_UserInRequest(iIDAttacker); // NPC 정보가 없을 경우 요청한다..
-		return false; // 공격하는 넘이 없으면 돌아간다.
+			this->MsgSend_UserInRequest(iIDAttacker); // NPC 정보가 없을 경우 요청한다.. Info
+		return false; // 공격하는 넘이 없으면 돌아간다. [Korean comment]
 	}
 
 	CPlayerBase* pTarget = nullptr;
-	if(bIAmTarget) // 타겟이 나라면..
+	if(bIAmTarget) // 타겟이 나라면.. [Korean comment]
 	{
-		this->CommandSitDown(false, false); // 일으켜 세운다.
+		this->CommandSitDown(false, false); // 일으켜 세운다. [Korean comment]
 		if(m_pMagicSkillMng->IsCasting())
 		{
 			__TABLE_UPC_SKILL* pSkill = s_pTbl_Skill.Find(s_pPlayer->m_dwMagicID);
 			if(pSkill)
 			{
 				int SuccessValue = rand()%100;
-				if(SuccessValue >= pSkill->iPercentSuccess) // 스킬 테이블에 있는 확률대로 실패한다..
-					s_pPlayer->Action(PSA_BASIC, false, nullptr, true); // 캐스팅 취소, 기본동작으로 강제 세팅..
+				if(SuccessValue >= pSkill->iPercentSuccess) // 스킬 테이블에 있는 확률대로 실패한다.. [Korean comment]
+					s_pPlayer->Action(PSA_BASIC, false, nullptr, true); // 캐스팅 취소, 기본동작으로 강제 세팅.. [Korean comment]
 			}
 		}
 		pTarget = s_pPlayer;
 	}
-	else // 타겟이 다른넘이면..
+	else // 타겟이 다른넘이면.. [Korean comment]
 	{
-		pTarget = s_pOPMgr->CharacterGetByID(iIDTarget, true); //  일단 살아있는 넘들중에서 가져와보고.. 
-		if(nullptr == pTarget) pTarget = s_pOPMgr->CharacterGetByID(iIDTarget, false); // 없다면 죽어가는 넘도 상관없이 타겟으로 잡고
+		pTarget = s_pOPMgr->CharacterGetByID(iIDTarget, true); //  일단 살아있는 넘들중에서 가져와보고..  [Korean comment]
+		if(nullptr == pTarget) pTarget = s_pOPMgr->CharacterGetByID(iIDTarget, false); // 없다면 죽어가는 넘도 상관없이 타겟으로 잡고 [Korean comment]
 	}
 
-	if(nullptr == pTarget) return false; // 타겟이 없다!!!!
+	if(nullptr == pTarget) return false; // 타겟이 없다!!!! [Korean comment]
 
-//	pTarget->m_iIDTargetMe = iIDAttacker; // 어떤 놈이 공격하는 거야??
+//	pTarget->m_iIDTargetMe = iIDAttacker; // 어떤 놈이 공격하는 거야?? [Korean comment]
 
-	if(pAttacker != s_pPlayer && pAttacker && pAttacker->IsAlive()) // 공격하는 넘이 내가 아니고 다른 살아있는 넘일때..
+	if(pAttacker != s_pPlayer && pAttacker && pAttacker->IsAlive()) // 공격하는 넘이 내가 아니고 다른 살아있는 넘일때.. [Korean comment]
 	{
-		((CPlayerNPC*)pAttacker)->RotateTo(pTarget); // 타겟을 향해서 방향 계산
+		((CPlayerNPC*)pAttacker)->RotateTo(pTarget); // 타겟을 향해서 방향 계산 Calculate
 		pAttacker->m_iIDTarget = iIDTarget; // 타겟 ID 설정..
-		if(0x01 == iType) pAttacker->Action(PSA_ATTACK, false, pTarget); // 물리적인 직접 공격..
-		else if(0x02 == iType) pAttacker->Action(PSA_SPELLMAGIC, false, pTarget); // 마법 공격..
-//		else if(0x03 == iType) pAttacker->Action(PSA_SPELLMAGIC, false, pTarget); // 지속 마법 공격..
+		if(0x01 == iType) pAttacker->Action(PSA_ATTACK, false, pTarget); // 물리적인 직접 공격.. [Korean comment]
+		else if(0x02 == iType) pAttacker->Action(PSA_SPELLMAGIC, false, pTarget); // 마법 공격.. [Korean comment]
+//		else if(0x03 == iType) pAttacker->Action(PSA_SPELLMAGIC, false, pTarget); // 지속 마법 공격.. [Korean comment]
 	}
 
 	if (bIAmTarget
@@ -3214,10 +3214,10 @@ bool CGameProcMain::MsgRecv_Attack(Packet& pkt)
 		}
 	}
 
-	pTarget->m_bGuardSuccess = false; // 방어에 성공했는지에 대한 플래그..
-	if(0x0 == iResult) // 공격 실패
+	pTarget->m_bGuardSuccess = false; // 방어에 성공했는지에 대한 플래그.. [Korean comment]
+	if(0x0 == iResult) // 공격 실패 [Korean comment]
 	{
-		// 죽은 넘이 아니고 스킬을 쓰즌 중이 아니면 막는 동작을 한다..
+		// 죽은 넘이 아니고 스킬을 쓰즌 중이 아니면 막는 동작을 한다.. [Korean comment]
 		if (pTarget->IsAlive()
 			&& pTarget->State() == PSA_SPELLMAGIC)
 		{
@@ -3238,11 +3238,11 @@ bool CGameProcMain::MsgRecv_Attack(Packet& pkt)
 		{
 //			if(m_pUIDead) m_pUIDead->SetVisible(true);
 			std::string szMsg = fmt::format_text_resource(IDS_REGENERATION);
-			MessageBoxPost(szMsg, "", MB_OK, BEHAVIOR_REGENERATION); // 다시 생성 메시지 보냄..
+			MessageBoxPost(szMsg, "", MB_OK, BEHAVIOR_REGENERATION); // 다시 생성 메시지 보냄.. Create
 		}
 		
-		pTarget->m_fTimeAfterDeath = 0.1f; // 죽기직전..
-		if(pTarget->m_pShapeExtraRef) s_pOPMgr->CharacterDelete(pTarget->IDNumber()); // 오브젝트 일때는 없애버린다..!!
+		pTarget->m_fTimeAfterDeath = 0.1f; // 죽기직전.. [Korean comment]
+		if(pTarget->m_pShapeExtraRef) s_pOPMgr->CharacterDelete(pTarget->IDNumber()); // 오브젝트 일때는 없애버린다..!! Object
 	}
 
 	if(pTarget == s_pPlayer) 
@@ -3255,7 +3255,7 @@ bool CGameProcMain::MsgRecv_Attack(Packet& pkt)
 
 bool CGameProcMain::MsgRecv_Dead(Packet& pkt)
 {
-	int iIDTarget	= pkt.read<int16_t>(); // 타겟이 되서 공격당한넘.
+	int iIDTarget	= pkt.read<int16_t>(); // 타겟이 되서 공격당한넘. [Korean comment]
 
 	
 	CPlayerBase* pTarget = nullptr;
@@ -3279,7 +3279,7 @@ bool CGameProcMain::MsgRecv_Dead(Packet& pkt)
 		if(pTarget->m_pShapeExtraRef) s_pOPMgr->CharacterDelete(pTarget->IDNumber());
 		else
 		{
-			pTarget->m_fTimeAfterDeath = 0.1f; // 죽기직전..
+			pTarget->m_fTimeAfterDeath = 0.1f; // 죽기직전.. [Korean comment]
 			pTarget->ActionDying(PSD_KEEP_POSITION, __Vector3(0,0,1));
 		}
 
@@ -3304,7 +3304,7 @@ bool CGameProcMain::MsgRecv_ItemMove(Packet& pkt)
 		pInfoBase->iHPMax = pkt.read<int16_t>();
 		pInfoExt->iMSPMax = pkt.read<int16_t>();
 		
-		// 아이템에 의해 가감된값이다..
+		// 아이템에 의해 가감된값이다.. [Korean comment]
 		pInfoExt->iStrength_Delta =		pkt.read<uint16_t>();
 		pInfoExt->iStamina_Delta	=	pkt.read<uint16_t>();
 		pInfoExt->iDexterity_Delta =	pkt.read<uint16_t>();
@@ -3318,8 +3318,8 @@ bool CGameProcMain::MsgRecv_ItemMove(Packet& pkt)
 		pInfoExt->iRegistCurse =	pkt.read<uint16_t>();
 		pInfoExt->iRegistPoison	=	pkt.read<uint16_t>();
 
-		if(pInfoBase->iHP > pInfoBase->iHPMax) pInfoBase->iHP = pInfoBase->iHPMax; // 범위검사..
-		if(pInfoExt->iMSP > pInfoExt->iMSPMax) pInfoExt->iMSP = pInfoExt->iMSPMax; // 범위검사..
+		if(pInfoBase->iHP > pInfoBase->iHPMax) pInfoBase->iHP = pInfoBase->iHPMax; // 범위검사.. Check
+		if(pInfoExt->iMSP > pInfoExt->iMSPMax) pInfoExt->iMSP = pInfoExt->iMSPMax; // 범위검사.. Check
 
 		m_pUIVar->m_pPageState->UpdateHP(pInfoBase->iHP, pInfoBase->iHPMax);
 		m_pUIVar->m_pPageState->UpdateMSP(pInfoExt->iMSP, pInfoExt->iMSPMax);
@@ -3351,7 +3351,7 @@ bool CGameProcMain::MsgRecv_ItemMove(Packet& pkt)
 	return true;
 }
 
-bool CGameProcMain::MsgRecv_ItemWeightChange(Packet& pkt)		// 아이템 무게 변화..
+bool CGameProcMain::MsgRecv_ItemWeightChange(Packet& pkt)		// 아이템 무게 변화.. [Korean comment]
 {
 	__InfoPlayerMySelf* pInfoExt = &s_pPlayer->m_InfoExt;
 	pInfoExt->iWeight = pkt.read<int16_t>();
@@ -3376,7 +3376,7 @@ bool CGameProcMain::MsgRecv_UserLookChange(Packet& pkt)
 
 	__TABLE_ITEM_EXT* pItemExt = nullptr;
 	if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
-		pItemExt = s_pTbl_Items_Exts[pItem->byExtIndex].Find(dwItemID%1000);	// 열 데이터 얻기..
+		pItemExt = s_pTbl_Items_Exts[pItem->byExtIndex].Find(dwItemID%1000);	// 열 데이터 얻기.. Data
 	if(dwItemID && (nullptr == pItem || nullptr == pItemExt))
 	{
 		__ASSERT(0, "NULL Item!!!");
@@ -3396,16 +3396,16 @@ bool CGameProcMain::MsgRecv_UserLookChange(Packet& pkt)
 
 	if(ePartPos != PART_POS_UNKNOWN) 
 	{
-		if(dwItemID) // 아이템이 있는 경우
+		if(dwItemID) // 아이템이 있는 경우 [Korean comment]
 		{
 			std::string szItemFN;
 			MakeResrcFileNameForUPC(pItem, pItemExt, &szItemFN, nullptr, ePartPos2, ePlugPos2, s_pPlayer->m_InfoBase.eRace);
-			pUPC->PartSet(ePartPos, szItemFN, pItem, pItemExt); // 아이템 붙이기..
+			pUPC->PartSet(ePartPos, szItemFN, pItem, pItemExt); // 아이템 붙이기.. [Korean comment]
 			pUPC->DurabilitySet(eSlot, iDurability);
 		}
 		else
 		{
-			__TABLE_PLAYER_LOOKS* pLooks = s_pTbl_UPC_Looks.Find(pUPC->m_InfoBase.eRace);	// User Player Character Skin 구조체 포인터..
+			__TABLE_PLAYER_LOOKS* pLooks = s_pTbl_UPC_Looks.Find(pUPC->m_InfoBase.eRace);	// User Player Character Skin 구조체 포인터.. [Korean comment]
 			if(nullptr == pLooks)
 			{
 				CLogWriter::Write("CGameProcMain::MsgRecv_UserLookChange() - failed find table : Race ({})",
@@ -3414,7 +3414,7 @@ bool CGameProcMain::MsgRecv_UserLookChange(Packet& pkt)
 			}
 			else
 			{
-				if(PART_POS_HAIR_HELMET == ePartPos) pUPC->InitHair(); // 머리인데 없는 경우는..
+				if(PART_POS_HAIR_HELMET == ePartPos) pUPC->InitHair(); // 머리인데 없는 경우는.. [Korean comment]
 				else pUPC->PartSet(ePartPos, pLooks->szPartFNs[ePartPos], nullptr, nullptr);
 			}
 		}
@@ -3436,10 +3436,10 @@ bool CGameProcMain::MsgRecv_UserLookChange(Packet& pkt)
 			pUPC->DurabilitySet(eSlot, 0);
 		}
 
-		// Sound Range 안쪽이면 사운드를 바꾸어준다..
+		// Sound Range 안쪽이면 사운드를 바꾸어준다.. [Korean comment]
 		__Vector3 vPosPlayer = s_pPlayer->Position();
 		float fDist = pUPC->Distance(vPosPlayer);
-		if(fDist < SOUND_RANGE_TO_SET) pUPC->SetSoundPlug(pItem); // SOUND_RANGE 안에 있으면.
+		if(fDist < SOUND_RANGE_TO_SET) pUPC->SetSoundPlug(pItem); // SOUND_RANGE 안에 있으면. [Korean comment]
 
 		return true;
 	}
@@ -3453,7 +3453,7 @@ bool CGameProcMain::MsgRecv_UserLookChange(Packet& pkt)
 	return false;
 }
 
-bool CGameProcMain::MsgRecv_ItemBundleDrop(Packet& pkt)		// Item 이 필드에 나타나는데에 대한 응답
+bool CGameProcMain::MsgRecv_ItemBundleDrop(Packet& pkt)		// Item 이 필드에 나타나는데에 대한 응답 [Korean comment]
 {
 	int iID = pkt.read<int16_t>();
 	int iItemID = pkt.read<uint32_t>();
@@ -3462,12 +3462,12 @@ bool CGameProcMain::MsgRecv_ItemBundleDrop(Packet& pkt)		// Item 이 필드에 �
 	if(nullptr == pCorpse) pCorpse = s_pOPMgr->CorpseGetByID(iID);
 	
 	if(pCorpse)
-		pCorpse->m_iDroppedItemID = iItemID; // 떨어트린 아이템 아이디 뭉치
+		pCorpse->m_iDroppedItemID = iItemID; // 떨어트린 아이템 아이디 뭉치 [Korean comment]
 
 	return true;
 }
 
-bool CGameProcMain::MsgRecv_ItemBundleOpen(Packet& pkt)		// 아이템 상자를 열거나 시체를 뒤진다..
+bool CGameProcMain::MsgRecv_ItemBundleOpen(Packet& pkt)		// 아이템 상자를 열거나 시체를 뒤진다.. [Korean comment]
 {
 	uint32_t dwItemID = 0;
 	int iItemCount = 0;
@@ -3481,7 +3481,7 @@ bool CGameProcMain::MsgRecv_ItemBundleOpen(Packet& pkt)		// 아이템 상자를 
 		dwItemID = pkt.read<uint32_t>();
 		iItemCount = pkt.read<int16_t>();
 
-		// 이부분에 몬스터 아이템창을 열고 준비한다..
+		// 이부분에 몬스터 아이템창을 열고 준비한다.. Window
 		if ( dwItemID )
 			m_pUIDroppedItemDlg->AddToItemTable(dwItemID, iItemCount, i);
 	}
@@ -3640,9 +3640,9 @@ bool CGameProcMain::MsgRecv_MyInfo_LevelChange(Packet& pkt)
 		
 		int iLevelPrev = pInfoBase->iLevel;
 		pInfoBase->iLevel = iLevel;
-		pInfoExt->iBonusPointRemain = pkt.read<uint8_t>(); // 남은 보너스 포인트..
+		pInfoExt->iBonusPointRemain = pkt.read<uint8_t>(); // 남은 보너스 포인트.. [Korean comment]
 
-		uint8_t	bExtraSkillPoint		= pkt.read<uint8_t>();	// 토탈 포인트
+		uint8_t	bExtraSkillPoint		= pkt.read<uint8_t>();	// 토탈 포인트 [Korean comment]
 		//TRACE("Skill change Extra value %d\n", bExtraSkillPoint);
 			
 		pInfoExt->iExpNext		= pkt.read<int32_t>();
@@ -3657,14 +3657,14 @@ bool CGameProcMain::MsgRecv_MyInfo_LevelChange(Packet& pkt)
 		pInfoExt->iWeightMax	= pkt.read<int16_t>();
 		pInfoExt->iWeight		= pkt.read<int16_t>();
 
-		m_pUIVar->UpdateAllStates(&(s_pPlayer->m_InfoBase), &(s_pPlayer->m_InfoExt)); // 모든 정보 업데이트..
+		m_pUIVar->UpdateAllStates(&(s_pPlayer->m_InfoBase), &(s_pPlayer->m_InfoExt)); // 모든 정보 업데이트.. Update
 
 		m_pUIStateBarAndMiniMap->UpdateExp(pInfoExt->iExp, pInfoExt->iExpNext, true);
 		m_pUIStateBarAndMiniMap->UpdateHP(pInfoBase->iHP, pInfoBase->iHPMax, false);
 		m_pUIStateBarAndMiniMap->UpdateMSP(pInfoExt->iMSP, pInfoExt->iMSPMax, false);
 
 		m_pUISkillTreeDlg->m_iSkillInfo[0] = bExtraSkillPoint;
-		m_pUISkillTreeDlg->InitIconUpdate();		// 레벨이 변화되었으므로 .. 스킬도 추가될 수 있다..
+		m_pUISkillTreeDlg->InitIconUpdate();		// 레벨이 변화되었으므로 .. 스킬도 추가될 수 있다.. Add
 
 		if(iLevel > iLevelPrev) // 이곳에 Level Up 효과를 넣어준다..
 		{
@@ -3672,7 +3672,7 @@ bool CGameProcMain::MsgRecv_MyInfo_LevelChange(Packet& pkt)
 			else if(s_pPlayer->Nation()==NATION_ELMORAD) CGameProcedure::s_pFX->TriggerBundle(iID, -1, FXID_LEVELUP_ELMORAD, iID, -1);
 		}
 	}
-	else // 다른 넘이다..
+	else // 다른 넘이다.. [Korean comment]
 	{
 		CPlayerOther* pUPC = s_pOPMgr->UPCGetByID(iID, false);
 		if(pUPC)
@@ -3721,7 +3721,7 @@ void CGameProcMain::MsgRecv_MyInfo_RealmPoint(Packet& pkt)
 		s_pPlayer->m_InfoExt.iRealmPointMonthly = iLoyaltyMonthly;
 
 		if (m_pUIVar->m_pPageState)
-			m_pUIVar->m_pPageState->UpdateRealmPoint(s_pPlayer->m_InfoExt.iRealmPoint, s_pPlayer->m_InfoExt.iRealmPointMonthly); // 국가 기여도는 10을 나누어서 표시
+			m_pUIVar->m_pPageState->UpdateRealmPoint(s_pPlayer->m_InfoExt.iRealmPoint, s_pPlayer->m_InfoExt.iRealmPointMonthly); // 국가 기여도는 10을 나누어서 표시 [Korean comment]
 	}
 	else if (opcode == 2)
 	{
@@ -3788,7 +3788,7 @@ void CGameProcMain::MsgRecv_MyInfo_PointChange(Packet& pkt)
 	if(iType >= 1 && iType <= 5)
 	{
 		s_pPlayer->m_InfoExt.iBonusPointRemain--;
-		m_pUIVar->m_pPageState->UpdateBonusPointAndButtons(s_pPlayer->m_InfoExt.iBonusPointRemain); // 보너스 포인트 적용이 가능한가??
+		m_pUIVar->m_pPageState->UpdateBonusPointAndButtons(s_pPlayer->m_InfoExt.iBonusPointRemain); // 보너스 포인트 적용이 가능한가?? [Korean comment]
 	}
 }
 
@@ -3800,7 +3800,7 @@ void CGameProcMain::InitUI()
 	RECT rc;
 	int iX = 0, iY = 0;
 
-	e_Nation eNation = s_pPlayer->m_InfoBase.eNation; // 국가....
+	e_Nation eNation = s_pPlayer->m_InfoBase.eNation; // 국가.... [Korean comment]
 
 	__TABLE_UI_RESRC* pTbl = s_pTbl_UI.Find(eNation);
 	if(nullptr == pTbl) return;
@@ -3811,10 +3811,10 @@ void CGameProcMain::InitUI()
 	m_pUICmd->SetPos((iW - (rc.right - rc.left))/2, iH - (rc.bottom - rc.top));
 	m_pUICmd->SetStyle(UISTYLE_FOCUS_UNABLE | UISTYLE_HIDE_UNABLE);
 
-	m_pUIChatDlg->Init(s_pUIMgr);					//Manager 자식으로 리스트에 추가 
+	m_pUIChatDlg->Init(s_pUIMgr);					//Manager 자식으로 리스트에 추가  Add
 	m_pUIChatDlg->LoadFromFile(pTbl->szChat);
 	rc = m_pUIChatDlg->GetRegion();
-	RECT rcCmd = m_pUICmd->GetRegion(); rcCmd.top += 5; // .. 하드 코딩..
+	RECT rcCmd = m_pUICmd->GetRegion(); rcCmd.top += 5; // .. 하드 코딩.. [Korean comment]
 	iX = 0;
 	iY = iH - ((rc.bottom - rc.top) + (rcCmd.bottom - rcCmd.top));
 	CGameProcedure::UIPostData_Read(UI_POST_WND_CHAT, m_pUIChatDlg, iX, iY);
@@ -3837,7 +3837,7 @@ void CGameProcMain::InitUI()
 	m_pUIMsgDlg2->SetStyle(UISTYLE_FOCUS_UNABLE | UISTYLE_HIDE_UNABLE);
 	m_pUIMsgDlg2->SetVisibleWithNoSound(false);
 
-	// 채팅창과 메시지 창 위치 맞추기..
+	// 채팅창과 메시지 창 위치 맞추기.. Window
 	m_pUIChatDlg->MoveOffset(0, -1);
 	m_pUIMsgDlg->MoveOffset(0, -1);
 
@@ -3845,7 +3845,7 @@ void CGameProcMain::InitUI()
 	m_pUIStateBarAndMiniMap->LoadFromFile(pTbl->szStateBar);
 	m_pUIStateBarAndMiniMap->SetStyle(UISTYLE_FOCUS_UNABLE | UISTYLE_HIDE_UNABLE);
 #ifdef _DEBUG
-	m_pUIStateBarAndMiniMap->SetPos(0, 70); // 디버그 정보 표시때문에 조금 내린다....
+	m_pUIStateBarAndMiniMap->SetPos(0, 70); // 디버그 정보 표시때문에 조금 내린다.... Info
 #else
 	m_pUIStateBarAndMiniMap->SetPos(0, 0);
 #endif
@@ -3892,7 +3892,7 @@ void CGameProcMain::InitUI()
 	m_pUIHelp->SetPos(iX, iY);
 //	m_pUIHelp->SetStyle(UISTYLE_SHOW_ME_ALONE);
 	
-	// 공지사항..
+	// 공지사항.. [Korean comment]
 	m_pUINotice->Init(s_pUIMgr);
 	m_pUINotice->LoadFromFile(pTbl->szNotice);
 	m_pUINotice->SetVisibleWithNoSound(false);
@@ -3945,7 +3945,7 @@ void CGameProcMain::InitUI()
 	rc = m_pUIPartyOrForce->GetRegion();
 	iX = iW - (rc.right - rc.left);
 	m_pUIPartyOrForce->SetPos(iX, 0);
-	m_pUIPartyOrForce->SetVisible(false); // 강제로 안보이기~
+	m_pUIPartyOrForce->SetVisible(false); // 강제로 안보이기~ [Korean comment]
 //	CGameProcedure::UIPostData_Read(UI_POST_WND_PARTY, m_pUIPartyOrForce, iX, 0);
 
 	// Dropped Item Dlg.. 
@@ -3983,7 +3983,7 @@ void CGameProcMain::InitUI()
 	CN3UIWndBase::s_pCountableItemEdit->Init(s_pUIMgr);
 	CN3UIWndBase::s_pCountableItemEdit->LoadFromFile(pTbl->szPersonalTradeEdit);
 	CN3UIWndBase::s_pCountableItemEdit->SetStyle(UISTYLE_ALWAYSTOP);
-	// 위치 계산 ..
+	// 위치 계산 .. Calculate
 	rc = CN3UIWndBase::s_pCountableItemEdit->GetRegion();
 	iX = (iW - (rc.right - rc.left))/2;
 	iY = (iH - (rc.bottom - rc.top))/2;
@@ -4027,16 +4027,16 @@ void CGameProcMain::InitUI()
 	m_pUIHotKeyDlg->LoadFromFile(pTbl->szHotKey);
 	m_pUIHotKeyDlg->SetStyle(UISTYLE_HIDE_UNABLE);
 	CGameProcedure::UIPostData_Read(UI_POST_WND_HOTKEY, m_pUIHotKeyDlg, rc.left, rc.bottom);
-	m_pUIHotKeyDlg->SetVisibleWithNoSound(true); // 무조건 보인다!!!
+	m_pUIHotKeyDlg->SetVisibleWithNoSound(true); // 무조건 보인다!!! [Korean comment]
 	m_pUIHotKeyDlg->InitIconWnd(UIWND_HOTKEY);
 	m_pUIHotKeyDlg->SetUIType(UI_TYPE_ICON_MANAGER);
 	m_pUIHotKeyDlg->SetState(UI_STATE_COMMON_NONE);
 
-	m_pUIKnightsOp->Init(s_pUIMgr);	// 기사단 리스트 보기, 가입, 등...
+	m_pUIKnightsOp->Init(s_pUIMgr);	// 기사단 리스트 보기, 가입, 등... [Korean comment]
 	m_pUIKnightsOp->LoadFromFile(pTbl->szKnightsOperation);
 	m_pUIKnightsOp->SetVisibleWithNoSound(false);
 
-	// 파티 지원 게시판..
+	// 파티 지원 게시판.. [Korean comment]
 	m_pUIPartyBBS->Init(s_pUIMgr);
 	m_pUIPartyBBS->LoadFromFile(pTbl->szPartyBBS);//, N3FORMAT_VER_1298);
 	m_pUIPartyBBS->SetVisibleWithNoSound(false);
@@ -4056,7 +4056,7 @@ void CGameProcMain::InitUI()
 	m_pUIWareHouseDlg->SetState(UI_STATE_COMMON_NONE);
 	m_pUIWareHouseDlg->SetStyle(UISTYLE_USER_MOVE_HIDE | UISTYLE_POS_RIGHT);
 
-	m_pTargetSymbol->LoadFromFile(pTbl->szTargetSymbolShape); // 플레이어가 타겟으로 잡은 캐릭터의 위치위에 그리면 된다..
+	m_pTargetSymbol->LoadFromFile(pTbl->szTargetSymbolShape); // 플레이어가 타겟으로 잡은 캐릭터의 위치위에 그리면 된다.. Character
 
 	m_pUIInn->Init(s_pUIMgr);
 	m_pUIInn->LoadFromFile(pTbl->szInn);
@@ -4102,7 +4102,7 @@ void CGameProcMain::InitUI()
 	m_pUIDead->SetPos(iX, iY);
 
 
-	// 상거래 게시판
+	// 상거래 게시판 [Korean comment]
 	m_pUITradeBBS->Init(s_pUIMgr);
 	m_pUITradeBBS->LoadFromFile(pTbl->szTradeBBS);
 	m_pUITradeBBS->SetVisibleWithNoSound(false);
@@ -4112,7 +4112,7 @@ void CGameProcMain::InitUI()
 	iY = (iH - (rc.bottom - rc.top))/2;
 	m_pUITradeBBS->SetPos(iX, iY);
 
-	// 상거래 종류 선택 
+	// 상거래 종류 선택  Type
 	m_pUITradeBBSSelector->Init(s_pUIMgr);
 	m_pUITradeBBSSelector->LoadFromFile(pTbl->szTradeBBSSelector);
 	m_pUITradeBBSSelector->SetVisibleWithNoSound(false);
@@ -4122,7 +4122,7 @@ void CGameProcMain::InitUI()
 	m_pUITradeBBSSelector->SetPos(iX, iY);
 	m_pUITradeBBSSelector->SetStyle(UISTYLE_USER_MOVE_HIDE);
 
-	// 상거래 항목 내용
+	// 상거래 항목 내용 [Korean comment]
 	m_pUITradeBBSEdit->LoadFromFile(pTbl->szTradeExplanation);
 	m_pUITradeBBSEdit->SetVisibleWithNoSound(false);
 	rc = m_pUITradeBBSEdit->GetRegion();
@@ -4179,7 +4179,7 @@ void CGameProcMain::MsgRecv_TargetHP(Packet& pkt)
 	}
 	__ASSERT(iTargetHPMax > 0, "최대 체력 수치는 0이상이어야 합니다.");
 
-	if(iID == s_pPlayer->m_iIDTarget) // 내가 공격하는 넘이면..
+	if(iID == s_pPlayer->m_iIDTarget) // 내가 공격하는 넘이면.. [Korean comment]
 	{
 		bool bUI = false;
 		if(byUpdateImmediately) bUI = true;
@@ -4209,7 +4209,7 @@ void CGameProcMain::MsgRecv_TargetHP(Packet& pkt)
 	}
 }
 
-// 상거래..................
+// 상거래.................. [Korean comment]
 bool CGameProcMain::MsgSend_NPCEvent(int16_t siIDTarget)
 {
 	uint8_t byBuff[4];
@@ -4222,33 +4222,33 @@ bool CGameProcMain::MsgSend_NPCEvent(int16_t siIDTarget)
 	return true;
 }
 
-void CGameProcMain::MsgSend_NPCInRequest(int iID) // NPC 정보가 없을 경우 요청한다..
+void CGameProcMain::MsgSend_NPCInRequest(int iID) // NPC 정보가 없을 경우 요청한다.. Info
 {
 	//TRACE("found NPC ghost (ID:%d)\n", iID);
 
-	int iOffset=0;													// 버퍼의 오프셋..
-	uint8_t byBuff[32];;												// 패킷 버퍼..
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_REQ_NPCIN);		// 커멘드.
-	CAPISocket::MP_AddShort(byBuff, iOffset, 1);					// 아이디 갯수..
-	CAPISocket::MP_AddShort(byBuff, iOffset, iID);					// 자세한 정보가 필요한 아이디들..
+	int iOffset=0;													// 버퍼의 오프셋.. [Korean comment]
+	uint8_t byBuff[32];;												// 패킷 버퍼.. [Korean comment]
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_REQ_NPCIN);		// 커멘드. [Korean comment]
+	CAPISocket::MP_AddShort(byBuff, iOffset, 1);					// 아이디 갯수.. [Korean comment]
+	CAPISocket::MP_AddShort(byBuff, iOffset, iID);					// 자세한 정보가 필요한 아이디들.. Info
 
 	s_pSocket->Send(byBuff, iOffset);
 }
 
-void CGameProcMain::MsgSend_UserInRequest(int iID) // User 정보가 없을 경우 요청한다..
+void CGameProcMain::MsgSend_UserInRequest(int iID) // User 정보가 없을 경우 요청한다.. Info
 {
 	//TRACE("found User ghost (ID:%d)\n", iID);
 
-	int iOffset=0;													// 버퍼의 오프셋..
-	uint8_t byBuff[32];;												// 패킷 버퍼..
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_REQ_USERIN);	// 커멘드.
-	CAPISocket::MP_AddShort(byBuff, iOffset, 1);					// 아이디 갯수..
-	CAPISocket::MP_AddShort(byBuff, iOffset, iID);					// 자세한 정보가 필요한 아이디들..
+	int iOffset=0;													// 버퍼의 오프셋.. [Korean comment]
+	uint8_t byBuff[32];;												// 패킷 버퍼.. [Korean comment]
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_REQ_USERIN);	// 커멘드. [Korean comment]
+	CAPISocket::MP_AddShort(byBuff, iOffset, 1);					// 아이디 갯수.. [Korean comment]
+	CAPISocket::MP_AddShort(byBuff, iOffset, iID);					// 자세한 정보가 필요한 아이디들.. Info
 
 	s_pSocket->Send(byBuff, iOffset);
 }
 
-void CGameProcMain::MsgSend_Warp() // 워프 - 존이동이 될수도 있다..
+void CGameProcMain::MsgSend_Warp() // 워프 - 존이동이 될수도 있다.. Move
 {	
 	__WarpInfo WI;
 	if (!m_pUIWarp->InfoGetCur(WI)
@@ -4269,7 +4269,7 @@ void CGameProcMain::MsgSend_Warp() // 워프 - 존이동이 될수도 있다..
 	}
 
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_WARP_LIST);
-	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t) WI.iID); // 워프 아이디 보내기...
+	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t) WI.iID); // 워프 아이디 보내기... [Korean comment]
 	s_pSocket->Send(byBuff, iOffset);
 }
 
@@ -4283,7 +4283,7 @@ void CGameProcMain::DoCommercialTransaction(int iTradeID)
 	if ( !m_pUITransactionDlg->IsVisible() )
 		m_pUITransactionDlg->SetVisible(true);
 
-	if (m_pUIInventory->IsVisible()) // 인벤토리가 안열려 있으면..
+	if (m_pUIInventory->IsVisible()) // 인벤토리가 안열려 있으면.. [Korean comment]
 		this->CommandToggleUIInventory();
 
 	if (m_pUISkillTreeDlg->IsVisible())
@@ -4292,7 +4292,7 @@ void CGameProcMain::DoCommercialTransaction(int iTradeID)
 	m_pUITransactionDlg->EnterTransactionState();
 }
 
-bool CGameProcMain::MsgRecv_ItemTradeStart(Packet& pkt)			// 아이템 상거래..
+bool CGameProcMain::MsgRecv_ItemTradeStart(Packet& pkt)			// 아이템 상거래.. [Korean comment]
 {
 	int iTradeID = pkt.read<uint32_t>();		// Trade id
 	CPlayerNPC* pNPC = s_pOPMgr->NPCGetByID(s_pPlayer->m_iIDTarget, true);
@@ -4302,7 +4302,7 @@ bool CGameProcMain::MsgRecv_ItemTradeStart(Packet& pkt)			// 아이템 상거래
 	return true;
 }
 
-bool CGameProcMain::MsgRecv_ItemTradeResult(Packet& pkt)			// 아이템 상거래 결과..
+bool CGameProcMain::MsgRecv_ItemTradeResult(Packet& pkt)			// 아이템 상거래 결과.. [Korean comment]
 {
 	byte bfType = 0x00;	int	iMoney = 0;
 	byte bResult = pkt.read<uint8_t>();		// Trade id
@@ -4333,27 +4333,27 @@ bool CGameProcMain::MsgRecv_ItemTradeResult(Packet& pkt)			// 아이템 상거�
 
 void CGameProcMain::InitZone(int iZone, const __Vector3& vPosPlayer)
 {
-	if(m_pSnd_Battle) m_pSnd_Battle->Stop(0.0f); // 음악 멈추기..
+	if(m_pSnd_Battle) m_pSnd_Battle->Stop(0.0f); // 음악 멈추기.. [Korean comment]
 	if(m_pSnd_Town) m_pSnd_Town->Stop(0.0f);
 
-	MsgSend_SpeedCheck(true);		// 스피드핵 체크 기준시간 정하기
+	MsgSend_SpeedCheck(true);		// 스피드핵 체크 기준시간 정하기 Check
 	static int iZonePrev = -1;
-	if(iZonePrev != iZone) // 다른 존일 경우에만 로딩..
+	if(iZonePrev != iZone) // 다른 존일 경우에만 로딩.. [Korean comment]
 	{
 		m_pLightMgr->Release();
 		s_pEng->SetDefaultLight(m_pLightMgr->Light(0), m_pLightMgr->Light(1), m_pLightMgr->Light(2));
 
-		if(m_pUIChatDlg) m_pUIChatDlg->ChangeChattingMode(N3_CHAT_NORMAL); //존 이동을 하면 일반 채팅상태로 바꿔준다.
-		if(m_pUIPartyOrForce) m_pUIPartyOrForce->MemberDestroy();	//존 이동을 할때 파티를 깬다...
-		this->UpdateUI_PartyOrForceButtons(); // 커맨드 줄에 있는 파티 버튼을 상황에 따라 업데이트 해준다.
+		if(m_pUIChatDlg) m_pUIChatDlg->ChangeChattingMode(N3_CHAT_NORMAL); //존 이동을 하면 일반 채팅상태로 바꿔준다. Status
+		if(m_pUIPartyOrForce) m_pUIPartyOrForce->MemberDestroy();	//존 이동을 할때 파티를 깬다... Move
+		this->UpdateUI_PartyOrForceButtons(); // 커맨드 줄에 있는 파티 버튼을 상황에 따라 업데이트 해준다. Update
 
-		s_pPlayer->m_bMoveContinous = true; // 멈춘다..
+		s_pPlayer->m_bMoveContinous = true; // 멈춘다.. [Korean comment]
 		this->CommandToggleMoveContinous();
 
 		CLogWriter::Write("CGameProcMain::InitZone -> Zone Change ({} -> {}) Position({:.1f}, {:.1f}, {:.1f})",
 			iZonePrev, iZone, vPosPlayer.x, vPosPlayer.y, vPosPlayer.z);
 
-		m_bLoadComplete = false; // 로딩 끝남..
+		m_bLoadComplete = false; // 로딩 끝남.. [Korean comment]
 		m_pMagicSkillMng->ClearDurationalMagic();
 		s_pFX->ClearAll();
 
@@ -4361,7 +4361,7 @@ void CGameProcMain::InitZone(int iZone, const __Vector3& vPosPlayer)
 			s_pUILoading->Render("", 0);
 		
 		s_pPlayer->m_InfoExt.iZoneCur = iZone;
-		iZonePrev = iZone; // 최근에 읽은 존 번호를 기억해둔다.
+		iZonePrev = iZone; // 최근에 읽은 존 번호를 기억해둔다. [Korean comment]
 
 		__TABLE_ZONE* pZoneData = s_pTbl_Zones.Find(s_pPlayer->m_InfoExt.iZoneCur);
 		if (nullptr == pZoneData)
@@ -4372,17 +4372,17 @@ void CGameProcMain::InitZone(int iZone, const __Vector3& vPosPlayer)
 			return;
 		}
 
-		s_pOPMgr->Release(); // 다른 넘들 다 날린다..
+		s_pOPMgr->Release(); // 다른 넘들 다 날린다.. [Korean comment]
 		s_pWorldMgr->InitWorld(iZone, vPosPlayer);
 
-		// 미니맵 로딩..
+		// 미니맵 로딩.. [Korean comment]
 		float fWidth = ACT_WORLD->GetWidthByMeterWithTerrain();
 		m_pUIStateBarAndMiniMap->LoadMap(pZoneData->szMiniMapFN, fWidth, fWidth);
 
-		// 줌 비율 정하기..
+		// 줌 비율 정하기.. [Korean comment]
 		float fZoom = 6.0f;
 		e_Class_Represent eCR = CGameProcedure::GetRepresentClass(s_pPlayer->m_InfoBase.eClass);
-		if(CLASS_REPRESENT_ROGUE == eCR) fZoom = 3.0f; // 로그 계열은 맵이 좀더 널리 자세히 보인다..
+		if(CLASS_REPRESENT_ROGUE == eCR) fZoom = 3.0f; // 로그 계열은 맵이 좀더 널리 자세히 보인다.. [Korean comment]
 		m_pUIStateBarAndMiniMap->ZoomSet(fZoom);
 
 		//char szBuf[256];
@@ -4396,11 +4396,11 @@ void CGameProcMain::InitZone(int iZone, const __Vector3& vPosPlayer)
 
 		m_pLightMgr->LoadZoneLight(pZoneData->szLightObjFN.c_str());
 
-		m_bLoadComplete = true; // 로딩 끝남..
+		m_bLoadComplete = true; // 로딩 끝남.. [Korean comment]
 	}
 		
-	// 카메라 세팅..
-	CN3Camera* pCamera		= s_pEng->CameraGetActive();		// 활성화된 카메라 얻기..
+	// 카메라 세팅.. [Korean comment]
+	CN3Camera* pCamera		= s_pEng->CameraGetActive();		// 활성화된 카메라 얻기.. [Korean comment]
 	if(pCamera)
 	{
 		__Vector3 vPosPlayer = s_pPlayer->Position();
@@ -4411,24 +4411,24 @@ void CGameProcMain::InitZone(int iZone, const __Vector3& vPosPlayer)
 		pCamera->Tick();
 		pCamera->Apply();
 	}
-	// 기본적인 캐릭터위치와 카메라 위치 잡기..
+	// 기본적인 캐릭터위치와 카메라 위치 잡기.. Character
 	////////////////////////////////////////////////////////////////////////////////
 
 	CLogWriter::Write("InitPlayerPosition() Position({:.1f}, {:.1f}, {:.1f})",
 		vPosPlayer.x, vPosPlayer.y, vPosPlayer.z); // TmpLog1122
-	InitPlayerPosition(vPosPlayer); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다.
-	s_pOPMgr->Release(); // 다른 플레이어 삭제...
+	InitPlayerPosition(vPosPlayer); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다. Initialize
+	s_pOPMgr->Release(); // 다른 플레이어 삭제... Delete
 }
 
 
 void CGameProcMain::MsgSend_GameStart()
 {
-	uint8_t byBuff[32];															// 패킷 버퍼..
-	int iOffset=0;															// 패킷 오프셋..
+	uint8_t byBuff[32];															// 패킷 버퍼.. [Korean comment]
+	int iOffset=0;															// 패킷 오프셋.. [Korean comment]
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_GAMESTART);						// 게임 스타트 패킷 커멘드..
-	//CAPISocket::MP_AddByte(byBuff, iOffset, s_pPlayer->IDString().size());		// 아이디 길이 패킷에 넣기..
-	//CAPISocket::MP_AddString(byBuff, iOffset, s_pPlayer->IDString());			// 아이디 문자열 패킷에 넣기..
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_GAMESTART);						// 게임 스타트 패킷 커멘드.. [Korean comment]
+	//CAPISocket::MP_AddByte(byBuff, iOffset, s_pPlayer->IDString().size());		// 아이디 길이 패킷에 넣기.. [Korean comment]
+	//CAPISocket::MP_AddString(byBuff, iOffset, s_pPlayer->IDString());			// 아이디 문자열 패킷에 넣기.. [Korean comment]
 
 	// NOTE(srmeier): start the first part of the login process
 	CAPISocket::MP_AddByte(byBuff, iOffset, 0x01);
@@ -4441,7 +4441,7 @@ bool CGameProcMain::CommandToggleWalkRun()
 	bool bRun = s_pPlayer->ToggleRunMode();
 	bool bMove = s_pPlayer->m_bMoveContinous;
 
-	// 커맨드 버튼 업데이트..
+	// 커맨드 버튼 업데이트.. Update
 	if(m_pUICmd->m_pBtn_Act_Walk)
 	{
 		m_pUICmd->m_pBtn_Act_Walk->SetVisible(bRun);
@@ -4470,7 +4470,7 @@ bool CGameProcMain::CommandToggleMoveContinous()
 {
 	if(s_pPlayer->IsDead()) return false;
 
-	s_pPlayer->ToggleMoveMode();				// 자동 전진 토글.. 
+	s_pPlayer->ToggleMoveMode();				// 자동 전진 토글..  [Korean comment]
 	if(s_pPlayer->m_bMoveContinous)
 	{
 		this->CommandMove(MD_FORWARD, true);
@@ -4479,7 +4479,7 @@ bool CGameProcMain::CommandToggleMoveContinous()
 	}
 	else
 	{
-		this->CommandMove(MD_STOP, true); // 움직임 패킷 보내기..
+		this->CommandMove(MD_STOP, true); // 움직임 패킷 보내기.. [Korean comment]
 		if(m_pUICmd->m_pBtn_Act_Run) m_pUICmd->m_pBtn_Act_Run->SetState(UI_STATE_BUTTON_NORMAL);
 		if(m_pUICmd->m_pBtn_Act_Walk) m_pUICmd->m_pBtn_Act_Walk->SetState(UI_STATE_BUTTON_NORMAL);
 	}
@@ -4491,33 +4491,33 @@ void CGameProcMain::CommandMove(e_MoveDirection eMD, bool bStartOrEnd)
 {
 	if(bStartOrEnd) this->CloseUIs(); // 각종 상거래, 워프등등... UI 닫기..
 
-	if(s_pPlayer->IsDead()) return; // 죽은 넘이 어딜 감히!!
+	if(s_pPlayer->IsDead()) return; // 죽은 넘이 어딜 감히!! [Korean comment]
 
 	if(MD_FORWARD == eMD || MD_BACKWARD == eMD)
 	{
 		s_pUIMgr->UserMoveHideUIs();
-		this->CommandSitDown(false, false, true); // 일으켜 세우고..
-		if(s_pPlayer->m_bStun) return; // 기절해 있음 움직이지 못함..
+		this->CommandSitDown(false, false, true); // 일으켜 세우고.. [Korean comment]
+		if(s_pPlayer->m_bStun) return; // 기절해 있음 움직이지 못함.. [Korean comment]
 		if(MD_FORWARD == eMD)
 		{
-			if(s_pPlayer->IsRunning()) s_pPlayer->ActionMove(PSM_RUN); // 뛰어가기..
-			else s_pPlayer->ActionMove(PSM_WALK); // 걸어가기..
+			if(s_pPlayer->IsRunning()) s_pPlayer->ActionMove(PSM_RUN); // 뛰어가기.. [Korean comment]
+			else s_pPlayer->ActionMove(PSM_WALK); // 걸어가기.. [Korean comment]
 		}
 		else
 		{
-			s_pPlayer->ActionMove(PSM_WALK_BACKWARD); // 후진..
+			s_pPlayer->ActionMove(PSM_WALK_BACKWARD); // 후진.. [Korean comment]
 		}
 
-		if( bStartOrEnd ) // 움직이기 시작할때에는 충돌체크를 먼저 해본다..
+		if( bStartOrEnd ) // 움직이기 시작할때에는 충돌체크를 먼저 해본다.. Check
 		{
-			float fSpeed = s_pPlayer->MoveSpeedCalculationAndCheckCollision(); // 속도를 구하고 그 속도로 충돌 체크를 한다. 리턴값이 0 이면 충돌이다..
-			if(0 == fSpeed) // 못움직이는 상황이면..
+			float fSpeed = s_pPlayer->MoveSpeedCalculationAndCheckCollision(); // 속도를 구하고 그 속도로 충돌 체크를 한다. 리턴값이 0 이면 충돌이다.. Check
+			if(0 == fSpeed) // 못움직이는 상황이면.. [Korean comment]
 			{
-				s_pPlayer->ActionMove(PSM_STOP); // 멈춤..
+				s_pPlayer->ActionMove(PSM_STOP); // 멈춤.. [Korean comment]
 			}
 			else
 			{
-				this->MsgSend_Move(true, false); // 움직이는 순간이면.. 움직임 시작 패킷 보내기.
+				this->MsgSend_Move(true, false); // 움직이는 순간이면.. 움직임 시작 패킷 보내기. [Korean comment]
 			}
 
 			if(m_pUICmd->m_pBtn_Act_Run) m_pUICmd->m_pBtn_Act_Run->SetState(UI_STATE_BUTTON_DOWN);
@@ -4526,20 +4526,20 @@ void CGameProcMain::CommandMove(e_MoveDirection eMD, bool bStartOrEnd)
 	}
 	else if(MD_STOP == eMD)
 	{
-		s_pPlayer->m_bMoveContinous = false; // 계속 걸음 멈춤..
+		s_pPlayer->m_bMoveContinous = false; // 계속 걸음 멈춤.. [Korean comment]
 		s_pPlayer->ActionMove(PSM_STOP);
 		
 		if(m_pUICmd->m_pBtn_Act_Run) m_pUICmd->m_pBtn_Act_Run->SetState(UI_STATE_BUTTON_NORMAL);
 		if(m_pUICmd->m_pBtn_Act_Walk) m_pUICmd->m_pBtn_Act_Walk->SetState(UI_STATE_BUTTON_NORMAL);
 
-		this->MsgSend_Move(false, false); // 움직임 멈춤 패킷 보내기.
+		this->MsgSend_Move(false, false); // 움직임 멈춤 패킷 보내기. [Korean comment]
 	}
 
-	if(s_pPlayer->m_bAttackContinous) // 공격중이면..
+	if(s_pPlayer->m_bAttackContinous) // 공격중이면.. [Korean comment]
 	{
 		CPlayerBase* pTarget = s_pOPMgr->CharacterGetByID(s_pPlayer->m_iIDTarget, false);
-		if(s_pPlayer->IsAttackableTarget(pTarget)) // 공격 가능하면..
-			s_pPlayer->Action(PSA_ATTACK, false, pTarget); // 공격
+		if(s_pPlayer->IsAttackableTarget(pTarget)) // 공격 가능하면.. [Korean comment]
+			s_pPlayer->Action(PSA_ATTACK, false, pTarget); // 공격 [Korean comment]
 	}
 }
 
@@ -4676,11 +4676,11 @@ bool CGameProcMain::CommandToggleUIState()
 	}
 	else m_pUIVar->Close();
 
-	// 커맨드 버튼 업데이트..
+	// 커맨드 버튼 업데이트.. Update
 //	if(m_pUICmd->m_pBtn_Character)
 //	{
-//		if(bNeedOpen) m_pUICmd->m_pBtn_Character->SetState(UI_STATE_BUTTON_DOWN); // 버튼 누름 해제..
-//		else m_pUICmd->m_pBtn_Character->SetState(UI_STATE_BUTTON_NORMAL); // 버튼 누름
+//		if(bNeedOpen) m_pUICmd->m_pBtn_Character->SetState(UI_STATE_BUTTON_DOWN); // 버튼 누름 해제.. Button
+//		else m_pUICmd->m_pBtn_Character->SetState(UI_STATE_BUTTON_NORMAL); // 버튼 누름 Button
 //	}
 
 	return bNeedOpen;
@@ -4690,7 +4690,7 @@ bool CGameProcMain::CommandToggleUIInventory()
 {
 	bool bNeedOpen = false;
 
-	// 개인 거래중이면..
+	// 개인 거래중이면.. [Korean comment]
 	if (m_pSubProcPerTrade->m_ePerTradeState != PER_TRADE_STATE_NONE)
 		return bNeedOpen;
 
@@ -4735,7 +4735,7 @@ bool CGameProcMain::CommandToggleUISkillTree()
 {
 	bool bNeedOpen = !(m_pUISkillTreeDlg->IsVisible());
 
-	// 개인 거래중이면..
+	// 개인 거래중이면.. [Korean comment]
 	if (m_pSubProcPerTrade->m_ePerTradeState != PER_TRADE_STATE_NONE)
 		return bNeedOpen;
 
@@ -4805,7 +4805,7 @@ bool CGameProcMain::OpenCmdEdit(std::string msg)
 	return bNeedOpen;
 }
 
-void CGameProcMain::CommandCameraChange() // 카메라 시점 바꾸기..
+void CGameProcMain::CommandCameraChange() // 카메라 시점 바꾸기.. [Korean comment]
 {
 	if(VP_THIRD_PERSON == s_pEng->ViewPoint() && s_pPlayer->m_bTargetOrPosMove)
 	{
@@ -4814,7 +4814,7 @@ void CGameProcMain::CommandCameraChange() // 카메라 시점 바꾸기..
 		CommandToggleMoveContinous();
 	}
 
-	s_pEng->ViewPointChange(VP_UNKNOWN); // 순서대로 시점을 바꾼다..
+	s_pEng->ViewPointChange(VP_UNKNOWN); // 순서대로 시점을 바꾼다.. [Korean comment]
 }
 
 void CGameProcMain::MsgOutput(const std::string& szMsg, D3DCOLOR crMsg)
@@ -4822,7 +4822,7 @@ void CGameProcMain::MsgOutput(const std::string& szMsg, D3DCOLOR crMsg)
 	m_pUIMsgDlg->AddMsg(szMsg, crMsg);
 }
 
-bool CGameProcMain::MsgRecv_ItemDroppedGetResult(Packet& pkt)	// 땅에 떨어진 아이템 먹기 결과..
+bool CGameProcMain::MsgRecv_ItemDroppedGetResult(Packet& pkt)	// 땅에 떨어진 아이템 먹기 결과.. [Korean comment]
 {
 	uint8_t	bResult; 
 	uint8_t	bPos = 0;
@@ -4880,17 +4880,17 @@ void CGameProcMain::MsgRecv_ZoneChange(
 			vPosPlayer.x = fX;
 			vPosPlayer.y = fY;
 			vPosPlayer.z = fZ;
-			InitPlayerPosition(vPosPlayer); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다.
+			InitPlayerPosition(vPosPlayer); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다. Initialize
 
-			s_pPlayer->RegenerateCollisionMesh(); // 충돌 메시를 다시 만든다..
-			s_pPlayer->m_iSendRegeneration = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그
-			s_pPlayer->m_fTimeAfterDeath = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그
+			s_pPlayer->RegenerateCollisionMesh(); // 충돌 메시를 다시 만든다.. Mesh
+			s_pPlayer->m_iSendRegeneration = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그 [Korean comment]
+			s_pPlayer->m_fTimeAfterDeath = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그 [Korean comment]
 
 			if (s_pPlayer->IsDead())
 			{
 				//TRACE("ZoneChange - 다시 살아나기(%.1f, %.1f)\n", fX, fZ);
 
-				//마법 & 효과 초기화..
+				//마법 & 효과 초기화.. Initialize
 				if (m_pUIStateBarAndMiniMap != nullptr)
 					m_pUIStateBarAndMiniMap->ClearMagic();
 
@@ -4941,9 +4941,9 @@ void CGameProcMain::MsgRecv_UserState(Packet& pkt)
 	
 	if(nullptr == pBPC) return;
 
-	if(N3_SP_STATE_CHANGE_SITDOWN == eSP) // 앉기,서기,죽음...
+	if(N3_SP_STATE_CHANGE_SITDOWN == eSP) // 앉기,서기,죽음... [Korean comment]
 	{
-		if(pBPC != s_pPlayer) // 플레이어가 아닐때..
+		if(pBPC != s_pPlayer) // 플레이어가 아닐때.. [Korean comment]
 		{
 			if(0x01 == iState) 
 				pBPC->Action(PSA_BASIC, true);
@@ -4953,7 +4953,7 @@ void CGameProcMain::MsgRecv_UserState(Packet& pkt)
 				pBPC->Action(PSA_DYING, false, nullptr, true);
 		}
 	}
-	else if(N3_SP_STATE_CHANGE_RECRUIT_PARTY == eSP) // 파티 구함..
+	else if(N3_SP_STATE_CHANGE_RECRUIT_PARTY == eSP) // 파티 구함.. [Korean comment]
 	{
 		if(0x01 == iState) 
 		{
@@ -4972,25 +4972,25 @@ void CGameProcMain::MsgRecv_UserState(Packet& pkt)
 			pBPC->InfoStringSet(szMsg, 0xff00ff00);
 		}
 	}
-	else if(N3_SP_STATE_CHANGE_SIZE == eSP) // 크기 변함
+	else if(N3_SP_STATE_CHANGE_SIZE == eSP) // 크기 변함 Size
 	{
 		if(0x01 == iState)
 		{
-			pBPC->ScaleSetGradually(1.0f); // 보통 크기..
-			pBPC->FlickerFactorSet(1.0f); // 부활되서 반투명.. 깜박거린다..
+			pBPC->ScaleSetGradually(1.0f); // 보통 크기.. Size
+			pBPC->FlickerFactorSet(1.0f); // 부활되서 반투명.. 깜박거린다.. [Korean comment]
 		}
-		else if(0x02 == iState) pBPC->ScaleSetGradually(2.0f); // 커졌다..
-		else if(0x03 == iState) pBPC->ScaleSetGradually(0.5f);// 작아졌다.
-		else if(0x04 == iState) pBPC->FlickerFactorSet(0.7f); // 부활되서 반투명.. 깜박거린다..
+		else if(0x02 == iState) pBPC->ScaleSetGradually(2.0f); // 커졌다.. [Korean comment]
+		else if(0x03 == iState) pBPC->ScaleSetGradually(0.5f);// 작아졌다. [Korean comment]
+		else if(0x04 == iState) pBPC->FlickerFactorSet(0.7f); // 부활되서 반투명.. 깜박거린다.. [Korean comment]
 	}
-	else if(N3_SP_STATE_CHANGE_ACTION == eSP) // 크기 변함
+	else if(N3_SP_STATE_CHANGE_ACTION == eSP) // 크기 변함 Size
 	{
-		if (1 == iState) pBPC->AnimationAdd(ANI_GREETING0, true); // 인사
-		else if (2 == iState) pBPC->AnimationAdd(ANI_GREETING1, true); // 인사
-		else if (3 == iState) pBPC->AnimationAdd(ANI_GREETING2, true); // 인사
-		else if (11 == iState) pBPC->AnimationAdd(ANI_WAR_CRY1, true); // 도발
-		else if (12 == iState) pBPC->AnimationAdd(ANI_WAR_CRY2, true); // 도발
-		else if (13 == iState) pBPC->AnimationAdd(ANI_WAR_CRY3, true); // 도발
+		if (1 == iState) pBPC->AnimationAdd(ANI_GREETING0, true); // 인사 [Korean comment]
+		else if (2 == iState) pBPC->AnimationAdd(ANI_GREETING1, true); // 인사 [Korean comment]
+		else if (3 == iState) pBPC->AnimationAdd(ANI_GREETING2, true); // 인사 [Korean comment]
+		else if (11 == iState) pBPC->AnimationAdd(ANI_WAR_CRY1, true); // 도발 [Korean comment]
+		else if (12 == iState) pBPC->AnimationAdd(ANI_WAR_CRY2, true); // 도발 [Korean comment]
+		else if (13 == iState) pBPC->AnimationAdd(ANI_WAR_CRY3, true); // 도발 [Korean comment]
 	}
 	else if (N3_SP_STATE_CHANGE_VISIBLE == eSP)
 	{
@@ -5070,36 +5070,36 @@ void CGameProcMain::MsgRecv_PartyOrForce(Packet& pkt)
 				int iMP				= pkt.read<int16_t>();
 				e_Nation eNation	= (e_Nation) pkt.read<uint8_t>();
 
-				m_pUIPartyOrForce->MemberAdd(iIDorErrorCode, szID, iLevel, eClass, iHP, iHPMax, iMP, iMPMax); // 다른넘 파티에추가..
-				if (iIDorErrorCode != s_pPlayer->IDNumber()) // 자기 자신이 아닌 경우 메시지 출력.
+				m_pUIPartyOrForce->MemberAdd(iIDorErrorCode, szID, iLevel, eClass, iHP, iHPMax, iMP, iMPMax); // 다른넘 파티에추가.. Add
+				if (iIDorErrorCode != s_pPlayer->IDNumber()) // 자기 자신이 아닌 경우 메시지 출력. Mesh
 				{
 					std::string szMsg = fmt::format_text_resource(IDS_PARTY_INSERT);
 					MsgOutput(szID + szMsg, D3DCOLOR_ARGB(255, 255, 255, 255));
 				}
 			}
-			// 파티에 들어올수 없다..
+			// 파티에 들어올수 없다.. [Korean comment]
 			else
 			{
 				std::string szMsg;
 
-				// 상대방이 파티에 들어오기를 거절 하였다..
+				// 상대방이 파티에 들어오기를 거절 하였다.. [Korean comment]
 				if (-1 == iIDorErrorCode)
 					szMsg = fmt::format_text_resource(IDS_PARTY_INSERT_ERR_REJECTED);
-				// 레벨 차이가 너무 난다...
+				// 레벨 차이가 너무 난다... [Korean comment]
 				else if (-2 == iIDorErrorCode)
 					szMsg = fmt::format_text_resource(IDS_PARTY_INSERT_ERR_LEVEL_DIFFERENCE);
-				// 파티를 맺을 수 없는 국가이다.
+				// 파티를 맺을 수 없는 국가이다. [Korean comment]
 				else if (-3 == iIDorErrorCode)
 					szMsg = fmt::format_text_resource(IDS_PARTY_INSERT_ERR_INVALID_NATION);
-				// 상대방이 파티에 들어오기를 거절 하였다..
+				// 상대방이 파티에 들어오기를 거절 하였다.. [Korean comment]
 				else
 					szMsg = fmt::format_text_resource(IDS_PARTY_INSERT_ERR);
 
 				MsgOutput(szMsg, D3DCOLOR_ARGB(255, 255, 255, 255));
-				if (m_pUIPartyOrForce->MemberCount() == 1) m_pUIPartyOrForce->MemberDestroy(); // 멤버가 한명이면 내가 파티를 만든 경우다.
+				if (m_pUIPartyOrForce->MemberCount() == 1) m_pUIPartyOrForce->MemberDestroy(); // 멤버가 한명이면 내가 파티를 만든 경우다. [Korean comment]
 			}
 			
-			this->UpdateUI_PartyOrForceButtons(); // 커맨드 줄에 있는 파티 버튼을 상황에 따라 업데이트 해준다.
+			this->UpdateUI_PartyOrForceButtons(); // 커맨드 줄에 있는 파티 버튼을 상황에 따라 업데이트 해준다. Update
 		}
 		break;
 	
@@ -5109,9 +5109,9 @@ void CGameProcMain::MsgRecv_PartyOrForce(Packet& pkt)
 
 			if (iID == s_pPlayer->IDNumber())
 			{
-				std::string szMsg = fmt::format_text_resource(IDS_PARTY_DESTROY); // 파티를 떠났다..
-				this->MsgOutput(szMsg, D3DCOLOR_ARGB(255, 255, 255, 255));  // 파티 해제 메시지
-				m_pUIPartyOrForce->MemberDestroy(); // 자기 자신이면.. 파티를 뽀갠다..
+				std::string szMsg = fmt::format_text_resource(IDS_PARTY_DESTROY); // 파티를 떠났다.. [Korean comment]
+				this->MsgOutput(szMsg, D3DCOLOR_ARGB(255, 255, 255, 255));  // 파티 해제 메시지 Mesh
+				m_pUIPartyOrForce->MemberDestroy(); // 자기 자신이면.. 파티를 뽀갠다.. [Korean comment]
 			}
 			else
 			{
@@ -5119,28 +5119,28 @@ void CGameProcMain::MsgRecv_PartyOrForce(Packet& pkt)
 				const __InfoPartyOrForce* pInfo = m_pUIPartyOrForce->MemberInfoGetByID(iID, iMemberIndex);
 				if (pInfo)
 				{
-					std::string szMsg = fmt::format_text_resource(IDS_PARTY_LEAVE); // 파티를 떠났다..
-					this->MsgOutput(pInfo->szID + szMsg, D3DCOLOR_ARGB(255, 255, 255, 255)); // 누가 파티에서 떠났다는 메시지..
-					m_pUIPartyOrForce->MemberRemove(iID); // 남이면..
+					std::string szMsg = fmt::format_text_resource(IDS_PARTY_LEAVE); // 파티를 떠났다.. [Korean comment]
+					this->MsgOutput(pInfo->szID + szMsg, D3DCOLOR_ARGB(255, 255, 255, 255)); // 누가 파티에서 떠났다는 메시지.. Mesh
+					m_pUIPartyOrForce->MemberRemove(iID); // 남이면.. [Korean comment]
 				}
 			}
 
-			this->UpdateUI_PartyOrForceButtons(); // 커맨드 줄에 있는 파티 버튼을 상황에 따라 업데이트 해준다.
+			this->UpdateUI_PartyOrForceButtons(); // 커맨드 줄에 있는 파티 버튼을 상황에 따라 업데이트 해준다. Update
 		}
 		break;
 		
 		case N3_SP_PARTY_OR_FORCE_DESTROY:			// 0x05	// Send
 		{
-			m_pUIPartyOrForce->MemberDestroy(); // 파티 뽀갠다..
+			m_pUIPartyOrForce->MemberDestroy(); // 파티 뽀갠다.. [Korean comment]
 
 			std::string szMsg = fmt::format_text_resource(IDS_PARTY_DESTROY);
 			this->MsgOutput(szMsg, D3DCOLOR_ARGB(255,255,255,255));
 
-			this->UpdateUI_PartyOrForceButtons(); // 커맨드 줄에 있는 파티 버튼을 상황에 따라 업데이트 해준다.
+			this->UpdateUI_PartyOrForceButtons(); // 커맨드 줄에 있는 파티 버튼을 상황에 따라 업데이트 해준다. Update
 		}
 		break;
 
-		case N3_SP_PARTY_OR_FORCE_HP_CHANGE:		// 0x06	// Recv - s3(ID, HPMax, HP, iMPMax, MP) - 자기 자신이면 파티를 깨야 한다..
+		case N3_SP_PARTY_OR_FORCE_HP_CHANGE:		// 0x06	// Recv - s3(ID, HPMax, HP, iMPMax, MP) - 자기 자신이면 파티를 깨야 한다.. [Korean comment]
 		{
 			int iID			= pkt.read<int16_t>();
 			int iHPMax		= pkt.read<int16_t>();
@@ -5161,7 +5161,7 @@ void CGameProcMain::MsgRecv_PartyOrForce(Packet& pkt)
 		}
 		break;
 		
-		case N3_SP_PARTY_OR_FORCE_CLASS_CHANGE:		// 0x08	// Recv - s1(ID), b1(Class)드물지만 전직할때...
+		case N3_SP_PARTY_OR_FORCE_CLASS_CHANGE:		// 0x08	// Recv - s1(ID), b1(Class)드물지만 전직할때... [Korean comment]
 		{
 			int iID			= pkt.read<int16_t>();
 			e_Class eClass	= (e_Class)(pkt.read<int16_t>());
@@ -5170,7 +5170,7 @@ void CGameProcMain::MsgRecv_PartyOrForce(Packet& pkt)
 		}
 		break;
 		
-		case N3_SP_PARTY_OR_FORCE_STATUS_CHANGE:	// 0x09	// Recv - s1(ID), b1(Status)...독, 저주, 지속성마법, 축복
+		case N3_SP_PARTY_OR_FORCE_STATUS_CHANGE:	// 0x09	// Recv - s1(ID), b1(Status)...독, 저주, 지속성마법, 축복 [Korean comment]
 		{
 			int iID	=			pkt.read<int16_t>();
 			e_PartyStatus ePS =	(e_PartyStatus)pkt.read<uint8_t>();
@@ -5185,9 +5185,9 @@ void CGameProcMain::MsgRecv_PartyOrForce(Packet& pkt)
 
 void CGameProcMain::CommandSitDown(bool bLimitInterval, bool bSitDown, bool bImmediately)
 {
-	if(bSitDown == s_pPlayer->m_bSitDown) return; // 상태가 같으면 돌아간다..
+	if(bSitDown == s_pPlayer->m_bSitDown) return; // 상태가 같으면 돌아간다.. Status
 
-	// 앉기 서기 제한..
+	// 앉기 서기 제한.. [Korean comment]
 	if(bLimitInterval)
 	{
 		float fTime = CN3Base::TimeGet();
@@ -5201,14 +5201,14 @@ void CGameProcMain::CommandSitDown(bool bLimitInterval, bool bSitDown, bool bImm
 
 	if(bSitDown)
 	{
-		if(eSM != PSM_STOP) // 뛰던 놈이면 멈춘다.
+		if(eSM != PSM_STOP) // 뛰던 놈이면 멈춘다. [Korean comment]
 			return;
 
-		if(this->m_pMagicSkillMng->IsCasting()) // 스킬 캐스팅 중이면 앉지 못한다..
+		if(this->m_pMagicSkillMng->IsCasting()) // 스킬 캐스팅 중이면 앉지 못한다.. [Korean comment]
 			return;
 
-		if(s_pPlayer->m_bAttackContinous) // 계속 공격하는 중이면..
-			this->CommandEnableAttackContinous(false, nullptr); // 계속 공격 취소..
+		if(s_pPlayer->m_bAttackContinous) // 계속 공격하는 중이면.. [Korean comment]
+			this->CommandEnableAttackContinous(false, nullptr); // 계속 공격 취소.. [Korean comment]
 	}
 
 	bool bVBs[2] = { false, false };
@@ -5218,13 +5218,13 @@ void CGameProcMain::CommandSitDown(bool bLimitInterval, bool bSitDown, bool bImm
 		eSA = PSA_SITDOWN;
 		bVBs[0] = false; bVBs[1] = true;
 		iState = 0x02;
-	} // 앉는 경우
+	} // 앉는 경우 [Korean comment]
 	else
 	{
 		eSA = PSA_BASIC;
 		bVBs[0] = true; bVBs[1] = false;
 		iState = 0x01;
-	} // 일어서는 경우
+	} // 일어서는 경우 [Korean comment]
 	
 	s_pPlayer->m_bSitDown = bSitDown;
 	s_pPlayer->Action(eSA, true, nullptr, bImmediately);
@@ -5232,18 +5232,18 @@ void CGameProcMain::CommandSitDown(bool bLimitInterval, bool bSitDown, bool bImm
 	if(m_pUICmd->m_pBtn_Act_SitDown)
 	{
 		m_pUICmd->m_pBtn_Act_SitDown->SetVisible(bVBs[0]);
-		m_pUICmd->m_pBtn_Act_SitDown->SetState(UI_STATE_BUTTON_DOWN); // 버튼 누름
+		m_pUICmd->m_pBtn_Act_SitDown->SetState(UI_STATE_BUTTON_DOWN); // 버튼 누름 Button
 	}
 	if(m_pUICmd->m_pBtn_Act_StandUp)
 	{
 		m_pUICmd->m_pBtn_Act_StandUp->SetVisible(bVBs[1]);
-		m_pUICmd->m_pBtn_Act_StandUp->SetState(UI_STATE_BUTTON_DOWN); // 버튼 누름
+		m_pUICmd->m_pBtn_Act_StandUp->SetState(UI_STATE_BUTTON_DOWN); // 버튼 누름 Button
 	}
 
-	this->MsgSend_StateChange(N3_SP_STATE_CHANGE_SITDOWN, iState); // 앉았다.. 패킷..
+	this->MsgSend_StateChange(N3_SP_STATE_CHANGE_SITDOWN, iState); // 앉았다.. 패킷.. [Korean comment]
 }
 
-// 가장 가까운 적 타겟 잡기..
+// 가장 가까운 적 타겟 잡기.. [Korean comment]
 void CGameProcMain::CommandTargetSelect_NearestEnemy()
 {
 	CPlayerNPC* pTarget = s_pOPMgr->CharacterGetByNearestEnemy(s_pPlayer->m_InfoBase.eNation, s_pPlayer->Position());
@@ -5251,7 +5251,7 @@ void CGameProcMain::CommandTargetSelect_NearestEnemy()
 	s_pPlayer->RotateTo(pTarget);
 }
 
-// 가장 가까운 파티 타겟잡기..
+// 가장 가까운 파티 타겟잡기.. [Korean comment]
 void CGameProcMain::CommandTargetSelect_NearestOurForce()
 {
 	CPlayerOther* pTarget = m_pUIPartyOrForce->MemberGetByNearst(s_pPlayer->Position());
@@ -5273,10 +5273,10 @@ void CGameProcMain::CloseUIs()
 
 void CGameProcMain::MsgSend_StateChange(e_SubPacket_State eSP, int iState)
 {
-	uint8_t byBuff[4];											// 패킷 버퍼..
-	int iOffset=0;											// 패킷 오프셋..
+	uint8_t byBuff[4];											// 패킷 버퍼.. [Korean comment]
+	int iOffset=0;											// 패킷 오프셋.. [Korean comment]
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_STATE_CHANGE);	// 상태 변화..
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_STATE_CHANGE);	// 상태 변화.. Status
 	CAPISocket::MP_AddByte(byBuff, iOffset, eSP);
 	CAPISocket::MP_AddShort(byBuff, iOffset, iState);//CAPISocket::MP_AddByte(byBuff, iOffset, iState);
 
@@ -5285,20 +5285,20 @@ void CGameProcMain::MsgSend_StateChange(e_SubPacket_State eSP, int iState)
 
 void CGameProcMain::MsgSend_PerTradeReq(int iDestID, bool bNear)
 {
-	uint8_t byBuff[4];											// 패킷 버퍼..
-	int iOffset=0;											// 패킷 오프셋..
+	uint8_t byBuff[4];											// 패킷 버퍼.. [Korean comment]
+	int iOffset=0;											// 패킷 오프셋.. [Korean comment]
 
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_EXCHANGE);			
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_PER_TRADE_REQ);		
-	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)iDestID );			// 상대방 아이디..
+	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)iDestID );			// 상대방 아이디.. [Korean comment]
 	if(bNear)
 		CAPISocket::MP_AddByte(byBuff, iOffset, 1);
 	else
 		CAPISocket::MP_AddByte(byBuff, iOffset, 2);
-	//1:일반 거래
-	//2:상거래 게시판 거래
+	//1:일반 거래 [Korean comment]
+	//2:상거래 게시판 거래 [Korean comment]
 
-	s_pSocket->Send(byBuff, iOffset);									// 보냄..
+	s_pSocket->Send(byBuff, iOffset);									// 보냄.. [Korean comment]
 
 	//TRACE("아이디: %d, 아이템 거래 신청 패킷 보냄.. \n", iDestID);
 }
@@ -5318,7 +5318,7 @@ void CGameProcMain::MsgRecv_PerTrade(Packet& pkt)
 
 			if (m_pUITransactionDlg->IsVisible()) 	/* 상인과 거래중이면.. */
 			{
-				// 거절한다..
+				// 거절한다.. [Korean comment]
 				m_pUITransactionDlg->LeaveTransactionState();
 				m_pSubProcPerTrade->LeavePerTradeState(PER_TRADE_RESULT_MY_DISAGREE);
 				break;
@@ -5326,7 +5326,7 @@ void CGameProcMain::MsgRecv_PerTrade(Packet& pkt)
 
 			if (m_pUIWareHouseDlg->IsVisible()) 	/* 보관함에 보관중이면.. */
 			{
-				// 거절한다..
+				// 거절한다.. [Korean comment]
 				m_pUIWareHouseDlg->LeaveWareHouseState();
 				m_pSubProcPerTrade->LeavePerTradeState(PER_TRADE_RESULT_MY_DISAGREE);
 				break;
@@ -5384,7 +5384,7 @@ void CGameProcMain::MsgRecv_PerTrade(Packet& pkt)
 
 		case N3_SP_PER_TRADE_DONE:
 			bResult = pkt.read<uint8_t>();
-			if ( bResult == 0x01 )		// 성공이면..
+			if ( bResult == 0x01 )		// 성공이면.. [Korean comment]
 			{	
 				iTotalGold = pkt.read<uint32_t>();
 				m_pSubProcPerTrade->ReceiveMsgPerTradeDoneSuccessBegin(iTotalGold);
@@ -5399,7 +5399,7 @@ void CGameProcMain::MsgRecv_PerTrade(Packet& pkt)
 				}
 				m_pSubProcPerTrade->ReceiveMsgPerTradeDoneSuccessEnd();
 			}
-			else						// 실패이면..
+			else						// 실패이면.. [Korean comment]
 				m_pSubProcPerTrade->ReceiveMsgPerTradeDoneFail();
 			break;
 
@@ -5417,67 +5417,67 @@ void CGameProcMain::TargetSelect(int iID, bool bMustAlive)
 
 void CGameProcMain::TargetSelect(CPlayerNPC* pTarget)
 {
-	if(PSA_SPELLMAGIC == s_pPlayer->State()) // 마법 캐스팅을 하는 중간에는 타겟을 못 바꾼다..
+	if(PSA_SPELLMAGIC == s_pPlayer->State()) // 마법 캐스팅을 하는 중간에는 타겟을 못 바꾼다.. [Korean comment]
 		return;
 
-	int iIDTargetPrev = s_pPlayer->m_iIDTarget; // 전의 타겟 기억..
+	int iIDTargetPrev = s_pPlayer->m_iIDTarget; // 전의 타겟 기억.. [Korean comment]
 	s_pPlayer->m_iIDTarget = -1;
 	s_pPlayer->m_pObjectTarget = nullptr;
 
 	if(pTarget && pTarget->m_InfoBase.iAuthority != AUTHORITY_MANAGER)
-	{ //운영자는 포커스를 주지 않게 하기 위해서...
+	{ //운영자는 포커스를 주지 않게 하기 위해서... [Korean comment]
 		s_pPlayer->m_iIDTarget = pTarget->IDNumber();
-		if(iIDTargetPrev != s_pPlayer->m_iIDTarget) // 전의 타겟과 다르면
+		if(iIDTargetPrev != s_pPlayer->m_iIDTarget) // 전의 타겟과 다르면 [Korean comment]
 		{
-			this->CommandEnableAttackContinous(false, nullptr);	// 자동 공격 취소..
+			this->CommandEnableAttackContinous(false, nullptr);	// 자동 공격 취소.. [Korean comment]
 
 			D3DCOLOR crID = 0xffffffff;
 			if(	pTarget->PlayerType() == PLAYER_OTHER) // User..
 			{
-				if(pTarget->m_InfoBase.eNation != s_pPlayer->m_InfoBase.eNation) crID = 0xffff4040; // 다른 국가이면
+				if(pTarget->m_InfoBase.eNation != s_pPlayer->m_InfoBase.eNation) crID = 0xffff4040; // 다른 국가이면 [Korean comment]
 				else crID = 0xff6b9fff;
 			}
 			else // NPC
 			{
-				if(pTarget->m_InfoBase.eNation != s_pPlayer->m_InfoBase.eNation) crID = 0xffff6060; // 다른 국가이면
+				if(pTarget->m_InfoBase.eNation != s_pPlayer->m_InfoBase.eNation) crID = 0xffff6060; // 다른 국가이면 [Korean comment]
 				else crID = 0xff1064ff;
 			}
 			
 			if( pTarget->IsAlive() )//살아있는 상태만 target bar를 보여준다.
 			{
 				m_pUITargetBar->SetVisible(true);
-				m_pUITargetBar->SetIDString(pTarget->IDString(), crID); // 이름을 넣고..
+				m_pUITargetBar->SetIDString(pTarget->IDString(), crID); // 이름을 넣고.. Name
 				this->MsgSend_RequestTargetHP(s_pPlayer->m_iIDTarget, 0x01);	// 서버에게 HP정보를 요청한다..
 			}
 			else
 			{
-				m_pUITargetBar->SetVisible(false); // 타겟 바 없애기..
+				m_pUITargetBar->SetVisible(false); // 타겟 바 없애기.. [Korean comment]
 			}
 		}
 	}
 	else
 	{
-		s_pPlayer->m_iIDTarget = -1; // 타겟 아이디를 잡고..
-		m_pUITargetBar->SetVisible(false); // 타겟 바 없애기..
+		s_pPlayer->m_iIDTarget = -1; // 타겟 아이디를 잡고.. [Korean comment]
+		m_pUITargetBar->SetVisible(false); // 타겟 바 없애기.. [Korean comment]
 
-		this->CommandEnableAttackContinous(false, nullptr); // 자동 공격 취소..
+		this->CommandEnableAttackContinous(false, nullptr); // 자동 공격 취소.. [Korean comment]
 	}
 
 	if(	PSA_SITDOWN != s_pPlayer->State() && 
 		PSM_STOP == s_pPlayer->StateMove() &&
-		PSA_BASIC == s_pPlayer->State()) s_pPlayer->Action(PSA_BASIC, true); // 기본 자세 바꾸기..
+		PSA_BASIC == s_pPlayer->State()) s_pPlayer->Action(PSA_BASIC, true); // 기본 자세 바꾸기.. [Korean comment]
 
-	this->UpdateUI_PartyOrForceButtons(); // 커맨드 줄에 있는 파티 버튼을 상황에 따라 업데이트 해준다.
+	this->UpdateUI_PartyOrForceButtons(); // 커맨드 줄에 있는 파티 버튼을 상황에 따라 업데이트 해준다. Update
 }
 
-void CGameProcMain::MsgRecv_SkillChange(Packet& pkt)			// 스킬 변화..
+void CGameProcMain::MsgRecv_SkillChange(Packet& pkt)			// 스킬 변화.. [Korean comment]
 {
 	int iType	= pkt.read<uint8_t>();
 	int iValue	= pkt.read<uint8_t>();
 
 	m_pUISkillTreeDlg->m_iSkillInfo[iType] = iValue;
 	m_pUISkillTreeDlg->m_iSkillInfo[0]++;
-	m_pUISkillTreeDlg->InitIconUpdate();		// 스킬 포인트가 변화되었으므로 .. 스킬도 변화될 수 있다..
+	m_pUISkillTreeDlg->InitIconUpdate();		// 스킬 포인트가 변화되었으므로 .. 스킬도 변화될 수 있다.. [Korean comment]
 }
 
 void CGameProcMain::MsgRecv_MagicProcess(Packet& pkt)
@@ -5504,7 +5504,7 @@ void CGameProcMain::MsgRecv_MagicProcess(Packet& pkt)
 	}	
 }
 
-void CGameProcMain::MsgRecv_ClassChange(Packet& pkt)			// 직업 변화..
+void CGameProcMain::MsgRecv_ClassChange(Packet& pkt)			// 직업 변화.. [Korean comment]
 {
 	e_SubPacket_ClassChange eSP = (e_SubPacket_ClassChange)pkt.read<uint8_t>();
 
@@ -5546,7 +5546,7 @@ void CGameProcMain::MsgRecv_ObjectEvent(Packet& pkt)
 		|| iType == OBJECT_TYPE_FLAG)
 	{
 		int iID = pkt.read<int16_t>();	// 열고 닫을 성문 ID
-		int iActivate = pkt.read<uint8_t>();	// 열고 닫음..
+		int iActivate = pkt.read<uint8_t>();	// 열고 닫음.. [Korean comment]
 
 		CPlayerNPC* pNPC = s_pOPMgr->NPCGetByID(iID, true);
 		__ASSERT(pNPC, "Invalid NPC ID");
@@ -5558,8 +5558,8 @@ void CGameProcMain::MsgRecv_ObjectEvent(Packet& pkt)
 			{
 				__Vector3 vAxis(0, 1, 0);
 				float fRadian = D3DXToRadian(90);
-				bool bShouldBeRotate = true; // 돌려야 하는지??
-				if (OBJECT_TYPE_DOOR_LEFTRIGHT == iType) // 좌우열림 성문
+				bool bShouldBeRotate = true; // 돌려야 하는지?? [Korean comment]
+				if (OBJECT_TYPE_DOOR_LEFTRIGHT == iType) // 좌우열림 성문 [Korean comment]
 				{
 					if (0x01 == iActivate)
 					{
@@ -5573,7 +5573,7 @@ void CGameProcMain::MsgRecv_ObjectEvent(Packet& pkt)
 					}
 					vAxis.Set(0, 1, 0);
 				}
-				else if (OBJECT_TYPE_DOOR_TOPDOWN == iType) // 상하열림 성문
+				else if (OBJECT_TYPE_DOOR_TOPDOWN == iType) // 상하열림 성문 [Korean comment]
 				{
 					if (0x01 == iActivate)
 					{
@@ -5587,7 +5587,7 @@ void CGameProcMain::MsgRecv_ObjectEvent(Packet& pkt)
 					}
 					vAxis.Set(0, 0, 1);
 				}
-				else if (OBJECT_TYPE_LEVER_TOPDOWN == iType) // 상하 레버
+				else if (OBJECT_TYPE_LEVER_TOPDOWN == iType) // 상하 레버 [Korean comment]
 				{
 					if (0x01 == iActivate)
 					{
@@ -5603,7 +5603,7 @@ void CGameProcMain::MsgRecv_ObjectEvent(Packet& pkt)
 				}
 				else if (OBJECT_TYPE_FLAG == iType)
 				{
-					bShouldBeRotate = false; // 돌려야 하는지??
+					bShouldBeRotate = false; // 돌려야 하는지?? [Korean comment]
 				}
 
 				if (0x01 == iActivate)
@@ -5681,23 +5681,23 @@ void CGameProcMain::ParseChattingCommand(const std::string& szCmd)
 	{
 		case CMD_WHISPER:
 		{
-			this->MsgSend_ChatSelectTarget(szCmds[1]); // 일대일 채팅 상대 정하기.
+			this->MsgSend_ChatSelectTarget(szCmds[1]); // 일대일 채팅 상대 정하기. [Korean comment]
 		}
 		break;
 
 		case CMD_TOWN:
 		{
-			if(s_pPlayer->m_bStun) return; // 기절해 있음 못함..
-			if(s_pPlayer->m_InfoBase.iHP * 2 >= s_pPlayer->m_InfoBase.iHPMax) // HP가 반 이상 있어야 한다.
+			if(s_pPlayer->m_bStun) return; // 기절해 있음 못함.. [Korean comment]
+			if(s_pPlayer->m_InfoBase.iHP * 2 >= s_pPlayer->m_InfoBase.iHPMax) // HP가 반 이상 있어야 한다. [Korean comment]
 			{
 				// NOTE(srmeier): currently there is an issue where OtherPlayers may get
 				// duplicated in the player manager if they where there before the TP
 
 				int iOffset = 0;
-				CAPISocket::MP_AddWord(byBuff, iOffset, WIZ_HOME);		// 마을로 가기...
+				CAPISocket::MP_AddWord(byBuff, iOffset, WIZ_HOME);		// 마을로 가기... [Korean comment]
 				s_pSocket->Send(byBuff, iOffset);
 			}
-			else // HP가 반 이상 있어야 한다.
+			else // HP가 반 이상 있어야 한다. [Korean comment]
 			{
 				std::string szMsg = fmt::format_text_resource(IDS_ERR_GOTO_TOWN_OUT_OF_HP);
 				this->MsgOutput(szMsg, 0xffff00ff);
@@ -5709,11 +5709,11 @@ void CGameProcMain::ParseChattingCommand(const std::string& szCmd)
 		{
 			CPlayerOther* pOPC = s_pOPMgr->UPCGetByID(s_pPlayer->m_iIDTarget, true);
 
-			// 타겟으로 다른 플레이어가 잡혀있고..  가까이 있으면..
+			// 타겟으로 다른 플레이어가 잡혀있고..  가까이 있으면.. [Korean comment]
 			if (pOPC != nullptr
 				&& (pOPC->Position() - s_pPlayer->Position()).Magnitude() < (pOPC->Height() + 5.0f)
-				// 개인간 아이템 거래..
-				// 상거래 중이 아니면..
+				// 개인간 아이템 거래.. [Korean comment]
+				// 상거래 중이 아니면.. [Korean comment]
 				&& !m_pUITransactionDlg->IsVisible())
 			{
 				std::string szMsg = fmt::format_text_resource(IDS_PERSONAL_TRADE_REQUEST);
@@ -5748,9 +5748,9 @@ void CGameProcMain::ParseChattingCommand(const std::string& szCmd)
 			{
 				std::string szMsg;
 				if (this->MsgSend_PartyOrForceCreate(0, pTarget->IDString()))
-					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE); // 파티 요청.. 
+					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE); // 파티 요청..  [Korean comment]
 				else
-					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE_FAILED); // 파티 초대 실패
+					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE_FAILED); // 파티 초대 실패 [Korean comment]
 				this->MsgOutput(pTarget->IDString() + szMsg, 0xffffff00);
 			}
 		}
@@ -5758,7 +5758,7 @@ void CGameProcMain::ParseChattingCommand(const std::string& szCmd)
 
 		case CMD_LEAVEPARTY:
 		{
-			this->MsgSend_PartyOrForceLeave(0); // 파티 요청..
+			this->MsgSend_PartyOrForceLeave(0); // 파티 요청.. [Korean comment]
 		}
 		break;
 
@@ -5894,7 +5894,7 @@ void CGameProcMain::ParseChattingCommand(const std::string& szCmd)
 		{
 			if(szCmd.size() >= (s_szCmdMsg[CMD_NOTICE].size()+2))//7)
 			{
-				std::string szChat = szCmd.substr(s_szCmdMsg[CMD_NOTICE].size()+2); // "/공지 "를 제외한 나머지 문자열
+				std::string szChat = szCmd.substr(s_szCmdMsg[CMD_NOTICE].size()+2); // "/공지 "를 제외한 나머지 문자열 [Korean comment]
 				this->MsgSend_Chat(N3_CHAT_PUBLIC, szChat);
 			}
 		}
@@ -5902,25 +5902,25 @@ void CGameProcMain::ParseChattingCommand(const std::string& szCmd)
 
 		case CMD_ARREST:
 		{
-			this->MsgSend_Administrator(N3_SP_ADMINISTRATOR_ARREST, szCmds[1]); //추적		
+			this->MsgSend_Administrator(N3_SP_ADMINISTRATOR_ARREST, szCmds[1]); //추적		 [Korean comment]
 		}
 		break;
 
 		case CMD_FORBIDCONNECT:
 		{
-			this->MsgSend_Administrator(N3_SP_ADMINISTRATOR_FORBID_CONNECT, szCmds[1]); //접속금지		
+			this->MsgSend_Administrator(N3_SP_ADMINISTRATOR_FORBID_CONNECT, szCmds[1]); //접속금지		 [Korean comment]
 		}
 		break;
 		
 		case CMD_FORBIDCHAT:
 		{
-			this->MsgSend_Administrator(N3_SP_ADMINISTRATOR_CHAT_FORBID, szCmds[1]); //채팅금지		
+			this->MsgSend_Administrator(N3_SP_ADMINISTRATOR_CHAT_FORBID, szCmds[1]); //채팅금지		 [Korean comment]
 		}
 		break;
 		
 		case CMD_PERMITCHAT:
 		{
-			this->MsgSend_Administrator(N3_SP_ADMINISTRATOR_CHAT_PERMIT, szCmds[1]); //채팅허가		
+			this->MsgSend_Administrator(N3_SP_ADMINISTRATOR_CHAT_PERMIT, szCmds[1]); //채팅허가		 [Korean comment]
 		}
 		break;
 		
@@ -5928,10 +5928,10 @@ void CGameProcMain::ParseChattingCommand(const std::string& szCmd)
 		{
 			if(m_fRequestGameSave > 300.0f)
 			{
-				uint8_t byBuff[4];												// 버퍼.. 
-				int iOffset=0;												// 옵셋..
-				s_pSocket->MP_AddByte(byBuff, iOffset, WIZ_DATASAVE);	// 저장 요청 커멘드..
-				s_pSocket->Send(byBuff, iOffset);				// 보냄..
+				uint8_t byBuff[4];												// 버퍼..  [Korean comment]
+				int iOffset=0;												// 옵셋.. [Korean comment]
+				s_pSocket->MP_AddByte(byBuff, iOffset, WIZ_DATASAVE);	// 저장 요청 커멘드.. Save
+				s_pSocket->Send(byBuff, iOffset);				// 보냄.. [Korean comment]
 				m_fRequestGameSave = 0.0f;
 
 				std::string szMsg = fmt::format_text_resource(IDS_REQUEST_GAME_SAVE);
@@ -5955,7 +5955,7 @@ void CGameProcMain::ParseChattingCommand(const std::string& szCmd)
 
 void CGameProcMain::UpdateUI_PartyOrForceButtons()
 {
-	// 파티 버튼 상태 바꾸기..
+	// 파티 버튼 상태 바꾸기.. Button
 	CPlayerBase* pTarget = nullptr;
 	bool bIAmLeader = false, bIAmMemberOfParty = false;
 	int iMemberIndex = -1;
@@ -5967,7 +5967,7 @@ void CGameProcMain::UpdateUI_PartyOrForceButtons()
 
 const __InfoPartyOrForce* CGameProcMain::PartyOrForceConditionGet(bool& bIAmLeader, bool& bIAmMember, int& iMemberIndex, class CPlayerBase*& pTarget)
 {
-	// 파티 버튼 상태 바꾸기..
+	// 파티 버튼 상태 바꾸기.. Button
 	bIAmLeader = false;
 	iMemberIndex = -1;
 	bIAmMember = false;
@@ -6013,38 +6013,38 @@ void CGameProcMain::UpdateUI_MiniMap()
 		pUPC = it2->second;
 
 		bool bDrawTop = false;
-		if(eNation != pUPC->m_InfoBase.eNation) // 적국일경우
+		if(eNation != pUPC->m_InfoBase.eNation) // 적국일경우 [Korean comment]
 		{
 			if(pUPC->State() == PSA_SITDOWN)
 			{
-				pUPC->m_InfoBase.bRenderID = false; // 아이디 표시하지 않음.
-				continue; // 앉아있으면.. 지나간다..
+				pUPC->m_InfoBase.bRenderID = false; // 아이디 표시하지 않음. [Korean comment]
+				continue; // 앉아있으면.. 지나간다.. [Korean comment]
 			}
 			else
 			{
-				pUPC->m_InfoBase.bRenderID = true; // 아이디 표시함.
+				pUPC->m_InfoBase.bRenderID = true; // 아이디 표시함. [Korean comment]
 			}
 
-			if(pZoneInfo && FALSE == pZoneInfo->bIndicateEnemyPlayer) continue; // 적국이 표시 되지 않아야 한다면.. 지나간다..
+			if(pZoneInfo && FALSE == pZoneInfo->bIndicateEnemyPlayer) continue; // 적국이 표시 되지 않아야 한다면.. 지나간다.. [Korean comment]
 			
-			crType = 0xffff4040; // 다른 국가  - 밝은 빨간색
+			crType = 0xffff4040; // 다른 국가  - 밝은 빨간색 Color
 		}
-		else // 같은 국가면..
+		else // 같은 국가면.. [Korean comment]
 		{
 			int iMemberIndex = -1;
 			const __InfoPartyOrForce* pPI = m_pUIPartyOrForce->MemberInfoGetByID(pUPC->IDNumber(), iMemberIndex);
 			if(pPI)
 			{
-				bDrawTop = true; // 맨 위에 그린다.
-				crType = 0xffffff00; // 파티 멤버면 // 노란색
+				bDrawTop = true; // 맨 위에 그린다. [Korean comment]
+				crType = 0xffffff00; // 파티 멤버면 // 노란색 Color
 			}
 			else
 			{
-				crType = 0xff0040ff; // 파티 멤버가 아니면 밝은 파란색
+				crType = 0xff0040ff; // 파티 멤버가 아니면 밝은 파란색 Color
 			}
 		}
 
-		if(pUPC && pUPC->m_InfoBase.iAuthority != AUTHORITY_MANAGER)	// 운영자가 아닌경우만 미니맵에 포인트를 찍어준다.
+		if(pUPC && pUPC->m_InfoBase.iAuthority != AUTHORITY_MANAGER)	// 운영자가 아닌경우만 미니맵에 포인트를 찍어준다. [Korean comment]
 			m_pUIStateBarAndMiniMap->PositionInfoAdd(pUPC->IDNumber(), pUPC->Position(), crType, bDrawTop);
 	}
 }
@@ -6062,16 +6062,16 @@ void CGameProcMain::UpdateUI_TargetBar()
 	}
 
 	CPlayerNPC* pTarget = s_pOPMgr->CharacterGetByID(s_pPlayer->m_iIDTarget, true);
-	if(pTarget) // 타겟이 유효하면..
+	if(pTarget) // 타겟이 유효하면.. [Korean comment]
 	{
 		float fTimeTmp = CN3Base::TimeGet();
-		if(fTimeTmp > m_pUITargetBar->m_fTimeSendPacketLast + PACKET_INTERVAL_REQUEST_TARGET_HP) // 1초가 지나면 타겟 정보 요청
+		if(fTimeTmp > m_pUITargetBar->m_fTimeSendPacketLast + PACKET_INTERVAL_REQUEST_TARGET_HP) // 1초가 지나면 타겟 정보 요청 Info
 		{
 			this->MsgSend_RequestTargetHP(s_pPlayer->m_iIDTarget, false);
 			m_pUITargetBar->m_fTimeSendPacketLast = fTimeTmp;
 		}
 	}
-	else // 타겟이 없으면..
+	else // 타겟이 없으면.. [Korean comment]
 	{
 		s_pPlayer->m_iIDTarget = -1;
 		m_pUITargetBar->SetVisible(false);
@@ -6132,11 +6132,11 @@ void CGameProcMain::UpdateCameraAndLight()
 	
 	s_pEng->Tick(	crDiffuses, crAmbients, ACT_WORLD->GetFogColorWithSky(), 
 					vPosPlayer, s_pPlayer->Rotation(),
-					s_pPlayer->Height(), ACT_WORLD->GetSunAngleByRadinWithSky() );		// 캐릭터 위치와 해의 각도를 넣어준다..
+					s_pPlayer->Height(), ACT_WORLD->GetSunAngleByRadinWithSky() );		// 캐릭터 위치와 해의 각도를 넣어준다.. Character
 	s_pEng->ApplyCameraAndLight();	// 카메라와 라이트에 세팅된 값을 D3D Device 에 적용한다.
 }
 
-void CGameProcMain::MsgRecv_DurabilityChange(Packet& pkt)		// 내구력 변경..
+void CGameProcMain::MsgRecv_DurabilityChange(Packet& pkt)		// 내구력 변경.. Change
 {
 	e_ItemSlot eSlot = (e_ItemSlot)pkt.read<uint8_t>();	
 	int iCurValue  = pkt.read<int16_t>();	
@@ -6161,19 +6161,19 @@ void CGameProcMain::MsgRecv_Knights(Packet& pkt)
 
 	switch(eSP)
 	{
-	case N3_SP_KNIGHTS_CREATE: // 생성..
+	case N3_SP_KNIGHTS_CREATE: // 생성.. Create
 		this->MsgRecv_Knights_Create(pkt);
 		break;
-	case N3_SP_KNIGHTS_WITHDRAW: //탈퇴
+	case N3_SP_KNIGHTS_WITHDRAW: //탈퇴 [Korean comment]
 		this->MsgRecv_Knights_Withdraw(pkt);
 		break;
-	case N3_SP_KNIGHTS_JOIN: //가입
+	case N3_SP_KNIGHTS_JOIN: //가입 [Korean comment]
 		this->MsgRecv_Knights_Join(pkt);
 		break;
-	case N3_SP_KNIGHTS_MEMBER_REMOVE: //멤버 삭제 - 
+	case N3_SP_KNIGHTS_MEMBER_REMOVE: //멤버 삭제 -  Delete
 		this->MsgRecv_Knights_Leave(pkt);
 		break;
-	case N3_SP_KNIGHTS_APPOINT_VICECHIEF: //부단장 임명 - 가입허가와 같음
+	case N3_SP_KNIGHTS_APPOINT_VICECHIEF: //부단장 임명 - 가입허가와 같음 [Korean comment]
 		this->MsgRecv_Knights_AppointViceChief(pkt);
  	break;
 	case N3_SP_KNIGHTS_MEMBER_INFO_ALL:
@@ -6189,13 +6189,13 @@ void CGameProcMain::MsgRecv_Knights(Packet& pkt)
 			std::string szMsg;
 			switch ( (e_SubPacket_KNights_Common)bSubCom )
 			{
-			case N3_SP_KNIGHTS_COMMON_SUCCESS: //클랜파괴 성공
+			case N3_SP_KNIGHTS_COMMON_SUCCESS: //클랜파괴 성공 [Korean comment]
 				szMsg = fmt::format_text_resource(IDS_CLAN_WITHDRAW_SUCCESS);
 				m_pUIKnightsOp->KnightsInfoDelete(s_pPlayer->m_InfoExt.iKnightsID);
 				this->MsgOutput(szMsg, 0xffffff00);
 				break;
-			case N3_SP_KNIGHTS_COMMON_DBFAIL: //DB검색 실패..
-			case N3_SP_KNIGHTS_COMMON_FAIL_NONE_USER:	//없는 유저..
+			case N3_SP_KNIGHTS_COMMON_DBFAIL: //DB검색 실패.. Color
+			case N3_SP_KNIGHTS_COMMON_FAIL_NONE_USER:	//없는 유저.. [Korean comment]
 				break;
 			}
 			s_pPlayer->m_InfoExt.eKnightsDuty = KNIGHTS_DUTY_UNKNOWN;
@@ -6203,63 +6203,63 @@ void CGameProcMain::MsgRecv_Knights(Packet& pkt)
 			m_pUIVar->UpdateKnightsInfo();
 		}
 		break;
-	case N3_SP_KNIGHTS_DUTY_CHANGE: // 직위 변경..
+	case N3_SP_KNIGHTS_DUTY_CHANGE: // 직위 변경.. Change
 		MsgRecv_Knights_Duty_Change(pkt);
 		break;
 	case N3_SP_KNIGHTS_JOIN_REQ:
 		MsgRecv_Knigts_Join_Req(pkt);
 		break;
 
-/*	case N3_SP_KNIGHTS_APPOINT_CHIEF: //단장 임명 - 가입허가와 같음
+/*	case N3_SP_KNIGHTS_APPOINT_CHIEF: //단장 임명 - 가입허가와 같음 [Korean comment]
 		{
-			szMsg = fmt::format_text_resource(IDS_KNIGHTS_APPOINT_CHIEF_SUCCESS); // 성공
+			szMsg = fmt::format_text_resource(IDS_KNIGHTS_APPOINT_CHIEF_SUCCESS); // 성공 [Korean comment]
 		}
 		break;
 	case N3_SP_KNIGHTS_DESTROY: // 뽀개기 Send - | Recv - b1(1:성공 0:실패)
 		{
-			szMsg = fmt::format_text_resource(IDS_KNIGHTS_DESTROY_SUCCESS); // 성공
+			szMsg = fmt::format_text_resource(IDS_KNIGHTS_DESTROY_SUCCESS); // 성공 [Korean comment]
 
 			s_pPlayer->m_InfoExt.iKnightsID = 0;
 			s_pPlayer->m_InfoExt.eKnightsDuty = KNIGHTS_DUTY_UNKNOWN;
 
-			// 기사단에서 뺀다..
+			// 기사단에서 뺀다.. [Korean comment]
 			m_pUIVar->m_pPageKnights->UpdateKnightsName("");
 			m_pUIVar->m_pPageKnights->UpdateKnightsChiefName("");
 			m_pUIVar->m_pPageKnights->UpdateKnightsDuty(KNIGHTS_DUTY_UNKNOWN);
 
-			m_pUIKnightsOp->MsgSend_KnightsList(0); // 다시 기사단 리스트를 요청한다..
+			m_pUIKnightsOp->MsgSend_KnightsList(0); // 다시 기사단 리스트를 요청한다.. [Korean comment]
 		}
 		break;
 
 	case N3_SP_KNIGHTS_MEMBER_JOIN_ADMIT: //멤버 가입 허가 Send - s1(Knights ID) | Recv - b1(1:성공 0:실패)
 		{
-			szMsg = fmt::format_text_resource(IDS_KNIGHTS_ADMIT_SUCCESS); // 성공
+			szMsg = fmt::format_text_resource(IDS_KNIGHTS_ADMIT_SUCCESS); // 성공 [Korean comment]
 		}
 		break;
-	case N3_SP_KNIGHTS_MEMBER_JOIN_REJECT: //멤버 가입 거절 - 가입허가와 같음
+	case N3_SP_KNIGHTS_MEMBER_JOIN_REJECT: //멤버 가입 거절 - 가입허가와 같음 [Korean comment]
 		{
-			szMsg = fmt::format_text_resource(IDS_KNIGHTS_REJECT_SUCCESS); // 성공
+			szMsg = fmt::format_text_resource(IDS_KNIGHTS_REJECT_SUCCESS); // 성공 [Korean comment]
 		}
 		break;
-	case N3_SP_KNIGHTS_MEMBER_PUNISH: //멤버 징계 - 가입허가와 같음
+	case N3_SP_KNIGHTS_MEMBER_PUNISH: //멤버 징계 - 가입허가와 같음 [Korean comment]
 		{
-			szMsg = fmt::format_text_resource(IDS_KNIGHTS_PUNISH_SUCCESS); // 성공
+			szMsg = fmt::format_text_resource(IDS_KNIGHTS_PUNISH_SUCCESS); // 성공 [Korean comment]
 		}
 		break;
-	case N3_SP_KNIGHTS_APPOINT_OFFICER: // 장교임명 - 가입허가와 같음
+	case N3_SP_KNIGHTS_APPOINT_OFFICER: // 장교임명 - 가입허가와 같음 [Korean comment]
 		{
-			szMsg = fmt::format_text_resource(IDS_KNIGHTS_APPOINT_OFFICER_SUCCESS); // 성공
+			szMsg = fmt::format_text_resource(IDS_KNIGHTS_APPOINT_OFFICER_SUCCESS); // 성공 [Korean comment]
 		}
 		break;
 	case N3_SP_KNIGHTS_LIST: //모든 리스트 요청 Send - | s1(Knights Count) Loop { s1(Knights ID) s1(Name Length) str1 (Name) }
 		{
 			if(false == m_pUIKnightsOp->IsVisible())
 			{
-				m_pUIKnightsOp->Open(s_pPlayer->m_InfoExt.eKnightsDuty); // UI 열고 리스트등 초기화..
+				m_pUIKnightsOp->Open(s_pPlayer->m_InfoExt.eKnightsDuty); // UI 열고 리스트등 초기화.. Initialize
 			}
 			else 
 			{
-				m_pUIKnightsOp->ChangeUIByDuty(s_pPlayer->m_InfoExt.eKnightsDuty); // UI 열고 리스트등 초기화..
+				m_pUIKnightsOp->ChangeUIByDuty(s_pPlayer->m_InfoExt.eKnightsDuty); // UI 열고 리스트등 초기화.. Initialize
 			}
 			m_pUIKnightsOp->MsgRecv_KnightsList(pkt);
 		}
@@ -6274,23 +6274,23 @@ void CGameProcMain::MsgRecv_Knights(Packet& pkt)
 			m_pUIVar->m_pPageKnights->MsgRecv_MemberInfo(pkt);
 		}
 		break;
-	case N3_SP_KNIGHTS_STASH: //기사단 창고
+	case N3_SP_KNIGHTS_STASH: //기사단 창고 Window
 		{
 		}
 		break;
-	case N3_SP_KNIGHTS_DUTY_CHANGE: // 직위 변경..
+	case N3_SP_KNIGHTS_DUTY_CHANGE: // 직위 변경.. Change
 		{
 			int iID = pkt.read<int16_t>();
 			e_KnightsDuty eDuty = (e_KnightsDuty)pkt.read<uint8_t>();
 
-			if(iID == s_pPlayer->IDNumber()) // 내 직위 변경..
+			if(iID == s_pPlayer->IDNumber()) // 내 직위 변경.. Change
 			{
 				m_pUIVar->m_pPageKnights->UpdateKnightsDuty(eDuty);
 			}
 			else
 			{
 				CPlayerOther* pUPC = s_pOPMgr->UPCGetByID(iID, false);
-				if(pUPC) // 다른넘 직위 변경..
+				if(pUPC) // 다른넘 직위 변경.. Change
 				{
 				}
 			}
@@ -6302,22 +6302,22 @@ void CGameProcMain::MsgRecv_Knights(Packet& pkt)
 */	}
 }
 
-void CGameProcMain::MsgRecv_KnightsListBasic(Packet& pkt) // 기사단 기본 정보 받기..
+void CGameProcMain::MsgRecv_KnightsListBasic(Packet& pkt) // 기사단 기본 정보 받기.. Info
 {
 	e_SubPacket_KnightsList eSP = (e_SubPacket_KnightsList)(pkt.read<uint8_t>());	// Sub Packet
 	switch(eSP)
 	{
 	case N3_SP_KNIGHTS_LIST_BASIC_ALL: // Receive - s1(knights Count) { s21(id, 이름길이), str1(이름) }
 		{
-			int iCount = pkt.read<int16_t>();	// 기사단 갯수
+			int iCount = pkt.read<int16_t>();	// 기사단 갯수 [Korean comment]
 			for(int i = 0; i < iCount; i++)
 			{
 				std::string szID;
 				int iID = pkt.read<int16_t>();		// 기사단 ID
-				int iLen = pkt.read<int16_t>();		// ID 문자열 길이..
-				pkt.readString(szID, iLen);	// ID 문자열..
+				int iLen = pkt.read<int16_t>();		// ID 문자열 길이.. [Korean comment]
+				pkt.readString(szID, iLen);	// ID 문자열.. [Korean comment]
 
-				m_pUIKnightsOp->KnightsInfoInsert(iID, szID); // 기사단 정보 모든 걸 받는다..
+				m_pUIKnightsOp->KnightsInfoInsert(iID, szID); // 기사단 정보 모든 걸 받는다.. Info
 			}
 		}
 		break;
@@ -6325,22 +6325,22 @@ void CGameProcMain::MsgRecv_KnightsListBasic(Packet& pkt) // 기사단 기본 �
 		{
 			std::string szID;
 			int iID = pkt.read<int16_t>();		// 기사단 ID
-			int iLen = pkt.read<int16_t>();		// ID 문자열 길이..
-			pkt.readString(szID, iLen);	// ID 문자열..
+			int iLen = pkt.read<int16_t>();		// ID 문자열 길이.. [Korean comment]
+			pkt.readString(szID, iLen);	// ID 문자열.. [Korean comment]
 
-			m_pUIKnightsOp->KnightsInfoInsert(iID, szID); // 기사단 정보 추가..
+			m_pUIKnightsOp->KnightsInfoInsert(iID, szID); // 기사단 정보 추가.. Info
 		}
 		break;
 	case N3_SP_KNIGHTS_LIST_BASIC_REMOVE: // Receive - s1(id)
 		{
 			int iID = pkt.read<int16_t>();		// 기사단 ID
-			m_pUIKnightsOp->KnightsInfoDelete(iID); // 기사단 정보 지우기..
+			m_pUIKnightsOp->KnightsInfoDelete(iID); // 기사단 정보 지우기.. Info
 		}
 		break;
 	}
 }
 
-void CGameProcMain::MsgRecv_ContinousPacket(Packet& pkt) // 압축된 데이터 이다... 한번 더 파싱해야 한다!!!
+void CGameProcMain::MsgRecv_ContinousPacket(Packet& pkt) // 압축된 데이터 이다... 한번 더 파싱해야 한다!!! Data
 {
 	uint16_t iWholeSize = pkt.read<uint16_t>();
 
@@ -6351,7 +6351,7 @@ void CGameProcMain::MsgRecv_ContinousPacket(Packet& pkt) // 압축된 데이터 
 		if (iSizeThisPacket <= 0 || iSizeThisPacket >= iWholeSize)
 		{
 			__ASSERT(0, "Invalid continous packet");
-			break; // 멈춘다!!
+			break; // 멈춘다!! [Korean comment]
 		}
 
 		Packet tempPacket;
@@ -6360,7 +6360,7 @@ void CGameProcMain::MsgRecv_ContinousPacket(Packet& pkt) // 압축된 데이터 
 	}
 }
 
-void CGameProcMain::MsgRecv_WareHouse(Packet& pkt)			// 보관함 관련 패킷..
+void CGameProcMain::MsgRecv_WareHouse(Packet& pkt)			// 보관함 관련 패킷.. [Korean comment]
 {
 	uint8_t	bResult, bSubCom = pkt.read<uint8_t>();
 
@@ -6396,7 +6396,7 @@ void CGameProcMain::MsgRecv_WareHouse(Packet& pkt)			// 보관함 관련 패킷.
 	}
 }
 
-void CGameProcMain::MsgRecv_WareHouseOpen(Packet& pkt)		// 보관함 오픈..
+void CGameProcMain::MsgRecv_WareHouseOpen(Packet& pkt)		// 보관함 오픈.. [Korean comment]
 {
 	if (m_pUIWareHouseDlg->IsVisible())
 		return;
@@ -6407,7 +6407,7 @@ void CGameProcMain::MsgRecv_WareHouseOpen(Packet& pkt)		// 보관함 오픈..
 	iWareGold		= pkt.read<uint32_t>();
 	m_pUIWareHouseDlg->EnterWareHouseStateStart(iWareGold);
 
-	for ( int i = 0; i < MAX_ITEM_WARE_PAGE*MAX_ITEM_TRADE; i++ )				// 슬롯 갯수마큼..
+	for ( int i = 0; i < MAX_ITEM_WARE_PAGE*MAX_ITEM_TRADE; i++ )				// 슬롯 갯수마큼.. [Korean comment]
 	{
 		iItemID			= pkt.read<uint32_t>();
 		iItemDurability	= pkt.read<int16_t>();
@@ -6418,7 +6418,7 @@ void CGameProcMain::MsgRecv_WareHouseOpen(Packet& pkt)		// 보관함 오픈..
 	if (!m_pUIWareHouseDlg->IsVisible())
 		m_pUIWareHouseDlg->SetVisible(true);
 
-	if (m_pUIInventory->IsVisible())		// 인벤토리가 안열려 있으면..
+	if (m_pUIInventory->IsVisible())		// 인벤토리가 안열려 있으면.. [Korean comment]
 		this->CommandToggleUIInventory();
 
 	if (m_pUISkillTreeDlg->IsVisible())
@@ -6432,7 +6432,7 @@ void CGameProcMain::PlayBGM_Town()
 	if(m_pSnd_Battle) m_pSnd_Battle->Stop(3.0f);
 	if(nullptr == m_pSnd_Town || m_pSnd_Town->IsPlaying()) return;
 	m_pSnd_Town->SetMaxVolume(60);
-	m_pSnd_Town->Play(nullptr, 3.0f); // 전투 음악 설정.. 해제는 주위에 몬스터가 없을때 한다..
+	m_pSnd_Town->Play(nullptr, 3.0f); // 전투 음악 설정.. 해제는 주위에 몬스터가 없을때 한다.. Set
 }
 
 void CGameProcMain::PlayBGM_Battle()
@@ -6440,7 +6440,7 @@ void CGameProcMain::PlayBGM_Battle()
 	if(m_pSnd_Town) m_pSnd_Town->Stop(3.0f);
 	if(nullptr == m_pSnd_Battle || m_pSnd_Battle->IsPlaying()) return;
 	m_pSnd_Battle->SetMaxVolume(80);
-	m_pSnd_Battle->Play(nullptr, 3.0f); // 전투 음악 설정.. 해제는 주위에 몬스터가 없을때 한다..
+	m_pSnd_Battle->Play(nullptr, 3.0f); // 전투 음악 설정.. 해제는 주위에 몬스터가 없을때 한다.. Set
 }
 
 void CGameProcMain::ReleaseSound()
@@ -6450,7 +6450,7 @@ void CGameProcMain::ReleaseSound()
 	CN3Base::s_SndMgr.ReleaseStreamObj(&m_pSnd_Battle);
 }
 
-void CGameProcMain::MsgRecv_NpcChangeOpen(Packet& pkt)		// Class Change와 초기화..
+void CGameProcMain::MsgRecv_NpcChangeOpen(Packet& pkt)		// Class Change와 초기화.. Initialize
 {
 	uint8_t	bSubCom = pkt.read<uint8_t>();
 
@@ -6482,7 +6482,7 @@ void CGameProcMain::MsgRecv_NpcChangeOpen(Packet& pkt)		// Class Change와 초�
 	}
 }
 
-void CGameProcMain::MsgRecv_AllPointInit(Packet& pkt)			// All Point 초기화..
+void CGameProcMain::MsgRecv_AllPointInit(Packet& pkt)			// All Point 초기화.. Initialize
 {
 	uint8_t	bType		= pkt.read<uint8_t>();	
 	uint32_t dwGold		= pkt.read<uint32_t>();	
@@ -6491,12 +6491,12 @@ void CGameProcMain::MsgRecv_AllPointInit(Packet& pkt)			// All Point 초기화..
 
 	switch (bType)
 	{
-		case 0x00:	// 돈이 부족..
+		case 0x00:	// 돈이 부족.. [Korean comment]
 			szMsg = fmt::format_text_resource(IDS_POINTINIT_NOT_ENOUGH_NOAH, dwGold);
 			MsgOutput(szMsg, 0xffff3b3b);
 			break;
 
-		case 0x01:	// 성공..
+		case 0x01:	// 성공.. [Korean comment]
 			s_pPlayer->m_InfoExt.iStrength = pkt.read<int16_t>();
 			m_pUIVar->m_pPageState->UpdateStrength(s_pPlayer->m_InfoExt.iStrength, s_pPlayer->m_InfoExt.iStrength_Delta);
 
@@ -6526,10 +6526,10 @@ void CGameProcMain::MsgRecv_AllPointInit(Packet& pkt)			// All Point 초기화..
 			m_pUIVar->m_pPageState->UpdateAttackPoint(s_pPlayer->m_InfoExt.iAttack, s_pPlayer->m_InfoExt.iAttack_Delta);
 			m_pUIVar->m_pPageState->UpdateWeight(s_pPlayer->m_InfoExt.iWeight, s_pPlayer->m_InfoExt.iWeightMax);
 
-			s_pPlayer->m_InfoExt.iBonusPointRemain = pkt.read<int16_t>(); // 남은 보너스 포인트..
-			m_pUIVar->m_pPageState->UpdateBonusPointAndButtons(s_pPlayer->m_InfoExt.iBonusPointRemain); // 보너스 포인트 적용이 가능한가??
+			s_pPlayer->m_InfoExt.iBonusPointRemain = pkt.read<int16_t>(); // 남은 보너스 포인트.. [Korean comment]
+			m_pUIVar->m_pPageState->UpdateBonusPointAndButtons(s_pPlayer->m_InfoExt.iBonusPointRemain); // 보너스 포인트 적용이 가능한가?? [Korean comment]
 
-			// 돈 변경.. 인벤토리는 바꾸고 상거래.. 개인 거래와는 배타적..
+			// 돈 변경.. 인벤토리는 바꾸고 상거래.. 개인 거래와는 배타적.. Change
 			s_pPlayer->m_InfoExt.iGold = dwGold;
 			if (m_pUIInventory->IsVisible())
 				m_pUIInventory->GoldUpdate();
@@ -6547,7 +6547,7 @@ void CGameProcMain::MsgRecv_AllPointInit(Packet& pkt)			// All Point 초기화..
 	}
 }
 
-void CGameProcMain::MsgRecv_SkillPointInit(Packet& pkt)		// Skill Point 초기화..
+void CGameProcMain::MsgRecv_SkillPointInit(Packet& pkt)		// Skill Point 초기화.. Initialize
 {
 	uint8_t	bType		= pkt.read<uint8_t>();	
 	uint32_t dwGold		= pkt.read<uint32_t>();	
@@ -6555,18 +6555,18 @@ void CGameProcMain::MsgRecv_SkillPointInit(Packet& pkt)		// Skill Point 초기�
 
 	switch (bType)
 	{
-		case 0x00:	// 돈이 부족..
+		case 0x00:	// 돈이 부족.. [Korean comment]
 			szMsg = fmt::format_text_resource(IDS_POINTINIT_NOT_ENOUGH_NOAH, dwGold);
 			MsgOutput(szMsg, 0xffff3b3b);
 			break;
 
-		case 0x01:	// 성공..
+		case 0x01:	// 성공.. [Korean comment]
 			m_pUISkillTreeDlg->m_iSkillInfo[0] = pkt.read<uint8_t>();
 			for (int i = 1; i < 9; i++)
 				m_pUISkillTreeDlg->m_iSkillInfo[i] = 0;
 			m_pUISkillTreeDlg->InitIconUpdate();
 
-			// 돈 변경.. 인벤토리는 바꾸고 상거래.. 개인 거래와는 배타적..
+			// 돈 변경.. 인벤토리는 바꾸고 상거래.. 개인 거래와는 배타적.. Change
 			s_pPlayer->m_InfoExt.iGold = dwGold;
 			if (m_pUIInventory->IsVisible())
 				m_pUIInventory->GoldUpdate();
@@ -6586,13 +6586,13 @@ void CGameProcMain::MsgRecv_SkillPointInit(Packet& pkt)		// Skill Point 초기�
 	}
 }
 
-void CGameProcMain::MsgRecv_PointChangePriceQueryRequest(Packet& pkt)		// 가격에 대한 응답 패킷..
+void CGameProcMain::MsgRecv_PointChangePriceQueryRequest(Packet& pkt)		// 가격에 대한 응답 패킷.. [Korean comment]
 {
 	uint32_t dwGold		= pkt.read<uint32_t>();	
 	m_pUINpcChange->ReceivePriceFromServer(dwGold);
 }
 
-void CGameProcMain::MsgRecv_NoahChange(Packet& pkt)		// 노아 변경..
+void CGameProcMain::MsgRecv_NoahChange(Packet& pkt)		// 노아 변경.. Change
 {
 	uint8_t	bType			= pkt.read<uint8_t>();	
 	uint32_t dwGoldOffset	= pkt.read<uint32_t>();		
@@ -6628,7 +6628,7 @@ void CGameProcMain::MsgRecv_NoahChange(Packet& pkt)		// 노아 변경..
 		m_pSubProcPerTrade->m_pUIPerTradeDlg->GoldUpdate();
 }
 
-void CGameProcMain::MsgRecv_WarpList(Packet& pkt)		// 워프 리스트 - 존 체인지가 될 수도 있다..
+void CGameProcMain::MsgRecv_WarpList(Packet& pkt)		// 워프 리스트 - 존 체인지가 될 수도 있다.. [Korean comment]
 {
 	uint8_t opcode = pkt.read<uint8_t>();
 	if (opcode == 2)
@@ -6655,14 +6655,14 @@ void CGameProcMain::MsgRecv_WarpList(Packet& pkt)		// 워프 리스트 - 존 체
 		__WarpInfo WI;
 		
 		WI.iID = pkt.read<int16_t>();				// 워프 ID
-		iStrLen = pkt.read<int16_t>();				// 이름 길이
-		pkt.readString(WI.szName, iStrLen);			// 이름
-		iStrLen = pkt.read<int16_t>();				// 동의문 길이
-		pkt.readString(WI.szAgreement, iStrLen);	// 동의문
-		WI.iZone = pkt.read<int16_t>();				// 존번호
-		WI.iMaxUser = pkt.read<int16_t>();			// 최대 유저 카운트.
-		WI.iGold = pkt.read<uint32_t>();			// 돈
-		WI.vPos.x = (pkt.read<int16_t>())/10.0f;	// 좌표 
+		iStrLen = pkt.read<int16_t>();				// 이름 길이 Name
+		pkt.readString(WI.szName, iStrLen);			// 이름 Name
+		iStrLen = pkt.read<int16_t>();				// 동의문 길이 [Korean comment]
+		pkt.readString(WI.szAgreement, iStrLen);	// 동의문 [Korean comment]
+		WI.iZone = pkt.read<int16_t>();				// 존번호 [Korean comment]
+		WI.iMaxUser = pkt.read<int16_t>();			// 최대 유저 카운트. Count
+		WI.iGold = pkt.read<uint32_t>();			// 돈 [Korean comment]
+		WI.vPos.x = (pkt.read<int16_t>())/10.0f;	// 좌표  [Korean comment]
 		WI.vPos.z = (pkt.read<int16_t>())/10.0f;	//
 		WI.vPos.y = (pkt.read<int16_t>())/10.0f;	// 
 
@@ -6732,17 +6732,17 @@ void CGameProcMain::MsgRecv_Knights_Create(Packet& pkt)
 				int sid = pkt.read<int16_t>();
 				std::string szID;
 				int iID = pkt.read<int16_t>();		// 기사단 ID
-				int iLen = pkt.read<int16_t>();		// ID 문자열 길이..
-				pkt.readString(szID, iLen);	// ID 문자열..
-				int iGrade = pkt.read<uint8_t>();	// 등급
-				int iRank = pkt.read<uint8_t>();		// 순위
+				int iLen = pkt.read<int16_t>();		// ID 문자열 길이.. [Korean comment]
+				pkt.readString(szID, iLen);	// ID 문자열.. [Korean comment]
+				int iGrade = pkt.read<uint8_t>();	// 등급 [Korean comment]
+				int iRank = pkt.read<uint8_t>();		// 순위 [Korean comment]
 				uint32_t dwGold = pkt.read<uint32_t>();
 
 				if(s_pPlayer->IDNumber()==sid)
 				{
 					m_pUIInn->Message(/*IDS_CLAN_MAKE_SUCCESS*/6505);
 
-					// 돈 변경.. 인벤토리는 바꾸고 상거래.. 개인 거래와는 배타적..
+					// 돈 변경.. 인벤토리는 바꾸고 상거래.. 개인 거래와는 배타적.. Change
 					s_pPlayer->m_InfoExt.iGold = dwGold;
 					if (m_pUIInventory->IsVisible()) m_pUIInventory->GoldUpdate();
 					if (m_pUITransactionDlg->IsVisible()) m_pUITransactionDlg->GoldUpdate();
@@ -6760,7 +6760,7 @@ void CGameProcMain::MsgRecv_Knights_Create(Packet& pkt)
 						m_pUIVar->m_pPageKnights->ChangeUIByDuty(s_pPlayer->m_InfoExt.eKnightsDuty);
 					}
 
-					//m_pUIKnightsOp->KnightsInfoInsert(iID, szID); // 기사단 정보 추가..
+					//m_pUIKnightsOp->KnightsInfoInsert(iID, szID); // 기사단 정보 추가.. Info
 				}
 				else
 				{
@@ -6866,18 +6866,18 @@ void CGameProcMain::MsgRecv_Knights_Join(Packet& pkt)
 	std::string szMsg;
 	switch ( (e_SubPacket_KNights_Common)bSubCom )
 	{
-	case N3_SP_KNIGHTS_COMMON_DBFAIL: //DB검색 실패..
+	case N3_SP_KNIGHTS_COMMON_DBFAIL: //DB검색 실패.. Color
 		break;
-	case N3_SP_KNIGHTS_COMMON_SUCCESS: //클랜가입 성공
+	case N3_SP_KNIGHTS_COMMON_SUCCESS: //클랜가입 성공 [Korean comment]
 		{
 			int sid = pkt.read<int16_t>();
 			int iID = pkt.read<int16_t>();
 			e_KnightsDuty eDuty = (e_KnightsDuty)pkt.read<uint8_t>();
-			int iL = pkt.read<int16_t>(); // 소속 기사단 이름 길이.
+			int iL = pkt.read<int16_t>(); // 소속 기사단 이름 길이. Name
 			std::string szKnightsName;
 			pkt.readString(szKnightsName, iL);
-			int iGrade = pkt.read<uint8_t>();	// 등급
-			int iRank = pkt.read<uint8_t>();		// 순위
+			int iGrade = pkt.read<uint8_t>();	// 등급 [Korean comment]
+			int iRank = pkt.read<uint8_t>();		// 순위 [Korean comment]
 
 			if(s_pPlayer->IDNumber()==sid)
 			{
@@ -6902,31 +6902,31 @@ void CGameProcMain::MsgRecv_Knights_Join(Packet& pkt)
 			}
 		}
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_NONE_USER:	//없는 유저..
+	case N3_SP_KNIGHTS_COMMON_FAIL_NONE_USER:	//없는 유저.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_NONE_USER);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_DEAD_USER:	//상대유저가 죽어 있음..
+	case N3_SP_KNIGHTS_COMMON_FAIL_DEAD_USER:	//상대유저가 죽어 있음.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_DEAD_USER);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_ENEMY_USER: //상대유저의 국가가 다름..
+	case N3_SP_KNIGHTS_COMMON_FAIL_ENEMY_USER: //상대유저의 국가가 다름.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_ENEMY_USER);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_OTHER_CLAN_USER: //상대유저가 이미 다른 클랜이나 기사단에 가입되어 있음..
+	case N3_SP_KNIGHTS_COMMON_FAIL_OTHER_CLAN_USER: //상대유저가 이미 다른 클랜이나 기사단에 가입되어 있음.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_OTHER_CLAN_USER);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_INVALIDRIGHT: //권한이 없음..
+	case N3_SP_KNIGHTS_COMMON_FAIL_INVALIDRIGHT: //권한이 없음.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_INVALIDRIGHT);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_NONE_CLAN:	//존재하지 않는 기사단..									
+	case N3_SP_KNIGHTS_COMMON_FAIL_NONE_CLAN:	//존재하지 않는 기사단..									 [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_NONE_CLAN);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_FULL:	//인원이 풀..
+	case N3_SP_KNIGHTS_COMMON_FAIL_FULL:	//인원이 풀.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_CLAN_FULL);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
@@ -6956,18 +6956,18 @@ void CGameProcMain::MsgRecv_Knights_Leave(Packet& pkt)
 	std::string szMsg;
 	switch ( (e_SubPacket_KNights_Common)bSubCom )
 	{
-	case N3_SP_KNIGHTS_COMMON_DBFAIL: //DB검색 실패..
+	case N3_SP_KNIGHTS_COMMON_DBFAIL: //DB검색 실패.. Color
 		break;
-	case N3_SP_KNIGHTS_COMMON_SUCCESS: //클랜탈퇴 성공
+	case N3_SP_KNIGHTS_COMMON_SUCCESS: //클랜탈퇴 성공 [Korean comment]
 		{
 			int sid = pkt.read<int16_t>();
 			int iID = pkt.read<int16_t>();
 			e_KnightsDuty eDuty = (e_KnightsDuty)pkt.read<uint8_t>();
-			int iL = pkt.read<int16_t>(); // 소속 기사단 이름 길이.
+			int iL = pkt.read<int16_t>(); // 소속 기사단 이름 길이. Name
 			std::string szKnightsName;
 			pkt.readString(szKnightsName, iL);
-			int iGrade = pkt.read<uint8_t>();	// 등급
-			int iRank = pkt.read<uint8_t>();		// 순위
+			int iGrade = pkt.read<uint8_t>();	// 등급 [Korean comment]
+			int iRank = pkt.read<uint8_t>();		// 순위 [Korean comment]
 
 			if(s_pPlayer->IDNumber()==sid)
 			{
@@ -6992,31 +6992,31 @@ void CGameProcMain::MsgRecv_Knights_Leave(Packet& pkt)
 			}
 		}
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_NONE_USER:	//없는 유저..
+	case N3_SP_KNIGHTS_COMMON_FAIL_NONE_USER:	//없는 유저.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_NONE_USER);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_DEAD_USER:	//상대유저가 죽어 있음..
+	case N3_SP_KNIGHTS_COMMON_FAIL_DEAD_USER:	//상대유저가 죽어 있음.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_DEAD_USER);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_ENEMY_USER: //상대유저의 국가가 다름..
+	case N3_SP_KNIGHTS_COMMON_FAIL_ENEMY_USER: //상대유저의 국가가 다름.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_ENEMY_USER);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_OTHER_CLAN_USER: //상대유저가 이미 다른 클랜이나 기사단에 가입되어 있음..
+	case N3_SP_KNIGHTS_COMMON_FAIL_OTHER_CLAN_USER: //상대유저가 이미 다른 클랜이나 기사단에 가입되어 있음.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_OTHER_CLAN_USER);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_INVALIDRIGHT: //권한이 없음..
+	case N3_SP_KNIGHTS_COMMON_FAIL_INVALIDRIGHT: //권한이 없음.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_INVALIDRIGHT);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_NONE_CLAN:	//존재하지 않는 기사단..									
+	case N3_SP_KNIGHTS_COMMON_FAIL_NONE_CLAN:	//존재하지 않는 기사단..									 [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_NONE_CLAN);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_FULL:	//인원이 풀..
+	case N3_SP_KNIGHTS_COMMON_FAIL_FULL:	//인원이 풀.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_CLAN_FULL);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
@@ -7042,9 +7042,9 @@ void CGameProcMain::MsgRecv_Knights_AppointViceChief(Packet& pkt)
 	std::string szMsg;
 	switch ( (e_SubPacket_KNights_Common)bSubCom )
 	{
-	case N3_SP_KNIGHTS_COMMON_DBFAIL: //DB검색 실패..
+	case N3_SP_KNIGHTS_COMMON_DBFAIL: //DB검색 실패.. Color
 		break;
-	case N3_SP_KNIGHTS_COMMON_SUCCESS: //클랜가입 성공
+	case N3_SP_KNIGHTS_COMMON_SUCCESS: //클랜가입 성공 [Korean comment]
 		{
 			int iID = pkt.read<int16_t>();
 			e_KnightsDuty eDuty = (e_KnightsDuty)pkt.read<uint8_t>();
@@ -7063,31 +7063,31 @@ void CGameProcMain::MsgRecv_Knights_AppointViceChief(Packet& pkt)
 			}
 		}
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_NONE_USER:	//없는 유저..
+	case N3_SP_KNIGHTS_COMMON_FAIL_NONE_USER:	//없는 유저.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_NONE_USER);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_DEAD_USER:	//상대유저가 죽어 있음..
+	case N3_SP_KNIGHTS_COMMON_FAIL_DEAD_USER:	//상대유저가 죽어 있음.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_DEAD_USER);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_ENEMY_USER: //상대유저의 국가가 다름..
+	case N3_SP_KNIGHTS_COMMON_FAIL_ENEMY_USER: //상대유저의 국가가 다름.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_ENEMY_USER);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_OTHER_CLAN_USER: //상대유저가 이미 다른 클랜이나 기사단에 가입되어 있음..
+	case N3_SP_KNIGHTS_COMMON_FAIL_OTHER_CLAN_USER: //상대유저가 이미 다른 클랜이나 기사단에 가입되어 있음.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_OTHER_CLAN_USER);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_INVALIDRIGHT: //권한이 없음..
+	case N3_SP_KNIGHTS_COMMON_FAIL_INVALIDRIGHT: //권한이 없음.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_INVALIDRIGHT);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_NONE_CLAN:	//존재하지 않는 기사단..									
+	case N3_SP_KNIGHTS_COMMON_FAIL_NONE_CLAN:	//존재하지 않는 기사단..									 [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_NONE_CLAN);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
-	case N3_SP_KNIGHTS_COMMON_FAIL_FULL:	//인원이 풀..
+	case N3_SP_KNIGHTS_COMMON_FAIL_FULL:	//인원이 풀.. [Korean comment]
 		szMsg = fmt::format_text_resource(IDS_CLAN_JOIN_FAIL_CLAN_FULL);
 		this->MsgOutput(szMsg, 0xffffff00);
 		break;
@@ -7116,7 +7116,7 @@ void CGameProcMain::MsgRecv_Knights_MemberInfoAll(Packet& pkt)
 	case N3_SP_KNIGHTS_COMMON_SUCCESS:
 		m_pUIVar->m_pPageKnights->MsgRecv_MemberInfo(pkt);
 		break;
-	case N3_SP_KNIGHTS_COMMON_DBFAIL: //DB검색 실패..
+	case N3_SP_KNIGHTS_COMMON_DBFAIL: //DB검색 실패.. Color
 	default:
 		break;		
 	}
@@ -7205,7 +7205,7 @@ void CGameProcMain::MsgRecv_Knigts_Join_Req(Packet& pkt)
 			m_iJoinReqClanRequierID = pkt.read<int16_t>();
 			m_iJoinReqClan = pkt.read<int16_t>();
 
-			int iL = pkt.read<int16_t>(); // 소속 기사단 이름 길이.
+			int iL = pkt.read<int16_t>(); // 소속 기사단 이름 길이. Name
 			std::string szKnightsName;
 			pkt.readString(szKnightsName, iL);
 
@@ -7236,16 +7236,16 @@ bool CGameProcMain::MsgRecv_CharacterSelect(Packet& pkt) // virtual
 {
 	bool bSuccess = CGameProcedure::MsgRecv_CharacterSelect(pkt);
 
-	//전쟁존에서 죽어서 서버 체인지 하는 경우는 다시 값을 세팅해준다.
+	//전쟁존에서 죽어서 서버 체인지 하는 경우는 다시 값을 세팅해준다. [Korean comment]
 	if(s_pPlayer->IsDead())
 	{
-		this->InitPlayerPosition(s_pPlayer->Position()); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다.
-		s_pPlayer->RegenerateCollisionMesh(); // 충돌 메시를 다시 만든다..
-		s_pPlayer->m_iSendRegeneration = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그
-		s_pPlayer->m_fTimeAfterDeath = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그
+		this->InitPlayerPosition(s_pPlayer->Position()); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다. Initialize
+		s_pPlayer->RegenerateCollisionMesh(); // 충돌 메시를 다시 만든다.. Mesh
+		s_pPlayer->m_iSendRegeneration = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그 [Korean comment]
+		s_pPlayer->m_fTimeAfterDeath = 0; // 한번 보내면 다시 죽을때까지 안보내는 플래그 [Korean comment]
 
 		//
-		//마법 & 효과 초기화..
+		//마법 & 효과 초기화.. Initialize
 		if(m_pUIStateBarAndMiniMap) m_pUIStateBarAndMiniMap->ClearMagic();
 		if(m_pMagicSkillMng) m_pMagicSkillMng->ClearDurationalMagic();
 		if(CGameProcedure::s_pFX) s_pFX->StopMine();
@@ -7257,15 +7257,15 @@ bool CGameProcMain::MsgRecv_CharacterSelect(Packet& pkt) // virtual
 	}
 			
 
-	this->InitZone(s_pPlayer->m_InfoExt.iZoneCur, s_pPlayer->Position()); // 존을 바꾼다..
-	s_pProcMain->MsgSend_GameStart(); // 존로딩이 끝나면 게임 시작..
+	this->InitZone(s_pPlayer->m_InfoExt.iZoneCur, s_pPlayer->Position()); // 존을 바꾼다.. [Korean comment]
+	s_pProcMain->MsgSend_GameStart(); // 존로딩이 끝나면 게임 시작.. [Korean comment]
 
 	return bSuccess;
 }
 
 void CGameProcMain::MsgRecv_Corpse(Packet& pkt)
 {
-	int iID	= pkt.read<int16_t>();//regen하고자 하는 유저의 아이디
+	int iID	= pkt.read<int16_t>();//regen하고자 하는 유저의 아이디 [Korean comment]
 
 	if( s_pPlayer->IDNumber() != iID )
 	{
@@ -7278,7 +7278,7 @@ void CGameProcMain::MsgRecv_Corpse(Packet& pkt)
 
 void CGameProcMain::MsgSend_PerTradeBBSReq(std::string szName, int iDestID)
 {
-	if(	!m_pUITransactionDlg->IsVisible() ) //// 개인간 아이템 거래.. // 상거래 중이 아니면..
+	if(	!m_pUITransactionDlg->IsVisible() ) //// 개인간 아이템 거래.. // 상거래 중이 아니면.. [Korean comment]
 	{
 		std::string szMsg = fmt::format_text_resource(IDS_PERSONAL_TRADE_REQUEST);
 		MsgOutput(szName + szMsg, 0xffffff00);
@@ -7322,14 +7322,14 @@ bool CGameProcMain::OnMouseMove(POINT ptCur, POINT ptPrev)
 			CPlayerNPC*	 pTarget = nullptr;
 		
 			int iID = -1;
-			pTarget = s_pOPMgr->Pick(ptCur.x, ptCur.y, iID, &vPick); // 사방에 깔린넘들 픽킹..
-			this->TargetSelect(iID, false); // 타겟을 잡는다..
-			if(nullptr == pTarget) // 타겟이 없으면..
+			pTarget = s_pOPMgr->Pick(ptCur.x, ptCur.y, iID, &vPick); // 사방에 깔린넘들 픽킹.. [Korean comment]
+			this->TargetSelect(iID, false); // 타겟을 잡는다.. [Korean comment]
+			if(nullptr == pTarget) // 타겟이 없으면.. [Korean comment]
 			{
-				s_pPlayer->m_pObjectTarget = ACT_WORLD->PickWithShape(ptCur.x, ptCur.y, true, &vPick); // 찍힌 위치를 저장한다..
-				if(nullptr == s_pPlayer->m_pObjectTarget) // 타겟도 없으면..
+				s_pPlayer->m_pObjectTarget = ACT_WORLD->PickWithShape(ptCur.x, ptCur.y, true, &vPick); // 찍힌 위치를 저장한다.. Save
+				if(nullptr == s_pPlayer->m_pObjectTarget) // 타겟도 없으면.. [Korean comment]
 				{
-					ACT_WORLD->PickWideWithTerrain(ptCur.x, ptCur.y, vPick); // 지형을 찍어본다..
+					ACT_WORLD->PickWideWithTerrain(ptCur.x, ptCur.y, vPick); // 지형을 찍어본다.. [Korean comment]
 				}
 			}
 			s_pFX->SetBundlePos(m_pMagicSkillMng->m_iMyRegionTargetFXID, m_pMagicSkillMng->m_iMyRegionTargetFXID, vPick);
@@ -7354,7 +7354,7 @@ bool CGameProcMain::OnMouseMove(POINT ptCur, POINT ptPrev)
 			vMyPos = s_pPlayer->Position();
 			vMyPos.y += s_pPlayer->Height() / 2;
 
-			ACT_WORLD->PickWideWithTerrain(ptCur.x, ptCur.y, m_vMouseSkillPos); // 지형을 찍어본다..
+			ACT_WORLD->PickWideWithTerrain(ptCur.x, ptCur.y, m_vMouseSkillPos); // 지형을 찍어본다.. [Korean comment]
 
 			vDir = m_vMouseSkillPos - vMyPos;
 			vGap = vDir;
@@ -7362,11 +7362,11 @@ bool CGameProcMain::OnMouseMove(POINT ptCur, POINT ptPrev)
 
 			bool bColShape = ACT_WORLD->CheckCollisionWithShape(vMyPos, vDir, vGap.Magnitude(), &m_vMouseSkillPos, &vNormal);
 
-			if(!bColShape) // 타겟도 없으면..
+			if(!bColShape) // 타겟도 없으면.. [Korean comment]
 			{
 				int iID = -1;
-				s_pOPMgr->Pick(ptCur.x, ptCur.y, iID, &m_vMouseSkillPos); // 사방에 깔린넘들 픽킹..
-				this->TargetSelect(iID, false); // 타겟을 잡는다..
+				s_pOPMgr->Pick(ptCur.x, ptCur.y, iID, &m_vMouseSkillPos); // 사방에 깔린넘들 픽킹.. [Korean comment]
+				this->TargetSelect(iID, false); // 타겟을 잡는다.. [Korean comment]
 			}
 			else
 			{
@@ -7379,7 +7379,7 @@ bool CGameProcMain::OnMouseMove(POINT ptCur, POINT ptPrev)
 	return true;
 }
 
-// 왼쪽 더블 클릭
+// 왼쪽 더블 클릭 [Korean comment]
 bool CGameProcMain::OnMouseLDBtnPress(POINT ptCur, POINT ptPrev)
 {
 	if(s_pUIMgr->m_bDoneSomething)
@@ -7423,7 +7423,7 @@ bool CGameProcMain::TryStartAttack()
 	return true;
 }
 
-// 왼쪽 클릭
+// 왼쪽 클릭 [Korean comment]
 bool CGameProcMain::OnMouseLBtnPress(POINT ptCur, POINT ptPrev)
 {
 	if(s_pUIMgr->m_bDoneSomething) return false;
@@ -7444,21 +7444,21 @@ bool CGameProcMain::OnMouseLBtnPress(POINT ptCur, POINT ptPrev)
 	BOOL		 bFindCorpse		= false;
 
 	int iID = -1;
-	pTarget = s_pOPMgr->PickPrecisely(ptCur.x, ptCur.y, iID, &m_vMouseLBClickedPos); // 사방에 깔린넘들 픽킹..
-	this->TargetSelect(iID, false); // 타겟을 잡는다..
-	if(nullptr == pTarget) // 타겟이 없으면..
+	pTarget = s_pOPMgr->PickPrecisely(ptCur.x, ptCur.y, iID, &m_vMouseLBClickedPos); // 사방에 깔린넘들 픽킹.. [Korean comment]
+	this->TargetSelect(iID, false); // 타겟을 잡는다.. [Korean comment]
+	if(nullptr == pTarget) // 타겟이 없으면.. [Korean comment]
 	{
-		if(s_pPlayer->m_bAttackContinous) // 계속 공격하는 중이면..
-			this->CommandEnableAttackContinous(false, nullptr); // 계속 공격 취소..
+		if(s_pPlayer->m_bAttackContinous) // 계속 공격하는 중이면.. [Korean comment]
+			this->CommandEnableAttackContinous(false, nullptr); // 계속 공격 취소.. [Korean comment]
 
-		s_pPlayer->m_pObjectTarget = ACT_WORLD->PickWithShape(ptCur.x, ptCur.y, true, &m_vMouseLBClickedPos); // 찍힌 위치를 저장한다..
-		if(nullptr == s_pPlayer->m_pObjectTarget) // 타겟도 없으면..
+		s_pPlayer->m_pObjectTarget = ACT_WORLD->PickWithShape(ptCur.x, ptCur.y, true, &m_vMouseLBClickedPos); // 찍힌 위치를 저장한다.. Save
+		if(nullptr == s_pPlayer->m_pObjectTarget) // 타겟도 없으면.. [Korean comment]
 		{
-			// 시체 뒤저서 아이템 상자 열기..
-			CPlayerNPC* pCorpse = s_pOPMgr->PickCorpse(ptCur.x, ptCur.y, iID); // 픽킹..
-			if(false == this->MsgSend_RequestItemBundleOpen(pCorpse)) // 시체 뒤지기 요청..
+			// 시체 뒤저서 아이템 상자 열기.. [Korean comment]
+			CPlayerNPC* pCorpse = s_pOPMgr->PickCorpse(ptCur.x, ptCur.y, iID); // 픽킹.. [Korean comment]
+			if(false == this->MsgSend_RequestItemBundleOpen(pCorpse)) // 시체 뒤지기 요청.. [Korean comment]
 			{
-				ACT_WORLD->PickWideWithTerrain(ptCur.x, ptCur.y, m_vMouseLBClickedPos); // 지형을 찍어본다..
+				ACT_WORLD->PickWideWithTerrain(ptCur.x, ptCur.y, m_vMouseLBClickedPos); // 지형을 찍어본다.. [Korean comment]
 			}
 			else
 				bFindCorpse = true;
@@ -7475,7 +7475,7 @@ bool CGameProcMain::OnMouseLBtnPress(POINT ptCur, POINT ptPrev)
 	if(!s_pPlayer->IsDead() && VP_THIRD_PERSON == s_pEng->ViewPoint())
 	{
 		m_fLBClickTime = CN3Base::TimeGet();
-		this->CommandSitDown(false, false); // 일단 일으켜 세운다..
+		this->CommandSitDown(false, false); // 일단 일으켜 세운다.. [Korean comment]
 
 		if(pTarget)
 		{
@@ -7486,7 +7486,7 @@ bool CGameProcMain::OnMouseLBtnPress(POINT ptCur, POINT ptPrev)
 					if(s_pPlayer->m_bTargetOrPosMove)
 						this->CommandMove(MD_STOP, true);
 
-					this->CommandEnableAttackContinous(true, pTarget); // 자동 공격
+					this->CommandEnableAttackContinous(true, pTarget); // 자동 공격 [Korean comment]
 				}
 				else
 				{
@@ -7504,7 +7504,7 @@ bool CGameProcMain::OnMouseLBtnPress(POINT ptCur, POINT ptPrev)
 		{
 			s_pPlayer->RotateTo(fYaw, true);
 			__Vector3 vMovePoint;
-			ACT_WORLD->PickWideWithTerrain(ptCur.x, ptCur.y, vMovePoint); // 지형을 찍어본다..
+			ACT_WORLD->PickWideWithTerrain(ptCur.x, ptCur.y, vMovePoint); // 지형을 찍어본다.. [Korean comment]
 
 			float fDist = (vMovePoint - s_pPlayer->Position()).Magnitude();
 
@@ -7530,7 +7530,7 @@ bool CGameProcMain::OnMouseLBtnPress(POINT ptCur, POINT ptPrev)
 				if(s_pPlayer->m_bTargetOrPosMove)
 					this->CommandMove(MD_STOP, true);
 
-				this->CommandEnableAttackContinous(true, pTarget); // 자동 공격
+				this->CommandEnableAttackContinous(true, pTarget); // 자동 공격 [Korean comment]
 			}
 			else
 			{
@@ -7543,7 +7543,7 @@ bool CGameProcMain::OnMouseLBtnPress(POINT ptCur, POINT ptPrev)
 	return true;
 }
 
-// 왼쪽 클릭업
+// 왼쪽 클릭업 [Korean comment]
 bool CGameProcMain::OnMouseLBtnPressd(POINT ptCur, POINT ptPrev)
 {
 	if(!s_pLocalInput->IsKeyDown(KM_MOVE_FOWARD))
@@ -7554,7 +7554,7 @@ bool CGameProcMain::OnMouseLBtnPressd(POINT ptCur, POINT ptPrev)
 	return true;
 }
 
-// 왼쪽 눌리고 있을때
+// 왼쪽 눌리고 있을때 [Korean comment]
 bool CGameProcMain::OnMouseLbtnDown(POINT ptCur, POINT ptPrev)
 {
 	if(s_pUIMgr->m_bDoneSomething) return false;
@@ -7583,11 +7583,11 @@ bool CGameProcMain::OnMouseLbtnDown(POINT ptCur, POINT ptPrev)
 				CommandToggleAttackContinous();
 
 
-			this->CommandSitDown(false, false); // 일단 일으켜 세운다..
+			this->CommandSitDown(false, false); // 일단 일으켜 세운다.. [Korean comment]
 			s_pPlayer->RotateTo(fYaw, true);
 			this->CommandMove(MD_FORWARD, false);
 
-			ACT_WORLD->PickWideWithTerrain(ptCur.x, ptCur.y, vMovePoint); // 지형을 찍어본다..
+			ACT_WORLD->PickWideWithTerrain(ptCur.x, ptCur.y, vMovePoint); // 지형을 찍어본다.. [Korean comment]
 			fDist = (vMovePoint - s_pPlayer->Position()).Magnitude();
 
 			s_pPlayer->SetMoveTargetPos(vMovePoint);
@@ -7598,7 +7598,7 @@ bool CGameProcMain::OnMouseLbtnDown(POINT ptCur, POINT ptPrev)
 				CommandToggleAttackContinous();
 
 			s_pPlayer->RotateTo(fYaw, true);
-			ACT_WORLD->PickWideWithTerrain(ptCur.x, ptCur.y, vMovePoint); // 지형을 찍어본다..
+			ACT_WORLD->PickWideWithTerrain(ptCur.x, ptCur.y, vMovePoint); // 지형을 찍어본다.. [Korean comment]
 
 			fDist = (vMovePoint - s_pPlayer->Position()).Magnitude();
 
@@ -7612,7 +7612,7 @@ bool CGameProcMain::OnMouseLbtnDown(POINT ptCur, POINT ptPrev)
 	return true;
 }
 
-// 오른쪽 클릭
+// 오른쪽 클릭 [Korean comment]
 bool CGameProcMain::OnMouseRBtnPress(POINT ptCur, POINT ptPrev)
 {
 	if(s_pUIMgr->m_bDoneSomething) return false;
@@ -7624,21 +7624,21 @@ bool CGameProcMain::OnMouseRBtnPress(POINT ptCur, POINT ptPrev)
 	}
 
 	int iID = -1;
-	CPlayerNPC* pNPC = s_pOPMgr->PickNPC(ptCur.x, ptCur.y, iID); // 픽킹..
+	CPlayerNPC* pNPC = s_pOPMgr->PickNPC(ptCur.x, ptCur.y, iID); // 픽킹.. [Korean comment]
 
 	if(nullptr == pNPC)
 	{
 		// NOTE: sending the packet to pick up items
-		CPlayerNPC* pCorpse = s_pOPMgr->PickCorpse(ptCur.x, ptCur.y, iID); // 픽킹..
-		if(false == this->MsgSend_RequestItemBundleOpen(pCorpse)) // 시체 뒤저서 아이템 상자 열기..
+		CPlayerNPC* pCorpse = s_pOPMgr->PickCorpse(ptCur.x, ptCur.y, iID); // 픽킹.. [Korean comment]
+		if(false == this->MsgSend_RequestItemBundleOpen(pCorpse)) // 시체 뒤저서 아이템 상자 열기.. [Korean comment]
 		{
 			// NOTE: if no corpse and item box then check if the player clicked on an iteractable shape
 			CN3Shape* pShape = ACT_WORLD->PickWithShape(ptCur.x, ptCur.y, true);
-			if(	pShape && pShape == s_pPlayer->m_pObjectTarget && pShape->m_iEventID) // Event 가 있으면..
+			if(	pShape && pShape == s_pPlayer->m_pObjectTarget && pShape->m_iEventID) // Event 가 있으면.. [Korean comment]
 			{
 				float fD = (s_pPlayer->Position() - pShape->Pos()).Magnitude(); 
 				float fDLimit = (s_pPlayer->Radius() + pShape->Radius()) * 2.0f;
-				if(fD > fDLimit) // 거리가 멀면
+				if(fD > fDLimit) // 거리가 멀면 [Korean comment]
 				{
 					std::string szMsg; 
 					if (OBJECT_TYPE_BINDPOINT == pShape->m_iEventType)
@@ -7652,23 +7652,23 @@ bool CGameProcMain::OnMouseRBtnPress(POINT ptCur, POINT ptPrev)
 					if(OBJECT_TYPE_BINDPOINT == pShape->m_iEventType)
 					{
 						std::string szMsg = fmt::format_text_resource(IDS_REQUEST_BINDPOINT);
-						this->MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_REQUEST_BINDPOINT); // 바인팅 포인트 설정 메시지 박스
+						this->MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_REQUEST_BINDPOINT); // 바인팅 포인트 설정 메시지 박스 Set
 					}
 					else if(OBJECT_TYPE_WARP_POINT == pShape->m_iEventType)
 					{
-						this->MsgSend_ObjectEvent(pShape->m_iEventID, pShape->m_iNPC_ID); // 오브젝트 이벤트 보내기..
+						this->MsgSend_ObjectEvent(pShape->m_iEventID, pShape->m_iNPC_ID); // 오브젝트 이벤트 보내기.. Object
 					}
 				}
 			}
 		}
 	}
-	else if(pNPC->IDNumber() == s_pPlayer->m_iIDTarget) // 타겟으로 찍은 캐릭터와 피킹한 캐릭터가 같고 ..) 
+	else if(pNPC->IDNumber() == s_pPlayer->m_iIDTarget) // 타겟으로 찍은 캐릭터와 피킹한 캐릭터가 같고 ..)  Character
 	{
 		if(	pNPC->m_pShapeExtraRef ) // 오브젝트 형태의 NPC 이면.. 컨트롤 할 NPC의 ID 가 있으면..
 		{
 			float fD = (s_pPlayer->Position() - pNPC->m_pShapeExtraRef->Pos()).Magnitude();
 			float fDLimit = (s_pPlayer->Radius() + pNPC->m_pShapeExtraRef->Radius()) * 2.0f;
-			if(fD > fDLimit) // 거리가 멀면
+			if(fD > fDLimit) // 거리가 멀면 [Korean comment]
 			{
 				std::string szMsg = fmt::format_text_resource(IDS_ERR_REQUEST_OBJECT_EVENT_SO_FAR);
 				this->MsgOutput(szMsg, 0xffff8080);
@@ -7683,20 +7683,20 @@ bool CGameProcMain::OnMouseRBtnPress(POINT ptCur, POINT ptPrev)
 			// NOTE: an NPC has been clicked on
 			// TODO(srmeier): need to use ZoneAbilityType here
 			// NOTE(srmeier): using the zone type to decide if you can talk with NPC
-			if(ACT_WORLD->GetZoneType()==ZONE_ABILITY_NEUTRAL || (pNPC->m_InfoBase.eNation == s_pPlayer->m_InfoBase.eNation)) // 같은 국가 일때만..
+			if(ACT_WORLD->GetZoneType()==ZONE_ABILITY_NEUTRAL || (pNPC->m_InfoBase.eNation == s_pPlayer->m_InfoBase.eNation)) // 같은 국가 일때만.. [Korean comment]
 			{
 				float fD = (s_pPlayer->Position() - pNPC->Position()).Magnitude();
 				float fDLimit = (s_pPlayer->Radius() + pNPC->Radius()) * 3.0f;
-				if(fD > fDLimit) // 거리가 멀면
+				if(fD > fDLimit) // 거리가 멀면 [Korean comment]
 				{
 					std::string szMsg = fmt::format_text_resource(IDS_ERR_REQUEST_NPC_EVENT_SO_FAR);
 					this->MsgOutput(szMsg, 0xffff8080);
 				}
 				else
 				{
-					s_pPlayer->ActionMove(PSM_STOP); // 일단 멈추고..
-					pNPC->RotateTo(s_pPlayer); // 방향을 플레이어 쪽으로 돌린다.
-					this->MsgSend_NPCEvent(iID); // 이벤트 요청..
+					s_pPlayer->ActionMove(PSM_STOP); // 일단 멈추고.. [Korean comment]
+					pNPC->RotateTo(s_pPlayer); // 방향을 플레이어 쪽으로 돌린다. [Korean comment]
+					this->MsgSend_NPCEvent(iID); // 이벤트 요청.. [Korean comment]
 					if (m_pUITransactionDlg) m_pUITransactionDlg->m_iNpcID = pNPC->IDNumber();
 				}
 			}
@@ -7705,13 +7705,13 @@ bool CGameProcMain::OnMouseRBtnPress(POINT ptCur, POINT ptPrev)
 	return true;
 }
 
-// 오른쪽 클릭업
+// 오른쪽 클릭업 [Korean comment]
 bool CGameProcMain::OnMouseRBtnPressd(POINT ptCur, POINT ptPrev)
 {
 	return true;
 }
 
-// 오른쪽 눌리고 있을때
+// 오른쪽 눌리고 있을때 [Korean comment]
 bool CGameProcMain::OnMouseRbtnDown(
 	POINT ptCur,
 	POINT ptPrev)
@@ -7721,23 +7721,23 @@ bool CGameProcMain::OnMouseRbtnDown(
 
 	float fMouseSensivity = 0.02f;//0.05f;//
 
-	float fRotY = D3DXToRadian(180.0f) * ((ptCur.x - ptPrev.x) * fMouseSensivity); // 회전할 양을 계산하고..
+	float fRotY = D3DXToRadian(180.0f) * ((ptCur.x - ptPrev.x) * fMouseSensivity); // 회전할 양을 계산하고.. Calculate
 	float fRotX = D3DXToRadian(180.0f) * ((ptCur.y - ptPrev.y) * fMouseSensivity);
 	if (fRotY != 0.0f
 		&& s_pPlayer->IsAlive())
 	{
 		if (VP_THIRD_PERSON == s_pEng->ViewPoint())
 			s_pEng->CameraYawAdd(fRotY);
-		// 기절해 있지 않을때만..
+		// 기절해 있지 않을때만.. [Korean comment]
 		else if (!s_pPlayer->m_bStun)
 			s_pPlayer->RotAdd(fRotY);
 	}
 	if (fRotX)
 	{
-		// 카메라 확대
+		// 카메라 확대 [Korean comment]
 		if (VP_THIRD_PERSON == s_pEng->ViewPoint())
 			s_pEng->CameraZoom(-fRotX);
-		// 카메라 각도
+		// 카메라 각도 [Korean comment]
 		else
 			s_pEng->CameraPitchAdd(fRotX);
 	}
@@ -7756,12 +7756,12 @@ bool CGameProcMain::OnMouseRbtnDown(
 	return true;
 }
 
-// 오른쪽 더블 클릭
+// 오른쪽 더블 클릭 [Korean comment]
 bool CGameProcMain::OnMouseRDBtnPress(POINT ptCur, POINT ptPrev)
 {
 	if(s_pUIMgr->m_bDoneSomething) return false;
 
-	//스킬 매직이 사용되었다면....
+	//스킬 매직이 사용되었다면.... [Korean comment]
 	m_pUIHotKeyDlg->EffectTriggerByMouse();
 
 	return true;
@@ -7790,14 +7790,14 @@ void CGameProcMain::ProcessUIKeyInput(bool bEnable)
 
 void CGameProcMain::MsgSend_SpeedCheck(bool bInit)
 {
-	uint8_t	byBuff[10];											// 버퍼.. 
-	int		iOffset=0;											// 옵셋..
-	float	fTime = CN3Base::TimeGet();							// 클라이언트 시간
+	uint8_t	byBuff[10];											// 버퍼..  [Korean comment]
+	int		iOffset=0;											// 옵셋.. [Korean comment]
+	float	fTime = CN3Base::TimeGet();							// 클라이언트 시간 Time
 
-	s_pSocket->MP_AddByte(byBuff, iOffset, WIZ_SPEEDHACK_CHECK);	// 스피드핵 체크 패킷..
+	s_pSocket->MP_AddByte(byBuff, iOffset, WIZ_SPEEDHACK_CHECK);	// 스피드핵 체크 패킷.. Check
 	s_pSocket->MP_AddByte(byBuff, iOffset, bInit);				// 서버가 기준 시간으로 쓸 타입 true 이면 기준시간 false면 체크타입
-	s_pSocket->MP_AddFloat(byBuff, iOffset, fTime);				// 클라이언트 시간
-	s_pSocket->Send(byBuff, iOffset);							// 보냄..
+	s_pSocket->MP_AddFloat(byBuff, iOffset, fTime);				// 클라이언트 시간 Time
+	s_pSocket->Send(byBuff, iOffset);							// 보냄.. [Korean comment]
 }
 
 void CGameProcMain::MsgRecv_ClassPromotion(Packet& pkt)

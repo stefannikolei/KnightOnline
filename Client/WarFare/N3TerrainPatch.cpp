@@ -16,7 +16,7 @@ static char THIS_FILE[]=__FILE__;
 
 
 //
-//	생성자
+//	생성자 Constructor
 //
 CN3TerrainPatch::CN3TerrainPatch()
 {
@@ -50,7 +50,7 @@ CN3TerrainPatch::CN3TerrainPatch()
 
 
 //
-//	소멸자
+//	소멸자 Destructor
 //
 CN3TerrainPatch::~CN3TerrainPatch()
 {
@@ -250,7 +250,7 @@ void CN3TerrainPatch::Tick()
 				m_pTileTexIndx[1][TileCount] = MapData.Tex2Idx;
 				m_pIsTileFull[TileCount] = MapData.bIsTileFull;
 
-				if( m_pTileTexIndx[0][TileCount]>m_pRefTerrain->m_NumTileTex || m_pIsTileFull[TileCount]==false)	// 타일이 없는 경우..컬러맵을 찍어야 돼...
+				if( m_pTileTexIndx[0][TileCount]>m_pRefTerrain->m_NumTileTex || m_pIsTileFull[TileCount]==false)	// 타일이 없는 경우..컬러맵을 찍어야 돼... [Korean comment]
 				{
 					u1[0] = u1[1] = UVConvert((float)(tx%UNITUV) / (float)UNITUV);
 					u1[2] = u1[3] = UVConvert(u1[0] + (1.0f/(float)UNITUV));
@@ -270,7 +270,7 @@ void CN3TerrainPatch::Tick()
 					v2[0] = v2[3] = 0.0f;
 					v2[1] = v2[2] = 1.0f;
 				}
-				else	// 타일을 찍는 경우...
+				else	// 타일을 찍는 경우... [Korean comment]
 				{
 					u1[0] = m_pRefTerrain->m_fTileDirU[dir1][2];
 					u1[1] = m_pRefTerrain->m_fTileDirU[dir1][0];
@@ -435,7 +435,7 @@ void CN3TerrainPatch::Tick()
 				cx = ix*m_CellSize + HalfCell + m_ti_LBPoint.x;
 				cz = iz*m_CellSize + HalfCell + m_ti_LBPoint.y;
 
-				//cell의 가운데 점...
+				//cell의 가운데 점... [Korean comment]
 				tx = cx;
 				tz = cz;
 
@@ -594,7 +594,7 @@ void CN3TerrainPatch::Tick()
 		return;
 	}
 
-	if(m_iLevel>2)	// level3 이상..	
+	if(m_iLevel>2)	// level3 이상..	 [Korean comment]
 	{
 		m_FanInfoList.clear();
 		__VertexT1* pVertices;
@@ -614,7 +614,7 @@ void CN3TerrainPatch::Tick()
 				cx = ix*m_CellSize + HalfCell + m_ti_LBPoint.x;
 				cz = iz*m_CellSize + HalfCell + m_ti_LBPoint.y;
 
-				//cell의 가운데 점...
+				//cell의 가운데 점... [Korean comment]
 				tx = cx;
 				tz = cz;
 
@@ -801,7 +801,7 @@ void CN3TerrainPatch::Render()
 			hr = CN3Base::s_lpD3DDev->DrawPrimitive( D3DPT_TRIANGLEFAN, vc, fc);
 			vc += it->NumVertex;
 #if _DEBUG
-			CN3Base::s_RenderInfo.nTerrain_Polygon += it->NumVertex; // Rendering Information 갱신..
+			CN3Base::s_RenderInfo.nTerrain_Polygon += it->NumVertex; // Rendering Information 갱신.. [Korean comment]
 #endif			
 		}		
 		return;
@@ -901,7 +901,7 @@ void CN3TerrainPatch::Render()
 		}
 
 #if _DEBUG
-		CN3Base::s_RenderInfo.nTerrain_Tile_Polygon += TotalTile * 2; // Rendering Information 갱신..
+		CN3Base::s_RenderInfo.nTerrain_Tile_Polygon += TotalTile * 2; // Rendering Information 갱신.. [Korean comment]
 #endif
 
 		// Render Light Map...

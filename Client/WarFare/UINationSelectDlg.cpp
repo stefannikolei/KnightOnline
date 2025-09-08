@@ -61,7 +61,7 @@ bool CUINationSelectDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		else
 		if ( pSender == m_pBtnBack ) // Back
 		{
-			CGameProcedure::ProcActiveSet((CGameProcedure*)CGameProcedure::s_pProcLogIn); // 캐릭터 선택 프로시저로 한다..
+			CGameProcedure::ProcActiveSet((CGameProcedure*)CGameProcedure::s_pProcLogIn); // 캐릭터 선택 프로시저로 한다.. Character
 		}
 	}
 

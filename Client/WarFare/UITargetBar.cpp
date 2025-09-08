@@ -42,7 +42,7 @@ void CUITargetBar::UpdateHP(int iHP, int iHPMax, bool bUpdateImmediately)
 	int iPercentage = iHP * 100 / iHPMax;
 
 	if(bUpdateImmediately) m_pProgress_HP->SetCurValue(iPercentage);
-	else m_pProgress_HP->SetCurValue(iPercentage, 0.5f, 50.0f);				// 1초뒤에 초당 50 의 속도로 변하게 한다.
+	else m_pProgress_HP->SetCurValue(iPercentage, 0.5f, 50.0f);				// 1초뒤에 초당 50 의 속도로 변하게 한다. [Korean comment]
 	return;
 }
 
@@ -65,7 +65,7 @@ bool CUITargetBar::Load(HANDLE hFile)
 	if (m_pProgress_HP != nullptr)
 		m_pProgress_HP->SetRange(0, 100);
 
-	// 폰트를 바꾼다.
+	// 폰트를 바꾼다. [Korean comment]
 	if (m_pStringID != nullptr)
 	{
 		std::string szFontID = fmt::format_text_resource(IDS_FONT_ID);

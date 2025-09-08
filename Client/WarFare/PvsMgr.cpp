@@ -147,10 +147,10 @@ bool CPvsMgr::Load(HANDLE hFile)
 	if (iT != ciVersion)
 		return LoadOldVersion(hFile, iT);
 
-	// N3Scene 화일.. 안쓴다.. -.-;
+	// N3Scene 화일.. 안쓴다.. -.-; [Korean comment]
 	std::string strSrc = ReadDecryptString(hFile), strDest;
 
-	// 전체 이동값.. 안슨다.. -.-;
+	// 전체 이동값.. 안슨다.. -.-; Move
 	ReadFile(hFile, &iT, sizeof(int), &dwNum, nullptr);
 	ReadFile(hFile, &iT, sizeof(int), &dwNum, nullptr);	
 	ReadFile(hFile, &iT, sizeof(int), &dwNum, nullptr);	
@@ -165,7 +165,7 @@ bool CPvsMgr::Load(HANDLE hFile)
 		ShapeInfo*	pSI = new ShapeInfo;
 		ReadFile(hFile, &pSI->m_iID, sizeof(int), &dwNum, nullptr);
 		
-		// 문자열 길이..
+		// 문자열 길이.. [Korean comment]
 		strSrc = ReadDecryptString(hFile);
 		_splitpath(strSrc.c_str(), szDrive, szDir, szFName, szExt);
 		strDest = szFName;	strDest +=  szExt;
@@ -231,7 +231,7 @@ CPortalVolume* CPvsMgr::GetPortalVolPointerByID(int iID)
 
 	while(it != m_pPvsList.end())
 	{
-		// 자신의 데이터 저장..
+		// 자신의 데이터 저장.. Save
 		pVol = *it++;
 		if (pVol->m_iID == iID)
 			return pVol;
@@ -433,11 +433,11 @@ CN3Shape* CPvsMgr::PickWithShape(int iXScreen, int iYScreen, bool bMustHaveEvent
 	return m_pCurVol->PickWithShape(iXScreen, iYScreen, bMustHaveEvent, pvPick);
 }
 
-bool CPvsMgr::CheckCollisionWithShape(	const __Vector3& vPos,				 // 충돌 위치
-																	const __Vector3& vDir,				   // 방향 벡터
-																	float fSpeedPerSec,					    // 초당 움직이는 속도
-																	__Vector3* pvCol,						 // 충돌 지점
-																	__Vector3* pvNormal,				  // 충돌한면의 법선벡터
+bool CPvsMgr::CheckCollisionWithShape(	const __Vector3& vPos,				 // 충돌 위치 Position
+																	const __Vector3& vDir,				   // 방향 벡터 [Korean comment]
+																	float fSpeedPerSec,					    // 초당 움직이는 속도 [Korean comment]
+																	__Vector3* pvCol,						 // 충돌 지점 [Korean comment]
+																	__Vector3* pvNormal,				  // 충돌한면의 법선벡터 [Korean comment]
 																	__Vector3* pVec)						// 충돌한 면 의 폴리곤 __Vector3[3]
 {
 	if (!m_pCurVol)

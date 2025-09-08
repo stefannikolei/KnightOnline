@@ -31,7 +31,7 @@ using __GameServerInfo = CUILogIn_1298::__GameServerInfo;
 CGameProcLogIn_1298::CGameProcLogIn_1298()
 {
 	m_pUILogIn	= nullptr;
-	m_bLogIn	= false; // 로그인 중복 방지..
+	m_bLogIn	= false; // 로그인 중복 방지.. [Korean comment]
 	m_fTimeUntilNextGameConnectionAttempt = 0.0f;
 }
 
@@ -135,22 +135,22 @@ void CGameProcLogIn_1298::Init()
 		{
 			m_pUILogIn->FocusToID(); // Focus on the ID input box..
 
-			// 게임 서버 리스트 요청..
+			// 게임 서버 리스트 요청.. [Korean comment]
 			int iOffset = 0;
 			uint8_t byBuffs[4];
-			CAPISocket::MP_AddByte(byBuffs, iOffset, LS_SERVERLIST);					// 커멘드.
-			s_pSocket->Send(byBuffs, iOffset);											// 보낸다
+			CAPISocket::MP_AddByte(byBuffs, iOffset, LS_SERVERLIST);					// 커멘드. [Korean comment]
+			s_pSocket->Send(byBuffs, iOffset);											// 보낸다 [Korean comment]
 		}
 	}
 	else
 	{
-		MessageBoxPost("No server list", "LogIn Server fail", MB_OK, BEHAVIOR_EXIT); // 끝낸다.
+		MessageBoxPost("No server list", "LogIn Server fail", MB_OK, BEHAVIOR_EXIT); // 끝낸다. [Korean comment]
 	}
 
-	// 게임 계정으로 들어 왔으면..
+	// 게임 계정으로 들어 왔으면.. [Korean comment]
 	if (LIC_KNIGHTONLINE != s_eLogInClassification)
 	{
-		MsgSend_AccountLogIn(s_eLogInClassification); // 로그인..
+		MsgSend_AccountLogIn(s_eLogInClassification); // 로그인.. [Korean comment]
 	}
 
 	// Re-entered the scene; we can reset any existing timer.
@@ -201,8 +201,8 @@ bool CGameProcLogIn_1298::MsgSend_AccountLogIn(e_LogInClassification eLIC)
 {
 	if (LIC_KNIGHTONLINE == eLIC)
 	{
-		m_pUILogIn->AccountIDGet(s_szAccount); // 계정 기억..
-		m_pUILogIn->AccountPWGet(s_szPassWord); // 비밀번호 기억..
+		m_pUILogIn->AccountIDGet(s_szAccount); // 계정 기억.. [Korean comment]
+		m_pUILogIn->AccountPWGet(s_szPassWord); // 비밀번호 기억.. [Korean comment]
 	}
 
 	if (s_szAccount.empty()
@@ -213,22 +213,22 @@ bool CGameProcLogIn_1298::MsgSend_AccountLogIn(e_LogInClassification eLIC)
 
 	m_pUILogIn->SetVisibleLogInUIs(false); // 패킷이 들어올때까지 UI 를 Disable 시킨다...
 	m_pUILogIn->SetRequestedLogIn(true);
-	m_bLogIn = true; // 로그인 시도..
+	m_bLogIn = true; // 로그인 시도.. [Korean comment]
 
-	uint8_t byBuff[256];										// 패킷 버퍼..
-	int iOffset = 0;										// 버퍼의 오프셋..
+	uint8_t byBuff[256];										// 패킷 버퍼.. [Korean comment]
+	int iOffset = 0;										// 버퍼의 오프셋.. [Korean comment]
 
 	uint8_t byCmd = LS_LOGIN_REQ;
 	if (eLIC == LIC_MGAME)
 		byCmd = LS_MGAME_LOGIN;
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, byCmd);				// 커멘드.
-	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t) s_szAccount.size());	// 아이디 길이..
-	CAPISocket::MP_AddString(byBuff, iOffset, s_szAccount);		// 실제 아이디..
-	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t) s_szPassWord.size());	// 패스워드 길이
-	CAPISocket::MP_AddString(byBuff, iOffset, s_szPassWord);		// 실제 패스워드
+	CAPISocket::MP_AddByte(byBuff, iOffset, byCmd);				// 커멘드. [Korean comment]
+	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t) s_szAccount.size());	// 아이디 길이.. [Korean comment]
+	CAPISocket::MP_AddString(byBuff, iOffset, s_szAccount);		// 실제 아이디.. [Korean comment]
+	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t) s_szPassWord.size());	// 패스워드 길이 [Korean comment]
+	CAPISocket::MP_AddString(byBuff, iOffset, s_szPassWord);		// 실제 패스워드 [Korean comment]
 
-	s_pSocket->Send(byBuff, iOffset);								// 보낸다
+	s_pSocket->Send(byBuff, iOffset);								// 보낸다 [Korean comment]
 
 	return true;
 }
@@ -268,7 +268,7 @@ void CGameProcLogIn_1298::MsgRecv_News(Packet& pkt)
 
 void CGameProcLogIn_1298::MsgRecv_GameServerGroupList(Packet& pkt)
 {
-	int iServerCount = pkt.read<uint8_t>();	// 서버 갯수
+	int iServerCount = pkt.read<uint8_t>();	// 서버 갯수 [Korean comment]
 	for (int i = 0; i < iServerCount; i++)
 	{
 		int iLen = 0;
@@ -277,7 +277,7 @@ void CGameProcLogIn_1298::MsgRecv_GameServerGroupList(Packet& pkt)
 		pkt.readString(GSI.szIP, iLen);
 		iLen = pkt.read<int16_t>();
 		pkt.readString(GSI.szName, iLen);
-		GSI.iConcurrentUserCount = pkt.read<int16_t>(); // 현재 동시 접속자수..
+		GSI.iConcurrentUserCount = pkt.read<int16_t>(); // 현재 동시 접속자수.. [Korean comment]
 		
 		m_pUILogIn->ServerInfoAdd(GSI); // ServerList
 	}
@@ -311,29 +311,29 @@ void CGameProcLogIn_1298::MsgRecv_AccountLogIn(int iCmd, Packet& pkt)
 			std::string szMsg = fmt::format_text_resource(IDS_NOACCOUNT_RETRY_MGAMEID);
 			std::string szTmp = fmt::format_text_resource(IDS_CONNECT_FAIL);
 
-			MessageBoxPost(szMsg, szTmp, MB_YESNO, BEHAVIOR_MGAME_LOGIN); // MGame ID 로 접속할거냐고 물어본다.
+			MessageBoxPost(szMsg, szTmp, MB_YESNO, BEHAVIOR_MGAME_LOGIN); // MGame ID 로 접속할거냐고 물어본다. [Korean comment]
 		}
 		else
 		{
 			std::string szMsg = fmt::format_text_resource(IDS_NO_MGAME_ACCOUNT);
 			std::string szTmp = fmt::format_text_resource(IDS_CONNECT_FAIL);
 
-			MessageBoxPost(szMsg, szTmp, MB_OK); // MGame ID 로 접속할거냐고 물어본다.
+			MessageBoxPost(szMsg, szTmp, MB_OK); // MGame ID 로 접속할거냐고 물어본다. [Korean comment]
 		}
 	}
-	else if (3 == iResult) // PassWord 실패
+	else if (3 == iResult) // PassWord 실패 [Korean comment]
 	{
 		std::string szMsg = fmt::format_text_resource(IDS_WRONG_PASSWORD);
 		std::string szTmp = fmt::format_text_resource(IDS_CONNECT_FAIL);
-		MessageBoxPost(szMsg, szTmp, MB_OK); // MGame ID 로 접속할거냐고 물어본다.
+		MessageBoxPost(szMsg, szTmp, MB_OK); // MGame ID 로 접속할거냐고 물어본다. [Korean comment]
 	}
-	else if (4 == iResult) // 서버 점검 중??
+	else if (4 == iResult) // 서버 점검 중?? [Korean comment]
 	{
 		std::string szMsg = fmt::format_text_resource(IDS_SERVER_CONNECT_FAIL);
 		std::string szTmp = fmt::format_text_resource(IDS_CONNECT_FAIL);
-		MessageBoxPost(szMsg, szTmp, MB_OK); // MGame ID 로 접속할거냐고 물어본다.
+		MessageBoxPost(szMsg, szTmp, MB_OK); // MGame ID 로 접속할거냐고 물어본다. [Korean comment]
 	}
-	else if (5 == iResult) // 어떤 넘이 접속해 있다. 서버에게 끊어버리라고 하자..
+	else if (5 == iResult) // 어떤 넘이 접속해 있다. 서버에게 끊어버리라고 하자.. [Korean comment]
 	{
 		int iLen = pkt.read<int16_t>();
 		if (iLen > 0)
@@ -343,10 +343,10 @@ void CGameProcLogIn_1298::MsgRecv_AccountLogIn(int iCmd, Packet& pkt)
 			uint32_t dwPort = pkt.read<int16_t>();
 
 			CAPISocket socketTmp;
-			s_bNeedReportConnectionClosed = false; // 서버접속이 끊어진걸 보고해야 하는지..
+			s_bNeedReportConnectionClosed = false; // 서버접속이 끊어진걸 보고해야 하는지.. [Korean comment]
 			if (0 == socketTmp.Connect(s_hWndBase, szIP.c_str(), dwPort))
 			{
-				// 로그인 서버에서 받은 겜서버 주소로 접속해서 짤르라고 꼰지른다.
+				// 로그인 서버에서 받은 겜서버 주소로 접속해서 짤르라고 꼰지른다. [Korean comment]
 				int iOffset2 = 0;
 				uint8_t Buff[32];
 				CAPISocket::MP_AddByte(Buff, iOffset2, WIZ_KICKOUT); // Recv s1, str1(IP) s1(port) | Send s1, str1(ID)
@@ -354,28 +354,28 @@ void CGameProcLogIn_1298::MsgRecv_AccountLogIn(int iCmd, Packet& pkt)
 				CAPISocket::MP_AddString(Buff, iOffset2, s_szAccount); // Recv s1, str1(IP) s1(port) | Send s1, str1(ID)
 
 				socketTmp.Send(Buff, iOffset2);
-				socketTmp.Disconnect(); // 짜른다..
+				socketTmp.Disconnect(); // 짜른다.. [Korean comment]
 			}
-			s_bNeedReportConnectionClosed = true; // 서버접속이 끊어진걸 보고해야 하는지..
+			s_bNeedReportConnectionClosed = true; // 서버접속이 끊어진걸 보고해야 하는지.. [Korean comment]
 
 			std::string szMsg = fmt::format_text_resource(IDS_LOGIN_ERR_ALREADY_CONNECTED_ACCOUNT);
 			std::string szTmp = fmt::format_text_resource(IDS_CONNECT_FAIL);
-			MessageBoxPost(szMsg, szTmp, MB_OK); // 다시 접속 할거냐고 물어본다.
+			MessageBoxPost(szMsg, szTmp, MB_OK); // 다시 접속 할거냐고 물어본다. [Korean comment]
 		}
 	}
 	else
 	{
 		std::string szMsg = fmt::format_text_resource(IDS_CURRENT_SERVER_ERROR);
 		std::string szTmp = fmt::format_text_resource(IDS_CONNECT_FAIL);
-		MessageBoxPost(szMsg, szTmp, MB_OK); // MGame ID 로 접속할거냐고 물어본다.
+		MessageBoxPost(szMsg, szTmp, MB_OK); // MGame ID 로 접속할거냐고 물어본다. [Korean comment]
 	}
 
-	// 로그인 실패..
+	// 로그인 실패.. [Korean comment]
 	if (1 != iResult)
 	{
 		m_pUILogIn->SetVisibleLogInUIs(true); // 접속 성공..UI 조작 불가능..
 		m_pUILogIn->SetRequestedLogIn(false);
-		m_bLogIn = false; // 로그인 시도..
+		m_bLogIn = false; // 로그인 시도.. [Korean comment]
 	}
 }
 
@@ -384,14 +384,14 @@ int CGameProcLogIn_1298::MsgRecv_VersionCheck(Packet & pkt) // virtual
 	int iVersion = CGameProcedure::MsgRecv_VersionCheck(pkt);
 	if (iVersion == CURRENT_VERSION)
 	{
-		CGameProcedure::MsgSend_GameServerLogIn(); // 게임 서버에 로그인..
+		CGameProcedure::MsgSend_GameServerLogIn(); // 게임 서버에 로그인.. [Korean comment]
 		m_pUILogIn->ConnectButtonSetEnable(false);
 	}
 
 	return iVersion;
 }
 
-int CGameProcLogIn_1298::MsgRecv_GameServerLogIn(Packet & pkt) // virtual - 국가번호를 리턴한다.
+int CGameProcLogIn_1298::MsgRecv_GameServerLogIn(Packet & pkt) // virtual - 국가번호를 리턴한다. [Korean comment]
 {
 	int iNation = CGameProcedure::MsgRecv_GameServerLogIn(pkt); // 국가 - 0 없음 0xff - 실패..
 
@@ -403,7 +403,7 @@ int CGameProcLogIn_1298::MsgRecv_GameServerLogIn(Packet & pkt) // virtual - 국�
 		std::string szMsg = fmt::format_text_resource(IDS_FMT_GAME_SERVER_LOGIN_ERROR,
 			GSI.szName, iNation);
 		MessageBoxPost(szMsg, "", MB_OK);
-		m_pUILogIn->ConnectButtonSetEnable(true); // 실패
+		m_pUILogIn->ConnectButtonSetEnable(true); // 실패 [Korean comment]
 	}
 	else
 	{
@@ -437,16 +437,16 @@ bool CGameProcLogIn_1298::ProcessPacket(Packet & pkt)
 	pkt.rpos(rpos);
 
 	s_pPlayer->m_InfoBase.eNation = NATION_UNKNOWN;
-	int iCmd = pkt.read<uint8_t>();	// 커멘드 파싱..
+	int iCmd = pkt.read<uint8_t>();	// 커멘드 파싱.. [Korean comment]
 	s_pPlayer->m_InfoBase.eNation = NATION_UNKNOWN;
-	switch (iCmd)										// 커멘드에 다라서 분기..
+	switch (iCmd)										// 커멘드에 다라서 분기.. [Korean comment]
 	{
-		case LS_SERVERLIST: // 접속하면 바로 보내준다..
+		case LS_SERVERLIST: // 접속하면 바로 보내준다.. [Korean comment]
 			MsgRecv_GameServerGroupList(pkt);
 			return true;
 
-		case LS_LOGIN_REQ: // 계정 접속 성공..
-		case LS_MGAME_LOGIN: // MGame 계정 접속 성공..
+		case LS_LOGIN_REQ: // 계정 접속 성공.. [Korean comment]
+		case LS_MGAME_LOGIN: // MGame 계정 접속 성공.. [Korean comment]
 			MsgRecv_AccountLogIn(iCmd, pkt);
 			return true;
 	
@@ -458,21 +458,21 @@ bool CGameProcLogIn_1298::ProcessPacket(Packet & pkt)
 	return false;
 }
 
-void CGameProcLogIn_1298::ConnectToGameServer() // 고른 게임 서버에 접속
+void CGameProcLogIn_1298::ConnectToGameServer() // 고른 게임 서버에 접속 [Korean comment]
 {
 	if (m_fTimeUntilNextGameConnectionAttempt > 0.0f)
 		return;
 
 	__GameServerInfo GSI;
 	if (!m_pUILogIn->ServerInfoGetCur(GSI))
-		return; // 서버를 고른다음..
+		return; // 서버를 고른다음.. [Korean comment]
 
 	const char* ip = GSI.szIP.c_str();
 	int port = SOCKET_PORT_GAME;
 
-	s_bNeedReportConnectionClosed = false; // 서버접속이 끊어진걸 보고해야 하는지..
-	int iErr = s_pSocket->Connect(s_hWndBase, ip, port); // 게임서버 소켓 연결
-	s_bNeedReportConnectionClosed = true; // 서버접속이 끊어진걸 보고해야 하는지..
+	s_bNeedReportConnectionClosed = false; // 서버접속이 끊어진걸 보고해야 하는지.. [Korean comment]
+	int iErr = s_pSocket->Connect(s_hWndBase, ip, port); // 게임서버 소켓 연결 [Korean comment]
+	s_bNeedReportConnectionClosed = true; // 서버접속이 끊어진걸 보고해야 하는지.. [Korean comment]
 
 	if (iErr != 0)
 	{

@@ -248,12 +248,12 @@ bool CMagicSkillMng::HasRequiredExhaustItem(const __TABLE_UPC_SKILL* pSkill, boo
 	{
 		__ASSERT(0, "NULL Item");
 		CLogWriter::Write("MyInfo - Inv - Unknown Item {}, IDNumber", pSkill->dwExhaustItem);
-		return false;	// 아이템이 없으면..
+		return false;	// 아이템이 없으면.. [Korean comment]
 	}
 
 	if (pItem->byAttachPoint == ITEM_LIMITED_EXHAUST)
 	{
-		// 종족 체크..
+		// 종족 체크.. Check
 		switch (pItem->byNeedRace)
 		{
 			case 0:
@@ -265,7 +265,7 @@ bool CMagicSkillMng::HasRequiredExhaustItem(const __TABLE_UPC_SKILL* pSkill, boo
 				break;
 		}
 
-		// 직업 체크..
+		// 직업 체크.. Check
 		if (pItem->byNeedClass != 0)
 		{
 			switch (pItem->byNeedClass)
@@ -425,11 +425,11 @@ bool CMagicSkillMng::HasRequiredExhaustItem(const __TABLE_UPC_SKILL* pSkill, boo
 			}
 		}
 
-		// 요구레벨 체크..
+		// 요구레벨 체크.. Check
 		if (s_pPlayer->m_InfoBase.iLevel < pItem->cNeedLevel + pItemExt->siNeedLevel)
 			return false;
 
-		// 요구 능력치 체크..
+		// 요구 능력치 체크.. Check
 		int iNeedValue;
 		iNeedValue = pItem->byNeedStrength;
 		if (iNeedValue != 0)
@@ -662,7 +662,7 @@ bool CMagicSkillMng::CheckValidCondition(int iTargetID, const __TABLE_UPC_SKILL*
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-// 스킬 사용시 오브젝트 체크
+// 스킬 사용시 오브젝트 체크 Check
 	CPlayerBase* pTarget = m_pGameProcMain->CharacterGetByID(iTargetID, false);
 	if (pTarget == nullptr)
 		return true;
@@ -724,7 +724,7 @@ bool CMagicSkillMng::CheckValidCondition(int iTargetID, const __TABLE_UPC_SKILL*
 			break;
 	}
 
-// 스킬 사용시 오브젝트 체크
+// 스킬 사용시 오브젝트 체크 Check
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	return true;
@@ -736,11 +736,11 @@ bool CMagicSkillMng::CheckValidCondition(int iTargetID, const __TABLE_UPC_SKILL*
 //
 bool CMagicSkillMng::MsgSend_MagicProcess(int iTargetID, __TABLE_UPC_SKILL* pSkill)
 {
-	//if(m_fRecastTime > 0.0f) return;//recast time이 아직 안되었네..^^
-	if(s_pPlayer->IsDead()) return false; // 죽어 있네.. ^^
+	//if(m_fRecastTime > 0.0f) return;//recast time이 아직 안되었네..^^ [Korean comment]
+	if(s_pPlayer->IsDead()) return false; // 죽어 있네.. ^^ [Korean comment]
 
 	///////////////////////////////////////////////////////////////////////////////////
-	// 스킬 쓸 조건이 되는지 검사...
+	// 스킬 쓸 조건이 되는지 검사... Check
 	// Existing validity checks
 	if (pSkill == nullptr) return false;
 	// Check cooldowns first
@@ -764,13 +764,13 @@ bool CMagicSkillMng::MsgSend_MagicProcess(int iTargetID, __TABLE_UPC_SKILL* pSki
 	if(!CheckValidCondition(iTargetID, pSkill)) return false;
 
 	//TRACE("마법성공 state : %d time %.2f\n", s_pPlayer->State(), CN3Base::TimeGet());
-	// 스킬 쓸 조건이 되는지 검사 끝...
+	// 스킬 쓸 조건이 되는지 검사 끝... Check
 	///////////////////////////////////////////////////////////////////////////////////
 	__InfoPlayerBase* pInfoBase = &(s_pPlayer->m_InfoBase);
 	__InfoPlayerMySelf* pInfoExt = &(s_pPlayer->m_InfoExt);
 	CPlayerBase* pTarget = m_pGameProcMain->CharacterGetByID(iTargetID, false);
 
-	//지역마법타겟 초기화..
+	//지역마법타겟 초기화.. Initialize
 	CGameProcedure::s_pFX->Stop(s_pPlayer->IDNumber(), s_pPlayer->IDNumber(), m_iMyRegionTargetFXID, m_iMyRegionTargetFXID, true);
 
 	CancelZonePointer();
@@ -789,9 +789,9 @@ bool CMagicSkillMng::MsgSend_MagicProcess(int iTargetID, __TABLE_UPC_SKILL* pSki
 	}
 	//	
 
-//	if(!pTarget) return false;//임시 일단 죽어 있다면 리턴을 한다.
+//	if(!pTarget) return false;//임시 일단 죽어 있다면 리턴을 한다. [Korean comment]
 
-	float fDist = s_pPlayer->Radius() + 1.0f; // 공격 거리제한..
+	float fDist = s_pPlayer->Radius() + 1.0f; // 공격 거리제한.. [Korean comment]
 	if(pTarget != nullptr) fDist += pTarget->Radius();
 
 	switch(pSkill->iTarget)
@@ -840,7 +840,7 @@ bool CMagicSkillMng::MsgSend_MagicProcess(int iTargetID, __TABLE_UPC_SKILL* pSki
 				StartSkillMagicAtTargetPacket(pSkill, (int16_t)pTarget->IDNumber());
 				return true;
 			}
-			else if(pInfo != nullptr)	//거리에 상관없이 파티원들에게 쓸때...
+			else if(pInfo != nullptr)	//거리에 상관없이 파티원들에게 쓸때... [Korean comment]
 			{
 				StartSkillMagicAtTargetPacket(pSkill, (int16_t)pInfo->iID);
 				return true;
@@ -895,8 +895,8 @@ bool CMagicSkillMng::MsgSend_MagicProcess(int iTargetID, __TABLE_UPC_SKILL* pSki
 		{
 			m_dwRegionMagicState = 1;
 			m_dwRegionSkill = (*pSkill);
-//			CGameProcedure::s_pFX->TriggerBundle(s_pPlayer->IDNumber(), 0, m_iMyRegionTargetFXID, m_pGameProcMain->m_vMouseLBClickedPos, m_iMyRegionTargetFXID);	//전격무기...
-			CGameProcedure::s_pFX->TriggerBundle(s_pPlayer->IDNumber(), 0, m_iMyRegionTargetFXID, m_pGameProcMain->m_vMouseSkillPos, m_iMyRegionTargetFXID);	//전격무기...
+//			CGameProcedure::s_pFX->TriggerBundle(s_pPlayer->IDNumber(), 0, m_iMyRegionTargetFXID, m_pGameProcMain->m_vMouseLBClickedPos, m_iMyRegionTargetFXID);	//전격무기... [Korean comment]
+			CGameProcedure::s_pFX->TriggerBundle(s_pPlayer->IDNumber(), 0, m_iMyRegionTargetFXID, m_pGameProcMain->m_vMouseSkillPos, m_iMyRegionTargetFXID);	//전격무기... [Korean comment]
 
 			// Zone pointer circle FX with scaling
 
@@ -977,7 +977,7 @@ void CMagicSkillMng::SetSkillCooldown(__TABLE_UPC_SKILL* pSkill)
 
 bool CMagicSkillMng::CheckValidDistance(const __TABLE_UPC_SKILL* pSkill, __Vector3 vTargetPos, float fTargetRadius) const
 {
-	float fDist = (vTargetPos - s_pPlayer->Position()).Magnitude(); // 공격 거리를 구하고..
+	float fDist = (vTargetPos - s_pPlayer->Position()).Magnitude(); // 공격 거리를 구하고.. [Korean comment]
 
 	if(pSkill->iValidDist > 0 && fDist <= (pSkill->iValidDist+fTargetRadius + 1.0f)) return true;
 
@@ -992,7 +992,7 @@ bool CMagicSkillMng::CheckValidDistance(const __TABLE_UPC_SKILL* pSkill, __Vecto
 		}
 	}
 
-	//화살쏠때....
+	//화살쏠때.... [Korean comment]
 	if(pSkill->dw1stTableType==2 || pSkill->dw2ndTableType==2)
 	{
 		__IconItemSkill* pItemIcon1 = m_pGameProcMain->m_pUIInventory->m_pMySlot[ITEM_SLOT_HAND_LEFT];
@@ -1038,7 +1038,7 @@ void CMagicSkillMng::StartSkillMagicAtPosPacket(__TABLE_UPC_SKILL* pSkill, __Vec
 		SetSkillCooldown(pSkill);
 		return;
 	}
-	m_pGameProcMain->CommandSitDown(false, false); // 혹시라도 앉아있음 일으켜 세운다..
+	m_pGameProcMain->CommandSitDown(false, false); // 혹시라도 앉아있음 일으켜 세운다.. [Korean comment]
 
 	if (pSkill->iCastTime == 0)
 	{
@@ -1061,7 +1061,7 @@ void CMagicSkillMng::StartSkillMagicAtPosPacket(__TABLE_UPC_SKILL* pSkill, __Vec
 		CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 		CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 
-		CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..	
+		CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..	 [Korean comment]
 		return;
 	}
 
@@ -1114,7 +1114,7 @@ void CMagicSkillMng::StartSkillMagicAtPosPacket(__TABLE_UPC_SKILL* pSkill, __Vec
 	CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 	CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 	
-	CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+	CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 	SetSkillCooldown(pSkill);
 
 	if(pSkill->iTarget == SKILLMAGIC_TARGET_ENEMY_ONLY) m_pGameProcMain->PlayBGM_Battle();
@@ -1142,7 +1142,7 @@ void CMagicSkillMng::StartSkillMagicAtTargetPacket(__TABLE_UPC_SKILL* pSkill, in
 		return;
 	}
 
-	m_pGameProcMain->CommandSitDown(false, false); // 혹시라도 앉아있음 일으켜 세운다..
+	m_pGameProcMain->CommandSitDown(false, false); // 혹시라도 앉아있음 일으켜 세운다.. [Korean comment]
 	
 	if((pSkill->dw1stTableType==1 || pSkill->dw2ndTableType==1) && pSkill->iCastTime==0)
 	{
@@ -1152,14 +1152,14 @@ void CMagicSkillMng::StartSkillMagicAtTargetPacket(__TABLE_UPC_SKILL* pSkill, in
 		//바로 skill로 들어가..^^
 		//casting packet은 보내지 않고..바로 effect packet을 보낸다..
 
-		//기술 애니메이션 드가...=^^=
-		//효과있으면 같이 드가..
+		//기술 애니메이션 드가...=^^= [Korean comment]
+		//효과있으면 같이 드가.. [Korean comment]
 		__TABLE_UPC_SKILL_TYPE_1* pType1 = m_pTbl_Type_1->Find(pSkill->dwID);
 		if(pType1 == nullptr) return;
 
-		// 검기 색을 바꾸어 준다..
-//		D3DCOLOR crTrace = TraceColorGet(pSkill); // 스킬의 종류에 따라 검기의 색을 정한다..
-//		s_pPlayer->PlugTraceColorRemake(crTrace); // 검기 색 적용..
+		// 검기 색을 바꾸어 준다.. Color
+//		D3DCOLOR crTrace = TraceColorGet(pSkill); // 스킬의 종류에 따라 검기의 색을 정한다.. Color
+//		s_pPlayer->PlugTraceColorRemake(crTrace); // 검기 색 적용.. Color
 
 		s_pPlayer->RotateTo(pTarget);
 
@@ -1167,7 +1167,7 @@ void CMagicSkillMng::StartSkillMagicAtTargetPacket(__TABLE_UPC_SKILL* pSkill, in
 
 		for(int i=0;i<pType1->iNumCombo;i++)
 		{
-			bool bImmediately = ((0 == i) ? true : false); // 처음건 바로 넣는다..
+			bool bImmediately = ((0 == i) ? true : false); // 처음건 바로 넣는다.. [Korean comment]
 			s_pPlayer->AnimationAdd((e_Ani)pType1->iAct[i], bImmediately);
 		}			
 		
@@ -1190,7 +1190,7 @@ void CMagicSkillMng::StartSkillMagicAtTargetPacket(__TABLE_UPC_SKILL* pSkill, in
 		CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 		CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 		
-		CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..	
+		CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..	 [Korean comment]
 		SetSkillCooldown(pSkill);
 		return;
 	}
@@ -1216,13 +1216,13 @@ void CMagicSkillMng::StartSkillMagicAtTargetPacket(__TABLE_UPC_SKILL* pSkill, in
 		CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 		CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 		
-		CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..	
+		CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..	 [Korean comment]
 		SetSkillCooldown(pSkill);
 		return;
 	}
 
 	/////////////////////////////////////////////////////////////
-	//내껀 패킷 보내면서 그냥 처리..
+	//내껀 패킷 보내면서 그냥 처리.. Process
 	s_pPlayer->m_dwMagicID = pSkill->dwID;
 	s_pPlayer->m_fCastingTime = 0.0f;
 	m_iTarget = TargetID;
@@ -1270,7 +1270,7 @@ void CMagicSkillMng::StartSkillMagicAtTargetPacket(__TABLE_UPC_SKILL* pSkill, in
 	CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 	CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 	
-	CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+	CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 	
 	if(pSkill->iTarget == SKILLMAGIC_TARGET_ENEMY_ONLY) m_pGameProcMain->PlayBGM_Battle();
 	//
@@ -1384,7 +1384,7 @@ void CMagicSkillMng::Tick()
 			CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 			CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 			
-			CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+			CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 
 			m_dwCastingStateNonAction = 0;
 			m_fCastTimeNonAction = 0.0f;
@@ -1454,7 +1454,7 @@ void CMagicSkillMng::SuccessCast(__TABLE_UPC_SKILL* pSkill, CPlayerBase* pTarget
 	else
 	{
 		CAPISocket::MP_AddByte(byBuff, iOffset, (uint8_t)N3_SP_MAGIC_FLYING);
-		if(pSkill->dw1stTableType==2 || pSkill->dw2ndTableType==2)//화살쏘기..
+		if(pSkill->dw1stTableType==2 || pSkill->dw2ndTableType==2)//화살쏘기.. [Korean comment]
 		{
 			int iNumArrow = 1;
 			__TABLE_UPC_SKILL_TYPE_2* pType2 = m_pTbl_Type_2->Find(pSkill->dwID);
@@ -1470,8 +1470,8 @@ void CMagicSkillMng::SuccessCast(__TABLE_UPC_SKILL* pSkill, CPlayerBase* pTarget
 		//바로 skill로 들어가..^^
 		//casting packet은 보내지 않고..바로 effect packet을 보낸다..
 
-		//기술 애니메이션 드가...=^^=
-		//효과있으면 같이 드가..
+		//기술 애니메이션 드가...=^^= [Korean comment]
+		//효과있으면 같이 드가.. [Korean comment]
 		__TABLE_UPC_SKILL_TYPE_1* pType1 = m_pTbl_Type_1->Find(pSkill->dwID);
 		if(pType1 == nullptr) return;
 
@@ -1479,7 +1479,7 @@ void CMagicSkillMng::SuccessCast(__TABLE_UPC_SKILL* pSkill, CPlayerBase* pTarget
 
 		for(int i=0;i<pType1->iNumCombo;i++)
 		{
-			bool bImmediately = ((0 == i) ? true : false); // 처음건 바로 넣는다..
+			bool bImmediately = ((0 == i) ? true : false); // 처음건 바로 넣는다.. [Korean comment]
 			s_pPlayer->AnimationAdd((const e_Ani)pType1->iAct[i], bImmediately);				
 		}			
 		
@@ -1502,7 +1502,7 @@ void CMagicSkillMng::SuccessCast(__TABLE_UPC_SKILL* pSkill, CPlayerBase* pTarget
 		CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 		CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 
-		CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..				
+		CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..				 [Korean comment]
 		SetSkillCooldown(pSkill);
 	}
 	else
@@ -1524,13 +1524,13 @@ void CMagicSkillMng::SuccessCast(__TABLE_UPC_SKILL* pSkill, CPlayerBase* pTarget
 		CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 		CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 
-		CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+		CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 		SetSkillCooldown(pSkill);
 
 		if (pSkill->iFlyingFX != 0)
 		{
 			////////////////////////////////////////////////////
-			//flying처리하기..	
+			//flying처리하기..	 Process
 			int SourceID = s_pPlayer->IDNumber();
 
 			s_pPlayer->m_iMagicAni = pSkill->iSelfAnimID2;
@@ -1551,7 +1551,7 @@ void CMagicSkillMng::SuccessCast(__TABLE_UPC_SKILL* pSkill, CPlayerBase* pTarget
 			CGameProcedure::s_pFX->Stop(SourceID, SourceID, pSkill->iSelfFX1, -1, true);
 			CGameProcedure::s_pFX->Stop(SourceID, SourceID, pSkill->iSelfFX1, -2, true);
 
-			if(pSkill->dw1stTableType == 2 || pSkill->dw2ndTableType == 2)//화살쏘기..
+			if(pSkill->dw1stTableType == 2 || pSkill->dw2ndTableType == 2)//화살쏘기.. [Korean comment]
 			{
 				int16_t Data[6] = { (int16_t)m_vTargetPos.x, (int16_t)m_vTargetPos.y, (int16_t)m_vTargetPos.z, (int16_t)idx, 0, 0 };
 				FlyingType2(pSkill, SourceID, m_iTarget, Data);
@@ -1611,20 +1611,20 @@ void CMagicSkillMng::FailCast(__TABLE_UPC_SKILL* pSkill)
 	CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 	CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 
-	CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..	
+	CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..	 [Korean comment]
 }
 
 void CMagicSkillMng::ProcessCasting()
 {
-	//캐스팅 처리..
+	//캐스팅 처리.. Process
 	if(s_pPlayer->m_dwMagicID != 0xffffffff)
 	{
 		__TABLE_UPC_SKILL* pSkill = s_pTbl_Skill.Find(s_pPlayer->m_dwMagicID);
 
 		CPlayerBase* pTarget = m_pGameProcMain->CharacterGetByID(m_iTarget, true);
-		if(pTarget != nullptr) s_pPlayer->RotateTo(pTarget); // 일단 타겟을 향해 방향을 돌린다..
+		if(pTarget != nullptr) s_pPlayer->RotateTo(pTarget); // 일단 타겟을 향해 방향을 돌린다.. [Korean comment]
 
-		//캐스팅 성공적으로 완료...
+		//캐스팅 성공적으로 완료... [Korean comment]
 		float fCastingTime = ((float)pSkill->iCastTime) / 10.0f * s_pPlayer->m_fAttackDelta;
 
 		if(pSkill != nullptr)
@@ -1636,7 +1636,7 @@ void CMagicSkillMng::ProcessCasting()
 				bSuccess = true;
 			}
 			
-			//캐스팅 실패...
+			//캐스팅 실패... [Korean comment]
 			if(bSuccess == false && (s_pPlayer->State()!=PSA_SPELLMAGIC || s_pPlayer->StateMove()!=PSM_STOP))
 				FailCast(pSkill);
 		}
@@ -1648,7 +1648,7 @@ void CMagicSkillMng::MobCasting(__TABLE_UPC_SKILL* pSkill, int iSourceID)
 {
 	if(pSkill == nullptr) return;
 
-	//캐스팅 성공적으로 완료...
+	//캐스팅 성공적으로 완료... [Korean comment]
 	uint8_t byBuff[32];
 	int iOffset=0;
 	CAPISocket::MP_AddByte(byBuff, iOffset, (uint8_t)WIZ_MAGIC_PROCESS);
@@ -1659,7 +1659,7 @@ void CMagicSkillMng::MobCasting(__TABLE_UPC_SKILL* pSkill, int iSourceID)
 	else
 	{
 		CAPISocket::MP_AddByte(byBuff, iOffset, (uint8_t)N3_SP_MAGIC_FLYING);
-		if(pSkill->dw1stTableType==2 || pSkill->dw2ndTableType==2)//화살쏘기..
+		if(pSkill->dw1stTableType==2 || pSkill->dw2ndTableType==2)//화살쏘기.. [Korean comment]
 		{
 			int iNumArrow = 1;
 			__TABLE_UPC_SKILL_TYPE_2* pType2 = m_pTbl_Type_2->Find(pSkill->dwID);
@@ -1682,7 +1682,7 @@ void CMagicSkillMng::MobCasting(__TABLE_UPC_SKILL* pSkill, int iSourceID)
 	CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 	CAPISocket::MP_AddShort(byBuff, iOffset, 0);
 
-	CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
+	CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다.. [Korean comment]
 }
 
 
@@ -1714,10 +1714,10 @@ void CMagicSkillMng::MsgRecv_Casting(Packet& pkt)
 	__TABLE_UPC_SKILL* pSkill = s_pTbl_Skill.Find(dwMagicID);
 	if(pSkill == nullptr) return;
 
-	//내가 쓸때...
+	//내가 쓸때... [Korean comment]
 	if(iSourceID==s_pPlayer->IDNumber())
 	{
-		m_pGameProcMain->CommandSitDown(false, false); // 혹시라도 앉아있음 일으켜 세운다..
+		m_pGameProcMain->CommandSitDown(false, false); // 혹시라도 앉아있음 일으켜 세운다.. [Korean comment]
 		
 		s_pPlayer->m_dwMagicID = dwMagicID;
 		s_pPlayer->m_fCastingTime = 0.0f;
@@ -1725,10 +1725,10 @@ void CMagicSkillMng::MsgRecv_Casting(Packet& pkt)
 		m_vTargetPos = vTargetPos;
 	}
 	
-	//몬스터가 나를 향해 쏠때...
+	//몬스터가 나를 향해 쏠때... [Korean comment]
 	if( s_pOPMgr->NPCGetByID(iSourceID, true) )
 	{
-		pPlayer->RotateTo((CPlayerBase*)s_pPlayer); // 이넘을 바라본다.
+		pPlayer->RotateTo((CPlayerBase*)s_pPlayer); // 이넘을 바라본다. [Korean comment]
 		pPlayer->m_iIDTarget = iTargetID;
 		pPlayer->ActionMove(PSM_STOP);
 		pPlayer->m_iMagicAni = pSkill->iSelfAnimID1;
@@ -1816,7 +1816,7 @@ void CMagicSkillMng::MsgRecv_Flying(Packet& pkt)
 	CGameProcedure::s_pFX->Stop(iSourceID, iSourceID, pSkill->iSelfFX1, -1, true);
 	CGameProcedure::s_pFX->Stop(iSourceID, iSourceID, pSkill->iSelfFX1, -2, true);
 
-	if(pSkill->dw1stTableType==2 || pSkill->dw2ndTableType==2)//화살쏘기..
+	if(pSkill->dw1stTableType==2 || pSkill->dw2ndTableType==2)//화살쏘기.. [Korean comment]
 	{
 		FlyingType2(pSkill, iSourceID, iTargetID, Data);
 		return;
@@ -1866,7 +1866,7 @@ void CMagicSkillMng::MsgRecv_Effecting(Packet& pkt)
 		
 	if(pPlayer != nullptr && iSourceID!=s_pPlayer->IDNumber() && pPlayer->State()==PSA_SPELLMAGIC)
 	{
-		pPlayer->m_iMagicAni = pSkill->iSelfAnimID2;	//화살놓는 동작...
+		pPlayer->m_iMagicAni = pSkill->iSelfAnimID2;	//화살놓는 동작... [Korean comment]
 		pPlayer->m_fCastFreezeTime = 0.0f;
 		pPlayer->Action(PSA_SPELLMAGIC, false);
 	}
@@ -1874,7 +1874,7 @@ void CMagicSkillMng::MsgRecv_Effecting(Packet& pkt)
 	CGameProcedure::s_pFX->Stop(iSourceID, iSourceID, pSkill->iSelfFX1, -1, true);
 	CGameProcedure::s_pFX->Stop(iSourceID, iSourceID, pSkill->iSelfFX1, -2, true);
 
-	if(pSkill->dw1stTableType==1 || pSkill->dw2ndTableType==1)	//	타입1인경우 걍 스킬이야..콤보도 껴있어..좀 특별하게 관리해야돼..
+	if(pSkill->dw1stTableType==1 || pSkill->dw2ndTableType==1)	//	타입1인경우 걍 스킬이야..콤보도 껴있어..좀 특별하게 관리해야돼.. Type
 	{
 		if(!EffectingType1(dwMagicID, iSourceID, iTargetID, Data)) return;
 	}
@@ -1960,7 +1960,7 @@ void CMagicSkillMng::MsgRecv_Fail(Packet& pkt)
 		if(iSourceID == s_pPlayer->IDNumber())
 		{
 			s_pPlayer->m_dwMagicID = 0xffffffff;
-			m_pGameProcMain->CommandSitDown(false, false); // 혹시라도 앉아있음 일으켜 세운다..
+			m_pGameProcMain->CommandSitDown(false, false); // 혹시라도 앉아있음 일으켜 세운다.. [Korean comment]
 
 			std::string szMsg = fmt::format_text_resource(IDS_SKILL_FAIL_EFFECTING, pSkill->szName);
 			m_pGameProcMain->MsgOutput(szMsg, 0xffff3b3b);			
@@ -1968,7 +1968,7 @@ void CMagicSkillMng::MsgRecv_Fail(Packet& pkt)
 		return;
 	}	
 
-	if(Data[3]==SKILLMAGIC_FAIL_CASTING)//	캐스팅 실패인 것이다..
+	if(Data[3]==SKILLMAGIC_FAIL_CASTING)//	캐스팅 실패인 것이다.. [Korean comment]
 	{
 		CGameProcedure::s_pFX->Stop(iSourceID, iSourceID, pSkill->iSelfFX1, -1, true);
 		CGameProcedure::s_pFX->Stop(iSourceID, iSourceID, pSkill->iSelfFX1, -2, true);
@@ -1979,7 +1979,7 @@ void CMagicSkillMng::MsgRecv_Fail(Packet& pkt)
 		if(iSourceID == s_pPlayer->IDNumber())
 		{
 			s_pPlayer->m_dwMagicID = 0xffffffff;
-			m_pGameProcMain->CommandSitDown(false, false); // 혹시라도 앉아있음 일으켜 세운다..
+			m_pGameProcMain->CommandSitDown(false, false); // 혹시라도 앉아있음 일으켜 세운다.. [Korean comment]
 
 			std::string szMsg = fmt::format_text_resource(IDS_SKILL_FAIL_CASTING);
 			m_pGameProcMain->MsgOutput(szMsg, 0xffff3b3b);
@@ -1987,7 +1987,7 @@ void CMagicSkillMng::MsgRecv_Fail(Packet& pkt)
 		return;
 	}
 
-	if(Data[3]==SKILLMAGIC_FAIL_KILLFLYING)//flying효과 죽이고..그자리에 타겟효과 해라..	
+	if(Data[3]==SKILLMAGIC_FAIL_KILLFLYING)//flying효과 죽이고..그자리에 타겟효과 해라..	 [Korean comment]
 	{
 		if(iSourceID == s_pPlayer->IDNumber() ||
 			((iTargetID==s_pPlayer->IDNumber() && s_pOPMgr->NPCGetByID(iSourceID, false)!= nullptr)))
@@ -2029,12 +2029,12 @@ void CMagicSkillMng::MsgRecv_Fail(Packet& pkt)
 	}
 
 	//그외 stop이 필요한게 있을꺼야..
-	//그땐...
+	//그땐... [Korean comment]
 	//CGameProcedure::s_pFX->Stop(iSourceID, iTargetID, pSkill->iSelfFX, 0);
 }
 
 
-//type4 해제..
+//type4 해제.. [Korean comment]
 void CMagicSkillMng::MsgRecv_BuffType(Packet& pkt)
 {
 	int iBuffType = pkt.read<uint8_t>();
@@ -2136,7 +2136,7 @@ void CMagicSkillMng::FlyingType2(__TABLE_UPC_SKILL* pSkill, int iSourceID, int i
 	int LeftItem = pPlayer->ItemClass_LeftHand()/10;
 	int RightItem = pPlayer->ItemClass_RightHand()/10;
 
-	if(LeftItem == (ITEM_CLASS_BOW/10))//활이닷..
+	if(LeftItem == (ITEM_CLASS_BOW/10))//활이닷.. [Korean comment]
 	{
 		CN3Base::s_SndMgr.PlayOnceAndRelease(ID_SOUND_SKILL_THROW_ARROW, &(pPlayer->Position()));
 	}
@@ -2162,7 +2162,7 @@ void CMagicSkillMng::FlyingType2(__TABLE_UPC_SKILL* pSkill, int iSourceID, int i
 		__Matrix44 mtx;
 		for(int i=1;i<=NumArrow;i++)
 		{
-			float fAng = (__PI * (float)i) / 12.0f;	// 15도 씩 나눠서...
+			float fAng = (__PI * (float)i) / 12.0f;	// 15도 씩 나눠서... [Korean comment]
 				
 			mtx.Identity();
 			mtx.RotationY(-fAng);
@@ -2192,7 +2192,7 @@ void CMagicSkillMng::FlyingType2(__TABLE_UPC_SKILL* pSkill, int iSourceID, int i
 			__Matrix44 mtx;
 			for(int i=1;i<=NumArrow;i++)
 			{
-				float fAng = (__PI * (float)i) / 12.0f;	// 15도 씩 나눠서...
+				float fAng = (__PI * (float)i) / 12.0f;	// 15도 씩 나눠서... [Korean comment]
 					
 				mtx.Identity();
 				mtx.RotationY(-fAng);
@@ -2219,7 +2219,7 @@ void CMagicSkillMng::FlyingType2(__TABLE_UPC_SKILL* pSkill, int iSourceID, int i
 			__Matrix44 mtx;
 			for(int i=1;i<=NumArrow;i++)
 			{
-				float fAng = (__PI * (float)i) / 12.0f;	// 15도 씩 나눠서...
+				float fAng = (__PI * (float)i) / 12.0f;	// 15도 씩 나눠서... [Korean comment]
 					
 				mtx.Identity();
 				mtx.RotationY(-fAng);
@@ -2249,7 +2249,7 @@ bool CMagicSkillMng::EffectingType1(uint32_t dwMagicID, int iSourceID, int iTarg
 	CPlayerBase* pTarget = m_pGameProcMain->CharacterGetByID(iTargetID, false);
 	if(pTarget != nullptr)
 	{
-		if(iSourceID != s_pPlayer->IDNumber()) // 내가 스킬을 쓸때..
+		if(iSourceID != s_pPlayer->IDNumber()) // 내가 스킬을 쓸때.. [Korean comment]
 		{
 			__TABLE_UPC_SKILL_TYPE_1* pType1 = m_pTbl_Type_1->Find(dwMagicID);
 			if(pType1 != nullptr)
@@ -2258,10 +2258,10 @@ bool CMagicSkillMng::EffectingType1(uint32_t dwMagicID, int iSourceID, int iTarg
 				__ASSERT(pPlayer, "NULL Player Pointer!!");
 				if(pPlayer != nullptr)
 				{
-					// 검기 색을 바꾸어 준다..
+					// 검기 색을 바꾸어 준다.. Color
 //					__TABLE_UPC_SKILL* pSkill = s_pTbl_Skill.Find(dwMagicID);
-//					D3DCOLOR crTrace = TraceColorGet(pSkill); // 스킬의 종류에 따라 검기의 색을 정한다..
-//					pPlayer->PlugTraceColorRemake(crTrace); // 검기 색 적용..
+//					D3DCOLOR crTrace = TraceColorGet(pSkill); // 스킬의 종류에 따라 검기의 색을 정한다.. Color
+//					pPlayer->PlugTraceColorRemake(crTrace); // 검기 색 적용.. Color
 
 					pPlayer->RotateTo(pTarget);
 
@@ -2322,7 +2322,7 @@ void CMagicSkillMng::EffectingType4(uint32_t dwMagicID)
 	m_pGameProcMain->m_pUIStateBarAndMiniMap->AddMagic(pSkill, (float)pType4->iDuration);
 	m_ListBuffTypeID.insert(stlmultimapVAL_INT_DWORD(pType4->iBuffType,dwMagicID));
 
-	//같은 버프타입의 마법은 중복사용할 수 없다...먼저 사용된 것만 유효..
+	//같은 버프타입의 마법은 중복사용할 수 없다...먼저 사용된 것만 유효.. Type
 	if(pType4 != nullptr)
 	{
 		switch(pType4->iBuffType)
@@ -2420,8 +2420,8 @@ void CMagicSkillMng::EffectingType4(uint32_t dwMagicID)
 
 
 //
-//	내가 쓰는 스킬이나 마법은 내가 인덱스를 넣어서 관리한다..
-//	이건 인덱스 넣는 함수..
+//	내가 쓰는 스킬이나 마법은 내가 인덱스를 넣어서 관리한다.. Index
+//	이건 인덱스 넣는 함수.. Function
 //
 int CMagicSkillMng::AddIdx(uint32_t MagicID, int iNum)
 {
@@ -2446,7 +2446,7 @@ int CMagicSkillMng::AddIdx(uint32_t MagicID, int iNum)
 		return idx;
 	}
 
-	//그냥 하나의 인덱스만 만드는 경우..
+	//그냥 하나의 인덱스만 만드는 경우.. Index
 	for(it = m_MySelf.begin(); it!=m_MySelf.end(); it++)
 	{
 		if(it->first==idx)
@@ -2509,7 +2509,7 @@ void CMagicSkillMng::InitType4()
 
 
 //
-//	이건 인덱스 제거하는 함수..
+//	이건 인덱스 제거하는 함수.. Function
 //
 void CMagicSkillMng::RemoveIdx(int idx)
 {
@@ -2522,12 +2522,12 @@ uint32_t CMagicSkillMng::GetMagicID(int idx)
 	return it->second;
 }
 
-D3DCOLOR CMagicSkillMng::TraceColorGet(__TABLE_UPC_SKILL* pSkill) // 스킬의 종류에 따라 검기의 색을 정한다..
+D3DCOLOR CMagicSkillMng::TraceColorGet(__TABLE_UPC_SKILL* pSkill) // 스킬의 종류에 따라 검기의 색을 정한다.. Color
 {
 	if(pSkill == nullptr) return 0xff404040;
 	
 	D3DCOLOR crTrace = 0xffff4040;
-	switch(pSkill->dwNeedItem) // 요구 아이템에 따라서...
+	switch(pSkill->dwNeedItem) // 요구 아이템에 따라서... [Korean comment]
 	{
 		case 1: crTrace = 0xff808080; // ITEM_CLASS_DAGGER = 11 // 단검(dagger)
 		case 2: crTrace = 0xff909090; // ITEM_CLASS_SWORD = 21, // 한손검(onehandsword)
@@ -2664,17 +2664,17 @@ void CMagicSkillMng::ClearDurationalMagic()
 
 void CMagicSkillMng::StopCastingByRatio()
 {
-	m_pGameProcMain->CommandSitDown(false, false); // 일으켜 세운다.
+	m_pGameProcMain->CommandSitDown(false, false); // 일으켜 세운다. [Korean comment]
 	if(IsCasting())
 	{
 		__TABLE_UPC_SKILL* pSkill = s_pTbl_Skill.Find(s_pPlayer->m_dwMagicID);
 		if(pSkill != nullptr)
 		{
 			int SuccessValue = rand()%100;
-			if(SuccessValue >= pSkill->iPercentSuccess) // 스킬 테이블에 있는 확률대로 실패한다..
+			if(SuccessValue >= pSkill->iPercentSuccess) // 스킬 테이블에 있는 확률대로 실패한다.. [Korean comment]
 			{
 				FailCast(pSkill);
-				//if(	s_pPlayer->Action(PSA_BASIC, false, nullptr, true); // 캐스팅 취소, 기본동작으로 강제 세팅..
+				//if(	s_pPlayer->Action(PSA_BASIC, false, nullptr, true); // 캐스팅 취소, 기본동작으로 강제 세팅.. [Korean comment]
 			}				
 		}
 	}
@@ -2693,9 +2693,9 @@ void CMagicSkillMng::StunMySelf(__TABLE_UPC_SKILL_TYPE_3* pType3)
 
 	float Prob = (30.0f+(40.0f-( 40.0f*(Regist/80.0f) )));
 
-	if(sample < (int)Prob) //얼어라...
+	if(sample < (int)Prob) //얼어라... [Korean comment]
 	{
-		m_pGameProcMain->CommandSitDown(false, false); // 일으켜 세운다.
+		m_pGameProcMain->CommandSitDown(false, false); // 일으켜 세운다. [Korean comment]
 		s_pPlayer->Stun(STUN_TIME);
 	}
 }

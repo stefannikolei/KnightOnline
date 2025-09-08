@@ -65,13 +65,13 @@ bool CUINPCChangeEvent::Load(HANDLE hFile)
 	N3_VERIFY_UI_COMPONENT(m_pBtn_Close, GetChildByID<CN3UIButton>("Btn_close"));
 
 	// UIPointInitDlg.. ^^
-	e_Nation eNation = CGameBase::s_pPlayer->m_InfoBase.eNation; // 국가....
+	e_Nation eNation = CGameBase::s_pPlayer->m_InfoBase.eNation; // 국가.... [Korean comment]
 	__TABLE_UI_RESRC* pTbl = CGameProcedure::s_pTbl_UI.Find(eNation);
 
 	m_pDlg = new CUIPointInitDlg();
 	m_pDlg->LoadFromFile(pTbl->szChangeInitBill);
 
-	// 위치 계산 ..
+	// 위치 계산 .. Calculate
 	int iXPos, iYPos;
 	iXPos = (iW / 2) - (m_pDlg->GetRegion().right - m_pDlg->GetRegion().left) / 2;
 	iYPos = (iH / 2) - (m_pDlg->GetRegion().bottom - m_pDlg->GetRegion().top) / 2;

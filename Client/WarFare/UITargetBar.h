@@ -19,7 +19,7 @@ public:
 	CN3UIProgress*	m_pProgress_HP_drop;
 	CN3UIProgress*	m_pProgress_HP_lasting;
 	CN3UIString*	m_pStringID;
-	float m_fTimeSendPacketLast; // 이걸 기준으로 1초에 한번씩 타겟의 정보 요청..
+	float m_fTimeSendPacketLast; // 이걸 기준으로 1초에 한번씩 타겟의 정보 요청.. Info
 
 public:
 	void	UpdateHP(int iHP, int iMaxHP, bool bUpdateImmediately);

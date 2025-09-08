@@ -180,7 +180,7 @@ bool CUIClassChange::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 					break;
 			}
 
-			CGameProcedure::s_pProcMain->m_pUIVar->UpdateAllStates(pInfoBase, pInfoExt); // 상태창 수치를 모두 적용
+			CGameProcedure::s_pProcMain->m_pUIVar->UpdateAllStates(pInfoBase, pInfoExt); // 상태창 수치를 모두 적용 Window
 
 			uint8_t byBuff[4];
 			int iOffset = 0;
@@ -191,7 +191,7 @@ bool CUIClassChange::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 			CGameProcedure::s_pProcMain->m_pUISkillTreeDlg->InitIconUpdate();
 
-			// 전직하는 순간..  핫키 정보를 모두 없앤다..
+			// 전직하는 순간..  핫키 정보를 모두 없앤다.. Info
 			CGameProcedure::s_pProcMain->m_pUIHotKeyDlg->ClassChangeHotkeyFlush();
 			Close();
 		}
@@ -213,7 +213,7 @@ void CUIClassChange::RestorePrevClass()
 	pInfoBase->eClass = m_eClass;
 	CGameProcedure::s_pProcMain->m_pUISkillTreeDlg->InitIconUpdate();
 
-	CGameProcedure::s_pProcMain->m_pUIVar->UpdateAllStates(pInfoBase, pInfoExt); // 상태창 수치를 모두 적용
+	CGameProcedure::s_pProcMain->m_pUIVar->UpdateAllStates(pInfoBase, pInfoExt); // 상태창 수치를 모두 적용 Window
 }
 
 void CUIClassChange::ChangeToNormalState()

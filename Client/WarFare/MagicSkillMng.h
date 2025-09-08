@@ -26,7 +26,7 @@ public:
 	int						m_iTarget;
 	__Vector3				m_vTargetPos;
 
-	//나를 타겟으로 잡은 몬스터처리 관련..
+	//나를 타겟으로 잡은 몬스터처리 관련.. Process
 	std::map<int, uint32_t>	m_MobList;	//	int m_iMobID; uint32_t m_dwMobMagicID;
 	
 	//related type4.....
@@ -58,17 +58,17 @@ public:
 	float					m_fDelay;
 		
 	//related region magic...
-	uint32_t				m_dwRegionMagicState;	//0:마침..1:지역선택중..2:지역선택했음.
-	__TABLE_UPC_SKILL		m_dwRegionSkill;		//선택된 지역스킬..
+	uint32_t				m_dwRegionMagicState;	//0:마침..1:지역선택중..2:지역선택했음. Select
+	__TABLE_UPC_SKILL		m_dwRegionSkill;		//선택된 지역스킬.. Select
 
 	//related non-casting action magic...
-	uint32_t				m_dwCastingStateNonAction;	//0:아무것도 없는 평온한 상태 1: 캐스팅중
+	uint32_t				m_dwCastingStateNonAction;	//0:아무것도 없는 평온한 상태 1: 캐스팅중 Status
 	float					m_fCastTimeNonAction;
 	uint32_t				m_dwNonActionMagicID;
 	int						m_iNonActionMagicTarget;
 	//float					m_fRecastTimeNonAction;
 
-	//지역마법..
+	//지역마법.. [Korean comment]
 	int						m_iMyRegionTargetFXID;
 
 private:
@@ -121,7 +121,7 @@ public:
 	void	StunMySelf(__TABLE_UPC_SKILL_TYPE_3* pType3);
 	void	StopCastingByRatio();
 	void	ClearDurationalMagic();
-	D3DCOLOR	TraceColorGet(__TABLE_UPC_SKILL* pSkill); // 스킬의 종류에 따라 검기의 색을 정한다..
+	D3DCOLOR	TraceColorGet(__TABLE_UPC_SKILL* pSkill); // 스킬의 종류에 따라 검기의 색을 정한다.. Color
 
 	bool	IsPositiveMagic(uint32_t dwMagicID);
 	bool	IsCasting();

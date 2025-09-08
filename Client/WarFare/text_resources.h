@@ -210,7 +210,7 @@ enum e_TextResourceID
 	IDS_NEWCHR_KA_ARKTUAREK						= 3211, // Arch Tuarek is a physically strong race who are fit to become a warrior. 
 	IDS_NEWCHR_KA_MAGE							= 3212, // The Magicians can become a Sorcerer which uses 4 basic elements to perform attack magic or they can become a Necromancer, the master of the dead. 
 	IDS_NEWCHR_KA_PRIEST						= 3213, // The Priests can become a Shaman that heals its ally or become a Dark Priest that can use cursing skills. 
-	IDS_NEWCHR_KA_PURITUAREK					= 3214, // 퓨리 투아렉은 순수하게 정화된 정신 에너지를 이용해 치료 마법과 저주 마법을 구사하는 카루스의 여성 캐릭터로 법사와 사제의 직업을 선택할 수 있습니다.
+	IDS_NEWCHR_KA_PURITUAREK					= 3214, // 퓨리 투아렉은 순수하게 정화된 정신 에너지를 이용해 치료 마법과 저주 마법을 구사하는 카루스의 여성 캐릭터로 법사와 사제의 직업을 선택할 수 있습니다. Character
 	IDS_NEWCHR_KA_ROGUE							= 3215, // The Rogues can become an Assassin to sneak up to the enemy and inflict a critical damage, or they can become a Hunter that can attack enemies from far away with bows and spears.  
 	IDS_NEWCHR_KA_TUAREK						= 3216, // Tuareks have balanced Strength and Intelligence which makes them fit for any kind of job.
 	IDS_NEWCHR_KA_WARRIOR						= 3217, // The Warriors can become a Berserker that uses variety of weapons to inflict critical damage, or they can become a Guardian with high defense ability to protect ally's magicians and priests.  
@@ -445,8 +445,8 @@ enum e_TextResourceID
 	IDS_MANNER_CHANGE_GET						= 6101, // Earned %d manner points. 
 	IDS_BEGINNER_HELPER_30						= 6102, // Congratulations on reaching level 30 on Beginner Helper event. 
 	IDS_LADDER_CHANGE_GET						= 6103, // Received %d leader points. 
-	IDS_LOYALTY_CHANGE_LOST						= 6104, // %d 국가기여도를 잃었습니다.
-	IDS_LADDER_CHANGE_LOST						= 6105, // %d 레더포인트를 잃었습니다.
+	IDS_LOYALTY_CHANGE_LOST						= 6104, // %d 국가기여도를 잃었습니다. [Korean comment]
+	IDS_LADDER_CHANGE_LOST						= 6105, // %d 레더포인트를 잃었습니다. [Korean comment]
 	IDS_MSG_HASITEMINSLOT						= 6112, // You cannot change your stat while there are items equipped on you.
 	IDS_ERR_REQUEST_NPC_EVENT_SO_FAR			= 6116, // You are too far away from the NPC. 
 	IDS_WRONG_PASSWORD							= 6120, // Invalid password. 
@@ -563,9 +563,9 @@ enum e_TextResourceID
 	IDS_CMD_GAME_SAVE							= 8009, // Save
 	IDS_CMD_RECOMMEND							= 8010, // Recommend
 	IDS_CMD_INDIVIDUAL_BATTLE					= 8011, // Individual_Battle
-	IDS_CMD_SIT_STAND							= 8012, // 앉기/서기
-	IDS_CMD_WALK_RUN							= 8013, // 걷기/뛰기
-	IDS_CMD_LOCATION							= 8014, // 위치
+	IDS_CMD_SIT_STAND							= 8012, // 앉기/서기 [Korean comment]
+	IDS_CMD_WALK_RUN							= 8013, // 걷기/뛰기 [Korean comment]
+	IDS_CMD_LOCATION							= 8014, // 위치 Position
 
 	IDS_CMD_TRADE								= 8200, // Trade
 	IDS_CMD_FORBIDTRADE							= 8201, // Block_Trade_Request

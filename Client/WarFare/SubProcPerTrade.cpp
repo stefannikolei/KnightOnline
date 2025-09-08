@@ -78,7 +78,7 @@ void CSubProcPerTrade::InitPerTradeDlg(CUIManager* pUIManager)
 	int iW = CN3Base::s_CameraData.vp.Width;
 	RECT rc;
 
-	e_Nation eNation = s_pPlayer->m_InfoBase.eNation;		// 국가....
+	e_Nation eNation = s_pPlayer->m_InfoBase.eNation;		// 국가.... [Korean comment]
 	__TABLE_UI_RESRC* pTbl = s_pTbl_UI.Find(eNation);
 
 	// UIPerTradeDlg.. ^^
@@ -99,7 +99,7 @@ void CSubProcPerTrade::InitPerTradeDlg(CUIManager* pUIManager)
 	m_pUITradeEditDlg->m_pSubProcPerTrade = this;
 	m_pUITradeEditDlg->LoadFromFile(pTbl->szPersonalTradeEdit);
 	m_pUITradeEditDlg->SetStyle(UISTYLE_ALWAYSTOP);
-	// 위치 계산 ..
+	// 위치 계산 .. Calculate
 	int iXPos, iYPos;
 	int iH = CN3Base::s_CameraData.vp.Height;
 	iXPos = (iW/2) - (m_pUITradeEditDlg->GetRegion().right - m_pUITradeEditDlg->GetRegion().left)/2;
@@ -109,18 +109,18 @@ void CSubProcPerTrade::InitPerTradeDlg(CUIManager* pUIManager)
 	m_pUITradeEditDlg->SetUIType(UI_TYPE_BASE);
 	m_pUITradeEditDlg->SetState(UI_STATE_COMMON_NONE);
 
-	// 일단은 돈 아이콘으로 픽스.. ^^
+	// 일단은 돈 아이콘으로 픽스.. ^^ [Korean comment]
 	N3_VERIFY_UI_COMPONENT(m_pUITradeEditDlg->m_pArea, m_pUITradeEditDlg->GetChildByID<CN3UIArea >("area_trade_icon"));
 
 	m_pUITradeEditDlg->m_pImageOfIcon = new CN3UIImage;
 	m_pUITradeEditDlg->m_pImageOfIcon->Init(m_pUITradeEditDlg);
-	// 돈 아이콘 문자열 찾기.. 아이디로 찾는 기능밖에 없다.. ㅠ.ㅠ
-	__TABLE_ITEM_BASIC*	pItem = s_pTbl_Items_Basic.Find(dwGold);	// 열 데이터 얻기..
+	// 돈 아이콘 문자열 찾기.. 아이디로 찾는 기능밖에 없다.. ㅠ.ㅠ [Korean comment]
+	__TABLE_ITEM_BASIC*	pItem = s_pTbl_Items_Basic.Find(dwGold);	// 열 데이터 얻기.. Data
 
 	std::string szIconFN;
 	e_PartPosition ePart;
 	e_PlugPosition ePlug;
-	CGameBase::MakeResrcFileNameForUPC(pItem, nullptr, nullptr, &szIconFN, ePart, ePlug); // 아이템에 따른 파일 이름을 만들어서
+	CGameBase::MakeResrcFileNameForUPC(pItem, nullptr, nullptr, &szIconFN, ePart, ePlug); // 아이템에 따른 파일 이름을 만들어서 File
 	m_pUITradeEditDlg->m_pImageOfIcon->SetTex(szIconFN);
 	float fUVAspect = (float)45.0f/(float)64.0f;
 	m_pUITradeEditDlg->m_pImageOfIcon->SetUVRect(0,0, fUVAspect, fUVAspect);
@@ -139,7 +139,7 @@ void CSubProcPerTrade::EnterWaitMsgFromServerStatePerTradeReq()
 
 	m_ePerTradeState = PER_TRADE_STATE_WAIT_FOR_REQ;
 
-	// 메시지 박스 텍스트 표시..
+	// 메시지 박스 텍스트 표시.. Mesh
 	std::string szMsg = fmt::format_text_resource(IDS_PERSONAL_TRADE_FMT_WAIT,
 		s_pPlayer->IDString(), pTarget->IDString());
 	m_szMsg = CGameProcedure::MessageBoxPost(szMsg, "", MB_CANCEL, BEHAVIOR_PERSONAL_TRADE_FMT_WAIT);
@@ -151,7 +151,7 @@ void CSubProcPerTrade::EnterWaitMsgFromServerStatePerTradeReq(std::string szName
 {
 	m_ePerTradeState = PER_TRADE_STATE_WAIT_FOR_REQ;
 
-	// 메시지 박스 텍스트 표시..
+	// 메시지 박스 텍스트 표시.. Mesh
 	std::string szMsg = fmt::format_text_resource(IDS_PERSONAL_TRADE_FMT_WAIT,
 		s_pPlayer->IDString(), szName);
 	m_szMsg = CGameProcedure::MessageBoxPost(szMsg, "", MB_CANCEL, BEHAVIOR_PERSONAL_TRADE_FMT_WAIT);
@@ -159,7 +159,7 @@ void CSubProcPerTrade::EnterWaitMsgFromServerStatePerTradeReq(std::string szName
 	SecureCodeBegin();
 }
 
-void CSubProcPerTrade::EnterWaitMyDecisionToPerTrade(int iOtherID)			// 내가 타인에게서 아이템 거래를 신청 받은 상태..
+void CSubProcPerTrade::EnterWaitMyDecisionToPerTrade(int iOtherID)			// 내가 타인에게서 아이템 거래를 신청 받은 상태.. Status
 {
 	CPlayerOther* pTarget = s_pOPMgr->UPCGetByID(iOtherID, false);
 	if (pTarget == nullptr)
@@ -168,7 +168,7 @@ void CSubProcPerTrade::EnterWaitMyDecisionToPerTrade(int iOtherID)			// 내가 �
 	m_iOtherID = iOtherID;
 	m_ePerTradeState = PER_TRADE_STATE_WAIT_FOR_MY_DECISION_AGREE_OR_DISAGREE;
 
-	// 메시지 박스 텍스트 표시..
+	// 메시지 박스 텍스트 표시.. Mesh
 	std::string szMsg = fmt::format_text_resource(IDS_PERSONAL_TRADE_PERMIT,
 		s_pPlayer->IDString(), pTarget->IDString());
 	m_szMsg = CGameProcedure::MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_PERSONAL_TRADE_PERMIT);
@@ -184,15 +184,15 @@ void CSubProcPerTrade::SecureCodeBegin()
 	// 1.상거래 중이면 개인 거래 신청이 않된다.. -> 해당 부분..	ok
 	// 2.상거래 중에 개인 거래 신청을 받으면 거절.. -> 해당 부분.. ok
 
-	// 3.유저가 움직이고 있는 중이면 멈춘다..
-	if ( s_pPlayer->IsMovingNow() )	s_pPlayer->ToggleMoveMode();				// 자동 전진 토글.. 
+	// 3.유저가 움직이고 있는 중이면 멈춘다.. [Korean comment]
+	if ( s_pPlayer->IsMovingNow() )	s_pPlayer->ToggleMoveMode();				// 자동 전진 토글..  [Korean comment]
 
-	// 4.아이콘 매니저 윈도우는 모두 닫는다..
-	//   인벤토리 윈도우이면..
+	// 4.아이콘 매니저 윈도우는 모두 닫는다.. Window
+	//   인벤토리 윈도우이면.. Window
 	if ( CGameProcedure::s_pProcMain->m_pUIInventory->IsVisible() )
 		CGameProcedure::s_pProcMain->m_pUIInventory->Close();
 
-	//   Drop Item 윈도우이면..
+	//   Drop Item 윈도우이면.. Window
 	if ( CGameProcedure::s_pProcMain->m_pUIDroppedItemDlg->IsVisible() )
 		CGameProcedure::s_pProcMain->m_pUIDroppedItemDlg->LeaveDroppedState();
 
@@ -206,7 +206,7 @@ void CSubProcPerTrade::SecureCodeBegin()
 	N3_VERIFY_UI_COMPONENT(pStrOther, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_other"));
 	pStrOther->SetString("0");
 
-	// 7.개인 거래 창의 처크 버튼들 원래대로..
+	// 7.개인 거래 창의 처크 버튼들 원래대로.. Window
 	CN3UIButton* pButtonMy = nullptr, *pButtonOther = nullptr;
 	N3_VERIFY_UI_COMPONENT(pButtonMy, m_pUIPerTradeDlg->GetChildByID<CN3UIButton>("btn_trade_my"));
 	pButtonMy->SetState(UI_STATE_BUTTON_NORMAL);
@@ -237,9 +237,9 @@ void CSubProcPerTrade::FinalizePerTrade()
 	}
 }
 
-void CSubProcPerTrade::PerTradeCompleteSuccess()						// 개인 거래 최종 성공..
+void CSubProcPerTrade::PerTradeCompleteSuccess()						// 개인 거래 최종 성공.. [Korean comment]
 {
-	// 개인 거래 창에 있는 아이템 삭제..
+	// 개인 거래 창에 있는 아이템 삭제.. Delete
 	for ( int i = 0; i < MAX_ITEM_PER_TRADE; i++ )
 	{
 		if (m_pUIPerTradeDlg->m_pPerTradeMy[i] != nullptr)	
@@ -247,10 +247,10 @@ void CSubProcPerTrade::PerTradeCompleteSuccess()						// 개인 거래 최종 �
 			__IconItemSkill* spItem;
 			spItem = m_pUIPerTradeDlg->m_pPerTradeMy[i];
 
-			// 매니저에서 제거..
+			// 매니저에서 제거.. Remove
 			m_pUIPerTradeDlg->RemoveChild(spItem->pUIIcon);
 
-			// 리소스 제거..
+			// 리소스 제거.. Remove
 			spItem->pUIIcon->Release();
 			delete spItem->pUIIcon;
 			spItem->pUIIcon = nullptr;
@@ -264,10 +264,10 @@ void CSubProcPerTrade::PerTradeCompleteSuccess()						// 개인 거래 최종 �
 			__IconItemSkill* spItem;
 			spItem = m_pUIPerTradeDlg->m_pPerTradeOther[i];
 
-			// 매니저에서 제거..
+			// 매니저에서 제거.. Remove
 			m_pUIPerTradeDlg->RemoveChild(spItem->pUIIcon);
 
-			// 리소스 제거..
+			// 리소스 제거.. Remove
 			spItem->pUIIcon->Release();
 			delete spItem->pUIIcon;
 			spItem->pUIIcon = nullptr;
@@ -280,29 +280,29 @@ void CSubProcPerTrade::PerTradeCompleteSuccess()						// 개인 거래 최종 �
 	m_pUIPerTradeDlg->LeavePerTradeState();
 }
 
-void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..	
+void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..	 [Korean comment]
 {
 	std::string str;
-	int iGold,			// 거래창의 값..
-		iMyMoney;		// 인벤토리의 값..
+	int iGold,			// 거래창의 값.. Window
+		iMyMoney;		// 인벤토리의 값.. [Korean comment]
 
 	if ( (int)m_ePerTradeState >= (int)PER_TRADE_STATE_NORMAL )
 	{
-		// 먼저 돈을 검사 한다..
-		// 거래 창의 내 현재 돈을 얻어 온다..
+		// 먼저 돈을 검사 한다.. Check
+		// 거래 창의 내 현재 돈을 얻어 온다.. Window
 		CN3UIString* pStrMy = nullptr;
 		N3_VERIFY_UI_COMPONENT(pStrMy, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_my"));
 		str = pStrMy->GetString();
 		iGold = atoi(str.c_str());
 
-		// 현재 내가 가진 돈을 얻어 온다..
+		// 현재 내가 가진 돈을 얻어 온다.. [Korean comment]
 		iMyMoney = s_pPlayer->m_InfoExt.iGold;
-		// 돈을 복구 한다..
+		// 돈을 복구 한다.. [Korean comment]
 		iMyMoney += iGold;
 		s_pPlayer->m_InfoExt.iGold = iMyMoney;
 
-		// 그다음 아이템을 검사한다..
-		// 아이템들을 원래 대로..
+		// 그다음 아이템을 검사한다.. Check
+		// 아이템들을 원래 대로.. [Korean comment]
 		for ( int i = 0; i < MAX_ITEM_PER_TRADE; i++ )
 		{
 			if (m_pUIPerTradeDlg->m_pPerTradeMy[i] != nullptr)	
@@ -310,21 +310,21 @@ void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..
 				if( (m_pUIPerTradeDlg->m_pPerTradeMy[i]->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) ||  
 					(m_pUIPerTradeDlg->m_pPerTradeMy[i]->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL) )
 				{
-					// 활이나 물약등 아이템인 경우..
+					// 활이나 물약등 아이템인 경우.. [Korean comment]
 					__IconItemSkill* spItem;
 					spItem = m_pUIPerTradeDlg->m_pPerTradeMy[i];
 					
-					// 기존에 아이콘이 있다면.. 
+					// 기존에 아이콘이 있다면..  [Korean comment]
 					if ( m_pUIPerTradeDlg->m_pPerTradeInv[m_pUIPerTradeDlg->m_iBackupiOrder[i]] )
 					{
-						// 숫자 업데이트 하고..
+						// 숫자 업데이트 하고.. Update
 						m_pUIPerTradeDlg->m_pPerTradeInv[m_pUIPerTradeDlg->m_iBackupiOrder[i]]->iCount 
 							+= m_pUIPerTradeDlg->m_pPerTradeMy[i]->iCount;
 
-						// 매니저에서 제거..
+						// 매니저에서 제거.. Remove
 						m_pUIPerTradeDlg->RemoveChild(spItem->pUIIcon);
 
-						// 리소스 제거..
+						// 리소스 제거.. Remove
 						spItem->pUIIcon->Release();
 						delete spItem->pUIIcon;
 						spItem->pUIIcon = nullptr;
@@ -332,7 +332,7 @@ void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..
 						spItem = nullptr;
 						m_pUIPerTradeDlg->m_pPerTradeMy[i] = nullptr;
 					}
-					// 없다면 그대로 이동한다..
+					// 없다면 그대로 이동한다.. Move
 					else
 					{
 						__IconItemSkill* spItem;
@@ -340,10 +340,10 @@ void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..
 
 						spItem->pUIIcon->SetParent(m_pUIPerTradeDlg);
 
-						// 인벤토리 윈도우에 세팅하고..
+						// 인벤토리 윈도우에 세팅하고.. Window
 						m_pUIPerTradeDlg->m_pPerTradeInv[m_pUIPerTradeDlg->m_iBackupiOrder[i]] = spItem;
 
-						// 내 거래 윈도우에서 클리어..
+						// 내 거래 윈도우에서 클리어.. Window
 						m_pUIPerTradeDlg->m_pPerTradeMy[i] = nullptr;
 
 						CN3UIArea* pArea;
@@ -363,10 +363,10 @@ void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..
 
 					spItem->pUIIcon->SetParent(m_pUIPerTradeDlg);
 
-					// 인벤토리 윈도우에 세팅하고..
+					// 인벤토리 윈도우에 세팅하고.. Window
 					m_pUIPerTradeDlg->m_pPerTradeInv[m_pUIPerTradeDlg->m_iBackupiOrder[i]] = spItem;
 
-					// 내 거래 윈도우에서 클리어..
+					// 내 거래 윈도우에서 클리어.. Window
 					m_pUIPerTradeDlg->m_pPerTradeMy[i] = nullptr;
 
 					CN3UIArea* pArea;
@@ -385,10 +385,10 @@ void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..
 				__IconItemSkill* spItem;
 				spItem = m_pUIPerTradeDlg->m_pPerTradeOther[i];
 
-				// 매니저에서 제거..
+				// 매니저에서 제거.. Remove
 				m_pUIPerTradeDlg->RemoveChild(spItem->pUIIcon);
 
-				// 리소스 제거..
+				// 리소스 제거.. Remove
 				spItem->pUIIcon->Release();
 				delete spItem->pUIIcon;
 				spItem->pUIIcon = nullptr;
@@ -405,67 +405,67 @@ void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..
 
 ///////////////////////////////////////////////////////////////////////
 
-void CSubProcPerTrade::LeavePerTradeState(e_PerTradeResultCode ePTRC)	// 아이템 거래가 취소되는 상태를 정의..
+void CSubProcPerTrade::LeavePerTradeState(e_PerTradeResultCode ePTRC)	// 아이템 거래가 취소되는 상태를 정의.. Status
 {
-	uint8_t byBuff[4];											// 패킷 버퍼..
-	int iOffset=0;											// 패킷 오프셋..
+	uint8_t byBuff[4];											// 패킷 버퍼.. [Korean comment]
+	int iOffset=0;											// 패킷 오프셋.. [Korean comment]
 
 	char szBuf[256] = "";
 	std::string szMsg; 
 
 	switch ( ePTRC )
 	{
-		case PER_TRADE_RESULT_MY_CANCEL:								// 거래를 신청한 내가 거래 신청을 취소..
-			// 서버에게 패킷 만들어서 날림..
+		case PER_TRADE_RESULT_MY_CANCEL:								// 거래를 신청한 내가 거래 신청을 취소.. [Korean comment]
+			// 서버에게 패킷 만들어서 날림.. [Korean comment]
 			CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_EXCHANGE);			
 			CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_PER_TRADE_CANCEL);
-			CGameProcedure::s_pSocket->Send(byBuff, iOffset);								// 보냄..
+			CGameProcedure::s_pSocket->Send(byBuff, iOffset);								// 보냄.. [Korean comment]
 
-			// 뒷 마무리..
+			// 뒷 마무리.. [Korean comment]
 			PerTradeCompleteCancel();
 			FinalizePerTrade();
 			//TRACE("내가 거래를 취소 상대방과 내가 취소됨.. 서버에게 보냄..\n");
 			break;
 
-		case PER_TRADE_RESULT_MY_DISAGREE:								// 거래를 신청받은 내가 거래 신청을 취소..
-			// 서버에게 패킷 만들어서 날림..
+		case PER_TRADE_RESULT_MY_DISAGREE:								// 거래를 신청받은 내가 거래 신청을 취소.. [Korean comment]
+			// 서버에게 패킷 만들어서 날림.. [Korean comment]
 			CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_EXCHANGE);			
 			CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_PER_TRADE_AGREE);		
 			CAPISocket::MP_AddByte(byBuff, iOffset, 0x00);		
 
-			CGameProcedure::s_pSocket->Send(byBuff, iOffset);								// 보냄..
+			CGameProcedure::s_pSocket->Send(byBuff, iOffset);								// 보냄.. [Korean comment]
 
-			// 뒷 마무리..
+			// 뒷 마무리.. [Korean comment]
 			FinalizePerTrade();
 			//TRACE("내가 거래를 거절.. 상대방과 내가 취소됨 서버에게 보냄..\n");
 			break;
 
-		case PER_TRADE_RESULT_OTHER_DISAGREE:							// 거래를 신청받은 상대방이 거래 신청을 취소..
+		case PER_TRADE_RESULT_OTHER_DISAGREE:							// 거래를 신청받은 상대방이 거래 신청을 취소.. [Korean comment]
 			//TRACE("상대방이 거래를 거절.. \n");
 			//this_ui
-			// 메시지 박스 텍스트 표시..
+			// 메시지 박스 텍스트 표시.. Mesh
 			szMsg = fmt::format_text_resource(IDS_OTHER_PER_TRADE_ID_NO);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
-			// 뒷 마무리..
+			// 뒷 마무리.. [Korean comment]
 			FinalizePerTrade();
 			break;
 	}
 }
 
-void CSubProcPerTrade::ProcessProceed(e_PerTradeProceedCode ePTPC)		// 아이템 거래가 계속되는 상태를 정의..
+void CSubProcPerTrade::ProcessProceed(e_PerTradeProceedCode ePTPC)		// 아이템 거래가 계속되는 상태를 정의.. Status
 {
-	uint8_t byBuff[4];											// 패킷 버퍼..
-	int iOffset=0;											// 패킷 오프셋..
+	uint8_t byBuff[4];											// 패킷 버퍼.. [Korean comment]
+	int iOffset=0;											// 패킷 오프셋.. [Korean comment]
 
 	switch ( ePTPC )
 	{
-		case PER_TRADE_RESULT_MY_AGREE:									// 거래를 신청받은 내가 거래 신청을 허락..
-			// 서버에게 패킷 만들어서 날림..
+		case PER_TRADE_RESULT_MY_AGREE:									// 거래를 신청받은 내가 거래 신청을 허락.. [Korean comment]
+			// 서버에게 패킷 만들어서 날림.. [Korean comment]
 			CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_EXCHANGE);			
 			CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_PER_TRADE_AGREE);		
 			CAPISocket::MP_AddByte(byBuff, iOffset, 0x01);		
 
-			CGameProcedure::s_pSocket->Send(byBuff, iOffset);				// 보냄..
+			CGameProcedure::s_pSocket->Send(byBuff, iOffset);				// 보냄.. [Korean comment]
 
 			CGameProcedure::MessageBoxClose(m_szMsg);
 			m_szMsg = "";
@@ -474,7 +474,7 @@ void CSubProcPerTrade::ProcessProceed(e_PerTradeProceedCode ePTPC)		// 아이템
 			PerTradeCoreStart();
 			break;
 
-		case PER_TRADE_RESULT_OTHER_AGREE:								// 거래를 신청받은 상대방이 거래 신청을 허락..
+		case PER_TRADE_RESULT_OTHER_AGREE:								// 거래를 신청받은 상대방이 거래 신청을 허락.. [Korean comment]
 			CGameProcedure::MessageBoxClose(m_szMsg);
 			m_szMsg = "";
 
@@ -523,56 +523,56 @@ void CSubProcPerTrade::RequestItemCountEdit()
 void CSubProcPerTrade::ItemCountEditOK()
 {
 	std::string str;
-	int iGold,			// 거래창의 값..
-		iGoldOffset,	// 편집창의 값..
-		iMyMoney;		// 인벤토리의 값..
+	int iGold,			// 거래창의 값.. Window
+		iGoldOffset,	// 편집창의 값.. Window
+		iMyMoney;		// 인벤토리의 값.. [Korean comment]
 
-	// 거래 창의 내 현재 돈을 얻어 온다..
+	// 거래 창의 내 현재 돈을 얻어 온다.. Window
 	CN3UIString* pStrMy = nullptr;
 	N3_VERIFY_UI_COMPONENT(pStrMy, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_my"));
 	str = pStrMy->GetString();
 	iGold = atoi(str.c_str());
 
-	//  입력 창의 값을 얻어서 
+	//  입력 창의 값을 얻어서  Window
 	iGoldOffset = m_pUITradeEditDlg->GetQuantity();
 
 	// Gold Offset Backup..
 	m_iGoldOffsetBackup = iGoldOffset;
 
-	// 현재 내가 가진 돈을 얻어 온다..
+	// 현재 내가 가진 돈을 얻어 온다.. [Korean comment]
 	iMyMoney = s_pPlayer->m_InfoExt.iGold;
 
 	if ( iGoldOffset <= 0 ) return;
 	if ( iGoldOffset > iMyMoney ) return;
 
-	// 돈을 감소 시킨다..
+	// 돈을 감소 시킨다.. [Korean comment]
 	iMyMoney -= iGoldOffset;
 	s_pPlayer->m_InfoExt.iGold = iMyMoney;
 
-	// 돈 표시.. 인벤토리..
+	// 돈 표시.. 인벤토리.. [Korean comment]
 	CGameProcedure::s_pProcMain->m_pUIInventory->GoldUpdate();
 	if(m_pUIPerTradeDlg->m_pStrMyGold) m_pUIPerTradeDlg->m_pStrMyGold->SetStringAsInt(iMyMoney);
 
-	// 돈 표시.. 개인 거래 창..
+	// 돈 표시.. 개인 거래 창.. Window
 	iGold += iGoldOffset;
 	pStrMy->SetStringAsInt(iGold);
 
-	// 서버에게 전송한다..
-	uint8_t byBuff[16];											// 패킷 버퍼..
-	int iOffset=0;											// 패킷 오프셋..
+	// 서버에게 전송한다.. [Korean comment]
+	uint8_t byBuff[16];											// 패킷 버퍼.. [Korean comment]
+	int iOffset=0;											// 패킷 오프셋.. [Korean comment]
 
-	// 서버에게 패킷 만들어서 날림..
+	// 서버에게 패킷 만들어서 날림.. [Korean comment]
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_EXCHANGE);			
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_PER_TRADE_ADD);		
 	CAPISocket::MP_AddByte(byBuff, iOffset, 0xff);		
 	CAPISocket::MP_AddDword(byBuff, iOffset, dwGold);		
 	CAPISocket::MP_AddDword(byBuff, iOffset, iGoldOffset);		
 
-	CGameProcedure::s_pSocket->Send(byBuff, iOffset);			// 보냄..
+	CGameProcedure::s_pSocket->Send(byBuff, iOffset);			// 보냄.. [Korean comment]
 
 	m_pUITradeEditDlg->SetQuantity(0);
 
-	// 상태를 변화시키고.. 창을 닫고..
+	// 상태를 변화시키고.. 창을 닫고.. Window
 	CN3UIBase::s_bWaitFromServer = true;
 	m_ePerTradeState = PER_TRADE_STATE_NORMAL;
 	m_ePerTradeItemKindBackup = PER_TRADE_ITEM_MONEY;
@@ -585,7 +585,7 @@ void CSubProcPerTrade::ItemCountEditCancel()
 {
 	m_pUITradeEditDlg->SetQuantity(0);
 
-	// 상태를 변화시키고.. 창을 닫고..
+	// 상태를 변화시키고.. 창을 닫고.. Window
 	m_ePerTradeState = PER_TRADE_STATE_NORMAL;
 	m_pUITradeEditDlg->Close();
 
@@ -595,21 +595,21 @@ void CSubProcPerTrade::ItemCountEditCancel()
 
 ///////////////////////////////////////////////////////////////////////
 
-void CSubProcPerTrade::PerTradeMyDecision()							// 내가 거래를 결정 했다..
+void CSubProcPerTrade::PerTradeMyDecision()							// 내가 거래를 결정 했다.. [Korean comment]
 {
 	std::string szFN = "btn_trade_my";
 	CN3UIButton* pButton;
 	pButton = (CN3UIButton* )m_pUIPerTradeDlg->GetChildButtonByName(szFN);
 
-	// 서버에게 전송한다..
-	uint8_t byBuff[4];											// 패킷 버퍼..
-	int iOffset=0;											// 패킷 오프셋..
+	// 서버에게 전송한다.. [Korean comment]
+	uint8_t byBuff[4];											// 패킷 버퍼.. [Korean comment]
+	int iOffset=0;											// 패킷 오프셋.. [Korean comment]
 
-	// 서버에게 패킷 만들어서 날림..
+	// 서버에게 패킷 만들어서 날림.. [Korean comment]
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_EXCHANGE);			
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_PER_TRADE_DECIDE);		
 
-	CGameProcedure::s_pSocket->Send(byBuff, iOffset);			// 보냄..
+	CGameProcedure::s_pSocket->Send(byBuff, iOffset);			// 보냄.. [Korean comment]
 
 	// 내 결정 버튼 Disable..
 	if(pButton) pButton->SetState(UI_STATE_BUTTON_DISABLE);
@@ -623,13 +623,13 @@ void CSubProcPerTrade::SecureJobStuffByMyDecision()
 	// 1. 인벤토리 영역 Icon 움직임 방지..
 	PerTradeCoreInvDisable();
 
-	// 2. 돈 입력창 클릭 방지..		해당 부분..
+	// 2. 돈 입력창 클릭 방지..		해당 부분.. Window
 
-	// 3. 올려놓는 버튼 금지..		해당 부분..
+	// 3. 올려놓는 버튼 금지..		해당 부분.. Button
 
 }
 
-void CSubProcPerTrade::PerTradeOtherDecision()						// 다른 사람이 거래를 결정 했다..
+void CSubProcPerTrade::PerTradeOtherDecision()						// 다른 사람이 거래를 결정 했다.. [Korean comment]
 {
 	CN3UIButton* pButtonOther = nullptr;
 	N3_VERIFY_UI_COMPONENT(pButtonOther, m_pUIPerTradeDlg->GetChildByID<CN3UIButton>("btn_trade_other"));
@@ -641,18 +641,18 @@ void CSubProcPerTrade::PerTradeOtherDecision()						// 다른 사람이 거래�
 
 void CSubProcPerTrade::ReceiveMsgPerTradeReq(int iOtherID)
 {
-	EnterWaitMyDecisionToPerTrade(iOtherID);							// 내가 타인에게서 아이템 거래를 신청 받은 상태..
+	EnterWaitMyDecisionToPerTrade(iOtherID);							// 내가 타인에게서 아이템 거래를 신청 받은 상태.. Status
 }
 
 void CSubProcPerTrade::ReceiveMsgPerTradeAgree(uint8_t bResult)
 {
 	switch ( bResult )
 	{
-		case 0x01:														// 성공..
+		case 0x01:														// 성공.. [Korean comment]
 			ProcessProceed(PER_TRADE_RESULT_OTHER_AGREE);
 			break;
 
-		case 0x00:														// 실패..
+		case 0x00:														// 실패.. [Korean comment]
 			LeavePerTradeState(PER_TRADE_RESULT_OTHER_DISAGREE);
 			break;
 	}
@@ -660,41 +660,41 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAgree(uint8_t bResult)
 
 void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 {
-	// 상태를 변화시키고.. 창을 닫고..
+	// 상태를 변화시키고.. 창을 닫고.. Window
 	CN3UIBase::s_bWaitFromServer = false;
 
 	std::string str;
-	int iGold,			// 거래창의 값..
-		iMyMoney;		// 인벤토리의 값..
+	int iGold,			// 거래창의 값.. Window
+		iMyMoney;		// 인벤토리의 값.. [Korean comment]
 	
 	switch ( bResult )
 	{
 		case 0x01:
 			break;
 
-		case 0x00:			// 실패 했을 경우.. 복구한다..	
-			// 전에 작업한 아이템 종류가 돈인 경우..
+		case 0x00:			// 실패 했을 경우.. 복구한다..	 [Korean comment]
+			// 전에 작업한 아이템 종류가 돈인 경우.. Type
 			switch ( m_ePerTradeItemKindBackup )
 			{
 				case PER_TRADE_ITEM_MONEY:
 					{
-						// 거래 창의 내 현재 돈을 얻어 온다..
+						// 거래 창의 내 현재 돈을 얻어 온다.. Window
 						CN3UIString* pStrMy = nullptr;
 						N3_VERIFY_UI_COMPONENT(pStrMy, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_my"));
 						str = pStrMy->GetString();
 						iGold = atoi(str.c_str());
 
-						// 현재 내가 가진 돈을 얻어 온다..
+						// 현재 내가 가진 돈을 얻어 온다.. [Korean comment]
 						iMyMoney = s_pPlayer->m_InfoExt.iGold;
-						// 돈을 증가 시킨다..
+						// 돈을 증가 시킨다.. [Korean comment]
 						iMyMoney += m_iGoldOffsetBackup;
 						s_pPlayer->m_InfoExt.iGold = iMyMoney;
 
-						// 돈 표시.. 인벤토리..
+						// 돈 표시.. 인벤토리.. [Korean comment]
 						CGameProcedure::s_pProcMain->m_pUIInventory->GoldUpdate();
 						if(m_pUIPerTradeDlg->m_pStrMyGold) m_pUIPerTradeDlg->m_pStrMyGold->SetStringAsInt(iMyMoney);
 
-						// 돈 표시.. 개인 거래 창..
+						// 돈 표시.. 개인 거래 창.. Window
 						iGold -= m_iGoldOffsetBackup;
 						pStrMy->SetStringAsInt(iGold);
 					}
@@ -702,32 +702,32 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 
 				case PER_TRADE_ITEM_OTHER:
 					{
-						// 전에 작업한 아이템 종류가 아이템인 경우..
+						// 전에 작업한 아이템 종류가 아이템인 경우.. Type
 						if( (m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->
 							pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) ||
 							(m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->
 							pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL) )
 						{
-							// 활이나 물약등 아이템인 경우..
+							// 활이나 물약등 아이템인 경우.. [Korean comment]
 							bool bFound = false;
 
-							// 인벤토리에 아이템이 없어진 경우.. 만든다..
+							// 인벤토리에 아이템이 없어진 경우.. 만든다.. [Korean comment]
 							if ( !m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] )
 							{
 								bFound = true;
-								// 인벤토리에 만들고 아이템의 갯수를 정해준다..
+								// 인벤토리에 만들고 아이템의 갯수를 정해준다.. [Korean comment]
 								__IconItemSkill *spItem, *spItemNew = nullptr;
 								spItem = m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 
-								// 아이콘이 없으면 아이콘을 만드록 갯수는 0으로..
+								// 아이콘이 없으면 아이콘을 만드록 갯수는 0으로.. [Korean comment]
 								spItemNew				= new __IconItemSkill;
 								spItemNew->pItemBasic	= spItem->pItemBasic;
 								spItemNew->pItemExt		= spItem->pItemExt;
-								spItemNew->szIconFN		= spItem->szIconFN; // 아이콘 파일 이름 복사..
+								spItemNew->szIconFN		= spItem->szIconFN; // 아이콘 파일 이름 복사.. File
 								spItemNew->iCount		= m_pUIPerTradeDlg->m_iBackupiCount;
 								spItemNew->iDurability	= spItem->iDurability;
 
-								// 아이콘 리소스 만들기..
+								// 아이콘 리소스 만들기.. [Korean comment]
 								spItemNew->pUIIcon		= new CN3UIIcon;
 								float fUVAspect			= (float)45.0f/(float)64.0f;
 								spItemNew->pUIIcon->Init(m_pUIPerTradeDlg); 
@@ -746,7 +746,7 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 
 								m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItemNew;
 
-								// 내 거래창의 아이템이 있는 경우 .. 갯수 갱신..
+								// 내 거래창의 아이템이 있는 경우 .. 갯수 갱신.. Window
 								if ( m_pUIPerTradeDlg->m_iBackupiCount != 
 									m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount )
 								{
@@ -755,7 +755,7 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 								}
 							}
 
-							// 아이콘이 내 거래창의 슬롯에 생긴경우.. 삭제한다..
+							// 아이콘이 내 거래창의 슬롯에 생긴경우.. 삭제한다.. Delete
 							if ( m_pUIPerTradeDlg->m_iBackupiCount == 
 								m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount )
 							{
@@ -764,10 +764,10 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 								__IconItemSkill* spItem;
 								spItem = m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 
-								// 매니저에서 제거..
+								// 매니저에서 제거.. Remove
 								m_pUIPerTradeDlg->RemoveChild(spItem->pUIIcon);
 
-								// 리소스 제거..
+								// 리소스 제거.. Remove
 								spItem->pUIIcon->Release();
 								delete spItem->pUIIcon;
 								spItem->pUIIcon = nullptr;
@@ -775,7 +775,7 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 								spItem = nullptr;
 								m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
 
-								// 인벤토리에 아이템이 있는 경우.. 갯수 갱신..
+								// 인벤토리에 아이템이 있는 경우.. 갯수 갱신.. [Korean comment]
 								if ( m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] )
 								{
 									m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount
@@ -783,10 +783,10 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 								}
 							}
 
-							// 위에서 갯수 보정한게 아니면.. 갯수만 보정한다..
+							// 위에서 갯수 보정한게 아니면.. 갯수만 보정한다.. [Korean comment]
 							if ( !bFound)
 							{
-								// 내 거래창과 인벤토리의 아이템의 갯수를 정해준다..
+								// 내 거래창과 인벤토리의 아이템의 갯수를 정해준다.. Window
 								m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount
 									+= m_pUIPerTradeDlg->m_iBackupiCount;
 
@@ -800,10 +800,10 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 							spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource;
 							spItem->pUIIcon->SetParent(m_pUIPerTradeDlg);
 
-							// 인벤토리 윈도우에 세팅하고..
+							// 인벤토리 윈도우에 세팅하고.. Window
 							m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItem;
 
-							// 내 거래 윈도우에서 클리어..
+							// 내 거래 윈도우에서 클리어.. Window
 							m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
 
 							CN3UIArea* pArea;
@@ -824,31 +824,31 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 void CSubProcPerTrade::ReceiveMsgPerTradeOtherAdd(int iItemID, int iCount, int iDurability)
 {
 	std::string str;
-	int iGold, iDestiOrder;			// 거래창의 값..
+	int iGold, iDestiOrder;			// 거래창의 값.. Window
 
 	if ( iItemID == dwGold )
 	{
-		// 거래 창의 다른 사람의 현재 돈을 얻어 온다..
+		// 거래 창의 다른 사람의 현재 돈을 얻어 온다.. Window
 		CN3UIString* pStrOther = nullptr;
 		N3_VERIFY_UI_COMPONENT(pStrOther, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_other"));
 		str = pStrOther->GetString();
 		iGold = atoi(str.c_str());
 		
-		// 돈을 더한 다음..
+		// 돈을 더한 다음.. [Korean comment]
 		iGold += iCount;
 
-		// 돈 표시.. 개인 거래 창..
+		// 돈 표시.. 개인 거래 창.. Window
 		pStrOther->SetStringAsInt(iGold);
 	}
 	else
 	{
-		// 아이템이 들어갈 수 있는지 확인, 아이템이 들어 가는 자리 계산..
+		// 아이템이 들어갈 수 있는지 확인, 아이템이 들어 가는 자리 계산.. Calculate
 		bool  bFound = false;
 
-		// 아이템 만들어서 넣기..
+		// 아이템 만들어서 넣기.. [Korean comment]
 		__TABLE_ITEM_BASIC*	pItem = nullptr;
 		__TABLE_ITEM_EXT*	pItemExt = nullptr;
-		pItem = s_pTbl_Items_Basic.Find(iItemID/1000*1000);	// 열 데이터 얻기..
+		pItem = s_pTbl_Items_Basic.Find(iItemID/1000*1000);	// 열 데이터 얻기.. Data
 		if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
 			pItemExt = CGameBase::s_pTbl_Items_Exts[pItem->byExtIndex].Find(iItemID%1000);
 		if(nullptr == pItem || nullptr == pItemExt)
@@ -869,10 +869,10 @@ void CSubProcPerTrade::ReceiveMsgPerTradeOtherAdd(int iItemID, int iCount, int i
 				}
 			}
 
-			// 못찾았으면.. 
+			// 못찾았으면..  [Korean comment]
 			if ( !bFound )
 			{
-				// 인벤토리 빈슬롯을 찾아 들어간다..
+				// 인벤토리 빈슬롯을 찾아 들어간다.. [Korean comment]
 				for(int i = 0; i < MAX_ITEM_PER_TRADE; i++ )
 				{
 					if ( !m_pUIPerTradeDlg->m_pPerTradeOther[i] )
@@ -883,11 +883,11 @@ void CSubProcPerTrade::ReceiveMsgPerTradeOtherAdd(int iItemID, int iCount, int i
 					}
 				}
 
-				if ( !bFound )	// 빈 슬롯을 찾지 못했으면..
+				if ( !bFound )	// 빈 슬롯을 찾지 못했으면.. [Korean comment]
 					return;
 			}
 
-			if ( m_pUIPerTradeDlg->m_pPerTradeOther[iDestiOrder] )	// 해당 위치에 아이콘이 있으면..
+			if ( m_pUIPerTradeDlg->m_pPerTradeOther[iDestiOrder] )	// 해당 위치에 아이콘이 있으면.. Position
 			{
 				m_pUIPerTradeDlg->m_pPerTradeOther[iDestiOrder]->iCount += iCount;
 			}
@@ -896,14 +896,14 @@ void CSubProcPerTrade::ReceiveMsgPerTradeOtherAdd(int iItemID, int iCount, int i
 				std::string szIconFN;
 				e_PartPosition ePart;
 				e_PlugPosition ePlug;
-				CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, RACE_UNKNOWN); // 아이템에 따른 파일 이름을 만들어서
+				CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, RACE_UNKNOWN); // 아이템에 따른 파일 이름을 만들어서 File
 
 				__IconItemSkill* spItem;
 
 				spItem				= new __IconItemSkill;
 				spItem->pItemBasic	= pItem;
 				spItem->pItemExt	= pItemExt;
-				spItem->szIconFN	= szIconFN; // 아이콘 파일 이름 복사..
+				spItem->szIconFN	= szIconFN; // 아이콘 파일 이름 복사.. File
 				spItem->iCount		= iCount;
 				spItem->iDurability = iDurability;
 				float fUVAspect		= (float)45.0f/(float)64.0f;
@@ -920,7 +920,7 @@ void CSubProcPerTrade::ReceiveMsgPerTradeOtherAdd(int iItemID, int iCount, int i
 				if ( pArea )
 				{
 					spItem->pUIIcon->SetRegion(pArea->GetRegion());
-					// 움직일 수 없다..
+					// 움직일 수 없다.. [Korean comment]
 					RECT rect = { 0, 0, 0, 0 };
 					spItem->pUIIcon->SetMoveRect(rect);
 				}
@@ -939,19 +939,19 @@ void CSubProcPerTrade::ReceiveMsgPerTradeOtherAdd(int iItemID, int iCount, int i
 				}
 			}
 
-			if ( !bFound )	return;	// 못 찾았으므로.. 실패..
+			if ( !bFound )	return;	// 못 찾았으므로.. 실패.. [Korean comment]
 
 			std::string szIconFN;
 			e_PartPosition ePart;
 			e_PlugPosition ePlug;
-			CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, RACE_UNKNOWN); // 아이템에 따른 파일 이름을 만들어서
+			CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, RACE_UNKNOWN); // 아이템에 따른 파일 이름을 만들어서 File
 
 			__IconItemSkill* spItem;
 
 			spItem				= new __IconItemSkill;
 			spItem->pItemBasic	= pItem;
 			spItem->pItemExt	= pItemExt;
-			spItem->szIconFN	= szIconFN; // 아이콘 파일 이름 복사..
+			spItem->szIconFN	= szIconFN; // 아이콘 파일 이름 복사.. File
 			spItem->iCount		= 1;
 			spItem->iDurability = iDurability;
 			float fUVAspect		= (float)45.0f/(float)64.0f;
@@ -968,7 +968,7 @@ void CSubProcPerTrade::ReceiveMsgPerTradeOtherAdd(int iItemID, int iCount, int i
 			if ( pArea )
 			{
 				spItem->pUIIcon->SetRegion(pArea->GetRegion());
-				// 움직일 수 없다..
+				// 움직일 수 없다.. [Korean comment]
 				RECT rect = { 0, 0, 0, 0 };
 				spItem->pUIIcon->SetMoveRect(rect);
 			}
@@ -997,19 +997,19 @@ void CSubProcPerTrade::ReceiveMsgPerTradeDoneItemMove(uint8_t bItemPos, int iIte
 	__IconItemSkill* spItem;
 
 	// 아이템 인벤토리 INV 영역에 추가..
-	// 아이템이 들어갈 수 있는지 확인..
+	// 아이템이 들어갈 수 있는지 확인.. [Korean comment]
 	if ( m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos] != nullptr )
 	{
 		if ( iItemID != (m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos]->pItemBasic->dwID/1000*1000)+
 			(m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos]->pItemExt->dwID%1000) )
 		{
-			// 기존 아이콘을 클리어..
+			// 기존 아이콘을 클리어.. [Korean comment]
 			spItem =  m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos];
 
-			// 매니저에서 제거..
+			// 매니저에서 제거.. Remove
 			m_pUIPerTradeDlg->RemoveChild(spItem->pUIIcon);
 
-			// 리소스 제거..
+			// 리소스 제거.. Remove
 			spItem->pUIIcon->Release();
 			delete spItem->pUIIcon;
 			spItem->pUIIcon = nullptr;
@@ -1017,20 +1017,20 @@ void CSubProcPerTrade::ReceiveMsgPerTradeDoneItemMove(uint8_t bItemPos, int iIte
 			spItem = nullptr;
 			m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos] = nullptr;
 
-			// 서버가 준 아이디로 아이콘을 만든다..
+			// 서버가 준 아이디로 아이콘을 만든다.. [Korean comment]
 			goto Make_Icon;	
 		}
 
 		switch (m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos]->pItemBasic->byContable)
 		{
-			case UIITEM_TYPE_COUNTABLE:						 // 화살 같은 종류..
+			case UIITEM_TYPE_COUNTABLE:						 // 화살 같은 종류.. Type
 				m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos]->iCount += iCount;
 				if (m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos]->iCount > UIITEM_COUNT_MANY)
 					m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos]->iCount = UIITEM_COUNT_MANY;
 				return;
 				break;
 
-			case UIITEM_TYPE_COUNTABLE_SMALL:			// 물약같은 종류..		
+			case UIITEM_TYPE_COUNTABLE_SMALL:			// 물약같은 종류..		 Type
 				m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos]->iCount += iCount;
 				if (m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos]->iCount > UIITEM_COUNT_FEW)
 					m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos]->iCount = UIITEM_COUNT_FEW;
@@ -1041,10 +1041,10 @@ void CSubProcPerTrade::ReceiveMsgPerTradeDoneItemMove(uint8_t bItemPos, int iIte
 
 Make_Icon:
 
-	// 아이템 만들어서 넣기..
+	// 아이템 만들어서 넣기.. [Korean comment]
 	__TABLE_ITEM_BASIC*	pItem = nullptr;
 	__TABLE_ITEM_EXT*	pItemExt = nullptr;
-	pItem = s_pTbl_Items_Basic.Find(iItemID/1000*1000);	// 열 데이터 얻기..
+	pItem = s_pTbl_Items_Basic.Find(iItemID/1000*1000);	// 열 데이터 얻기.. Data
 	if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
 		pItemExt = CGameBase::s_pTbl_Items_Exts[pItem->byExtIndex].Find(iItemID%1000);
 	if(nullptr == pItem || nullptr == pItemExt)
@@ -1056,12 +1056,12 @@ Make_Icon:
 	std::string szIconFN;
 	e_PartPosition ePart;
 	e_PlugPosition ePlug;
-	CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, RACE_UNKNOWN); // 아이템에 따른 파일 이름을 만들어서
+	CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, RACE_UNKNOWN); // 아이템에 따른 파일 이름을 만들어서 File
 
 	spItem				= new __IconItemSkill;
 	spItem->pItemBasic	= pItem;
 	spItem->pItemExt	= pItemExt;
-	spItem->szIconFN	= szIconFN; // 아이콘 파일 이름 복사..
+	spItem->szIconFN	= szIconFN; // 아이콘 파일 이름 복사.. File
 	spItem->iCount		= iCount;
 	spItem->iDurability = iDurability;
 
@@ -1090,7 +1090,7 @@ Make_Icon:
 
 void CSubProcPerTrade::ReceiveMsgPerTradeDoneSuccessEnd()
 {
-	// 뒷 마무리..
+	// 뒷 마무리.. [Korean comment]
 	PerTradeCompleteSuccess();
 	FinalizePerTrade();
 
@@ -1115,7 +1115,7 @@ void CSubProcPerTrade::ReceiveMsgPerTradeDoneFail()
 
 void CSubProcPerTrade::ReceiveMsgPerTradeCancel()
 {
-	// 메시지 박스 텍스트 표시..
+	// 메시지 박스 텍스트 표시.. Mesh
 	CPlayerOther* pUPC = s_pOPMgr->UPCGetByID(m_iOtherID, false);
 	if (pUPC != nullptr)
 	{
@@ -1124,7 +1124,7 @@ void CSubProcPerTrade::ReceiveMsgPerTradeCancel()
 		CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 	}
 
-	// 뒷 마무리..
+	// 뒷 마무리.. [Korean comment]
 	PerTradeCompleteCancel();
 	FinalizePerTrade();
 }

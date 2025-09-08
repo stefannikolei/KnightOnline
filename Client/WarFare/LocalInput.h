@@ -44,28 +44,28 @@ protected:
 //	BOOL m_bMouse;
 //	BOOL m_bKeyboard;
 
-	int m_nMouseFlag, m_nMouseFlagOld; // 마우스 버튼 눌림 플래그
-	uint32_t m_dwTickLBDown; // 마우스 왼쪽 버튼 더블 클릭 감지용
-	uint32_t m_dwTickRBDown; // 마우스 오른쪽 버튼 더블 클릭 감지용
+	int m_nMouseFlag, m_nMouseFlagOld; // 마우스 버튼 눌림 플래그 Button
+	uint32_t m_dwTickLBDown; // 마우스 왼쪽 버튼 더블 클릭 감지용 Button
+	uint32_t m_dwTickRBDown; // 마우스 오른쪽 버튼 더블 클릭 감지용 Button
 
-	POINT	m_ptCurMouse; // 현재 마우스 포인터
-	POINT	m_ptOldMouse; // 직전 마우스 포인터
+	POINT	m_ptCurMouse; // 현재 마우스 포인터 [Korean comment]
+	POINT	m_ptOldMouse; // 직전 마우스 포인터 [Korean comment]
 
-	RECT	m_rcLBDrag; // 드래그 영역
-	RECT	m_rcMBDrag; // 드래그 영역
-	RECT	m_rcRBDrag; // 드래그 영역
+	RECT	m_rcLBDrag; // 드래그 영역 [Korean comment]
+	RECT	m_rcMBDrag; // 드래그 영역 [Korean comment]
+	RECT	m_rcRBDrag; // 드래그 영역 [Korean comment]
 
-	RECT m_rcMLimit; // 마우스 움직임 제한 영역
-	uint8_t m_byCurKeys[NUMDIKEYS]; // 현재 키 상태
-	uint8_t m_byOldKeys[NUMDIKEYS]; // 직전 키 상태
-	BOOL m_bKeyPresses[NUMDIKEYS]; // 키를 누른 순간인지
-	BOOL m_bKeyPresseds[NUMDIKEYS]; // 키를 눌렀다 떼는 순간인지
-	BOOL m_bNoKeyDown; // 아무 키입력도 없는지
+	RECT m_rcMLimit; // 마우스 움직임 제한 영역 [Korean comment]
+	uint8_t m_byCurKeys[NUMDIKEYS]; // 현재 키 상태 Status
+	uint8_t m_byOldKeys[NUMDIKEYS]; // 직전 키 상태 Status
+	BOOL m_bKeyPresses[NUMDIKEYS]; // 키를 누른 순간인지 [Korean comment]
+	BOOL m_bKeyPresseds[NUMDIKEYS]; // 키를 눌렀다 떼는 순간인지 [Korean comment]
+	BOOL m_bNoKeyDown; // 아무 키입력도 없는지 [Korean comment]
 
 	uint32_t m_dwTickKeyPress[NUMDIKEYS];
 	
 public:
-	void KeyboardClearInput(int iIndex = -1) // 키보드 입력을 무효화 시킨다.. 기본값은 몽땅 무효화이다..
+	void KeyboardClearInput(int iIndex = -1) // 키보드 입력을 무효화 시킨다.. 기본값은 몽땅 무효화이다.. [Korean comment]
 	{
 		if(-1 == iIndex)
 		{
@@ -74,7 +74,7 @@ public:
 			memset(m_bKeyPresses, 0, sizeof(m_bKeyPresses));
 			memset(m_bKeyPresseds, 0, sizeof(m_bKeyPresseds));
 		}
-		else if(iIndex >= 0 && iIndex < NUMDIKEYS) // 특정한 키만 무효화..
+		else if(iIndex >= 0 && iIndex < NUMDIKEYS) // 특정한 키만 무효화.. [Korean comment]
 		{
 			m_byCurKeys[iIndex] = m_byOldKeys[iIndex] = m_bKeyPresses[iIndex] = m_bKeyPresseds[iIndex] = 0;
 		}
@@ -92,7 +92,7 @@ public:
 	void SetActiveDevices(BOOL bKeyboard);
 	void MouseSetPos(int x, int y);
 
-	BOOL KeyboardGetKeyState(int nDIKey); // 최근 눌려진 키 검사..
+	BOOL KeyboardGetKeyState(int nDIKey); // 최근 눌려진 키 검사.. Check
 
 	const POINT MouseGetPos() { return m_ptCurMouse; }
 	const POINT MouseGetPosOld() { return m_ptOldMouse; }

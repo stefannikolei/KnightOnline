@@ -28,14 +28,14 @@ protected:
 	
 	static __RenderStateForUI s_sRSFU;	// RenderStateForUI
 	uint32_t		m_dwMouseFlagsCur;
-	bool		m_bEnableOperation;		// UI 조작이 가능한 상태인가?
+	bool		m_bEnableOperation;		// UI 조작이 가능한 상태인가? Status
 	CN3UIBase*	m_pUIFocused;
 #ifdef _DEBUG
 	CDFont*		m_pDFont;
 #endif
 
 public:
-	bool		m_bDoneSomething;		// UI 에서 조작을 했다...
+	bool		m_bDoneSomething;		// UI 에서 조작을 했다... [Korean comment]
 
 public:
 	void UserMoveHideUIs();
@@ -43,8 +43,8 @@ public:
 	static void	RenderStateRestore();
 	static void	RenderStateSet();
 
-	void	EnableOperationSet(bool bEnable) { m_bEnableOperation = bEnable; } // UI 조작 가능/불가능..
-	bool	EnableOperation() { return m_bEnableOperation; } // UI 조작이 가능한 상태인가?
+	void	EnableOperationSet(bool bEnable) { m_bEnableOperation = bEnable; } // UI 조작 가능/불가능.. [Korean comment]
+	bool	EnableOperation() { return m_bEnableOperation; } // UI 조작이 가능한 상태인가? Status
 
 	void		Release();
 	void		Tick();

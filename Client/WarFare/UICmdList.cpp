@@ -37,9 +37,9 @@ static char THIS_FILE[] = __FILE__;
 
 CUICmdList::CUICmdList()
 {
-	m_bOpenningNow = false; // 열리고 있다..
-	m_bClosingNow = false;	// 닫히고 있다..
-	m_fMoveDelta = 0.0f; // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
+	m_bOpenningNow = false; // 열리고 있다.. [Korean comment]
+	m_bClosingNow = false;	// 닫히고 있다.. [Korean comment]
+	m_fMoveDelta = 0.0f; // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다.. Calculate
 	m_pBtn_cancel = nullptr;
 	m_pList_CmdCat = nullptr;
 	m_pList_Cmds = nullptr;
@@ -110,7 +110,7 @@ void CUICmdList::RenderSelectionBorder(CN3UIList* pListToRender)
 
 void CUICmdList::Tick()
 {
-	if (m_bOpenningNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면..
+	if (m_bOpenningNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면.. [Korean comment]
 	{
 		POINT ptCur = this->GetPos();
 		RECT rc = this->GetRegion();
@@ -123,7 +123,7 @@ void CUICmdList::Tick()
 
 		int iXLimit = CN3Base::s_CameraData.vp.Width - (int)fWidth;
 		ptCur.x = CN3Base::s_CameraData.vp.Width - (int)m_fMoveDelta;
-		if (ptCur.x <= iXLimit) // 다열렸다!!
+		if (ptCur.x <= iXLimit) // 다열렸다!! [Korean comment]
 		{
 			ptCur.x = iXLimit;
 			m_bOpenningNow = false;
@@ -131,7 +131,7 @@ void CUICmdList::Tick()
 
 		this->SetPos(ptCur.x, ptCur.y);
 	}
-	else if (m_bClosingNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면..
+	else if (m_bClosingNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면.. [Korean comment]
 	{
 		POINT ptCur = this->GetPos();
 		RECT rc = this->GetRegion();
@@ -144,12 +144,12 @@ void CUICmdList::Tick()
 
 		int iXLimit = CN3Base::s_CameraData.vp.Width;
 		ptCur.x = CN3Base::s_CameraData.vp.Width - (int)(fWidth - m_fMoveDelta);
-		if (ptCur.x >= iXLimit) // 다 닫혔다..!!
+		if (ptCur.x >= iXLimit) // 다 닫혔다..!! [Korean comment]
 		{
 			ptCur.x = iXLimit;
 			m_bClosingNow = false;
 
-			this->SetVisibleWithNoSound(false, false, true); // 다 닫혔으니 눈에서 안보이게 한다.
+			this->SetVisibleWithNoSound(false, false, true); // 다 닫혔으니 눈에서 안보이게 한다. [Korean comment]
 		}
 
 		this->SetPos(ptCur.x, ptCur.y);
@@ -279,7 +279,7 @@ bool CUICmdList::OnKeyPress(int iKey)
 
 void CUICmdList::Open()
 {
-	// 스르륵 열린다!!
+	// 스르륵 열린다!! [Korean comment]
 	SetVisible(true);
 	SetPos(CN3Base::s_CameraData.vp.Width, 10);
 	m_fMoveDelta = 0;

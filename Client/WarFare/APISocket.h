@@ -17,9 +17,9 @@
 #include <string>
 
 #define WM_SOCKETMSG	(WM_USER+1)
-#define RECEIVE_BUF_SIZE	262144 // 최대 버퍼..
+#define RECEIVE_BUF_SIZE	262144 // 최대 버퍼.. [Korean comment]
 
-#define _CRYPTION		// 암호화 사용
+#define _CRYPTION		// 암호화 사용 [Korean comment]
 #ifdef _CRYPTION
 #include <shared/JvCryption.h>
 #endif
@@ -87,7 +87,7 @@ public:
 			if (sc) CopyMemory(pData+fc, m_pBuffer, sc);
 		}
 	}
-	int		GetOutData(uint8_t *pData) //HeadPos, 변화
+	int		GetOutData(uint8_t *pData) //HeadPos, 변화 [Korean comment]
 	{
 		int len = GetValidCount();
 		int fc, sc;
@@ -224,7 +224,7 @@ public:
 	int					m_iSendByteCount;
 	std::queue<Packet *> m_qRecvPkt;
 
-	BOOL	m_bEnableSend; // 보내기 가능..?
+	BOOL	m_bEnableSend; // 보내기 가능..? [Korean comment]
 public:
 	int		Connect(HWND hWnd, const char* pszIP, uint32_t port);
 	void	Disconnect();
@@ -241,7 +241,7 @@ public:
 
 #ifdef _CRYPTION
 protected:
-	static BOOL			s_bCryptionFlag;			//0 : 비암호화 , 1 : 암호화
+	static BOOL			s_bCryptionFlag;			//0 : 비암호화 , 1 : 암호화 [Korean comment]
 	static CJvCryption	s_JvCrypt;
 	static uint32_t		s_wSendVal;
 	static uint32_t		s_wRcvVal;
@@ -258,7 +258,7 @@ public:
 	}
 #endif
 
-	//패킷 만들기 함수
+	//패킷 만들기 함수 Function
 	static	void	MP_AddByte(uint8_t *dest, int& iOffset, uint8_t byte) { CopyMemory(dest+iOffset, &byte, 1); iOffset ++; }
 	static	void	MP_AddShort(uint8_t *dest, int& iOffset, int16_t value) { CopyMemory(dest+iOffset, &value, 2); iOffset += 2; }
 	static	void	MP_AddWord(uint8_t *dest, int& offset, uint16_t value) { CopyMemory(dest+offset, &value, 2); offset += 2; }

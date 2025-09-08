@@ -79,7 +79,7 @@ void CUIPartyBBSSelector::MsgSend_PartyBBSKind(uint8_t byKind)
 	uint8_t byBuff[4];											
 	int iOffset=0;											
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, 1);		// 패킷도 정해야 할듯
-	CAPISocket::MP_AddByte(byBuff, iOffset, byKind);		// 파티구함인지 파티원 구함인지...
-	CGameProcedure::s_pSocket->Send(byBuff, iOffset);		// 패킷을 보냄..
+	CAPISocket::MP_AddByte(byBuff, iOffset, 1);		// 패킷도 정해야 할듯 [Korean comment]
+	CAPISocket::MP_AddByte(byBuff, iOffset, byKind);		// 파티구함인지 파티원 구함인지... [Korean comment]
+	CGameProcedure::s_pSocket->Send(byBuff, iOffset);		// 패킷을 보냄.. [Korean comment]
 }

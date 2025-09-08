@@ -43,7 +43,7 @@ protected:
 	CN3Texture**				m_pRefLightMapTex;
 	int							m_NumLightMapTex;
 
-	//Tile지원 안하는 카드들을 위한 설정.
+	//Tile지원 안하는 카드들을 위한 설정. Set
 	//LPDIRECT3DVERTEXBUFFER8		m_pFoolishTileVB;
 	//int							m_NumFoolishTile;
 

@@ -22,7 +22,7 @@ class CUIPerTradeDlg : public CN3UIWndBase
 public:
 	CSubProcPerTrade*	m_pSubProcPerTrade;
 
-// 직접 접근해야 할 객체 참조 포인터
+// 직접 접근해야 할 객체 참조 포인터 [Korean comment]
 	__IconItemSkill*		m_pPerTradeMy[MAX_ITEM_PER_TRADE];
 	__IconItemSkill*		m_pPerTradeOther[MAX_ITEM_PER_TRADE];
 	__IconItemSkill*		m_pPerTradeInv[MAX_ITEM_INVENTORY];
@@ -30,7 +30,7 @@ public:
 	int						m_iBackupiOrder[MAX_ITEM_PER_TRADE];
 
 	CUIImageTooltipDlg*		m_pUITooltipDlg;
-	int						m_iBackupiCount;	// 전에 옮긴 화살등의 갯수..
+	int						m_iBackupiCount;	// 전에 옮긴 화살등의 갯수.. [Korean comment]
 
 	CN3UIString*			m_pStrMyGold;
 

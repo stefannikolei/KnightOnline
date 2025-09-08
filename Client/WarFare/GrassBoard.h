@@ -24,16 +24,16 @@ protected:
 	typedef struct Grass_Info
 	{
 		__Matrix44	mtxWorld;
-		__Vector3	vPos;	//	풀의 위치(지도상의)
-		uint32_t		dwAlpColor;	//	풀의 알파
-		int			iTexIndex;	//	풀의 인덱스
+		__Vector3	vPos;	//	풀의 위치(지도상의) Position
+		uint32_t		dwAlpColor;	//	풀의 알파 [Korean comment]
+		int			iTexIndex;	//	풀의 인덱스 Index
 	}Grass_Info;
 //	__VertexXyzColorT1 m_vRects[4];
 	Grass_Info		m_sGrassInfo[20];
 
 	int				m_nTexIndex;
-	uint8_t	m_ucTexIndex;	//	그림인덱스
-	uint8_t	m_ucTexNum;	//	풀의 갯수
+	uint8_t	m_ucTexIndex;	//	그림인덱스 Index
+	uint8_t	m_ucTexNum;	//	풀의 갯수 [Korean comment]
 
 //	float			m_fLeftPo;
 //	float			m_fTopPo;
@@ -47,7 +47,7 @@ public:
 
 	BOOL	m_bCamOut;	//	카메라의 범위를 벋어나 랜더 할 필요 없음(TRUE)
 
-	BOOL	m_bGroundInfo;	//	현재 셀이 풀을 그릴수 있는지 확인
+	BOOL	m_bGroundInfo;	//	현재 셀이 풀을 그릴수 있는지 확인 [Korean comment]
 
 public:
 //	void TexSelectNum(int Texindex,uint8_t TexOrgIndex) {m_nTexIndex = Texindex, m_usTexIndex = TexOrgIndex;}

@@ -66,7 +66,7 @@ BOOL CLocalInput::Init(HINSTANCE hInst, HWND hWnd)
 {
 	HRESULT rval;
 
-	m_hWnd = hWnd; // 윈도우 핸들 기억..
+	m_hWnd = hWnd; // 윈도우 핸들 기억.. Window
 
 	rval = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**) &m_lpDI, nullptr);
 	if (rval != DI_OK)
@@ -183,12 +183,12 @@ void CLocalInput::UnacquireKeyboard()
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Updates all devices. Call this before you check for input.
 /////////////////////////////////////////////////////////////////////////////////////////////
-// 되도록이면 전체 프로시저 돌때 한번씩만 도는게 좋다.. 여러번 하면 혼란이 올수도 있다.
+// 되도록이면 전체 프로시저 돌때 한번씩만 도는게 좋다.. 여러번 하면 혼란이 올수도 있다. [Korean comment]
 void CLocalInput::Tick()
 {
 	HRESULT err;
 
-	HWND hWndActive = ::GetActiveWindow(); // 포커싱되었을때만...
+	HWND hWndActive = ::GetActiveWindow(); // 포커싱되었을때만... [Korean comment]
 	if (hWndActive != m_hWnd)
 		return;
 
@@ -197,24 +197,24 @@ void CLocalInput::Tick()
 	///////////////////////
 //	if(m_bKeyboard)
 //	{
-		memcpy(m_byOldKeys, m_byCurKeys, NUMDIKEYS); // 전의 키 상태 기록
+		memcpy(m_byOldKeys, m_byCurKeys, NUMDIKEYS); // 전의 키 상태 기록 Status
 
-		err = m_lpDIDKeyboard->GetDeviceState(NUMDIKEYS, m_byCurKeys); // 현재 키 상태 기록
+		err = m_lpDIDKeyboard->GetDeviceState(NUMDIKEYS, m_byCurKeys); // 현재 키 상태 기록 Status
 		if (err != DI_OK)
 			AcquireKeyboard();
 		else
 		{
-			m_bNoKeyDown = TRUE; // 첨엔 아무것도 안눌림
+			m_bNoKeyDown = TRUE; // 첨엔 아무것도 안눌림 [Korean comment]
 
 			for (int i = 0; i < NUMDIKEYS; i++)
 			{
 				if (!m_byOldKeys[i] && m_byCurKeys[i])
-					m_bKeyPresses[i] = TRUE; // 눌리는 순간
+					m_bKeyPresses[i] = TRUE; // 눌리는 순간 [Korean comment]
 				else
 					m_bKeyPresses[i] = FALSE;
 
 				if (m_byOldKeys[i] && !m_byCurKeys[i])
-					m_bKeyPresseds[i] = TRUE; // 눌렀다 떼는 순간..
+					m_bKeyPresseds[i] = TRUE; // 눌렀다 떼는 순간.. [Korean comment]
 				else
 					m_bKeyPresseds[i] = FALSE;
 
@@ -228,20 +228,20 @@ void CLocalInput::Tick()
 	//  MOUSE
 	///////////////////////
 
-	m_ptOldMouse = m_ptCurMouse; // 일단 전의 것 복사...
+	m_ptOldMouse = m_ptCurMouse; // 일단 전의 것 복사... [Korean comment]
 
 	RECT rcClient;
 	::GetClientRect(m_hWnd, &rcClient);
-	::GetCursorPos(&m_ptCurMouse); // 좀 이상해서... 그냥 시스템 마우스 커서 위치 가져오기
-	::ScreenToClient(m_hWnd, &m_ptCurMouse); // 클라이언트 영역으로 변환
+	::GetCursorPos(&m_ptCurMouse); // 좀 이상해서... 그냥 시스템 마우스 커서 위치 가져오기 Position
+	::ScreenToClient(m_hWnd, &m_ptCurMouse); // 클라이언트 영역으로 변환 [Korean comment]
 
-	if (PtInRect(&rcClient, m_ptCurMouse)) //  && GetFocus() == m_hWnd) // 스크린 영역 밖에 있거나 포커스가 가있지 않으면..
+	if (PtInRect(&rcClient, m_ptCurMouse)) //  && GetFocus() == m_hWnd) // 스크린 영역 밖에 있거나 포커스가 가있지 않으면.. [Korean comment]
 	{
-		// 마우스 버튼 상태 보관.
+		// 마우스 버튼 상태 보관. Button
 		m_nMouseFlagOld = m_nMouseFlag;
 		m_nMouseFlag = 0;
 
-		// 마우스 상태 가져오기
+		// 마우스 상태 가져오기 Status
 		if (_IsKeyDown(VK_LBUTTON))
 			m_nMouseFlag |= MOUSE_LBDOWN;
 
@@ -251,7 +251,7 @@ void CLocalInput::Tick()
 		if (_IsKeyDown(VK_RBUTTON))
 			m_nMouseFlag |= MOUSE_RBDOWN;
 
-		// 버튼 클릭 직후..
+		// 버튼 클릭 직후.. Button
 		if (!(m_nMouseFlagOld & MOUSE_LBDOWN) && (m_nMouseFlag & MOUSE_LBDOWN))
 			m_nMouseFlag |= MOUSE_LBCLICK;
 
@@ -261,7 +261,7 @@ void CLocalInput::Tick()
 		if (!(m_nMouseFlagOld & MOUSE_RBDOWN) && (m_nMouseFlag & MOUSE_RBDOWN))
 			m_nMouseFlag |= MOUSE_RBCLICK;
 
-		// 버튼에서 손을 떼면
+		// 버튼에서 손을 떼면 Button
 		if ((m_nMouseFlagOld & MOUSE_LBDOWN) && !(m_nMouseFlag & MOUSE_LBDOWN))
 			m_nMouseFlag |= MOUSE_LBCLICKED;
 
@@ -271,8 +271,8 @@ void CLocalInput::Tick()
 		if ((m_nMouseFlagOld & MOUSE_RBDOWN) && !(m_nMouseFlag & MOUSE_RBDOWN))
 			m_nMouseFlag |= MOUSE_RBCLICKED;
 
-		static DWORD dwDblClk = GetDoubleClickTime(); // 윈도우의 더블 클릭시간을 가져오고..
-		if (m_nMouseFlag & MOUSE_LBCLICKED) // 왼쪽 더블 클릭 감지
+		static DWORD dwDblClk = GetDoubleClickTime(); // 윈도우의 더블 클릭시간을 가져오고.. Window
+		if (m_nMouseFlag & MOUSE_LBCLICKED) // 왼쪽 더블 클릭 감지 [Korean comment]
 		{
 			static DWORD dwCLicked = 0;
 			if (timeGetTime() < dwCLicked + dwDblClk)
@@ -280,7 +280,7 @@ void CLocalInput::Tick()
 			dwCLicked = timeGetTime();
 		}
 
-		if (m_nMouseFlag & MOUSE_MBCLICKED) // 왼쪽 더블 클릭 감지
+		if (m_nMouseFlag & MOUSE_MBCLICKED) // 왼쪽 더블 클릭 감지 [Korean comment]
 		{
 			static DWORD dwCLicked = 0;
 			if (timeGetTime() < dwCLicked + dwDblClk)
@@ -288,7 +288,7 @@ void CLocalInput::Tick()
 			dwCLicked = timeGetTime();
 		}
 
-		if (m_nMouseFlag & MOUSE_RBCLICKED) // 왼쪽 더블 클릭 감지
+		if (m_nMouseFlag & MOUSE_RBCLICKED) // 왼쪽 더블 클릭 감지 [Korean comment]
 		{
 			static DWORD dwCLicked = 0;
 			if (timeGetTime() < dwCLicked + dwDblClk)
@@ -296,7 +296,7 @@ void CLocalInput::Tick()
 			dwCLicked = timeGetTime();
 		}
 
-		// 드래그 영역 처리
+		// 드래그 영역 처리 Process
 		if (m_nMouseFlag & MOUSE_LBDOWN)
 		{
 			m_rcLBDrag.right = m_ptCurMouse.x;

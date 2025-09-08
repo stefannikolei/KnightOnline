@@ -25,11 +25,11 @@ enum e_UIWND				{
 								UIWND_INVENTORY = 0,		// Inventory Wnd..
 								UIWND_TRANSACTION, 			// Transaction Wnd..
 								UIWND_DROPITEM,				// Drop Item Wnd..
-								UIWND_PER_TRADE,			// 개인간 거래..
+								UIWND_PER_TRADE,			// 개인간 거래.. [Korean comment]
 								UIWND_SKILL_TREE,			// Skill Icon Info Wnd..
 								UIWND_HOTKEY,				// Hot Key Wnd..
 								UIWND_PER_TRADE_EDIT,		// Per Trade Edit Wnd..
-								UIWND_WARE_HOUSE,			// 보관함..
+								UIWND_WARE_HOUSE,			// 보관함.. [Korean comment]
 								UIWND_UNKNOWN,				// Wnd Unknown..
 							};
 
@@ -43,7 +43,7 @@ enum e_UIWND_DISTRICT		{
 								UIWND_DISTRICT_DROPITEM,			// Dropitem district of Drop item wnd..
 								UIWND_DISTRICT_SKILL_TREE,			// Skillicon district of Skill icon wnd..
 								UIWND_DISTRICT_SKILL_HOTKEY,		// Skillicon district of Hotkey icon wnd..
-								UIWND_DISTRICT_TRADE_MY,			// Npc 와의 거래에서 내 영역..
+								UIWND_DISTRICT_TRADE_MY,			// Npc 와의 거래에서 내 영역.. [Korean comment]
 								UIWND_DISTRICT_PER_TRADE_INV,		// Inv District of Per Trade Wnd ..
 								UIWND_DISTRICT_UNKNOWN,				// District Unknown..
 							};
@@ -125,7 +125,7 @@ public:
 protected:
 	e_UIWND						m_eUIWnd;
 
-	static int					s_iRefCount; // 참조 카운트...
+	static int					s_iRefCount; // 참조 카운트... Count
 	static CN3SndObj*			s_pSnd_Item_Etc;
 	static CN3SndObj*			s_pSnd_Item_Weapon;
 	static CN3SndObj*			s_pSnd_Item_Armor;

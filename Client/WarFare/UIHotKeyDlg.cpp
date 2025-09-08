@@ -106,10 +106,10 @@ uint32_t CUIHotKeyDlg::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POI
 {
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
 	if ( !IsVisible() ) { dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);  return dwRet; }
-	// 실제로 쓰진 않는다..
+	// 실제로 쓰진 않는다.. [Korean comment]
 	if (s_bWaitFromServer) { dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);  return dwRet; }
 
-	// 드래그 되는 아이콘 갱신..
+	// 드래그 되는 아이콘 갱신.. [Korean comment]
 	if ( GetState() == UI_STATE_ICON_MOVING ) 
 	{
 		if(CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo)
@@ -160,7 +160,7 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			break;
 
 		case UIMSG_ICON_RUP:
-			// Hot Key 윈도우를 돌아 다니면서 검사..
+			// Hot Key 윈도우를 돌아 다니면서 검사.. Check
 			if ( IsIn(ptCur.x, ptCur.y) )
 			{
 				int iOrder = GetAreaiOrder();
@@ -174,11 +174,11 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			break;
 
 		case UIMSG_ICON_UP:
-			// Hot Key 윈도우를 돌아 다니면서 검사..
+			// Hot Key 윈도우를 돌아 다니면서 검사.. Check
 			if ( IsIn(ptCur.x, ptCur.y) )
 			{
 				int iOrder = GetAreaiOrder();
-				if ( CN3UIWndBase::s_sSkillSelectInfo.iOrder == iOrder )	// 실행..
+				if ( CN3UIWndBase::s_sSkillSelectInfo.iOrder == iOrder )	// 실행.. [Korean comment]
 				{
 					CN3UIArea* pArea;
 					pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, iOrder);
@@ -197,10 +197,10 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 						// 리소스 Free..
 						spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 
-						// 매니저에서 제거..
+						// 매니저에서 제거.. Remove
 						RemoveChild(spSkill->pUIIcon);
 
-						// 리소스 제거..
+						// 리소스 제거.. Remove
 						spSkill->pUIIcon->Release();
 						delete spSkill->pUIIcon;
 						spSkill->pUIIcon = nullptr;
@@ -215,18 +215,18 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 						CloseIconRegistry();
 					}
-					else	// 옮기기..
+					else	// 옮기기.. [Korean comment]
 					{
-						// 기존 아이콘이 있다면..
+						// 기존 아이콘이 있다면.. [Korean comment]
 						if ( m_pMyHotkey[m_iCurPage][iOrder] )
 						{
-							// 기존 아이콘을 삭제한다..
+							// 기존 아이콘을 삭제한다.. Delete
 							spSkill = m_pMyHotkey[m_iCurPage][iOrder];
 
-							// 매니저에서 제거..
+							// 매니저에서 제거.. Remove
 							RemoveChild(spSkill->pUIIcon);
 
-							// 리소스 제거..
+							// 리소스 제거.. Remove
 							spSkill->pUIIcon->Release();
 							delete spSkill->pUIIcon;
 							spSkill->pUIIcon = nullptr;
@@ -257,15 +257,15 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 					}
 				}
 			}
-			else		// 삭제..
+			else		// 삭제.. Delete
 			{
 				// 리소스 Free..
 				spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 
-				// 매니저에서 제거..
+				// 매니저에서 제거.. Remove
 				RemoveChild(spSkill->pUIIcon);
 
-				// 리소스 제거..
+				// 리소스 제거.. Remove
 				spSkill->pUIIcon->Release();
 				delete spSkill->pUIIcon;
 				spSkill->pUIIcon = nullptr;
@@ -319,7 +319,7 @@ void CUIHotKeyDlg::Render()
 			RenderSelectIcon(pUIIcon);
 	}
 
-	// 현재 페이지에서 
+	// 현재 페이지에서  [Korean comment]
 	CN3UIArea* pArea;
 	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
 
@@ -422,11 +422,11 @@ void CUIHotKeyDlg::InitIconUpdate()
 			__IconItemSkill* spSkill = new __IconItemSkill();
 			spSkill->pSkill = pUSkill;
 
-			// 아이콘 이름 만들기.. ^^
+			// 아이콘 이름 만들기.. ^^ Name
 			spSkill->szIconFN = fmt::format("UI\\skillicon_{:02}_{}.dxt",
 				HD.iID % 100, HD.iID / 100);
 
-			// 아이콘 로드하기.. ^^
+			// 아이콘 로드하기.. ^^ Load
 			spSkill->pUIIcon = new CN3UIIcon;
 			spSkill->pUIIcon->Init(this);
 			spSkill->pUIIcon->SetTex(spSkill->szIconFN);
@@ -444,7 +444,7 @@ void CUIHotKeyDlg::InitIconUpdate()
 				spSkill->pUIIcon->SetMoveRect(pArea->GetRegion());
 			}
 
-			// 아이콘 정보 저장..
+			// 아이콘 정보 저장.. Save
 			m_pMyHotkey[HD.row][HD.column] = spSkill;
 		}
 		iSkillCount++;
@@ -535,10 +535,10 @@ void CUIHotKeyDlg::AllFactorClear()
 				// 리소스 Free..
 				spSkill = m_pMyHotkey[i][j];
 
-				// 매니저에서 제거..
+				// 매니저에서 제거.. Remove
 				RemoveChild(spSkill->pUIIcon);
 
-				// 리소스 제거..
+				// 리소스 제거.. Remove
 				spSkill->pUIIcon->Release();
 				delete spSkill->pUIIcon;
 				spSkill->pUIIcon = nullptr;
@@ -613,10 +613,10 @@ void CUIHotKeyDlg::SetReceiveSelectedSkill(int iIndex)
 		// 리소스 Free..
 		spSkill = m_pMyHotkey[m_iCurPage][iIndex];
 
-		// 매니저에서 제거..
+		// 매니저에서 제거.. Remove
 		RemoveChild(spSkill->pUIIcon);
 
-		// 리소스 제거..
+		// 리소스 제거.. Remove
 		spSkill->pUIIcon->Release();
 		delete spSkill->pUIIcon;
 		spSkill->pUIIcon = nullptr;
@@ -628,7 +628,7 @@ void CUIHotKeyDlg::SetReceiveSelectedSkill(int iIndex)
 	CN3UIArea* pArea;
 	pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, iIndex);
 
-	// 그 다음에.. 그 자리에 
+	// 그 다음에.. 그 자리에  [Korean comment]
 	m_pMyHotkey[m_iCurPage][iIndex] = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 	m_pMyHotkey[m_iCurPage][iIndex]->szIconFN = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->szIconFN;
 	m_pMyHotkey[m_iCurPage][iIndex]->pUIIcon->SetRegion(pArea->GetRegion());
@@ -720,7 +720,7 @@ void CUIHotKeyDlg::DoOperate(__IconItemSkill* pSkill)
 	if (pSkill == nullptr)
 		return;
 
-	// 메시지 박스 출력..	
+	// 메시지 박스 출력..	 Mesh
 	// std::string buff = fmt::format("{} 스킬이 사용되었습니다.", pSkill->pSkill->szName);
 	// CGameProcedure::s_pProcMain->MsgOutput(buff, 0xffffff00);			
 
@@ -741,10 +741,10 @@ void CUIHotKeyDlg::ClassChangeHotkeyFlush()
 				// 리소스 Free..
 				spSkill = m_pMyHotkey[i][j];
 
-				// 매니저에서 제거..
+				// 매니저에서 제거.. Remove
 				RemoveChild(spSkill->pUIIcon);
 
-				// 리소스 제거..
+				// 리소스 제거.. Remove
 				spSkill->pUIIcon->Release();
 				delete spSkill->pUIIcon;
 				spSkill->pUIIcon = nullptr;
@@ -840,7 +840,7 @@ int CUIHotKeyDlg::GetCountCurPageIndex(__IconItemSkill* spSkill)
 bool CUIHotKeyDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 {
 	bool bFound = false;
-	// 내가 가졌던 아이콘이 아니면..
+	// 내가 가졌던 아이콘이 아니면.. [Korean comment]
 	if ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd != UIWND_INVENTORY )
 		return false;
 	else
@@ -863,16 +863,16 @@ bool CUIHotKeyDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 
 		__IconItemSkill* spSkill, *spItem;
 
-		// 기존 아이콘이 있다면..
+		// 기존 아이콘이 있다면.. [Korean comment]
 		if ( m_pMyHotkey[m_iCurPage][iOrder] )
 		{
-			// 기존 아이콘을 삭제한다..
+			// 기존 아이콘을 삭제한다.. Delete
 			spSkill = m_pMyHotkey[m_iCurPage][iOrder];
 
-			// 매니저에서 제거..
+			// 매니저에서 제거.. Remove
 			RemoveChild(spSkill->pUIIcon);
 
-			// 리소스 제거..
+			// 리소스 제거.. Remove
 			spSkill->pUIIcon->Release();
 			delete spSkill->pUIIcon;
 			spSkill->pUIIcon = nullptr;
@@ -890,11 +890,11 @@ bool CUIHotKeyDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 		spSkill = new __IconItemSkill();
 		spSkill->pSkill = pUSkill;
 
-		// 아이콘 이름 만들기.. ^^
+		// 아이콘 이름 만들기.. ^^ Name
 		spSkill->szIconFN = fmt::format("UI\\skillicon_{:02}_{}.dxt",
 			spItem->pItemBasic->dwEffectID1 % 100, spItem->pItemBasic->dwEffectID1 / 100);
 
-		// 아이콘 로드하기.. ^^
+		// 아이콘 로드하기.. ^^ Load
 		spSkill->pUIIcon = new CN3UIIcon;
 		spSkill->pUIIcon->Init(this);
 		spSkill->pUIIcon->SetTex(spSkill->szIconFN);
@@ -994,7 +994,7 @@ void CUIHotKeyDlg::RenderSelectIcon(CN3UIIcon* pUIIcon)
 {
 	if(!pUIIcon) return;
 
-	RECT rc = pUIIcon->GetRegion(); // 선택 표시
+	RECT rc = pUIIcon->GetRegion(); // 선택 표시 Select
 
 	__VertexTransformedColor vLines[5];
 	vLines[0].Set((float)rc.left, (float)rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
@@ -1153,7 +1153,7 @@ bool CUIHotKeyDlg::OnKeyPress(int iKey)
 	{
 	case DIK_ESCAPE:
 		{	//hotkey가 포커스 잡혀있을때는 다른 ui를 닫을수 없으므로 DIK_ESCAPE가 들어오면 포커스를 다시잡고
-			//열려있는 다른 유아이를 닫아준다.
+			//열려있는 다른 유아이를 닫아준다. [Korean comment]
 			CGameProcedure::s_pUIMgr->ReFocusUI();//this_ui
 			CN3UIBase* pFocus = CGameProcedure::s_pUIMgr->GetFocusedUI();
 			if(pFocus && pFocus != this) pFocus->OnKeyPress(iKey);

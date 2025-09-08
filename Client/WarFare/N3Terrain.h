@@ -37,15 +37,15 @@ public:
 	CN3TerrainPatch**	m_ppPatch;
 	POINT				m_pat_LBPos;
 	POINT				m_pat_PrevLBPos;
-	RECT				m_pat_BoundRect;	//LBPos에 대한 상대좌표..
+	RECT				m_pat_BoundRect;	//LBPos에 대한 상대좌표.. [Korean comment]
 	int					m_iNumPatch;
-	int					m_pat_Center2Side;	//중심점에서 한쪽변까지의 길이..
+	int					m_pat_Center2Side;	//중심점에서 한쪽변까지의 길이.. [Korean comment]
 	int					m_iDistanceTable[DISTANCE_TABLE_SIZE][DISTANCE_TABLE_SIZE];
 	
 	//MapInfo..
 	MAPDATA*			m_pMapData;
 	int					m_ti_MapSize;				// 셀이 몇개 들어가나.. 4096Meter -> 1024 + 1
-	int					m_pat_MapSize;				// 패치 갯수.. 사이즈에 따라 틀리다..
+	int					m_pat_MapSize;				// 패치 갯수.. 사이즈에 따라 틀리다.. [Korean comment]
 	__Vector3*			m_pNormal;
 
 	//LightMap Info..
@@ -64,17 +64,17 @@ public:
 	POINT				m_ti_PrevCenterPos;
 
 	//Texture...
-	uint32_t				m_NumTileTex;				// Tile Texture 갯수
+	uint32_t				m_NumTileTex;				// Tile Texture 갯수 [Korean comment]
 	CN3Texture*			m_pTileTex;
 
 	//ColorMap..
 	CN3Texture**		m_ppColorMapTex;
-	int					m_iNumColorMap;				// 컬러맵은 분할 저장되어 있다.. 갯수 = 
+	int					m_iNumColorMap;				// 컬러맵은 분할 저장되어 있다.. 갯수 =  Save
 
-	//컬러맵위에 덧 씌우는 무늬맵..
+	//컬러맵위에 덧 씌우는 무늬맵.. [Korean comment]
 	CN3Texture			m_pBaseTex;
 
-	//타일방향..
+	//타일방향.. [Korean comment]
 	float m_fTileDirU[8][4];
 	float m_fTileDirV[8][4];
 
@@ -100,10 +100,10 @@ protected:
 	void	TestAvailableTile();
 	void	MakeDistanceTable();
 
-	inline	int	Log2(int x);	//2의 승수 전용....
-	int Real2Tile(float x){ return ((int)x / (int)TILE_SIZE); } // 실좌표 -> 타일좌표...(절대좌표)
-	int Tile2Patch(int x) { return (x / PATCH_TILE_SIZE); } // 타일좌표 -> 패치좌표...(절대좌표계)
-	int Real2Patch(float fX) { return ( ((int)fX / (int)TILE_SIZE) / PATCH_TILE_SIZE ); } // 실좌표 -> 패치좌표..(절대좌표계)
+	inline	int	Log2(int x);	//2의 승수 전용.... [Korean comment]
+	int Real2Tile(float x){ return ((int)x / (int)TILE_SIZE); } // 실좌표 -> 타일좌표...(절대좌표) [Korean comment]
+	int Tile2Patch(int x) { return (x / PATCH_TILE_SIZE); } // 타일좌표 -> 패치좌표...(절대좌표계) [Korean comment]
+	int Real2Patch(float fX) { return ( ((int)fX / (int)TILE_SIZE) / PATCH_TILE_SIZE ); } // 실좌표 -> 패치좌표..(절대좌표계) [Korean comment]
 		
 	void	LoadTileInfo(HANDLE hFile);
 	bool	CheckRenderablePatch();
@@ -148,7 +148,7 @@ public:	//additional........
 	BOOL			CheckCollisionByHeight(const __Vector3& vPos, float fUnitSize, float& fHeight)
 	{
 		fHeight = this->GetHeight(vPos.x, vPos.z);
-		if(vPos.y < fHeight + fUnitSize) return TRUE; // 현재 높이가 지형높이 + 크기 보다 작다면 
+		if(vPos.y < fHeight + fUnitSize) return TRUE; // 현재 높이가 지형높이 + 크기 보다 작다면  Size
 		return FALSE;
 	}
 	bool			CheckCollision(__Vector3& vPos, __Vector3& vDir, float fVelocity, __Vector3* vpCol);
