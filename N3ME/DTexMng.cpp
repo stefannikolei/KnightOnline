@@ -291,7 +291,7 @@ void CDTexMng::SaveToFile(CString RealFileName)
 {
 	char szDTexDir[_MAX_PATH];
 	wsprintf(szDTexDir, "%sDTex", s_szPath.c_str());
-	CreateDirectory("dtex", nullptr); // 경로 만들고.. // Create path..
+	CreateDirectory("dtex", nullptr); // 경로 만들고.. Create path..
 
 	char szDTexInfoFileName[_MAX_PATH];
 	wsprintf(szDTexInfoFileName, "%sDTEX\\%s.dtx", s_szPath.c_str(), (LPCTSTR)RealFileName);
