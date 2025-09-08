@@ -34,7 +34,7 @@ CN3UIEdit::CN3Caret::CN3Caret()
 	m_pVB[0].Set(0,0,UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xffff0000);
 	m_pVB[1].Set(0,10,UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xffff0000);
 	m_bVisible = FALSE;
-	m_fFlickerTimePrev = CN3Base::TimeGet();	// 깜박이기 위한 시간.. Time
+	m_fFlickerTimePrev = CN3Base::TimeGet();	// 깜박이기 위한 시간.. Time for flickering
 	m_bFlickerStatus = true;
 
 }
@@ -67,7 +67,7 @@ void CN3UIEdit::CN3Caret::Render(LPDIRECT3DDEVICE9	lpD3DDev)
 {
 	if (FALSE == m_bVisible) return;
 
-	// 깜박임 처리.. Process
+	// 깜박임 처리.. Process flickering
 	float fTime = CN3Base::TimeGet();
 	if(fTime - m_fFlickerTimePrev > CARET_FLICKERING_TIME)
 	{
@@ -85,7 +85,7 @@ void CN3UIEdit::CN3Caret::Render(LPDIRECT3DDEVICE9	lpD3DDev)
 }
 void CN3UIEdit::CN3Caret::InitFlckering()
 {
-	m_fFlickerTimePrev = CN3Base::TimeGet();	// 깜박이기 위한 시간.. Time
+	m_fFlickerTimePrev = CN3Base::TimeGet();	// 깜박이기 위한 시간.. Time for flickering
 	m_bFlickerStatus = true;
 }
 
@@ -110,7 +110,7 @@ BOOL CN3UIEdit::CreateEditWindow(HWND hParent, RECT rect)
 	::SendMessage(s_hWndEdit, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
 	::SendMessage(s_hWndEdit, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
 
-	// 배경 지우기...?? [Korean comment]
+	// 배경 지우기...?? Clear background...??
 	HDC hDC = GetDC(s_hWndEdit);
 	SetBkMode(hDC, TRANSPARENT);
 	SetROP2(hDC, R2_XORPEN);
@@ -449,7 +449,7 @@ void CN3UIEdit::Render()
 	CN3UIStatic::Render();
 	if (HaveFocus())
 	{
-		s_Caret.Render(s_lpD3DDev);	// 포커스가 있으면 캐럿 그리기 Draw
+		s_Caret.Render(s_lpD3DDev);	// 포커스가 있으면 캐럿 그리기 Draw caret if focus exists
 	}
 }
 
@@ -457,7 +457,7 @@ void CN3UIEdit::SetVisible(bool bVisible)
 {
 	CN3UIBase::SetVisible(bVisible);
 
-	if (false == bVisible && true == m_bVisible)	// 보이지 않게 할때 [Korean comment]
+	if (false == bVisible && true == m_bVisible)	// 보이지 않게 할때 When making it invisible
 	{
 		KillFocus();
 	}
@@ -480,9 +480,9 @@ void CN3UIEdit::KillFocus()
 
 bool CN3UIEdit::SetFocus()
 {
-//	if (HaveFocus()) return true;		// 이미 내가 포커스를 가지고 있으면 return true;
-	if (nullptr != s_pFocusedEdit) s_pFocusedEdit->KillFocus();	// 다른 edit 가 가지고 있으면 killfocus호출
-	s_pFocusedEdit = this;				// 포커스를 가지고 있는 edit를 나로 설정
+//	if (HaveFocus()) return true;		// 이미 내가 포커스를 가지고 있으면 return true; If I already have focus, return true
+	if (nullptr != s_pFocusedEdit) s_pFocusedEdit->KillFocus();	// 다른 edit 가 가지고 있으면 killfocus호출 Call killfocus if another edit has it
+	s_pFocusedEdit = this;				// 포커스를 가지고 있는 edit를 나로 설정 Set the edit that has focus to me
 
 	SIZE size;
 	if (m_pBuffOutRef && m_pBuffOutRef->GetTextExtent("가",2,&size))
@@ -493,7 +493,7 @@ bool CN3UIEdit::SetFocus()
 
 	s_Caret.m_bVisible = TRUE;
 	s_Caret.InitFlckering();
-	CN3UIEdit::UpdateCaretPosFromEditCtrl(); // 캐럿 포지션 설정 Set
+	CN3UIEdit::UpdateCaretPosFromEditCtrl(); // 캐럿 포지션 설정 Set caret position
 
 	if(s_hWndEdit)
 	{
@@ -524,9 +524,9 @@ uint32_t CN3UIEdit::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 {
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
 	if (!m_bVisible) return dwRet;
-	if(dwFlags & UI_MOUSE_LBCLICK &&IsIn(ptCur.x, ptCur.y))	// 영역 안에서 왼쪽 버튼이 눌렸으면 Button
+	if(dwFlags & UI_MOUSE_LBCLICK &&IsIn(ptCur.x, ptCur.y))	// 영역 안에서 왼쪽 버튼이 눌렸으면 If left button is pressed within the area
 	{
-		SetFocus();	// 나에게 포커스를 준다. [Korean comment]
+		SetFocus();	// 나에게 포커스를 준다. Give focus to me
 		dwRet |= (UI_MOUSEPROC_DONESOMETHING|UI_MOUSEPROC_INREGION);
 		return dwRet;
 	}
@@ -537,11 +537,11 @@ uint32_t CN3UIEdit::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 void CN3UIEdit::SetCaretPos(uint32_t nPos)
 {
 	if (nPos > m_iMaxStrLen)
-		nPos = m_iMaxStrLen;	// 최대 길이보다 길경우 작게 세팅 [Korean comment]
+		nPos = m_iMaxStrLen;	// 최대 길이보다 길경우 작게 세팅 Set smaller if longer than maximum length
 	m_nCaretPos = nPos;
 
 	const std::string& szBuff = m_pBuffOutRef->GetString();
-	__ASSERT(szBuff.empty() || -1 == szBuff.find('\n'), "multiline edit");	// 지금은 multiline은 지원하지 않는다.
+	__ASSERT(szBuff.empty() || -1 == szBuff.find('\n'), "multiline edit");	// 지금은 multiline은 지원하지 않는다. Currently multiline is not supported
 	SIZE size = {0,0};
 	if (!szBuff.empty() && m_pBuffOutRef ) m_pBuffOutRef->GetTextExtent(szBuff, m_nCaretPos, &size) ;
 
@@ -550,7 +550,7 @@ void CN3UIEdit::SetCaretPos(uint32_t nPos)
 	s_Caret.SetPos(m_pBuffOutRef->m_ptDrawPos.x + size.cx, m_pBuffOutRef->m_ptDrawPos.y);
 }
 
-void CN3UIEdit::SetMaxString(uint32_t nMax)		// 최대 글씨 수를 정해준다 [Korean comment]
+void CN3UIEdit::SetMaxString(uint32_t nMax)		// 최대 글씨 수를 정해준다 Set maximum number of characters
 {
 	if (nMax == 0)
 	{
