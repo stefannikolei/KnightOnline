@@ -108,21 +108,21 @@ void CKnightsManager::CreateKnights(CUser* pUser, char* pBuf)
 	if (!IsAvailableName(idname))
 		goto fail_return;
 
-	// 기사단에 가입되어 있습니다
+	// 기사단에 가입되어 있습니다 [Korean comment]
 	if (pUser->m_pUserData->m_bKnights != 0)
 	{
 		ret_value = 5;
 		goto fail_return;
 	}
 
-	// 기사단은 서버 1군에서만 만들 수 있도록...
+	// 기사단은 서버 1군에서만 만들 수 있도록... [Korean comment]
 	if (m_pMain->m_nServerGroup == 2)
 	{
 		ret_value = 8;
 		goto fail_return;
 	}
 
-	// 요일 체크
+	// 요일 체크 Check
 	week = time.GetDayOfWeek();
 	/*if (week != 1
 		&& week != 6
@@ -131,28 +131,28 @@ void CKnightsManager::CreateKnights(CUser* pUser, char* pBuf)
 		goto fail_return;
 	}*/
 
-	// 20 Level 이상이 필요
+	// 20 Level 이상이 필요 [Korean comment]
 	if (pUser->m_pUserData->m_bLevel < 20)
 	{
 		ret_value = 2;
 		goto fail_return;
 	}
 
-	// 국가기여도 800 이상이 필요
+	// 국가기여도 800 이상이 필요 [Korean comment]
 	/*if (pUser->m_pUserData->m_iLoyalty < 800)
 		goto fail_return;
 
-	// 지휘스킬 10, 예절스킬 5 이상이 필요
+	// 지휘스킬 10, 예절스킬 5 이상이 필요 [Korean comment]
 	if (pUser->m_pUserData->m_bstrSkill[SKILLPT_TYPE_ORDER] < 10
 		|| pUser->m_pUserData->m_bstrSkill[SKILLPT_TYPE_MANNER] < 5)
 		goto fail_return;
 
-	// 매력 120 이상이 필요
+	// 매력 120 이상이 필요 [Korean comment]
 	if (pUser->m_pUserData->m_bCha < 120)
 		goto fail_return;
 	}*/
 
-	// 5000000노아 이상이 필요
+	// 5000000노아 이상이 필요 [Korean comment]
 	if (pUser->m_pUserData->m_iGold < 500000)
 	{
 		ret_value = 4;
@@ -161,7 +161,7 @@ void CKnightsManager::CreateKnights(CUser* pUser, char* pBuf)
 
 	knightindex = GetKnightsIndex(pUser->m_pUserData->m_bNation);
 
-	// 기사단 창설에 실패
+	// 기사단 창설에 실패 Window
 	if (knightindex == -1)
 	{
 		ret_value = 6;
@@ -217,7 +217,7 @@ int CKnightsManager::GetKnightsIndex(int nation)
 		{
 			if (nation == KARUS)
 			{
-				// sungyong,, 카루스와 전쟁존의 합침으로 인해서,,,
+				// sungyong,, 카루스와 전쟁존의 합침으로 인해서,,, [Korean comment]
 				if (pKnights->m_sIndex >= 15000)
 					continue;
 			}
@@ -240,7 +240,7 @@ int CKnightsManager::GetKnightsIndex(int nation)
 			return -1;
 	}
 
-	// 확인 사살..
+	// 확인 사살.. [Korean comment]
 	if (m_pMain->m_KnightsMap.GetData(knightindex))
 		return -1;
 
@@ -257,7 +257,7 @@ void CKnightsManager::JoinKnights(CUser* pUser, char* pBuf)
 	if (pUser == nullptr)
 		return;
 
-	// 전쟁존에서는 기사단 처리가 안됨
+	// 전쟁존에서는 기사단 처리가 안됨 Process
 	if (pUser->m_pUserData->m_bZone > 2)
 	{
 		ret_value = 12;
@@ -279,7 +279,7 @@ void CKnightsManager::JoinKnights(CUser* pUser, char* pBuf)
 		goto fail_return;
 	}
 
-	// 인원 체크
+	// 인원 체크 Check
 /*	if (pKnights->sMembers >= 24)
 	{
 		ret_value = 8;
@@ -314,7 +314,7 @@ void CKnightsManager::JoinKnights(CUser* pUser, char* pBuf)
 		goto fail_return;
 	}
 
-	// 기사단에 가입되어 있습니다
+	// 기사단에 가입되어 있습니다 [Korean comment]
 	if (pTUser->m_pUserData->m_bKnights > 0)
 	{
 		ret_value = 5;
@@ -375,7 +375,7 @@ void CKnightsManager::JoinKnightsReq(CUser* pUser, char* pBuf)
 		return;
 	}
 
-	// 거절
+	// 거절 [Korean comment]
 	if (flag == 0)
 	{
 		ret_value = 11;
@@ -395,7 +395,7 @@ void CKnightsManager::JoinKnightsReq(CUser* pUser, char* pBuf)
 		goto fail_return;
 	}
 
-	// 인원 체크
+	// 인원 체크 Check
 	/*if (pKnights->sMembers >= 24)
 	{
 		ret_value = 8;
@@ -426,7 +426,7 @@ void CKnightsManager::WithdrawKnights(CUser* pUser, char* pBuf)
 	if (pUser == nullptr)
 		return;
 
-	// 기사단에 가입되어 있지 않습니다
+	// 기사단에 가입되어 있지 않습니다 [Korean comment]
 	if (pUser->m_pUserData->m_bKnights < 1
 		|| pUser->m_pUserData->m_bKnights > 30000)
 	{
@@ -434,17 +434,17 @@ void CKnightsManager::WithdrawKnights(CUser* pUser, char* pBuf)
 		goto fail_return;
 	}
 
-	// 전쟁존에서는 기사단 처리가 안됨
+	// 전쟁존에서는 기사단 처리가 안됨 Process
 	if (pUser->m_pUserData->m_bZone > 2)
 	{
 		ret_value = 12;
 		goto fail_return;
 	}
 
-	// 단장이 탈퇴할 경우에는 클랜 파괴
+	// 단장이 탈퇴할 경우에는 클랜 파괴 [Korean comment]
 	if (pUser->m_pUserData->m_bFame == CHIEF)
 	{
-		// 전쟁존에서는 클랜을 파괴할 수 없다
+		// 전쟁존에서는 클랜을 파괴할 수 없다 [Korean comment]
 		if (pUser->m_pUserData->m_bZone > 2)
 		{
 			ret_value = 12;
@@ -517,7 +517,7 @@ void CKnightsManager::ModifyKnightsMember(CUser* pUser, char* pBuf, BYTE command
 
 	idlen = GetShort(pBuf, index);
 
-	// 잘못된 아이디
+	// 잘못된 아이디 [Korean comment]
 	if (idlen > MAX_ID_SIZE
 		|| idlen <= 0)
 	{
@@ -527,34 +527,34 @@ void CKnightsManager::ModifyKnightsMember(CUser* pUser, char* pBuf, BYTE command
 
 	GetString(userid, pBuf, idlen, index);
 
-	// 전쟁존에서는 기사단 처리가 안됨
+	// 전쟁존에서는 기사단 처리가 안됨 Process
 	if (pUser->m_pUserData->m_bZone > 2)
 	{
 		ret_value = 12;
 		goto fail_return;
 	}
 
-	// 자신은 할 수 없습니다
+	// 자신은 할 수 없습니다 [Korean comment]
 	if (_strnicmp(userid, pUser->m_pUserData->m_id, MAX_ID_SIZE) == 0)
 	{
 		ret_value = 9;
 		goto fail_return;
 	}
 
-	// 기사단, 멤버가입 및 멤버거절, 장교 이상이 할 수 있습니다
+	// 기사단, 멤버가입 및 멤버거절, 장교 이상이 할 수 있습니다 [Korean comment]
 	if (command == KNIGHTS_ADMIT
 		|| command == KNIGHTS_REJECT)
 	{
 		if (pUser->m_pUserData->m_bFame < OFFICER)
 			goto fail_return;
 	}
-	// 징계, 부기사단장 이상이 할 수 있습니다
+	// 징계, 부기사단장 이상이 할 수 있습니다 [Korean comment]
 	else if (command == KNIGHTS_PUNISH)
 	{
 		if (pUser->m_pUserData->m_bFame < VICECHIEF)
 			goto fail_return;
 	}
-	// 기사단장 만이 할 수 있습니다
+	// 기사단장 만이 할 수 있습니다 [Korean comment]
 	else
 	{
 		if (pUser->m_pUserData->m_bFame != CHIEF)
@@ -567,7 +567,7 @@ void CKnightsManager::ModifyKnightsMember(CUser* pUser, char* pBuf, BYTE command
 	pTUser = m_pMain->GetUserPtr(userid, NameType::Character);
 	if (pTUser == nullptr)
 	{
-		// 게임상에 없는 유저 추방시 (100)
+		// 게임상에 없는 유저 추방시 (100) [Korean comment]
 		if (command == KNIGHTS_REMOVE)
 		{
 			remove_flag = 0;
@@ -600,11 +600,11 @@ void CKnightsManager::ModifyKnightsMember(CUser* pUser, char* pBuf, BYTE command
 		goto fail_return;
 	}
 
-	// 부단장이 3명이 됐는지를 판단 (클랜인 경우이다,,)
-	// 부단장 임명
+	// 부단장이 3명이 됐는지를 판단 (클랜인 경우이다,,) [Korean comment]
+	// 부단장 임명 [Korean comment]
 	if (command == KNIGHTS_VICECHIEF)
 	{
-		// 이미 부단장인 경우
+		// 이미 부단장인 경우 [Korean comment]
 		if (pTUser->m_pUserData->m_bFame == VICECHIEF)
 		{
 			ret_value = 8;
@@ -627,7 +627,7 @@ void CKnightsManager::ModifyKnightsMember(CUser* pUser, char* pBuf, BYTE command
 		}	*/
 	}
 
-	remove_flag = 1;	// 게임상에 있는 유저 추방시 (1)
+	remove_flag = 1;	// 게임상에 있는 유저 추방시 (1) [Korean comment]
 	SetByte(send_buff, WIZ_KNIGHTS_PROCESS, send_index);
 	SetByte(send_buff, command + 0x10, send_index);
 	SetShort(send_buff, pUser->GetSocketID(), send_index);
@@ -663,7 +663,7 @@ void CKnightsManager::AllKnightsList(CUser* pUser, char* pBuf)
 		if (pKnights == nullptr)
 			continue;
 
-		// 기사단 리스트만 받자
+		// 기사단 리스트만 받자 [Korean comment]
 		if (pKnights->m_byFlag != KNIGHTS_TYPE)
 			continue;
 
@@ -708,7 +708,7 @@ void CKnightsManager::AllKnightsMember(CUser* pUser, char* pBuf)
 	if (pUser == nullptr)
 		return;
 
-	// 기사단에 가입되어 있지 않습니다
+	// 기사단에 가입되어 있지 않습니다 [Korean comment]
 	if (pUser->m_pUserData->m_bKnights <= 0)
 	{
 		ret_value = 2;
@@ -722,7 +722,7 @@ void CKnightsManager::AllKnightsMember(CUser* pUser, char* pBuf)
 		goto fail_return;
 	}
 
-	// 단장
+	// 단장 [Korean comment]
 /*	if (pUser->m_pUserData->m_bFame == CHIEF)
 	{
 		SetByte( send_buff, WIZ_KNIGHTS_PROCESS, send_index );
@@ -734,7 +734,7 @@ void CKnightsManager::AllKnightsMember(CUser* pUser, char* pBuf)
 		return;
 	}*/
 
-	// 직접.. 게임서버에서 유저정보를 참조해서 불러오는 방식 (단장이 아닌 모든 사람)
+	// 직접.. 게임서버에서 유저정보를 참조해서 불러오는 방식 (단장이 아닌 모든 사람) Info
 	if (pUser->m_pUserData->m_bFame == CHIEF)
 	{
 		count = m_pMain->GetKnightsAllMembers(pUser->m_pUserData->m_bKnights, temp_buff, temp_index, 1);
@@ -969,7 +969,7 @@ void CKnightsManager::RecvCreateKnights(CUser* pUser, char* pBuf)
 
 	m_pMain->m_KnightsMap.PutData(pKnights->m_sIndex, pKnights);
 
-	// 클랜정보에 추가
+	// 클랜정보에 추가 Info
 	AddKnightsUser(knightsindex, chiefname);
 
 	//TRACE(_T("RecvCreateKnights - nid=%d, name=%hs, index=%d, fame=%d, money=%d\n"), pUser->GetSocketID(), pUser->m_pUserData->m_id, knightsindex, pUser->m_pUserData->m_bFame, money);
@@ -1035,18 +1035,18 @@ void CKnightsManager::RecvJoinKnights(CUser* pUser, char* pBuf, BYTE command)
 		pUser->m_pUserData->m_bFame = TRAINEE;
 		finalstr = fmt::format_db_resource(IDS_KNIGHTS_JOIN, pUser->m_pUserData->m_id);
 
-		// 클랜정보에 추가
+		// 클랜정보에 추가 Info
 		AddKnightsUser(knightsindex, pUser->m_pUserData->m_id);
 
 		//TRACE(_T("RecvJoinKnights - 가입, nid=%d, name=%hs, index=%d, fame=%d\n"), pUser->GetSocketID(), pUser->m_pUserData->m_id, pUser->m_pUserData->m_bKnights, pUser->m_pUserData->m_bFame);
 	}
-	// 탈퇴..
+	// 탈퇴.. [Korean comment]
 	else
 	{
 		pUser->m_pUserData->m_bKnights = 0;
 		pUser->m_pUserData->m_bFame = 0;
 
-		// 클랜정보에 추가
+		// 클랜정보에 추가 Info
 		RemoveKnightsUser(knightsindex, pUser->m_pUserData->m_id);
 
 		/*if (pKnights != nullptr)
@@ -1278,7 +1278,7 @@ void CKnightsManager::RecvDestroyKnights(CUser* pUser, char* pBuf)
 
 	flag = pKnights->m_byFlag;
 
-	// 클랜이나 기사단이 파괴된 메시지를 보내고 유저 데이타를 초기화
+	// 클랜이나 기사단이 파괴된 메시지를 보내고 유저 데이타를 초기화 Initialize
 	if (flag == CLAN_TYPE)
 		finalstr = fmt::format_db_resource(IDS_CLAN_DESTORY, pKnights->m_strName);
 	else if (flag == KNIGHTS_TYPE)

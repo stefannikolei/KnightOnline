@@ -137,7 +137,7 @@ void CUser::Initialize()
 
 	memset(m_strAccountID, 0, sizeof(m_strAccountID));
 /*
-	m_iSelMsgEvent[0] = -1;		// 이밴트 관련 초기화 ^^;
+	m_iSelMsgEvent[0] = -1;		// 이밴트 관련 초기화 ^^; Initialize
 	m_iSelMsgEvent[1] = -1;
 	m_iSelMsgEvent[2] = -1;
 	m_iSelMsgEvent[3] = -1;
@@ -433,7 +433,7 @@ void CUser::Parsing(int len, char* pData)
 			ZoneConCurrentUsers(pData + index);
 			break;
 
-		// 인원체크가 끝나고 해당 서버로 가도 좋다는 허락을 받았다
+		// 인원체크가 끝나고 해당 서버로 가도 좋다는 허락을 받았다 Check
 		case WIZ_VIRTUAL_SERVER:
 			ServerChangeOk(pData + index);
 			break;
@@ -713,7 +713,7 @@ void CUser::DelCharToAgent(char* pBuf)
 	// ~sungyong tw
 	GetString(socno, pBuf, soclen, index);
 
-	// 단장은 캐릭 삭제가 안되게, 먼저 클랜을 탈퇴 후 삭제가 되도록,,
+	// 단장은 캐릭 삭제가 안되게, 먼저 클랜을 탈퇴 후 삭제가 되도록,, Delete
 	if (m_pUserData->m_bKnights > 0
 		&& m_pUserData->m_bFame == CHIEF)
 		goto fail_return;
@@ -817,7 +817,7 @@ void CUser::SelCharToAgent(char* pBuf)
 			goto fail_return;
 		}
 
-		strcpy(m_strAccountID, accountId);	// 존이동 한 경우는 로그인 프로시져가 없으므로...
+		strcpy(m_strAccountID, accountId);	// 존이동 한 경우는 로그인 프로시져가 없으므로... Move
 	}
 
 	pUser = m_pMain->GetUserPtr(charId, NameType::Character);
@@ -828,7 +828,7 @@ void CUser::SelCharToAgent(char* pBuf)
 		goto fail_return;
 	}
 
-	// 음냥,, 여기서 존을 비교,,,
+	// 음냥,, 여기서 존을 비교,,, [Korean comment]
 	if (zoneId <= 0)
 	{
 		spdlog::error("User::SelCharToAgent: invalid zoneId={}", zoneId);
@@ -949,7 +949,7 @@ void CUser::SelectCharacter(char* pBuf)
 		return;
 	}
 
-	// 전쟁중이 아닌상태에서는 대장유저가->일반단장으로
+	// 전쟁중이 아닌상태에서는 대장유저가->일반단장으로 Status
 	if (m_pMain->m_byBattleOpen == NO_BATTLE
 		&& m_pUserData->m_bFame == COMMAND_CAPTAIN)
 		m_pUserData->m_bFame = CHIEF;
@@ -998,18 +998,18 @@ void CUser::SelectCharacter(char* pBuf)
 	SetByte(send_buff, m_pMain->m_byOldVictory, send_index);
 	Send(send_buff, send_index);
 
-	SetDetailData();	// 디비에 없는 데이터 셋팅...
+	SetDetailData();	// 디비에 없는 데이터 셋팅... Data
 
 	//TRACE(_T("SelectCharacter 111 - id=%hs, knights=%d, fame=%d\n"), m_pUserData->m_id, m_pUserData->m_bKnights, m_pUserData->m_bFame);
 
-	// sungyong ,, zone server : 카루스와 전쟁존을 합치므로 인해서,,
-	// 전쟁존일때 ... 
+	// sungyong ,, zone server : 카루스와 전쟁존을 합치므로 인해서,, [Korean comment]
+	// 전쟁존일때 ...  [Korean comment]
 	if (m_pUserData->m_bZone > 2)
 	{
-		// 나의 기사단 리스트에서 내가 기사단 정보에 있는지를 검색해서 만약 없으면 
-		// 추가한다(다른존에서 기사단에 가입된 경우)
+		// 나의 기사단 리스트에서 내가 기사단 정보에 있는지를 검색해서 만약 없으면  Info
+		// 추가한다(다른존에서 기사단에 가입된 경우) Add
 
-		// 추방된 유저
+		// 추방된 유저 [Korean comment]
 		if (m_pUserData->m_bKnights == -1)
 		{
 			m_pUserData->m_bKnights = 0;
@@ -1064,10 +1064,10 @@ void CUser::SelectCharacter(char* pBuf)
 	}
 	else
 	{
-		// 나의 기사단 리스트에서 내가 기사단 정보에 있는지를 검색해서 만약 없으면 
-		// 추가한다(다른존에서 기사단에 가입된 경우)
+		// 나의 기사단 리스트에서 내가 기사단 정보에 있는지를 검색해서 만약 없으면  Info
+		// 추가한다(다른존에서 기사단에 가입된 경우) Add
 
-		// 추방된 유저
+		// 추방된 유저 [Korean comment]
 		if (m_pUserData->m_bKnights == -1)
 		{
 			m_pUserData->m_bKnights = 0;
@@ -1083,7 +1083,7 @@ void CUser::SelectCharacter(char* pBuf)
 			{
 				m_pMain->m_KnightsManager.SetKnightsUser(m_pUserData->m_bKnights, m_pUserData->m_id);
 			}
-			// 기사단이 파괴되어 있음으로..
+			// 기사단이 파괴되어 있음으로.. [Korean comment]
 			else
 			{
 				m_pUserData->m_bKnights = 0;
@@ -1206,7 +1206,7 @@ void CUser::LogOut()
 		return;
 	}
 
-	// 이미 유저가 빠진 경우.. 
+	// 이미 유저가 빠진 경우..  [Korean comment]
 	if (strlen(m_pUserData->m_id) == 0)
 		return;
 
@@ -1295,7 +1295,7 @@ void CUser::MoveProcess(char* pBuf)
 
 //	real_y = pMap->GetHeight(	real_x, real_y, real_z );
 
-//	if( speed > 60 ) {	// client 에서 이수치보다 크게 보낼때가 많음...
+//	if( speed > 60 ) {	// client 에서 이수치보다 크게 보낼때가 많음... [Korean comment]
 //		if( m_bSpeedAmount == 100 )
 //			speed = 0;
 //	}
@@ -1313,17 +1313,17 @@ void CUser::MoveProcess(char* pBuf)
 
 	if (speed != 0)
 	{
-		m_pUserData->m_curx = m_fWill_x;	// 가지고 있던 다음좌표를 현재좌표로 셋팅...
+		m_pUserData->m_curx = m_fWill_x;	// 가지고 있던 다음좌표를 현재좌표로 셋팅... [Korean comment]
 		m_pUserData->m_curz = m_fWill_z;
 		m_pUserData->m_cury = m_fWill_y;
 
-		m_fWill_x = will_x / 10.0f;	// 다음좌표를 기억....
+		m_fWill_x = will_x / 10.0f;	// 다음좌표를 기억.... [Korean comment]
 		m_fWill_z = will_z / 10.0f;
 		m_fWill_y = will_y / 10.0f;
 	}
 	else
 	{
-		m_pUserData->m_curx = m_fWill_x = will_x / 10.0f;	// 다음좌표 == 현재 좌표...
+		m_pUserData->m_curx = m_fWill_x = will_x / 10.0f;	// 다음좌표 == 현재 좌표... [Korean comment]
 		m_pUserData->m_curz = m_fWill_z = will_z / 10.0f;
 		m_pUserData->m_cury = m_fWill_y = will_y / 10.0f;
 	}
@@ -1378,7 +1378,7 @@ void CUser::UserInOut(BYTE Type)
 	{
 		m_pMain->Send_Region(send_buff, send_index, (int) m_pUserData->m_bZone, m_RegionX, m_RegionZ, this);
 
-		// AI Server쪽으로 정보 전송..
+		// AI Server쪽으로 정보 전송.. Info
 		memset(send_buff, 0, sizeof(send_buff));
 		send_index = 0;
 		SetByte(send_buff, AG_USER_INOUT, send_index);
@@ -1397,8 +1397,8 @@ void CUser::UserInOut(BYTE Type)
 //	TRACE(_T("USERINOUT - %d, %hs\n"), m_Sid, m_pUserData->m_id);
 	m_pMain->Send_Region(send_buff, send_index, (int) m_pUserData->m_bZone, m_RegionX, m_RegionZ, this);
 
-	// AI Server쪽으로 정보 전송..
-	// 이거 않되도 너무 미워하지 마세요 ㅜ.ㅜ
+	// AI Server쪽으로 정보 전송.. Info
+	// 이거 않되도 너무 미워하지 마세요 ㅜ.ㅜ [Korean comment]
 	if (m_bAbnormalType != ABNORMAL_BLINKING)
 	{
 		send_index = 0;
@@ -1446,7 +1446,7 @@ void CUser::Attack(char* pBuf)
 	result = GetByte(pBuf, index);
 //	sid = GetShort(pBuf, index);
 	tid = GetShort(pBuf, index);
-// 비러머글 해킹툴 유저 --;
+// 비러머글 해킹툴 유저 --; [Korean comment]
 	delaytime = GetShort(pBuf, index);
 	distance = GetShort(pBuf, index);
 //
@@ -1478,7 +1478,7 @@ void CUser::Attack(char* pBuf)
 		return;
 	}
 
-// 비러머글 해킹툴 유저 --;
+// 비러머글 해킹툴 유저 --; [Korean comment]
 	// This checks if such an item exists.
 	pTable = m_pMain->m_ItemTableMap.GetData(m_pUserData->m_sItemArray[RIGHTHAND].nNum);
 	if (pTable == nullptr
@@ -1519,7 +1519,7 @@ void CUser::Attack(char* pBuf)
 		}
 		else
 		{
-// 비러머글 해킹툴 유저 --;
+// 비러머글 해킹툴 유저 --; [Korean comment]
 			// Check if the user is holding a weapon!!! No null pointers allowed!!!
 			if (pTable != nullptr)
 			{
@@ -1531,7 +1531,7 @@ void CUser::Attack(char* pBuf)
 //
 			damage = GetDamage(tid, 0);
 
-			// 눈싸움전쟁존에서 눈싸움중이라면 공격은 눈을 던지는 것만 가능하도록,,,
+			// 눈싸움전쟁존에서 눈싸움중이라면 공격은 눈을 던지는 것만 가능하도록,,, [Korean comment]
 			if (m_pUserData->m_bZone == ZONE_SNOW_BATTLE
 				&& m_pMain->m_byBattleOpen == SNOW_BATTLE)
 				damage = 0;
@@ -1569,7 +1569,7 @@ void CUser::Attack(char* pBuf)
 					memset(send_buff, 0, sizeof(send_buff));
 					send_index = 0;
 
-					// 지휘권한이 있는 유저가 죽는다면,, 지휘 권한 박탈
+					// 지휘권한이 있는 유저가 죽는다면,, 지휘 권한 박탈 [Korean comment]
 					if (pTUser->m_pUserData->m_bFame == COMMAND_CAPTAIN)
 					{
 						pTUser->m_pUserData->m_bFame = CHIEF;
@@ -1608,18 +1608,18 @@ void CUser::Attack(char* pBuf)
 	// NPC
 	else if (tid >= NPC_BAND)
 	{
-		// 포인터 참조하면 안됨
+		// 포인터 참조하면 안됨 [Korean comment]
 		if (!m_pMain->m_bPointCheckFlag)
 			return;
 
 		pNpc = m_pMain->m_NpcMap.GetData(tid);
 
-		// Npc 상태 체크..
+		// Npc 상태 체크.. Check
 		if (pNpc != nullptr
 			&& pNpc->m_NpcState != NPC_DEAD
 			&& pNpc->m_iHP > 0)
 		{
-// 비러머글 해킹툴 유저 --;
+// 비러머글 해킹툴 유저 --; [Korean comment]
 			// Check if the user is holding a weapon!!! No null pointers allowed!!!
 			if (pTable != nullptr)
 			{
@@ -1639,8 +1639,8 @@ void CUser::Attack(char* pBuf)
 //			SetShort( send_buff, sid, send_index );
 			SetShort(send_buff, m_Sid, send_index);
 			SetShort(send_buff, tid, send_index);
-			SetShort(send_buff, m_sTotalHit * m_bAttackAmount / 100, send_index);   // 표시
-			SetShort(send_buff, m_sTotalAc + m_sACAmount, send_index);   // 표시
+			SetShort(send_buff, m_sTotalHit * m_bAttackAmount / 100, send_index);   // 표시 [Korean comment]
+			SetShort(send_buff, m_sTotalAc + m_sACAmount, send_index);   // 표시 [Korean comment]
 			Setfloat(send_buff, m_sTotalHitrate, send_index);
 			Setfloat(send_buff, m_sTotalEvasionrate, send_index);
 			SetShort(send_buff, m_sItemAc, send_index);
@@ -1648,7 +1648,7 @@ void CUser::Attack(char* pBuf)
 			SetByte(send_buff, m_bMagicTypeRightHand, send_index);
 			SetShort(send_buff, m_sMagicAmountLeftHand, send_index);
 			SetShort(send_buff, m_sMagicAmountRightHand, send_index);
-			m_pMain->Send_AIServer(m_pUserData->m_bZone, send_buff, send_index);	// AI Server쪽으로 정보 전송..
+			m_pMain->Send_AIServer(m_pUserData->m_bZone, send_buff, send_index);	// AI Server쪽으로 정보 전송.. Info
 			return;
 		}
 	}
@@ -1667,7 +1667,7 @@ void CUser::Attack(char* pBuf)
 	{
 		if (result == 0x02)
 		{
-			// 유저에게는 바로 데드 패킷을 날림... (한 번 더 보냄, 유령을 없애기 위해서)
+			// 유저에게는 바로 데드 패킷을 날림... (한 번 더 보냄, 유령을 없애기 위해서) [Korean comment]
 			if (pTUser != nullptr)
 			{
 				pTUser->Send(send_buff, send_index);
@@ -1820,7 +1820,7 @@ void CUser::SendMyInfo(int type)
 	SetByte(send_buff, static_cast<BYTE>(m_sItemCham), send_index);
 	SetShort(send_buff, m_sTotalHit, send_index);
 	SetShort(send_buff, m_sTotalAc, send_index);
-//	SetShort( send_buff, m_sBodyAc+m_sItemAc, send_index );		<- 누가 이렇게 해봤어? --;	
+//	SetShort( send_buff, m_sBodyAc+m_sItemAc, send_index );		<- 누가 이렇게 해봤어? --;	 [Korean comment]
 	SetByte(send_buff, m_bFireR, send_index);
 	SetByte(send_buff, m_bColdR, send_index);
 	SetByte(send_buff, m_bLightningR, send_index);
@@ -1828,7 +1828,7 @@ void CUser::SendMyInfo(int type)
 	SetByte(send_buff, m_bDiseaseR, send_index);
 	SetByte(send_buff, m_bPoisonR, send_index);
 	SetDWORD(send_buff, m_pUserData->m_iGold, send_index);
-// 이거 나중에 꼭 주석해 --;
+// 이거 나중에 꼭 주석해 --; [Korean comment]
 	SetByte(send_buff, m_pUserData->m_bAuthority, send_index);
 //
 
@@ -1864,7 +1864,7 @@ void CUser::SendMyInfo(int type)
 
 	Send(send_buff, send_index);
 
-	// AI Server쪽으로 정보 전송..
+	// AI Server쪽으로 정보 전송.. Info
 	int ai_send_index = 0;
 	char ai_send_buff[256] = {};
 
@@ -1877,8 +1877,8 @@ void CUser::SendMyInfo(int type)
 	SetByte(ai_send_buff, m_pUserData->m_bLevel, ai_send_index);
 	SetShort(ai_send_buff, m_pUserData->m_sHp, ai_send_index);
 	SetShort(ai_send_buff, m_pUserData->m_sMp, ai_send_index);
-	SetShort(ai_send_buff, m_sTotalHit * m_bAttackAmount / 100, ai_send_index);  // 표시
-	SetShort(ai_send_buff, m_sTotalAc + m_sACAmount, ai_send_index);  // 표시
+	SetShort(ai_send_buff, m_sTotalHit * m_bAttackAmount / 100, ai_send_index);  // 표시 [Korean comment]
+	SetShort(ai_send_buff, m_sTotalAc + m_sACAmount, ai_send_index);  // 표시 [Korean comment]
 	Setfloat(ai_send_buff, m_sTotalHitrate, ai_send_index);
 	Setfloat(ai_send_buff, m_sTotalEvasionrate, ai_send_index);
 
@@ -1986,7 +1986,7 @@ void CUser::Chat(char* pBuf)
 			break;
 
 		case COMMAND_CHAT:
-			if (m_pUserData->m_bFame == COMMAND_CAPTAIN)		// 지휘권자만 채팅이 되도록
+			if (m_pUserData->m_bFame == COMMAND_CAPTAIN)		// 지휘권자만 채팅이 되도록 [Korean comment]
 				m_pMain->Send_CommandChat(send_buff, send_index, m_pUserData->m_bNation, this);
 			break;
 
@@ -2058,7 +2058,7 @@ void CUser::SetMaxMp()
 		m_iMaxMp = (short) ((p_TableCoefficient->ManaPoint * m_pUserData->m_bLevel * m_pUserData->m_bLevel * temp_intel)
 				  + (0.1f * m_pUserData->m_bLevel * 2 * temp_intel) + (temp_intel / 5));
 		m_iMaxMp += m_sItemMaxMp;
-		m_iMaxMp += 20;		 // 성래씨 요청
+		m_iMaxMp += 20;		 // 성래씨 요청 [Korean comment]
 	}
 	else if (p_TableCoefficient->Sp != 0)
 	{
@@ -2077,7 +2077,7 @@ void CUser::SetMaxMp()
 // 너무 개판이라 나중에 반드시 수정해야 할 함수....  This function is too messy and must be fixed later....
 void CUser::Regene(char* pBuf, int magicid)
 {
-//	Corpse();		// Get rid of the corpse ~ 또 사고칠뻔 했자나 이 바보야!!!
+//	Corpse();		// Get rid of the corpse ~ 또 사고칠뻔 했자나 이 바보야!!! [Korean comment]
 
 	InitType3();
 	InitType4();
@@ -2166,7 +2166,7 @@ void CUser::Regene(char* pBuf, int magicid)
 */
 				x = pHomeInfo->BattleZoneX + myrand(0, pHomeInfo->BattleZoneLX);
 				z = pHomeInfo->BattleZoneZ + myrand(0, pHomeInfo->BattleZoneLZ);
-// 비러머글 개척존 바꾸어치기 >.<
+// 비러머글 개척존 바꾸어치기 >.< [Korean comment]
 				if (m_pUserData->m_bZone == ZONE_SNOW_BATTLE)
 				{
 					x = pHomeInfo->FreeZoneX + myrand(0, pHomeInfo->FreeZoneLX);
@@ -2174,7 +2174,7 @@ void CUser::Regene(char* pBuf, int magicid)
 				}
 //
 			}
-// 비러머글 뉴존 >.<
+// 비러머글 뉴존 >.< [Korean comment]
 			else if (m_pUserData->m_bZone > 10 && m_pUserData->m_bZone < 20)
 			{
 				x = 527 + myrand(0, 10);
@@ -2260,7 +2260,7 @@ void CUser::Regene(char* pBuf, int magicid)
 		m_bRegeneType = REGENE_NORMAL;
 	}
 
-//	비러머글 클랜 소환!!! //	Bilge clan summon!!!
+//	비러머글 클랜 소환!!! //	Bilge clan summon!!! [Korean comment]
 	m_fLastRegeneTime = TimeGet();
 //
 	m_sWhoKilledMe = -1;
@@ -2372,7 +2372,7 @@ void CUser::ZoneChange(int zone, float x, float z)
 	{
 		if (m_pUserData->m_bZone == BATTLE_ZONE)
 		{
-			// 상대방 국가로 못넘어 가게..
+			// 상대방 국가로 못넘어 가게.. [Korean comment]
 			if (pMap->m_bType == 1
 				&& m_pUserData->m_bNation != zone)
 			{
@@ -2393,7 +2393,7 @@ void CUser::ZoneChange(int zone, float x, float z)
 				}
 			}
 		}
-		// 상대방 국가로 못넘어 가게..
+		// 상대방 국가로 못넘어 가게.. [Korean comment]
 		else if (pMap->m_bType == 1
 			&& m_pUserData->m_bNation != zone)
 		{
@@ -2404,7 +2404,7 @@ void CUser::ZoneChange(int zone, float x, float z)
 		else if (pMap->m_bType == 2
 			&& zone == ZONE_FRONTIER)
 		{
-			// 비러머글 마을 도착 공지....
+			// 비러머글 마을 도착 공지.... [Korean comment]
 			int temp_index = 0;
 			char temp_buff[128] = {};
 
@@ -2420,7 +2420,7 @@ void CUser::ZoneChange(int zone, float x, float z)
 	// Snow Battle zone open
 	else if (m_pMain->m_byBattleOpen == SNOW_BATTLE)
 	{
-		// 상대방 국가로 못넘어 가게..
+		// 상대방 국가로 못넘어 가게.. [Korean comment]
 		if (pMap->m_bType == 1
 			&& m_pUserData->m_bNation != zone)
 			return;
@@ -2433,7 +2433,7 @@ void CUser::ZoneChange(int zone, float x, float z)
 	// Battle zone close
 	else
 	{
-		// 상대방 국가로 못넘어 가게..
+		// 상대방 국가로 못넘어 가게.. [Korean comment]
 		if (pMap->m_bType == 1)
 		{
 			if (m_pUserData->m_bNation != zone
@@ -2468,7 +2468,7 @@ void CUser::ZoneChange(int zone, float x, float z)
 		SetMaxHp();
 	}
 
-	PartyRemove(m_Sid);	// 파티에서 탈퇴되도록 처리
+	PartyRemove(m_Sid);	// 파티에서 탈퇴되도록 처리 Process
 
 	//TRACE(_T("ZoneChange ,,, id=%hs, nation=%d, zone=%d, x=%.2f, z=%.2f\n"), m_pUserData->m_id, m_pUserData->m_bNation, zone, x, z);
 
@@ -2490,7 +2490,7 @@ void CUser::ZoneChange(int zone, float x, float z)
 		SetShort(send_buff, strlen(pInfo->strServerIP), send_index);
 		SetString(send_buff, pInfo->strServerIP, strlen(pInfo->strServerIP), send_index);
 		SetShort(send_buff, pInfo->sPort, send_index);
-		SetByte(send_buff, 0x02, send_index);				// 중간에 서버가 바뀌는 경우...
+		SetByte(send_buff, 0x02, send_index);				// 중간에 서버가 바뀌는 경우... [Korean comment]
 		SetByte(send_buff, m_pUserData->m_bZone, send_index);
 		SetByte(send_buff, m_pMain->m_byOldVictory, send_index);
 		Send(send_buff, send_index);
@@ -2512,7 +2512,7 @@ void CUser::ZoneChange(int zone, float x, float z)
 	SetByte(send_buff, m_pMain->m_byOldVictory, send_index);
 	Send(send_buff, send_index);
 
-	// 비러머글 순간이동 >.<
+	// 비러머글 순간이동 >.< Move
 	if (!m_bZoneChangeSameZone)
 	{
 		m_sWhoKilledMe = -1;
@@ -2626,7 +2626,7 @@ void CUser::SetDetailData()
 
 	m_iZoneIndex = m_pMain->GetZoneIndex(m_pUserData->m_bZone);
 
-	// 이 서버에 없는 존....
+	// 이 서버에 없는 존.... [Korean comment]
 	if (m_iZoneIndex == -1)
 		Close();
 
@@ -2662,10 +2662,10 @@ void CUser::RegisterRegion()
 
 		if (m_State == STATE_GAMESTART)
 		{
-			// delete user 는 계산 방향이 진행방향의 반대...
+			// delete user 는 계산 방향이 진행방향의 반대... Calculate
 			RemoveRegion(old_region_x - m_RegionX, old_region_z - m_RegionZ);
 
-			// add user 는 계산 방향이 진행방향...
+			// add user 는 계산 방향이 진행방향... Calculate
 			InsertRegion(m_RegionX - old_region_x, m_RegionZ - old_region_z);
 
 			m_pMain->RegionNpcInfoForMe(this);
@@ -2690,7 +2690,7 @@ void CUser::RemoveRegion(int del_x, int del_z)
 	SetByte(send_buff, USER_OUT, send_index);
 	SetShort(send_buff, m_Sid, send_index);
 
-	// x 축으로 이동되었을때...
+	// x 축으로 이동되었을때... Move
 	if (del_x != 0)
 	{
 		m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x * 2, m_RegionZ + del_z - 1);
@@ -2700,12 +2700,12 @@ void CUser::RemoveRegion(int del_x, int del_z)
 		// TRACE(_T("Remove : (%d %d), (%d %d), (%d %d)\n"), m_RegionX+del_x*2, m_RegionZ+del_z-1, m_RegionX+del_x*2, m_RegionZ+del_z, m_RegionX+del_x*2, m_RegionZ+del_z+1 );
 	}
 
-	// z 축으로 이동되었을때...
+	// z 축으로 이동되었을때... Move
 	if (del_z != 0)
 	{
 		m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x, m_RegionZ + del_z * 2);
 
-		// x, z 축 둘다 이동되었을때 겹치는 부분 한번만 보낸다..
+		// x, z 축 둘다 이동되었을때 겹치는 부분 한번만 보낸다.. Move
 		if (del_x < 0)
 		{
 			m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x + 1, m_RegionZ + del_z * 2);
@@ -2738,7 +2738,7 @@ void CUser::InsertRegion(int del_x, int del_z)
 	SetShort(send_buff, m_Sid, send_index);
 	GetUserInfo(send_buff, send_index);
 
-	// x 축으로 이동되었을때...
+	// x 축으로 이동되었을때... Move
 	if (del_x != 0)
 	{
 		m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + del_x, m_RegionZ - 1);
@@ -2748,12 +2748,12 @@ void CUser::InsertRegion(int del_x, int del_z)
 		// TRACE(_T("Insert : (%d %d), (%d %d), (%d %d)\n"), m_RegionX+del_x, m_RegionZ-1, m_RegionX+del_x, m_RegionZ, m_RegionX+del_x, m_RegionZ+1 );
 	}
 
-	// z 축으로 이동되었을때...
+	// z 축으로 이동되었을때... Move
 	if (del_z != 0)
 	{
 		m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX, m_RegionZ + del_z);
 		
-		// x, z 축 둘다 이동되었을때 겹치는 부분 한번만 보낸다..
+		// x, z 축 둘다 이동되었을때 겹치는 부분 한번만 보낸다.. Move
 		if (del_x < 0)
 		{
 			m_pMain->Send_UnitRegion(pMap, send_buff, send_index, m_RegionX + 1, m_RegionZ + del_z);
@@ -2812,7 +2812,7 @@ void CUser::RequestUserIn(char* pBuf)
 
 void CUser::RequestNpcIn(char* pBuf)
 {
-	// 포인터 참조하면 안됨
+	// 포인터 참조하면 안됨 [Korean comment]
 	if (!m_pMain->m_bPointCheckFlag)
 		return;
 
@@ -2835,7 +2835,7 @@ void CUser::RequestNpcIn(char* pBuf)
 		if (pNpc == nullptr)
 			continue;
 
-		// 음냥,,
+		// 음냥,, [Korean comment]
 		// if (pNpc->m_NpcState != NPC_LIVE)
 		//	continue;
 
@@ -2972,7 +2972,7 @@ BYTE CUser::GetHitRate(float rate)
 	return result;
 }
 
-// 착용한 아이템의 값(타격률, 회피율, 데미지)을 구한다.
+// 착용한 아이템의 값(타격률, 회피율, 데미지)을 구한다. [Korean comment]
 void CUser::SetSlotItemValue()
 {
 	model::Item* pTable = nullptr;
@@ -3016,7 +3016,7 @@ void CUser::SetSlotItemValue()
 		{
 			if ((m_pUserData->m_sClass == BERSERKER
 				|| m_pUserData->m_sClass == BLADE))
-	//			m_sItemHit += item_hit * (double) (m_pUserData->m_bstrSkill[PRO_SKILL1] / 60.0);    // 성래씨 요청 ^^;
+	//			m_sItemHit += item_hit * (double) (m_pUserData->m_bstrSkill[PRO_SKILL1] / 60.0);    // 성래씨 요청 ^^; [Korean comment]
 				m_sItemHit += item_hit * 0.5f;
 		}
 
@@ -3200,8 +3200,8 @@ short CUser::GetDamage(short tid, int magicid)
 		|| pTUser->m_bResHpType == USER_DEAD)
 		return -1;
 
-	temp_ac = pTUser->m_sTotalAc + pTUser->m_sACAmount;    // 표시   
-	temp_hit_B = (m_sTotalHit * m_bAttackAmount * 200 / 100) / (temp_ac + 240);   // 표시
+	temp_ac = pTUser->m_sTotalAc + pTUser->m_sACAmount;    // 표시    [Korean comment]
+	temp_hit_B = (m_sTotalHit * m_bAttackAmount * 200 / 100) / (temp_ac + 240);   // 표시 [Korean comment]
 
 	// Skill/Arrow hit.    
 	if (magicid > 0)
@@ -3260,7 +3260,7 @@ short CUser::GetDamage(short tid, int magicid)
 
 			if (pType2->HitType == 1
 				/*|| pType2->HitType == 2*/)
-				temp_hit = m_sTotalHit * m_bAttackAmount * (pType2->DamageMod / 100.0f) / 100;   // 표시
+				temp_hit = m_sTotalHit * m_bAttackAmount * (pType2->DamageMod / 100.0f) / 100;   // 표시 [Korean comment]
 			else
 				temp_hit = temp_hit_B * (pType2->DamageMod / 100.0f);
 		}
@@ -3268,7 +3268,7 @@ short CUser::GetDamage(short tid, int magicid)
 	// Normal Hit.
 	else
 	{
-		temp_hit = m_sTotalHit * m_bAttackAmount / 100;	// 표시
+		temp_hit = m_sTotalHit * m_bAttackAmount / 100;	// 표시 [Korean comment]
 		result = GetHitRate(m_sTotalHitrate / pTUser->m_sTotalEvasionrate);
 	}
 
@@ -3303,8 +3303,8 @@ short CUser::GetDamage(short tid, int magicid)
 
 	damage = GetMagicDamage(damage, tid);	// 2. Magical item damage....	
 	damage = GetACDamage(damage, tid);		// 3. Additional AC calculation....	
-//	damage = damage / 2;	// 성래씨 추가 요청!!!!
-	damage = damage / 3;	// 성래씨 추가 요청!!!!  
+//	damage = damage / 2;	// 성래씨 추가 요청!!!! Add
+	damage = damage / 3;	// 성래씨 추가 요청!!!!   Add
 
 	return damage;
 }
@@ -3822,8 +3822,8 @@ void CUser::Send2AI_UserUpdateInfo()
 	SetByte(send_buff, m_pUserData->m_bLevel, send_index);
 	SetShort(send_buff, m_pUserData->m_sHp, send_index);
 	SetShort(send_buff, m_pUserData->m_sMp, send_index);
-	SetShort(send_buff, m_sTotalHit * m_bAttackAmount / 100, send_index); // 표시
-	SetShort(send_buff, m_sTotalAc + m_sACAmount, send_index);  // 표시
+	SetShort(send_buff, m_sTotalHit * m_bAttackAmount / 100, send_index); // 표시 [Korean comment]
+	SetShort(send_buff, m_sTotalAc + m_sACAmount, send_index);  // 표시 [Korean comment]
 	Setfloat(send_buff, m_sTotalHitrate, send_index);
 	Setfloat(send_buff, m_sTotalEvasionrate, send_index);
 
@@ -3854,7 +3854,7 @@ void CUser::SetUserAbility()
 		pItem = m_pMain->m_ItemTableMap.GetData(m_pUserData->m_sItemArray[RIGHTHAND].nNum);
 		if (pItem != nullptr)
 		{
-			// 무기 타입....
+			// 무기 타입.... Type
 			switch (pItem->Kind / 10)
 			{
 				case WEAPON_DAGGER:
@@ -3894,11 +3894,11 @@ void CUser::SetUserAbility()
 	if (m_pUserData->m_sItemArray[LEFTHAND].nNum != 0
 		&& hitcoefficient == 0.0f)
 	{
-		// 왼손 무기 : 활 적용을 위해
+		// 왼손 무기 : 활 적용을 위해 [Korean comment]
 		pItem = m_pMain->m_ItemTableMap.GetData(m_pUserData->m_sItemArray[LEFTHAND].nNum);
 		if (pItem != nullptr)
 		{
-			// 무기 타입....
+			// 무기 타입.... Type
 			switch (pItem->Kind / 10)
 			{
 				case WEAPON_BOW:
@@ -4015,7 +4015,7 @@ void CUser::ItemMove(char* pBuf)
 			if (!IsValidSlotPos(pTable, destpos))
 				goto fail_return;
 			
-			// 오른손전용 무기(또는 양손쓸수 있고 장착하려는 위치가 오른손) 인데 다른손에 두손쓰는 경우 체크
+			// 오른손전용 무기(또는 양손쓸수 있고 장착하려는 위치가 오른손) 인데 다른손에 두손쓰는 경우 체크 Check
 			if (pTable->Slot == 0x01
 				|| (pTable->Slot == 0x00 && destpos == RIGHTHAND))
 			{
@@ -4026,7 +4026,7 @@ void CUser::ItemMove(char* pBuf)
 					{
 						if (pTable2->Slot == 0x04)
 						{
-							// 오른손에 넣구..
+							// 오른손에 넣구.. [Korean comment]
 							m_pUserData->m_sItemArray[RIGHTHAND].nNum = m_pUserData->m_sItemArray[SLOT_MAX + srcpos].nNum;
 							m_pUserData->m_sItemArray[RIGHTHAND].sDuration = m_pUserData->m_sItemArray[SLOT_MAX + srcpos].sDuration;
 							m_pUserData->m_sItemArray[RIGHTHAND].sCount = m_pUserData->m_sItemArray[SLOT_MAX + srcpos].sCount;
@@ -4035,7 +4035,7 @@ void CUser::ItemMove(char* pBuf)
 							if (m_pUserData->m_sItemArray[RIGHTHAND].nSerialNum == 0)
 								m_pUserData->m_sItemArray[RIGHTHAND].nSerialNum = m_pMain->GenerateItemSerial();
 
-							// 왼손무기를 인벤으로 넣어준다.
+							// 왼손무기를 인벤으로 넣어준다. [Korean comment]
 							m_pUserData->m_sItemArray[SLOT_MAX + srcpos].nNum = m_pUserData->m_sItemArray[LEFTHAND].nNum;
 							m_pUserData->m_sItemArray[SLOT_MAX + srcpos].sDuration = m_pUserData->m_sItemArray[LEFTHAND].sDuration;
 							m_pUserData->m_sItemArray[SLOT_MAX + srcpos].sCount = m_pUserData->m_sItemArray[LEFTHAND].sCount;
@@ -4044,7 +4044,7 @@ void CUser::ItemMove(char* pBuf)
 							if (m_pUserData->m_sItemArray[SLOT_MAX + srcpos].nSerialNum == 0)
 								m_pUserData->m_sItemArray[SLOT_MAX + srcpos].nSerialNum = m_pMain->GenerateItemSerial();
 
-							// 왼손은 비어있게 되지...
+							// 왼손은 비어있게 되지... [Korean comment]
 							m_pUserData->m_sItemArray[LEFTHAND].nNum = 0;
 							m_pUserData->m_sItemArray[LEFTHAND].sDuration = 0;
 							m_pUserData->m_sItemArray[LEFTHAND].sCount = 0;
@@ -4099,7 +4099,7 @@ void CUser::ItemMove(char* pBuf)
 						m_pUserData->m_sItemArray[destpos].nSerialNum = m_pMain->GenerateItemSerial();
 				}
 			}
-			// 왼손전용 무기(또는 양손쓸수 있고 장착하려는 위치가 왼손) 인데 다른손에 두손쓰는 경우 체크
+			// 왼손전용 무기(또는 양손쓸수 있고 장착하려는 위치가 왼손) 인데 다른손에 두손쓰는 경우 체크 Check
 			else if (pTable->Slot == 0x02
 				|| (pTable->Slot == 0x00 && destpos == LEFTHAND))
 			{
@@ -4118,7 +4118,7 @@ void CUser::ItemMove(char* pBuf)
 							if (m_pUserData->m_sItemArray[LEFTHAND].nSerialNum == 0)
 								m_pUserData->m_sItemArray[LEFTHAND].nSerialNum = m_pMain->GenerateItemSerial();
 
-							// 오른손무기를 인벤으로 넣어준다.
+							// 오른손무기를 인벤으로 넣어준다. [Korean comment]
 							m_pUserData->m_sItemArray[SLOT_MAX + srcpos].nNum = m_pUserData->m_sItemArray[RIGHTHAND].nNum;
 							m_pUserData->m_sItemArray[SLOT_MAX + srcpos].sDuration = m_pUserData->m_sItemArray[RIGHTHAND].sDuration;
 							m_pUserData->m_sItemArray[SLOT_MAX + srcpos].sCount = m_pUserData->m_sItemArray[RIGHTHAND].sCount;
@@ -4181,7 +4181,7 @@ void CUser::ItemMove(char* pBuf)
 						m_pUserData->m_sItemArray[destpos].nSerialNum = m_pMain->GenerateItemSerial();
 				}
 			}
-			// 두손 사용하고 오른손 무기
+			// 두손 사용하고 오른손 무기 [Korean comment]
 			else if (pTable->Slot == 0x03)
 			{
 				if (m_pUserData->m_sItemArray[LEFTHAND].nNum != 0
@@ -4235,7 +4235,7 @@ void CUser::ItemMove(char* pBuf)
 						m_pUserData->m_sItemArray[destpos].nSerialNum = m_pMain->GenerateItemSerial();
 				}
 			}
-			// 두손 사용하고 왼손 무기
+			// 두손 사용하고 왼손 무기 [Korean comment]
 			else if (pTable->Slot == 0x04)
 			{
 				if (m_pUserData->m_sItemArray[LEFTHAND].nNum != 0
@@ -4432,14 +4432,14 @@ void CUser::ItemMove(char* pBuf)
 			break;
 	}
 
-	// 장착이 바뀌는 경우에만 계산..
+	// 장착이 바뀌는 경우에만 계산.. Calculate
 	if (dir != ITEM_MOVE_INVEN_INVEN)
 	{
 		SetSlotItemValue();
 		SetUserAbility();
 	}
 
-//	비러머글 사자의 힘 >.<
+//	비러머글 사자의 힘 >.< [Korean comment]
 	SetByte(send_buff, WIZ_ITEM_MOVE, send_index);
 	SetByte(send_buff, 0x01, send_index);
 	SetShort(send_buff, m_sTotalHit, send_index);
@@ -4464,7 +4464,7 @@ void CUser::ItemMove(char* pBuf)
 
 	if (dir == ITEM_MOVE_INVEN_SLOT)
 	{
-		// 장착
+		// 장착 [Korean comment]
 		if (destpos == HEAD
 			|| destpos == BREAST
 			|| destpos == SHOULDER
@@ -4478,7 +4478,7 @@ void CUser::ItemMove(char* pBuf)
 
 	if (dir == ITEM_MOVE_SLOT_INVEN)
 	{
-		// 해제
+		// 해제 [Korean comment]
 		if (srcpos == HEAD
 			|| srcpos == BREAST
 			|| srcpos == SHOULDER
@@ -4490,7 +4490,7 @@ void CUser::ItemMove(char* pBuf)
 			UserLookChange(srcpos, 0, 0);		
 	}
 
-	// AI Server에 바끤 데이타 전송....
+	// AI Server에 바끤 데이타 전송.... [Korean comment]
 	Send2AI_UserUpdateInfo();
 	return;
 
@@ -4584,7 +4584,7 @@ BOOL CUser::IsValidSlotPos(model::Item* pTable, int destpos)
 
 void CUser::NpcEvent(char* pBuf)
 {
-	// 포인터 참조하면 안됨
+	// 포인터 참조하면 안됨 [Korean comment]
 	if (!m_pMain->m_bPointCheckFlag)
 		return;
 
@@ -4731,7 +4731,7 @@ void CUser::ItemTrade(char* pBuf)
 	CNpc* pNpc = nullptr;
 	BYTE type = 0, pos = 0, destpos = 0, result = 0;
 
-	// 상거래 안되게...
+	// 상거래 안되게... [Korean comment]
 	if (m_bResHpType == USER_DEAD
 		|| m_pUserData->m_sHp == 0)
 	{
@@ -4760,7 +4760,7 @@ void CUser::ItemTrade(char* pBuf)
 	else
 		count = GetShort(pBuf, index);
 
-	// 비러머글 크리스마스 이밴트 >.<
+	// 비러머글 크리스마스 이밴트 >.< [Korean comment]
 	if (itemid >= ITEM_NO_TRADE)
 		goto fail_return;
 
@@ -4916,7 +4916,7 @@ void CUser::ItemTrade(char* pBuf)
 
 		m_pUserData->m_iGold -= static_cast<int>(buyPrice);
 
-		// count 개념이 있는 아이템
+		// count 개념이 있는 아이템 [Korean comment]
 		if (pTable->Countable
 			&& count > 0)
 		{
@@ -5033,7 +5033,7 @@ void CUser::SendTargetHP(BYTE echo, int tid, int damage)
 
 	if (tid >= NPC_BAND)
 	{
-		// 포인터 참조하면 안됨
+		// 포인터 참조하면 안됨 [Korean comment]
 		if (!m_pMain->m_bPointCheckFlag)
 			return;
 
@@ -5411,8 +5411,8 @@ void CUser::StateChange(char* pBuf)
 	else if (type == 3)
 		nResult = m_bAbnormalType;
 	// Just plain echo :)
-	//		N3_SP_STATE_CHANGE_ACTION = 0x04,			// 1 - 인사, 11 - 도발
-	//		N3_SP_STATE_CHANGE_VISIBLE = 0x05 };		// 투명 0 ~ 255
+	//		N3_SP_STATE_CHANGE_ACTION = 0x04,			// 1 - 인사, 11 - 도발 [Korean comment]
+	//		N3_SP_STATE_CHANGE_VISIBLE = 0x05 };		// 투명 0 ~ 255 [Korean comment]
 	else
 		nResult = buff;
 		
@@ -5611,7 +5611,7 @@ void CUser::PartyProcess(char* pBuf)
 			result = GetByte(pBuf, index);
 			if (result != 0)
 				PartyInsert();
-			// 거절한 경우
+			// 거절한 경우 [Korean comment]
 			else
 				PartyCancel();
 			break;
@@ -5643,7 +5643,7 @@ void CUser::PartyProcess(char* pBuf)
 	}
 }
 
-// 거절한 사람한테 온다... 리더를 찾아서 알려주는 함수
+// 거절한 사람한테 온다... 리더를 찾아서 알려주는 함수 Function
 void CUser::PartyCancel()
 {
 	int send_index = 0, leader_id = -1, count = 0;
@@ -5656,7 +5656,7 @@ void CUser::PartyCancel()
 
 	pParty = m_pMain->m_PartyMap.GetData(m_sPartyIndex);
 
-	// 이상한 경우
+	// 이상한 경우 [Korean comment]
 	if (pParty == nullptr)
 	{
 		m_sPartyIndex = -1;
@@ -5674,14 +5674,14 @@ void CUser::PartyCancel()
 	if (pUser == nullptr)
 		return;
 
-	// 파티 생성시 취소한거면..파티를 뽀개야쥐...
+	// 파티 생성시 취소한거면..파티를 뽀개야쥐... Create
 	for (int i = 0; i < 8; i++)
 	{
 		if (pParty->uid[i] >= 0)
 			count++;
 	}
 
-	// 리더 혼자이면 파티 깨짐
+	// 리더 혼자이면 파티 깨짐 [Korean comment]
 	if (count == 1)
 		pUser->PartyDelete();
 
@@ -5691,7 +5691,7 @@ void CUser::PartyCancel()
 	pUser->Send(send_buff, send_index);
 }
 
-//리더에게 패킷이 온거다..
+//리더에게 패킷이 온거다.. [Korean comment]
 void CUser::PartyRequest(int memberid, BOOL bCreate)
 {
 	int index = 0, send_index = 0, result = -1, i = 0;
@@ -5707,7 +5707,7 @@ void CUser::PartyRequest(int memberid, BOOL bCreate)
 	if (pUser == nullptr)
 		goto fail_return;
 
-	//이미 파티 가입되어 있으면 안되징...
+	//이미 파티 가입되어 있으면 안되징... [Korean comment]
 	if (pUser->m_sPartyIndex != -1)
 		goto fail_return;
 
@@ -5724,7 +5724,7 @@ void CUser::PartyRequest(int memberid, BOOL bCreate)
 		goto fail_return;
 	}
 
-	// 기존의 파티에 추가하는 경우
+	// 기존의 파티에 추가하는 경우 Add
 	if (!bCreate)
 	{
 		pParty = m_pMain->m_PartyMap.GetData(m_sPartyIndex);
@@ -5744,7 +5744,7 @@ void CUser::PartyRequest(int memberid, BOOL bCreate)
 
 	if (bCreate)
 	{
-		// (생성자)리더가 이미 파티 가입되어 있으면 안되징...
+		// (생성자)리더가 이미 파티 가입되어 있으면 안되징... Constructor
 		if (m_sPartyIndex != -1)
 			goto fail_return;
 
@@ -5789,7 +5789,7 @@ void CUser::PartyRequest(int memberid, BOOL bCreate)
 
 /*	파티 BBS를 위해 추가...
 	if (pUser->m_bNeedParty == 2 && pUser->m_sPartyIndex != -1) {
-		pUser->m_bNeedParty = 1;	// 난 더 이상 파티가 필요하지 않아 ^^;
+		pUser->m_bNeedParty = 1;	// 난 더 이상 파티가 필요하지 않아 ^^; [Korean comment]
 		memset( send_buff, 0x00, 256 ); send_index = 0;
 		SetByte(send_buff, 2, send_index);
 		SetByte(send_buff, pUser->m_bNeedParty, send_index);
@@ -5797,7 +5797,7 @@ void CUser::PartyRequest(int memberid, BOOL bCreate)
 	}
 
 	if (m_bNeedParty == 2 && m_sPartyIndex != -1) {
-		m_bNeedParty = 1;	// 난 더 이상 파티가 필요하지 않아 ^^;
+		m_bNeedParty = 1;	// 난 더 이상 파티가 필요하지 않아 ^^; [Korean comment]
 		memset( send_buff, 0x00, 256 ); send_index = 0;
 		SetByte(send_buff, 2, send_index);
 		SetByte(send_buff, m_bNeedParty, send_index);
@@ -5809,7 +5809,7 @@ void CUser::PartyRequest(int memberid, BOOL bCreate)
 	SetByte(send_buff, WIZ_PARTY, send_index);
 	SetByte(send_buff, PARTY_PERMIT, send_index);
 	SetShort(send_buff, m_Sid, send_index);
-// 원거리가 않된데자나 씨~
+// 원거리가 않된데자나 씨~ [Korean comment]
 	SetShort(send_buff, strlen(m_pUserData->m_id), send_index);	// Create packet.
 	SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
 //
@@ -5823,7 +5823,7 @@ fail_return:
 	Send(send_buff, send_index);
 }
 
-void CUser::PartyInsert()	// 본인이 추가 된다.  리더에게 패킷이 가는것이 아님
+void CUser::PartyInsert()	// 본인이 추가 된다.  리더에게 패킷이 가는것이 아님 Add
 {
 	int send_index = 0;
 	CUser* pUser = nullptr;
@@ -5835,7 +5835,7 @@ void CUser::PartyInsert()	// 본인이 추가 된다.  리더에게 패킷이 �
 
 	pParty = m_pMain->m_PartyMap.GetData(m_sPartyIndex);
 
-	// 이상한 경우
+	// 이상한 경우 [Korean comment]
 	if (pParty == nullptr)
 	{
 		m_sPartyIndex = -1;
@@ -5869,13 +5869,13 @@ void CUser::PartyInsert()	// 본인이 추가 된다.  리더에게 패킷이 �
 		SetShort(send_buff, pParty->sClass[i], send_index);
 		SetShort(send_buff, pUser->m_iMaxMp, send_index);
 		SetShort(send_buff, pUser->m_pUserData->m_sMp, send_index);
-		Send(send_buff, send_index);	// 추가된 사람에게 기존 인원 다 받게함..
+		Send(send_buff, send_index);	// 추가된 사람에게 기존 인원 다 받게함.. Add
 	}
 
 	int i;
 	for (i = 0; i < 8; i++)
 	{
-		// Party Structure 에 추가
+		// Party Structure 에 추가 Add
 		if (pParty->uid[i] != -1)
 			continue;
 
@@ -5892,11 +5892,11 @@ void CUser::PartyInsert()	// 본인이 추가 된다.  리더에게 패킷이 �
 	if (pUser == nullptr)
 		return;
 
-	// 이건 파티장 것...
+	// 이건 파티장 것... [Korean comment]
 	if (pUser->m_bNeedParty == 2
 		&& pUser->m_sPartyIndex != -1)
 	{
-		// 난 더 이상 파티가 필요하지 않아 ^^;
+		// 난 더 이상 파티가 필요하지 않아 ^^; [Korean comment]
 		pUser->m_bNeedParty = 1;
 
 		memset(send_buff, 0, sizeof(send_buff));
@@ -5905,14 +5905,14 @@ void CUser::PartyInsert()	// 본인이 추가 된다.  리더에게 패킷이 �
 		SetByte(send_buff, pUser->m_bNeedParty, send_index);
 		pUser->StateChange(send_buff);
 	}
-// 추가 끝................
+// 추가 끝................ Add
 
 // 파티 BBS를 위해 추가...	쫄따구판!!!
-	// 이건 실제로 추가된 사람 것...
+	// 이건 실제로 추가된 사람 것... Add
 	if (m_bNeedParty == 2
 		&& m_sPartyIndex != -1)
 	{
-		// 난 더 이상 파티가 필요하지 않아 ^^;
+		// 난 더 이상 파티가 필요하지 않아 ^^; [Korean comment]
 		m_bNeedParty = 1;
 
 		memset(send_buff, 0, sizeof(send_buff));
@@ -5921,7 +5921,7 @@ void CUser::PartyInsert()	// 본인이 추가 된다.  리더에게 패킷이 �
 		SetByte(send_buff, m_bNeedParty, send_index);
 		StateChange(send_buff);
 	}
-// 추가 끝................
+// 추가 끝................ Add
 
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
@@ -5936,7 +5936,7 @@ void CUser::PartyInsert()	// 본인이 추가 된다.  리더에게 패킷이 �
 	SetShort(send_buff, m_pUserData->m_sClass, send_index);
 	SetShort(send_buff, m_iMaxMp, send_index);
 	SetShort(send_buff, m_pUserData->m_sMp, send_index);
-	m_pMain->Send_PartyMember(m_sPartyIndex, send_buff, send_index);	// 추가된 인원을 브로드캐스팅..
+	m_pMain->Send_PartyMember(m_sPartyIndex, send_buff, send_index);	// 추가된 인원을 브로드캐스팅.. Load
 
 	// AI Server
 	BYTE byIndex = i;
@@ -5965,13 +5965,13 @@ void CUser::PartyRemove(int memberid)
 		|| memberid >= MAX_USER)
 		return;
 
-	pUser = (CUser*) m_pMain->m_Iocport.m_SockArray[memberid];	// 제거될 사람...
+	pUser = (CUser*) m_pMain->m_Iocport.m_SockArray[memberid];	// 제거될 사람... Remove
 	if (pUser == nullptr)
 		return;
 
 	pParty = m_pMain->m_PartyMap.GetData(m_sPartyIndex);
 
-	// 이상한 경우
+	// 이상한 경우 [Korean comment]
 	if (pParty == nullptr)
 	{
 		pUser->m_sPartyIndex = -1;
@@ -5979,16 +5979,16 @@ void CUser::PartyRemove(int memberid)
 		return;
 	}
 
-	// 자기자신 탈퇴가 아닌경우
+	// 자기자신 탈퇴가 아닌경우 [Korean comment]
 	if (memberid != m_Sid)
 	{
-		// 리더만 멤버 삭제 할수 있음..
+		// 리더만 멤버 삭제 할수 있음.. Delete
 		if (pParty->uid[0] != m_Sid)
 			return;
 	}
 	else
 	{
-		// 리더가 탈퇴하면 파티 깨짐
+		// 리더가 탈퇴하면 파티 깨짐 [Korean comment]
 		if (pParty->uid[0] == memberid)
 		{
 			PartyDelete();
@@ -6003,21 +6003,21 @@ void CUser::PartyRemove(int memberid)
 			++count;
 	}
 
-	// 리더 혼자 남은 경우 파티 깨짐
+	// 리더 혼자 남은 경우 파티 깨짐 [Korean comment]
 	if (count == 1)
 	{
 		PartyDelete();
 		return;
 	}
 
-	// 삭제된 인원을 브로드캐스팅..제거될 사람한테두 패킷이 간다.
+	// 삭제된 인원을 브로드캐스팅..제거될 사람한테두 패킷이 간다. Load
 	char send_buff[256] = {};
 	SetByte(send_buff, WIZ_PARTY, send_index);
 	SetByte(send_buff, PARTY_REMOVE, send_index);
 	SetShort(send_buff, memberid, send_index);
 	m_pMain->Send_PartyMember(m_sPartyIndex, send_buff, send_index);
 
-	// 파티가 유효한 경우 에는 파티 리스트에서 뺀다.
+	// 파티가 유효한 경우 에는 파티 리스트에서 뺀다. [Korean comment]
 	for (int i = 0; i < 8; i++)
 	{
 		if (pParty->uid[i] != -1
@@ -6067,7 +6067,7 @@ void CUser::PartyDelete()
 			pUser->m_sPartyIndex = -1;
 	}
 
-	// 삭제된 인원을 브로드캐스팅..
+	// 삭제된 인원을 브로드캐스팅.. Load
 	char send_buff[256] = {};
 	SetByte(send_buff, WIZ_PARTY, send_index);
 	SetByte(send_buff, PARTY_DELETE, send_index);
@@ -6127,7 +6127,7 @@ void CUser::ExchangeReq(char* pBuf)
 		|| destid >= MAX_USER)
 		goto fail_return;
 
-	// 교환 안되게.....
+	// 교환 안되게..... [Korean comment]
 	if (m_bResHpType == USER_DEAD
 		|| m_pUserData->m_sHp == 0)
 	{
@@ -6186,7 +6186,7 @@ void CUser::ExchangeAgree(char* pBuf)
 		return;
 	}
 
-	// 거절
+	// 거절 [Korean comment]
 	if (result == 0)
 	{
 		m_sExchangeUser = -1;
@@ -6270,7 +6270,7 @@ void CUser::ExchangeAdd(char* pBuf)
 		if (m_MirrorItem[pos].sCount < count)
 			goto add_fail;
 
-		// 중복허용 아이템
+		// 중복허용 아이템 [Korean comment]
 		if (pTable->Countable)
 		{
 			for (_EXCHANGE_ITEM* pExchangeItem : m_ExchangeItemList)
@@ -6316,7 +6316,7 @@ void CUser::ExchangeAdd(char* pBuf)
 	if (static_cast<int>(m_ExchangeItemList.size()) > ((bGold) ? 13 : 12))
 		goto add_fail;
 
-	// Gold 가 중복되면 추가하지 않는댜..
+	// Gold 가 중복되면 추가하지 않는댜.. Add
 	if (bAdd)
 	{
 		pItem = new _EXCHANGE_ITEM;
@@ -6378,10 +6378,10 @@ void CUser::ExchangeDecide()
 		SetByte(send_buff, EXCHANGE_OTHERDECIDE, send_index);
 		pUser->Send(send_buff, send_index);
 	}
-	// 둘다 승인한 경우
+	// 둘다 승인한 경우 [Korean comment]
 	else
 	{
-		// 교환 실패
+		// 교환 실패 [Korean comment]
 		if (!ExecuteExchange()
 			|| !pUser->ExecuteExchange())
 		{
@@ -6389,7 +6389,7 @@ void CUser::ExchangeDecide()
 			{
 				if (pExchangeItem->itemid == ITEM_GOLD)
 				{
-					// 돈만 백업
+					// 돈만 백업 [Korean comment]
 					m_pUserData->m_iGold += pExchangeItem->count;
 					break;
 				}
@@ -6399,7 +6399,7 @@ void CUser::ExchangeDecide()
 			{
 				if (pExchangeItem->itemid == ITEM_GOLD)
 				{
-					// 돈만 백업
+					// 돈만 백업 [Korean comment]
 					pUser->m_pUserData->m_iGold += pExchangeItem->count;
 					break;
 				}
@@ -6410,7 +6410,7 @@ void CUser::ExchangeDecide()
 
 		if (bSuccess)
 		{
-			// 실제 데이터 교환...
+			// 실제 데이터 교환... Data
 			getmoney = ExchangeDone();
 			putmoney = pUser->ExchangeDone();
 
@@ -6446,7 +6446,7 @@ void CUser::ExchangeDecide()
 
 			for (_EXCHANGE_ITEM* pExchangeItem : pUser->m_ExchangeItemList)
 			{
-				// 새로 들어갈 인벤토리 위치
+				// 새로 들어갈 인벤토리 위치 Position
 				SetByte(send_buff, pExchangeItem->pos, send_index);
 				SetDWORD(send_buff, pExchangeItem->itemid, send_index);
 				SetShort(send_buff, pExchangeItem->count, send_index);
@@ -6461,7 +6461,7 @@ void CUser::ExchangeDecide()
 					pExchangeItem->count,
 					pExchangeItem->duration);
 			}
-			Send(send_buff, send_index);		// 나한테 보내고...
+			Send(send_buff, send_index);		// 나한테 보내고... [Korean comment]
 
 			memset(send_buff, 0, sizeof(send_buff));
 			send_index = 0;
@@ -6473,7 +6473,7 @@ void CUser::ExchangeDecide()
 
 			for (_EXCHANGE_ITEM* pExchangeItem : m_ExchangeItemList)
 			{
-				// 새로 들어갈 인벤토리 위치
+				// 새로 들어갈 인벤토리 위치 Position
 				SetByte(send_buff, pExchangeItem->pos, send_index);
 				SetDWORD(send_buff, pExchangeItem->itemid, send_index);
 				SetShort(send_buff, pExchangeItem->count, send_index);
@@ -6489,7 +6489,7 @@ void CUser::ExchangeDecide()
 					pExchangeItem->duration);
 			}
 
-			pUser->Send(send_buff, send_index);	// 상대방도 보내준다. 
+			pUser->Send(send_buff, send_index);	// 상대방도 보내준다.  [Korean comment]
 
 			SendItemWeight();
 			pUser->SendItemWeight();
@@ -6527,7 +6527,7 @@ void CUser::ExchangeCancel()
 	{
 		if (pExchangeItem->itemid == ITEM_GOLD)
 		{
-			// 돈만 백업
+			// 돈만 백업 [Korean comment]
 			m_pUserData->m_iGold += pExchangeItem->count;
 			break;
 		}
@@ -6553,7 +6553,7 @@ void CUser::InitExchange(BOOL bStart)
 		m_ExchangeItemList.pop_front();
 	}
 
-	// 교환 시작시 백업
+	// 교환 시작시 백업 [Korean comment]
 	if (bStart)
 	{
 		for (int i = 0; i < HAVE_MAX; i++)
@@ -6564,7 +6564,7 @@ void CUser::InitExchange(BOOL bStart)
 			m_MirrorItem[i].nSerialNum = m_pUserData->m_sItemArray[SLOT_MAX + i].nSerialNum;
 		}
 	}
-	// 교환 종료시 클리어
+	// 교환 종료시 클리어 [Korean comment]
 	else
 	{
 		m_sExchangeUser = -1;
@@ -6599,7 +6599,7 @@ BOOL CUser::ExecuteExchange()
 	auto Iter = pUser->m_ExchangeItemList.begin();
 	for (; Iter != pUser->m_ExchangeItemList.end(); ++Iter)
 	{
-		// 비러머글 크리스마스 이밴트 >.<
+		// 비러머글 크리스마스 이밴트 >.< [Korean comment]
 		if ((*Iter)->itemid >= ITEM_NO_TRADE)
 			return FALSE;
 
@@ -6615,7 +6615,7 @@ BOOL CUser::ExecuteExchange()
 
 			for (i = 0; i < HAVE_MAX; i++)
 			{
-				// 증복허용 않되는 아이템!!!
+				// 증복허용 않되는 아이템!!! [Korean comment]
 				if (m_MirrorItem[i].nNum == 0
 					&& pTable->Countable == 0)
 				{
@@ -6624,12 +6624,12 @@ BOOL CUser::ExecuteExchange()
 					m_MirrorItem[i].sCount = (*Iter)->count;
 					m_MirrorItem[i].nSerialNum = (*Iter)->nSerialNum;
 
-					// 패킷용 데이터...
+					// 패킷용 데이터... Data
 					(*Iter)->pos = i;
 					weight += pTable->Weight;
 					break;
 				}
-				// 증복허용 아이템!!!				
+				// 증복허용 아이템!!!				 [Korean comment]
 				else if (m_MirrorItem[i].nNum == (*Iter)->itemid
 					&& pTable->Countable == 1)
 				{
@@ -6638,14 +6638,14 @@ BOOL CUser::ExecuteExchange()
 					if (m_MirrorItem[i].sCount > MAX_ITEM_COUNT)
 						m_MirrorItem[i].sCount = MAX_ITEM_COUNT;
 
-					// 패킷용 데이터...
+					// 패킷용 데이터... Data
 					(*Iter)->pos = i;
 					weight += (pTable->Weight * (*Iter)->count);
 					break;
 				}
 			}
 
-			// 중복 허용 아이템인데 기존에 가지고 있지 않은 경우 빈곳에 추가
+			// 중복 허용 아이템인데 기존에 가지고 있지 않은 경우 빈곳에 추가 Add
 			if (i == HAVE_MAX
 				&& pTable->Countable == 1)
 			{
@@ -6658,14 +6658,14 @@ BOOL CUser::ExecuteExchange()
 					m_MirrorItem[i].sDuration = (*Iter)->duration;
 					m_MirrorItem[i].sCount = (*Iter)->count;
 
-					// 패킷용 데이터...
+					// 패킷용 데이터... Data
 					(*Iter)->pos = i;
 					weight += (pTable->Weight * (*Iter)->count);
 					break;
 				}
 			}
 
-			// 인벤토리 공간 부족...
+			// 인벤토리 공간 부족... [Korean comment]
 			if (Iter != pUser->m_ExchangeItemList.end()
 				&& i == HAVE_MAX)
 				return FALSE;
@@ -6706,11 +6706,11 @@ int CUser::ExchangeDone()
 		++Iter;
 	}
 
-	// 상대방이 준 돈.
+	// 상대방이 준 돈. [Korean comment]
 	if (money > 0)
 		m_pUserData->m_iGold += money;
 
-	// 성공시 리스토어..
+	// 성공시 리스토어.. [Korean comment]
 	for (int i = 0; i < HAVE_MAX; i++)
 	{
 		m_pUserData->m_sItemArray[SLOT_MAX + i].nNum = m_MirrorItem[i].nNum;
@@ -6803,28 +6803,28 @@ void CUser::ClassChange(char* pBuf)
 
 	type = GetByte(pBuf, index);
 
-	// 전직요청
+	// 전직요청 [Korean comment]
 	if (type == CLASS_CHANGE_REQ)
 	{
 		ClassChangeReq();
 		return;
 	}
 	
-	// 포인트 초기화
+	// 포인트 초기화 Initialize
 	if (type == ALL_POINT_CHANGE)
 	{
 		AllPointChange();
 		return;
 	}
 	
-	// 스킬 초기화
+	// 스킬 초기화 Initialize
 	if (type == ALL_SKILLPT_CHANGE)
 	{
 		AllSkillPointChange();
 		return;
 	}
 
-	// 포인트 & 스킬 초기화에 돈이 얼마인지를 묻는 서브 패킷
+	// 포인트 & 스킬 초기화에 돈이 얼마인지를 묻는 서브 패킷 Initialize
 	if (type == CHANGE_MONEY_REQ)
 	{
 		sub_type = GetByte(pBuf, index);
@@ -6843,10 +6843,10 @@ void CUser::ClassChange(char* pBuf)
 			&& m_pUserData->m_bLevel <= 90)
 			money = static_cast<int>(money * 1.5);
 
-		// 능력치 포인트
+		// 능력치 포인트 [Korean comment]
 		if (sub_type == 1)
 		{
-			// 할인시점이고 승리국이라면
+			// 할인시점이고 승리국이라면 [Korean comment]
 			if (m_pMain->m_sDiscount == 1
 				&& m_pMain->m_byOldVictory == m_pUserData->m_bNation)
 			{
@@ -6866,13 +6866,13 @@ void CUser::ClassChange(char* pBuf)
 			SetDWORD(send_buff, money, send_index);
 			Send(send_buff, send_index);
 		}
-		// skill 포인트
+		// skill 포인트 [Korean comment]
 		else if (sub_type == 2)
 		{
-			// 스킬은 한번 더
+			// 스킬은 한번 더 [Korean comment]
 			money = static_cast<int>(money * 1.5);
 
-			// 할인시점이고 승리국이라면
+			// 할인시점이고 승리국이라면 [Korean comment]
 			if (m_pMain->m_sDiscount == 1
 				&& m_pMain->m_byOldVictory == m_pUserData->m_bNation)
 			{
@@ -7055,8 +7055,8 @@ void CUser::SendUserInfo(char* temp_send, int& index)
 	SetByte(temp_send, m_pUserData->m_bLevel, index);
 	SetShort(temp_send, m_pUserData->m_sHp, index);
 	SetShort(temp_send, m_pUserData->m_sMp, index);
-	SetShort(temp_send, m_sTotalHit * m_bAttackAmount / 100, index);    // 표시
-	SetShort(temp_send, m_sTotalAc + m_sACAmount, index);	// 표시
+	SetShort(temp_send, m_sTotalHit * m_bAttackAmount / 100, index);    // 표시 [Korean comment]
+	SetShort(temp_send, m_sTotalAc + m_sACAmount, index);	// 표시 [Korean comment]
 	Setfloat(temp_send, m_sTotalHitrate, index);
 	Setfloat(temp_send, m_sTotalEvasionrate, index);
 	SetShort(temp_send, m_sPartyIndex, index);
@@ -7276,13 +7276,13 @@ void CUser::Dead()
 
 	m_bResHpType = USER_DEAD;
 
-	// 유저에게는 바로 데드 패킷을 날림... (한 번 더 보냄, 유령을 없애기 위해서)
+	// 유저에게는 바로 데드 패킷을 날림... (한 번 더 보냄, 유령을 없애기 위해서) [Korean comment]
 	Send(send_buff, send_index);
 
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
 
-	// 지휘권한이 있는 유저가 죽는다면,, 지휘 권한 박탈
+	// 지휘권한이 있는 유저가 죽는다면,, 지휘 권한 박탈 [Korean comment]
 	if (m_pUserData->m_bFame == COMMAND_CAPTAIN)
 	{
 		m_pUserData->m_bFame = CHIEF;
@@ -7418,7 +7418,7 @@ void CUser::ItemWoreOut(int type, int damage)
 		{
 			pTable = m_pMain->m_ItemTableMap.GetData(m_pUserData->m_sItemArray[RIGHTHAND].nNum);
 			if (pTable != nullptr
-				// 방패?
+				// 방패? [Korean comment]
 				&& pTable->Slot == 2)
 			{
 				m_pUserData->m_sItemArray[RIGHTHAND].sDuration -= worerate;
@@ -7431,7 +7431,7 @@ void CUser::ItemWoreOut(int type, int damage)
 		{
 			pTable = m_pMain->m_ItemTableMap.GetData(m_pUserData->m_sItemArray[LEFTHAND].nNum);
 			if (pTable
-				// 방패?
+				// 방패? [Korean comment]
 				&& pTable->Slot == 2)
 			{
 				m_pUserData->m_sItemArray[LEFTHAND].sDuration -= worerate;
@@ -7468,7 +7468,7 @@ void CUser::ItemDurationChange(int slot, int maxvalue, int curvalue, int amount)
 
 		memset(send_buff, 0, sizeof(send_buff));
 		send_index = 0;
-		SetByte(send_buff, WIZ_ITEM_MOVE, send_index);	// durability 변경에 따른 수치 재조정...
+		SetByte(send_buff, WIZ_ITEM_MOVE, send_index);	// durability 변경에 따른 수치 재조정... Change
 		SetByte(send_buff, 0x01, send_index);
 		SetShort(send_buff, m_sTotalHit, send_index);
 		SetShort(send_buff, m_sTotalAc, send_index);
@@ -7933,7 +7933,7 @@ void CUser::Type4Duration(float currenttime)
 
 		SetSlotItemValue();
 		SetUserAbility();
-		Send2AI_UserUpdateInfo();	// AI Server에 바끤 데이타 전송....
+		Send2AI_UserUpdateInfo();	// AI Server에 바끤 데이타 전송.... [Korean comment]
 
 		/*	Send Party Packet.....
 		if (m_sPartyIndex != -1)
@@ -8276,7 +8276,7 @@ void CUser::SpeedHackTime(char* pBuf)
 */
 }
 
-// server의 상태를 체크..
+// server의 상태를 체크.. Check
 void CUser::ServerStatusCheck()
 {
 	int send_index = 0;
@@ -8360,7 +8360,7 @@ void CUser::WarehouseProcess(char* pBuf)
 
 	BYTE command = GetByte(pBuf, index);
 
-	// 창고 안되게...
+	// 창고 안되게... Window
 	if (m_bResHpType == USER_DEAD
 		|| m_pUserData->m_sHp == 0)
 	{
@@ -8645,7 +8645,7 @@ void CUser::InitType4()
 	m_bMagicRAmount = 0;
 	m_bDiseaseRAmount = 0;
 	m_bPoisonRAmount = 0;
-// 비러머글 수능
+// 비러머글 수능 [Korean comment]
 	m_bAbnormalType = 1;
 //
 	m_sDuration1 = 0;  m_fStartTime1 = 0.0f;		// Used for Type 4 Durational Spells.
@@ -8664,7 +8664,7 @@ void CUser::InitType4()
 	m_bType4Flag = FALSE;
 }
 
-// item 먹을때 비어잇는 슬롯을 찾아야되...
+// item 먹을때 비어잇는 슬롯을 찾아야되... [Korean comment]
 int CUser::GetEmptySlot(int itemid, int bCountable)
 {
 	int pos = 255, i = 0;
@@ -8793,7 +8793,7 @@ CUser* CUser::GetItemRoutingUser(int itemid, short itemcount)
 			pUser = (CUser*) m_pMain->m_Iocport.m_SockArray[select_user];
 			if (pUser != nullptr)
 			{
-//	이거 않되도 저를 너무 미워하지 마세요 ㅠ.ㅠ
+//	이거 않되도 저를 너무 미워하지 마세요 ㅠ.ㅠ [Korean comment]
 				// Check weight of countable item.
 				if (pTable->Countable)
 				{
@@ -8803,7 +8803,7 @@ CUser* CUser::GetItemRoutingUser(int itemid, short itemcount)
 						if (pParty->bItemRouting > 6)
 							pParty->bItemRouting = 0;
 
-						// 즉, 유저의 포인터를 리턴한다 :)
+						// 즉, 유저의 포인터를 리턴한다 :) [Korean comment]
 						return pUser;
 					}
 				}
@@ -8817,7 +8817,7 @@ CUser* CUser::GetItemRoutingUser(int itemid, short itemcount)
 						if (pParty->bItemRouting > 6)
 							pParty->bItemRouting = 0;
 
-						// 즉, 유저의 포인터를 리턴한다 :)
+						// 즉, 유저의 포인터를 리턴한다 :) [Korean comment]
 						return pUser;
 					}
 				}
@@ -8828,7 +8828,7 @@ CUser* CUser::GetItemRoutingUser(int itemid, short itemcount)
 				if (pParty->bItemRouting > 6)
 					pParty->bItemRouting = 0;
 
-				// 즉, 유저의 포인터를 리턴한다 :)
+				// 즉, 유저의 포인터를 리턴한다 :) [Korean comment]
 				return pUser;
 */
 			}
@@ -8918,9 +8918,9 @@ void CUser::ClassChangeReq()
 
 void CUser::AllSkillPointChange()
 {
-	// 돈을 먼저 깍고.. 만약,, 돈이 부족하면.. 에러...
+	// 돈을 먼저 깍고.. 만약,, 돈이 부족하면.. 에러... [Korean comment]
 	int index = 0, send_index = 0, skill_point = 0, money = 0, i = 0, j = 0, temp_value = 0, old_money = 0;
-	BYTE type = 0;    // 0:돈이 부족, 1:성공, 2:초기화할 스킬이 없을때..
+	BYTE type = 0;    // 0:돈이 부족, 1:성공, 2:초기화할 스킬이 없을때.. Initialize
 	char send_buff[128] = {};
 
 	temp_value = pow((m_pUserData->m_bLevel * 2), 3.4);
@@ -8937,10 +8937,10 @@ void CUser::AllSkillPointChange()
 		&& m_pUserData->m_bLevel <= 90)
 		temp_value = static_cast<int>(temp_value * 1.5);
 
-	// 스킬은 한번 더 
+	// 스킬은 한번 더  [Korean comment]
 	temp_value = static_cast<int>(temp_value * 1.5);
 
-	// 할인시점이고 승리국이라면
+	// 할인시점이고 승리국이라면 [Korean comment]
 	if (m_pMain->m_sDiscount == 1
 		&& m_pMain->m_byOldVictory == m_pUserData->m_bNation)
 	{
@@ -8974,7 +8974,7 @@ void CUser::AllSkillPointChange()
 		goto fail_return;
 	}
 
-	// 문제될 소지가 많음 : 가용스킬이 255을 넘는 상황이 발생할 확율이 높음..
+	// 문제될 소지가 많음 : 가용스킬이 255을 넘는 상황이 발생할 확율이 높음.. [Korean comment]
 	//m_pUserData->m_bstrSkill[0] += skill_point;		
 	m_pUserData->m_bstrSkill[0] = (m_pUserData->m_bLevel - 9) * 2;
 	for (j = 1; j < 9; j++)
@@ -9000,7 +9000,7 @@ fail_return:
 
 void CUser::AllPointChange()
 {
-	// 돈을 먼저 깍고.. 만약,, 돈이 부족하면.. 에러...
+	// 돈을 먼저 깍고.. 만약,, 돈이 부족하면.. 에러... [Korean comment]
 	int index = 0, send_index = 0, total_point = 0, money = 0, classcode = 0, temp_money = 0, old_money = 0;
 	double dwMoney = 0;
 	BYTE type = 0;
@@ -9023,7 +9023,7 @@ void CUser::AllPointChange()
 		&& m_pUserData->m_bLevel <= 90)
 		temp_money = static_cast<int>(temp_money * 1.5);
 
-	// 할인시점이고 승리국이라면
+	// 할인시점이고 승리국이라면 [Korean comment]
 	if (m_pMain->m_sDiscount == 1
 		&& m_pMain->m_byOldVictory == m_pUserData->m_bNation)
 	{
@@ -9038,7 +9038,7 @@ void CUser::AllPointChange()
 	if (money < 0)
 		goto fail_return;
 
-	// 장착아이템이 하나라도 있으면 에러처리 
+	// 장착아이템이 하나라도 있으면 에러처리  Process
 	for (i = 0; i < SLOT_MAX; i++)
 	{
 		if (m_pUserData->m_sItemArray[i].nNum != 0)
@@ -9368,7 +9368,7 @@ void CUser::SelectWarpList(char* pBuf)
 	C3DMap* pCurrentMap = nullptr, *pTargetMap = nullptr;
 	char send_buff[128] = {};
 
-// 비러머글 순간이동 >.<
+// 비러머글 순간이동 >.< Move
 	BYTE type = 2;
 //		
 	warpid = GetShort(pBuf, index);
@@ -9407,7 +9407,7 @@ void CUser::SelectWarpList(char* pBuf)
 	if (rz < pWarp->fR)
 		rz = -rz;
 
-// 비러머글 순간이동 >.<
+// 비러머글 순간이동 >.< Move
 /*
 	SetByte(send_buff, WIZ_WARP_LIST, send_index);
 	SetByte(send_buff, type, send_index);
@@ -9495,12 +9495,12 @@ void CUser::ServerChangeOk(char* pBuf)
 
 BOOL CUser::GetWarpList(int warp_group)
 {
-	int warpid = 0, send_index = 0;	// 헤더와 카운트를 나중에 패킹...
+	int warpid = 0, send_index = 0;	// 헤더와 카운트를 나중에 패킹... Count
 	int zoneindex = -1, temp_index = 0, count = 0;
 	char buff[8192] = {};
 	char send_buff[8192] = {};
-// 비러머글 마을 이름 표시 >.<
-	BYTE type = 1;		// 1이면 일반, 2이면 워프 성공했는지 않했는지 ^^;
+// 비러머글 마을 이름 표시 >.< Name
+	BYTE type = 1;		// 1이면 일반, 2이면 워프 성공했는지 않했는지 ^^; [Korean comment]
 //
 
 	C3DMap* pCurrentMap = m_pMain->GetMapByIndex(m_iZoneIndex);
@@ -9535,7 +9535,7 @@ BOOL CUser::GetWarpList(int warp_group)
 	}
 
 	SetByte(send_buff, WIZ_WARP_LIST, temp_index);
-// 비러머글 마을 이름 표시 >.<
+// 비러머글 마을 이름 표시 >.< Name
 	SetByte(send_buff, type, temp_index);
 //
 	SetShort(send_buff, count, temp_index);
@@ -9595,7 +9595,7 @@ BOOL CUser::BindObjectEvent(short objectindex, short nid)
 
 BOOL CUser::GateObjectEvent(short objectindex, short nid)
 {
-	// 포인터 참조하면 안됨
+	// 포인터 참조하면 안됨 [Korean comment]
 	if (!m_pMain->m_bPointCheckFlag)
 		return FALSE;
 
@@ -9647,7 +9647,7 @@ BOOL CUser::GateObjectEvent(short objectindex, short nid)
 
 BOOL CUser::GateLeverObjectEvent(short objectindex, short nid)
 {
-	// 포인터 참조하면 안됨
+	// 포인터 참조하면 안됨 [Korean comment]
 	if (!m_pMain->m_bPointCheckFlag)
 		return FALSE;
 
@@ -9735,7 +9735,7 @@ BOOL CUser::GateLeverObjectEvent(short objectindex, short nid)
 
 BOOL CUser::FlagObjectEvent(short objectindex, short nid)
 {
-	// 포인터 참조하면 안됨
+	// 포인터 참조하면 안됨 [Korean comment]
 	if (!m_pMain->m_bPointCheckFlag)
 		return FALSE;
 
@@ -9901,7 +9901,7 @@ void CUser::ObjectEvent(char* pBuf)
 				goto fail_return;
 			break;
 
-		// Gate Object : 사용치 않음 : 2002.12.23
+		// Gate Object : 사용치 않음 : 2002.12.23 [Korean comment]
 		case 1:
 		case 2:
 			//if (!GateObjectEvent(objectindex, nid))
@@ -11057,12 +11057,12 @@ void CUser::KickOut(char* pBuf)
 		m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
 	}
 }
-// 여기서 부터 정애씨가 고생하면서 해주신 퀘스트 부분....
+// 여기서 부터 정애씨가 고생하면서 해주신 퀘스트 부분.... [Korean comment]
 // The main function for the quest procedures!!!
 // (actually, this only takes care of the first event :(  )
 void CUser::ClientEvent(char* pBuf)
 {
-	// 포인터 참조하면 안됨
+	// 포인터 참조하면 안됨 [Korean comment]
 	if (!m_pMain->m_bPointCheckFlag)
 		return;
 
@@ -11081,9 +11081,9 @@ void CUser::ClientEvent(char* pBuf)
 	if (pNpc == nullptr)
 		return;
 
-	m_sEventNid = nid;     // 이건 나중에 내가 추가한 거였슴....
+	m_sEventNid = nid;     // 이건 나중에 내가 추가한 거였슴.... Add
 
-	// 이거 일단 주석 처리 절대 빼지마!!
+	// 이거 일단 주석 처리 절대 빼지마!! Process
 	// if (pNpc->m_byEvent < 0)
 	//	return;
 
@@ -11441,7 +11441,7 @@ BOOL CUser::CheckEventLogic(EVENT_DATA* pEventData)
 				if (!CheckWeight(pLE->m_LogicElseInt[0], pLE->m_LogicElseInt[1]))
 					bExact = TRUE;
 				break;
-	// 비러머글 복권 >.<		
+	// 비러머글 복권 >.<		 [Korean comment]
 			case LOGIC_CHECK_EDITBOX:
 				if (!CheckEditBox())
 					bExact = TRUE;
@@ -11452,7 +11452,7 @@ BOOL CUser::CheckEventLogic(EVENT_DATA* pEventData)
 					bExact = TRUE;
 				break;
 	//
-	// 비러머글 엑셀 >.<
+	// 비러머글 엑셀 >.< [Korean comment]
 			case LOGIC_CHECK_LV:
 				if (m_pUserData->m_bLevel >= pLE->m_LogicElseInt[0]
 					&& m_pUserData->m_bLevel <= pLE->m_LogicElseInt[1])
@@ -11547,7 +11547,7 @@ BOOL CUser::RunNpcEvent(CNpc* pNpc, EXEC* pExec)
 				return FALSE;
 			break;
 
-		//	비러머글 복권 >.<
+		//	비러머글 복권 >.< [Korean comment]
 		case EXEC_OPEN_EDITBOX:
 			OpenEditBox(pExec->m_ExecInt[1], pExec->m_ExecInt[2]);
 			break;
@@ -11560,7 +11560,7 @@ BOOL CUser::RunNpcEvent(CNpc* pNpc, EXEC* pExec)
 			LogCoupon(pExec->m_ExecInt[0], pExec->m_ExecInt[1]);
 			break;
 	//
-	// 비러머글 엑셀 >.<
+	// 비러머글 엑셀 >.< [Korean comment]
 		case EXEC_SAVE_COM_EVENT:
 			SaveComEvent(pExec->m_ExecInt[0]);
 			break;
@@ -11620,7 +11620,7 @@ BOOL CUser::RunEvent(EVENT_DATA* pEventData)
 					return FALSE;
 				break;
 
-//	비러머글 복권 >.<
+//	비러머글 복권 >.< [Korean comment]
 			case EXEC_OPEN_EDITBOX:
 				OpenEditBox(pExec->m_ExecInt[1], pExec->m_ExecInt[2]);
 				break;
@@ -11633,7 +11633,7 @@ BOOL CUser::RunEvent(EVENT_DATA* pEventData)
 				LogCoupon(pExec->m_ExecInt[0], pExec->m_ExecInt[1]);
 				break;
 //
-// 비러머글 엑셀 >.<
+// 비러머글 엑셀 >.< [Korean comment]
 			case EXEC_SAVE_COM_EVENT:
 				SaveComEvent(pExec->m_ExecInt[0]);
 				break;
@@ -11649,10 +11649,10 @@ BOOL CUser::RunEvent(EVENT_DATA* pEventData)
 
 	return TRUE;
 }
-// 정애씨가 고생하면서 해주신 퀘스트 부분 끝
+// 정애씨가 고생하면서 해주신 퀘스트 부분 끝 [Korean comment]
 void CUser::TestPacket(char* pBuf)
 {
-	// npc의 리스트를 재 요청하는 군,,,,,
+	// npc의 리스트를 재 요청하는 군,,,,, [Korean comment]
 	m_pMain->RegionNpcInfoForMe(this, 1);
 	m_pMain->SyncTest(2);
 }
@@ -11983,7 +11983,7 @@ void CUser::RecvSelectMsg(char* pBuf)
 
 	selnum = GetByte(pBuf, index);
 
-	// 비러머글 퀘스트 >.<
+	// 비러머글 퀘스트 >.< [Korean comment]
 	if (selnum < 0
 		|| selnum >= MAX_MESSAGE_EVENT)
 		goto fail_return;
@@ -12008,7 +12008,7 @@ void CUser::RecvSelectMsg(char* pBuf)
 	return;
 
 fail_return:
-// 비러머글 퀘스트 >.<
+// 비러머글 퀘스트 >.< [Korean comment]
 	for (int i = 0; i < MAX_MESSAGE_EVENT; i++)
 		m_iSelMsgEvent[i] = -1;
 //
@@ -12041,12 +12041,12 @@ void CUser::SelectMsg(EXEC* pExec)
 
 	SetByte(send_buff, WIZ_SELECT_MSG, send_index);
 	SetShort(send_buff, m_sEventNid, send_index);
-//	SetByte(send_buff, (BYTE) pExec->m_ExecInt[0], send_index);		// NPC 직업
-	SetDWORD(send_buff, pExec->m_ExecInt[1], send_index);			// 지문 번호
+//	SetByte(send_buff, (BYTE) pExec->m_ExecInt[0], send_index);		// NPC 직업 [Korean comment]
+	SetDWORD(send_buff, pExec->m_ExecInt[1], send_index);			// 지문 번호 [Korean comment]
 
 	chat = 2;
 
-	// 비러머글 퀘스트 >.<
+	// 비러머글 퀘스트 >.< [Korean comment]
 	for (i = 0; i < MAX_MESSAGE_EVENT; i++)
 	{
 		SetDWORD(send_buff, pExec->m_ExecInt[chat], send_index);
@@ -12063,7 +12063,7 @@ void CUser::SelectMsg(EXEC* pExec)
 	m_iSelMsgEvent[4] = pExec->m_ExecInt[11];
 */
 
-// 비러머글 퀘스트 >.<
+// 비러머글 퀘스트 >.< [Korean comment]
 	for (int j = 0; j < MAX_MESSAGE_EVENT; j++)
 		m_iSelMsgEvent[j] = pExec->m_ExecInt[(2 * j) + 3];
 //
@@ -12175,7 +12175,7 @@ BOOL CUser::JobGroupCheck(short jobgroupid)
 	return FALSE;
 }
 
-// 잉...성용씨 미워!!! 흑흑흑 ㅠ.ㅠ
+// 잉...성용씨 미워!!! 흑흑흑 ㅠ.ㅠ [Korean comment]
 void CUser::TrapProcess()
 {
 	float currenttime = TimeGet();
@@ -12219,7 +12219,7 @@ void CUser::KickOutZoneUser(BOOL home)
 	{
 		// ZoneChange(pMap->m_nZoneNumber, pMap->m_fInitX, pMap->m_fInitZ);
 
-// 비러머글 버퍼
+// 비러머글 버퍼 [Korean comment]
 		int random = myrand(0, 9000);
 		if (random < 3000)
 			regene_event = 0;
@@ -12315,11 +12315,11 @@ BOOL CUser::CheckEditBox()
 
 void CUser::OpenEditBox(int message, int event)
 {
-	// 이것은 기술지원 필요함 ㅠ.ㅠ
+	// 이것은 기술지원 필요함 ㅠ.ㅠ [Korean comment]
 	// if (!CheckCouponUsed())
 	//	return;
 
-	// 이것은 기술지원 필요함 ㅠ.ㅠ
+	// 이것은 기술지원 필요함 ㅠ.ㅠ [Korean comment]
 	int send_index = 0, retvalue = 0;
 	char send_buff[256] = {};
 
@@ -12329,7 +12329,7 @@ void CUser::OpenEditBox(int message, int event)
 	SetShort(send_buff, strlen(m_strAccountID), send_index);
 	SetString(send_buff, m_strAccountID, strlen(m_strAccountID), send_index);
 	SetDWORD(send_buff, event, send_index);
-//	비러머글 대사문 >.<
+//	비러머글 대사문 >.< [Korean comment]
 	SetDWORD(send_buff, message, send_index);
 //	
 	retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
@@ -12385,7 +12385,7 @@ void CUser::RecvEditBox(char* pBuf)
 
 	selevent = m_iEditBoxEvent;
 
-	pEvent = m_pMain->m_EventMap.GetData(m_pUserData->m_bZone);	// 여기서 부터 중요함 --;
+	pEvent = m_pMain->m_EventMap.GetData(m_pUserData->m_bZone);	// 여기서 부터 중요함 --; [Korean comment]
 	if (pEvent == nullptr)
 		goto fail_return;
 
@@ -12408,14 +12408,14 @@ fail_return:
 
 BOOL CUser::CheckCouponUsed()
 {
-	// 이것은 기술지원 필요함 ㅠ.ㅠ
+	// 이것은 기술지원 필요함 ㅠ.ㅠ [Korean comment]
 	return TRUE;
 }
 
 void CUser::LogCoupon(int itemid, int count)
 {
 	// 참고로 쿠폰 번호는 : m_iEditboxEvent
-	// 이것은 기술지원 필요함 ㅠ.ㅠ	
+	// 이것은 기술지원 필요함 ㅠ.ㅠ	 [Korean comment]
 	int send_index = 0, retvalue = 0;
 	char send_buff[256] = {};
 
@@ -12445,19 +12445,19 @@ void CUser::CouponEvent(char* pBuf)
 	int index = 0, nEventNum = 0, nItemCount = 0, nResult = 0, nMessageNum = 0;
 	nResult = GetByte(pBuf, index);
 	nEventNum = GetDWORD(pBuf, index);
-// 비러머글 대사 >.<
+// 비러머글 대사 >.< [Korean comment]
 	nMessageNum = GetDWORD(pBuf, index);
 //
 
 	if (nResult == 0)
 		return;
 
-	// 알아서 사용
+	// 알아서 사용 [Korean comment]
 	int send_index = 0;
 	char send_buff[128] = {};
 	m_iEditBoxEvent = nEventNum;	// What will the next event be when an answer is given?
 	SetByte(send_buff, WIZ_EDIT_BOX, send_index);
-// 비러머글 대사 >.<
+// 비러머글 대사 >.< [Korean comment]
 	SetDWORD(send_buff, nMessageNum, send_index);
 //
 	Send(send_buff, send_index);
@@ -12551,7 +12551,7 @@ void CUser::RecvDeleteChar(char* pBuf)
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
 	SetByte(send_buff, WIZ_DEL_CHAR, send_index);
-	SetByte(send_buff, nResult, send_index);					// 성공시 국가 정보
+	SetByte(send_buff, nResult, send_index);					// 성공시 국가 정보 Info
 	SetByte(send_buff, char_index, send_index);
 
 	Send(send_buff, send_index);
@@ -12597,7 +12597,7 @@ void CUser::GetUserInfo(char* buff, int& buff_index)
 	SetByte(buff, m_pUserData->m_bFace, buff_index);
 	SetByte(buff, m_pUserData->m_bHairColor, buff_index);
 	SetByte(buff, m_bResHpType, buff_index);
-// 비러머글 수능...
+// 비러머글 수능... [Korean comment]
 	SetDWORD(buff, m_bAbnormalType, buff_index);
 //
 	SetByte(buff, m_bNeedParty, buff_index);

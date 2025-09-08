@@ -277,7 +277,7 @@ void CIOCPSocket2::ReceivedData(int length)
 	{
 		if (pData != nullptr)
 		{
-			Parsing(len, pData); // 실제 파싱 함수...
+			Parsing(len, pData); // 실제 파싱 함수... Function
 
 			delete[] pData;
 			pData = nullptr;

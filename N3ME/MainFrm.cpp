@@ -210,12 +210,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndToolBar.SetBarStyle(m_wndToolBar.GetBarStyle() |
 		CBRS_TOOLTIPS | CBRS_FLYBY);
 
-	// 경로 설정..
+	// 경로 설정.. Set
 	char szPathCur[256] = "";
 	GetCurrentDirectory(256, szPathCur);
 	CN3Base::PathSet(szPathCur);
 	
-	// 엔진 초기화
+	// 엔진 초기화 Initialize
 	m_pEng = new CN3EngTool();
 	//m_pEng->InitEnv();
 	m_pEng->Init(TRUE, m_hWnd, 32, 32, 0, TRUE);
@@ -231,17 +231,17 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_pDTexMng = new CDTexMng;
 	m_pDTexMng->Init(this);
 
-	// 기본 리소스 읽기..
+	// 기본 리소스 읽기.. Load
 	m_pMapMng->LoadSourceObjects();
 	m_pDTexGroupMng->Init(this);
 	//m_pDTexGroupMng->LoadFromFile();
 	m_pDTexMng->Init(this);
 	//m_pDTexMng->LoadFromFile();
 
-	// 툴바 다이얼로그 정보..
+	// 툴바 다이얼로그 정보.. Info
 	m_wndDlgBar.SetDlgItemText(IDC_E_PATH, m_pEng->PathGet().c_str());
 
-	//씨앗 뿌리기 관련 클래스 초기화..
+	//씨앗 뿌리기 관련 클래스 초기화.. Initialize
 	m_pDlgSowSeed = new CDlgSowSeed;
 	m_pDlgSowSeed->Create(IDD_SOW_SEED,this);
 	m_pDlgSowSeed->ShowWindow(FALSE);
@@ -349,7 +349,7 @@ void CMainFrame::OnCursorDtex()
 	}
 */	
 	m_pMapMng->SetCursorMode(CM_SET_DTEX);
-//	this->OnViewDtex(); // 화면에 타일 텍스처 그룹 다이얼로그를 열어준다..
+//	this->OnViewDtex(); // 화면에 타일 텍스처 그룹 다이얼로그를 열어준다.. Texture
 }
 void CMainFrame::OnCursorEditRiver() 
 {	ASSERT(m_pMapMng);	m_pMapMng->SetCursorMode(CM_EDIT_RIVER);}
@@ -580,10 +580,10 @@ void CMainFrame::OnResourcePathSet()
 	
 	CString szPath = dlg.GetPath();
 	CT2A szPathA(szPath);
-	CN3Base::PathSet(szPathA.m_psz); // 경로 설정..
+	CN3Base::PathSet(szPathA.m_psz); // 경로 설정.. Set
 	m_wndDlgBar.SetDlgItemText(IDC_E_PATH, szPath);
 	
-	// 기본 리소스 읽기..
+	// 기본 리소스 읽기.. Load
 	m_pMapMng->LoadSourceObjects();
 	
 }
@@ -623,7 +623,7 @@ void CMainFrame::UpdateTransformInfo()
 	m_wndDlgBar.UpdateInfo();
 }
 
-void CMainFrame::OnTipDefaultMaterial() // 기본재질로 만들기.
+void CMainFrame::OnTipDefaultMaterial() // 기본재질로 만들기. [Korean comment]
 {
 	ASSERT(m_pMapMng);
 
@@ -634,12 +634,12 @@ void CMainFrame::OnTipDefaultMaterial() // 기본재질로 만들기.
 		if(pObj->Type() & OBJ_SHAPE)
 		{
 			CN3Shape* pShape = (CN3Shape*)pObj;
-			pShape->MakeDefaultMaterial(); // 기본재질로 만들기.
+			pShape->MakeDefaultMaterial(); // 기본재질로 만들기. [Korean comment]
 		}
 	}
 }
 
-void CMainFrame::OnTipRemoveAlphaflag() // 알파 블렌딩 플래그 제거..
+void CMainFrame::OnTipRemoveAlphaflag() // 알파 블렌딩 플래그 제거.. Remove
 {
 	ASSERT(m_pMapMng);
 
@@ -650,7 +650,7 @@ void CMainFrame::OnTipRemoveAlphaflag() // 알파 블렌딩 플래그 제거..
 		if(pObj->Type() & OBJ_SHAPE)
 		{
 			CN3Shape* pShape = (CN3Shape*)pObj;
-			pShape->RemoveRenderFlags(RF_ALPHABLENDING); // 알파 블렌딩 플래그 제거..
+			pShape->RemoveRenderFlags(RF_ALPHABLENDING); // 알파 블렌딩 플래그 제거.. Remove
 		}
 	}
 }
@@ -695,7 +695,7 @@ void CMainFrame::OnTipSowSeed()
 	if(!m_pDlgSowSeed->m_hWnd) m_pDlgSowSeed->Create(IDD_SOW_SEED);
 	m_pDlgSowSeed->ShowWindow(TRUE);
 
-	// 풀심기 
+	// 풀심기  [Korean comment]
 	if( m_pMapMng)
 	{
 		m_pMapMng->SetCursorMode(CM_EDIT_SEED);

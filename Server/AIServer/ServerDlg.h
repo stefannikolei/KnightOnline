@@ -20,7 +20,7 @@
 #include "Server.h"
 #include "Party.h"
 
-#include "Extern.h"			// 전역 객체
+#include "Extern.h"			// 전역 객체 [Korean comment]
 
 #include "resource.h"
 
@@ -95,7 +95,7 @@ public:
 	void CheckAliveTest();
 	void DeleteUserList(int uid);
 	void DeleteAllUserList(int zone);
-	void SendCompressedData(int nZone);			// 패킷을 압축해서 보낸다..
+	void SendCompressedData(int nZone);			// 패킷을 압축해서 보낸다.. [Korean comment]
 	int Send(char* pData, int length, int nZone = 0);
 	void SendSystemMsg(const std::string_view msg, int zone, int type = 0, int who = 0);
 	void ResetBattleZone();
@@ -155,29 +155,29 @@ public:
 
 	CUser* m_pUser[MAX_USER];
 
-	// class 객체
+	// class 객체 [Korean comment]
 	CNpcItem				m_NpcItem;
 
-	// 전역 객체 변수
+	// 전역 객체 변수 Variable
 	//BOOL			m_bNpcExit;
-	long			m_TotalNPC;			// DB에있는 총 수
-	long			m_CurrentNPCError;	// 세팅에서 실패한 수
-	long			m_CurrentNPC;		// 현재 게임상에서 실제로 셋팅된 수
-	short			m_sTotalMap;		// Zone 수 
+	long			m_TotalNPC;			// DB에있는 총 수 [Korean comment]
+	long			m_CurrentNPCError;	// 세팅에서 실패한 수 [Korean comment]
+	long			m_CurrentNPC;		// 현재 게임상에서 실제로 셋팅된 수 [Korean comment]
+	short			m_sTotalMap;		// Zone 수  [Korean comment]
 	short			m_sMapEventNpc;		// Map에서 읽어들이는 event npc 수
 
 	// sungyong 2002.05.23
-	BOOL			m_bFirstServerFlag;		// 서버가 처음시작한 후 게임서버가 붙은 경우에는 1, 붙지 않은 경우 0
-	short m_sSocketCount;		// GameServer와 처음접시 필요
-	short m_sReSocketCount;		// GameServer와 재접시 필요
-	float m_fReConnectStart;	// 처음 소켓이 도착한 시간
-	short m_sErrorSocketCount;  // 이상소켓 감시용
+	BOOL			m_bFirstServerFlag;		// 서버가 처음시작한 후 게임서버가 붙은 경우에는 1, 붙지 않은 경우 0 [Korean comment]
+	short m_sSocketCount;		// GameServer와 처음접시 필요 [Korean comment]
+	short m_sReSocketCount;		// GameServer와 재접시 필요 [Korean comment]
+	float m_fReConnectStart;	// 처음 소켓이 도착한 시간 Time
+	short m_sErrorSocketCount;  // 이상소켓 감시용 [Korean comment]
 	// ~sungyong 2002.05.23
-	BYTE  m_byBattleEvent;				   // 전쟁 이벤트 관련 플래그( 1:전쟁중이 아님, 0:전쟁중)
+	BYTE  m_byBattleEvent;				   // 전쟁 이벤트 관련 플래그( 1:전쟁중이 아님, 0:전쟁중) [Korean comment]
 	short m_sKillKarusNpc, m_sKillElmoNpc; // 전쟁동안에 죽은 npc숫자
 
 	int m_iYear, m_iMonth, m_iDate, m_iHour, m_iMin, m_iWeather, m_iAmount;
-	BYTE	m_byNight;			// 밤인지,, 낮인지를 판단... 1:낮, 2:밤
+	BYTE	m_byNight;			// 밤인지,, 낮인지를 판단... 1:낮, 2:밤 [Korean comment]
 	BYTE    m_byTestMode;
 
 	CIOCPort m_Iocport;
@@ -213,11 +213,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	// 패킷 압축에 필요 변수   -------------
+	// 패킷 압축에 필요 변수   ------------- Variable
 	int					m_CompCount;
 	char				m_CompBuf[10240];
 	int					m_iCompIndex;
-	// ~패킷 압축에 필요 변수   -------------
+	// ~패킷 압축에 필요 변수   ------------- Variable
 
 	BYTE				m_byZone;
 

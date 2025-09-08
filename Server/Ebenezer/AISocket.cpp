@@ -159,12 +159,12 @@ void CAISocket::LoginProcess(char* pBuf)
 	// 1: reconnect
 	BYTE byReConnect = GetByte(pBuf, index);
 	
-	// zone 틀리면 에러 
+	// zone 틀리면 에러  [Korean comment]
 	if (zone == 0xff)
 	{
 		AfxMessageBox(_T("AI Server Version Fail!!"));
 	}
-	// 틀리면 에러 
+	// 틀리면 에러  [Korean comment]
 	else
 	{
 		std::wstring logstr = std::format(L"AIServer zone connected: {}", zone);
@@ -206,7 +206,7 @@ void CAISocket::LoginProcess(char* pBuf)
 			{
 				fReConnectEndTime = TimeGet();
 
-				// 1분안에 모든 소켓이 재접됐다면...
+				// 1분안에 모든 소켓이 재접됐다면... [Korean comment]
 				if (fReConnectEndTime < m_pMain->m_fReConnectStart + 60)
 				{
 					spdlog::info("AISocket::LoginProcess: sockets reconnected in under a minute [sockets={}]",
@@ -216,7 +216,7 @@ void CAISocket::LoginProcess(char* pBuf)
 					spdlog::debug("AISocket::LoginProcess: sending all user info...");
 					m_pMain->SendAllUserInfo();
 				}
-				// 하나의 떨어진 소켓이라면...
+				// 하나의 떨어진 소켓이라면... [Korean comment]
 				else
 				{
 					m_pMain->m_sReSocketCount = 0;
@@ -270,8 +270,8 @@ void CAISocket::RecvServerInfo(char* pBuf)
 void CAISocket::RecvNpcInfoAll(char* pBuf)
 {
 	int index = 0;
-	BYTE		byCount = 0;	// 마리수
-	BYTE        byType;			// 0:처음에 등장하지 않는 몬스터, 1:등장
+	BYTE		byCount = 0;	// 마리수 [Korean comment]
+	BYTE        byType;			// 0:처음에 등장하지 않는 몬스터, 1:등장 [Korean comment]
 	short		instanceId;			// NPC index
 	short		npcId;			// NPC index
 	short       sZone;			// Current zone number
@@ -281,7 +281,7 @@ void CAISocket::RecvNpcInfoAll(char* pBuf)
 	int			iweapon_1;
 	int			iweapon_2;
 	char		npcName[MAX_NPC_NAME_SIZE + 1];
-	BYTE		byGroup;		// 소속 집단
+	BYTE		byGroup;		// 소속 집단 [Korean comment]
 	BYTE		byLevel;		// level
 	float		fPosX;			// X Position
 	float		fPosZ;			// Z Position
@@ -292,9 +292,9 @@ void CAISocket::RecvNpcInfoAll(char* pBuf)
 	int			iSellingGroup;
 	int			nMaxHP;			// 최대 HP
 	int			nHP;			// 현재 HP
-	BYTE		byGateOpen;		// 성문일경우 열림과 닫힘 정보
+	BYTE		byGateOpen;		// 성문일경우 열림과 닫힘 정보 Info
 	short		sHitRate;
-	BYTE		byObjectType;	// 보통 : 0, 특수 : 1
+	BYTE		byObjectType;	// 보통 : 0, 특수 : 1 [Korean comment]
 
 	byCount = GetByte(pBuf, index);
 
@@ -444,8 +444,8 @@ void CAISocket::RecvNpcMoveResult(char* pBuf)
 	// sungyong tw
 	char send_buff[256];	memset(send_buff, 0x00, 256);
 	int index = 0, send_index = 0;
-	BYTE		flag;			// 01(INFO_MODIFY)	: NPC 정보 변경
-								// 02(INFO_DELETE)	: NPC 정보 삭제
+	BYTE		flag;			// 01(INFO_MODIFY)	: NPC 정보 변경 Info
+								// 02(INFO_DELETE)	: NPC 정보 삭제 Delete
 	short		nid;			// NPC index
 	float		fPosX;			// X Position
 	float		fPosZ;			// Z Position
@@ -462,7 +462,7 @@ void CAISocket::RecvNpcMoveResult(char* pBuf)
 	if (pNpc == nullptr)
 		return;
 
-	// Npc 상태 동기화 불량,, 재요청..
+	// Npc 상태 동기화 불량,, 재요청.. Status
 	if (pNpc->m_NpcState == NPC_DEAD
 		|| pNpc->m_iHP <= 0)
 	{
@@ -513,7 +513,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 		if (pNpc->m_iHP < 0)
 			pNpc->m_iHP = 0;
 
-		// 마법으로 죽는경우
+		// 마법으로 죽는경우 [Korean comment]
 		if (result == 0x04)
 		{
 			SetByte(pOutBuf, WIZ_DEAD, send_index);
@@ -523,10 +523,10 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 		else
 		{
 			SetByte(pOutBuf, WIZ_ATTACK, send_index);
-			SetByte(pOutBuf, byAttackType, send_index);		// 직접:1, 마법:2, 지속마법:3
-			//if(result == 0x04)								// 마법으로 죽는경우
+			SetByte(pOutBuf, byAttackType, send_index);		// 직접:1, 마법:2, 지속마법:3 [Korean comment]
+			//if(result == 0x04)								// 마법으로 죽는경우 [Korean comment]
 			//	SetByte( pOutBuf, 0x02, send_index );
-			//else											// 단순공격으로 죽는경우
+			//else											// 단순공격으로 죽는경우 [Korean comment]
 			SetByte(pOutBuf, result, send_index);
 			SetShort(pOutBuf, sid, send_index);
 			SetShort(pOutBuf, tid, send_index);
@@ -606,7 +606,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 					pEvent->byLife = 0;
 			}
 
-			//	성용씨! 대만 재미있어요? --;
+			//	성용씨! 대만 재미있어요? --; [Korean comment]
 			if (pNpc->m_tNpcType == 2
 				&& sid >= 0
 				&& sid < MAX_USER)
@@ -673,7 +673,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 				if (pUser->m_bResHpType == USER_DEAD)
 					return;
 
-				// 유저에게는 바로 데드 패킷을 날림... (한 번 더 보냄, 유령을 없애기 위해서)
+				// 유저에게는 바로 데드 패킷을 날림... (한 번 더 보냄, 유령을 없애기 위해서) [Korean comment]
 				pUser->Send(pOutBuf, send_index);
 
 				pUser->m_bResHpType = USER_DEAD;
@@ -685,7 +685,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 				memset(pOutBuf, 0, sizeof(pOutBuf));
 				send_index = 0;
 
-				// 지휘권한이 있는 유저가 죽는다면,, 지휘 권한 박탈
+				// 지휘권한이 있는 유저가 죽는다면,, 지휘 권한 박탈 [Korean comment]
 				// If the user with command authority dies, revoke their command authority.
 				if (pUser->m_pUserData->m_bFame == COMMAND_CAPTAIN)
 				{
@@ -705,7 +705,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 						m_pMain->Announcement(ELMORAD_CAPTAIN_DEPRIVE_NOTIFY, ELMORAD);
 				}
 
-				// 경비병에게 죽는 경우라면..
+				// 경비병에게 죽는 경우라면.. [Korean comment]
 				if (pNpc->m_tNpcType == NPC_PATROL_GUARD)
 				{
 					pUser->ExpChange(-pUser->m_iMaxExp / 100);
@@ -716,7 +716,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 					if (pUser->m_pUserData->m_bZone != pUser->m_pUserData->m_bNation && pUser->m_pUserData->m_bZone < 3)
 					{
 						pUser->ExpChange(-pUser->m_iMaxExp / 100);
-						//TRACE(_T("정말로 1%만 깍였다니까요 ㅠ.ㅠ"));
+						//TRACE(_T("정말로 1%만 깍였다니까요 ㅠ.ㅠ")); [Korean comment]
 					}
 					else
 					{
@@ -866,24 +866,24 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 {
 	int index = 0;
 
-	BYTE		Mode;						// 01(INFO_MODIFY)	: NPC 정보 변경
-											// 02(INFO_DELETE)	: NPC 정보 삭제
+	BYTE		Mode;						// 01(INFO_MODIFY)	: NPC 정보 변경 Info
+											// 02(INFO_DELETE)	: NPC 정보 삭제 Delete
 	short		instanceId;						// NPC index
 	short		npcId;						// NPC index
 	short		pictureId;						// NPC Picture Number
 	short		sSize = 100;				// NPC Size
-	int			iWeapon_1;					// 오른손 무기
-	int			iWeapon_2;					// 왼손  무기
+	int			iWeapon_1;					// 오른손 무기 [Korean comment]
+	int			iWeapon_2;					// 왼손  무기 [Korean comment]
 	short       sZone;						// Current zone number
 	short       sZoneIndex;					// Current zone index
 	char		npcName[MAX_NPC_NAME_SIZE + 1];	// NPC Name
-	BYTE		byGroup;					// 소속 집단
+	BYTE		byGroup;					// 소속 집단 [Korean comment]
 	BYTE		byLevel;					// level
 	float		fPosX;						// X Position
 	float		fPosZ;						// Z Position
 	float		fPosY;						// Y Position
-	BYTE		byDirection;				// 방향
-	BYTE		tState;						// NPC 상태
+	BYTE		byDirection;				// 방향 [Korean comment]
+	BYTE		tState;						// NPC 상태 Status
 											// 00	: NPC Dead
 											// 01	: NPC Live
 	BYTE		tNpcKind;					// 00	: Monster
@@ -892,8 +892,8 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 	int			nMaxHP;						// 최대 HP
 	int			nHP;						// 현재 HP
 	BYTE		byGateOpen;
-	short		sHitRate;					// 공격 성공률
-	BYTE		byObjectType;				// 보통 : 0, 특수 : 1
+	short		sHitRate;					// 공격 성공률 [Korean comment]
+	BYTE		byObjectType;				// 보통 : 0, 특수 : 1 [Korean comment]
 
 	Mode = GetByte(pBuf, index);
 	instanceId = GetShort(pBuf, index);
@@ -932,7 +932,7 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 
 	pNpc->m_NpcState = NPC_DEAD;
 	
-	// 살아 있는데 또 정보를 받는 경우
+	// 살아 있는데 또 정보를 받는 경우 Info
 	if (pNpc->m_NpcState == NPC_LIVE)
 	{
 		spdlog::get(logger::EbenezerRegion)->info("AISocket::RecvNpcInfo: npc regen check [state={} serial={} npcId={} npcName={} x={} z={} regionX={} regionZ={}]",
@@ -1135,7 +1135,7 @@ void CAISocket::RecvNpcGiveItem(char* pBuf)
 	C3DMap* pMap = nullptr;
 	CUser* pUser = nullptr;
 
-	sUid = GetShort(pBuf, index);	// Item을 가져갈 사람의 아이디... (이것을 참조해서 작업하셈~)
+	sUid = GetShort(pBuf, index);	// Item을 가져갈 사람의 아이디... (이것을 참조해서 작업하셈~) [Korean comment]
 	sNid = GetShort(pBuf, index);
 	sZone = GetShort(pBuf, index);
 	regionx = GetShort(pBuf, index);
@@ -1258,10 +1258,10 @@ void CAISocket::RecvCompressedData(char* pBuf)
 
 	uint32_t dwCrcValue = 0, dwActualCrcValue = 0;
 
-	sCompLen = GetShort(pBuf, index);	// 압축된 데이타길이얻기...
-	sOrgLen = GetShort(pBuf, index);	// 원래데이타길이얻기...
-	dwCrcValue = GetDWORD(pBuf, index);	// CRC값 얻기...
-	sCompCount = GetShort(pBuf, index);	// 압축 데이타 수 얻기...
+	sCompLen = GetShort(pBuf, index);	// 압축된 데이타길이얻기... [Korean comment]
+	sOrgLen = GetShort(pBuf, index);	// 원래데이타길이얻기... [Korean comment]
+	dwCrcValue = GetDWORD(pBuf, index);	// CRC값 얻기... [Korean comment]
+	sCompCount = GetShort(pBuf, index);	// 압축 데이타 수 얻기... [Korean comment]
 
 	decompressedBuffer.resize(sOrgLen);
 
@@ -1464,12 +1464,12 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 		if (nResult == KARUS)
 		{
 			//TRACE(_T("--> RecvBattleEvent : 카루스 땅으로 넘어갈 수 있어\n"));
-			m_pMain->m_byKarusOpenFlag = 1;		// 카루스 땅으로 넘어갈 수 있어
+			m_pMain->m_byKarusOpenFlag = 1;		// 카루스 땅으로 넘어갈 수 있어 [Korean comment]
 		}
 		else if (nResult == ELMORAD)
 		{
 			//TRACE(_T("--> RecvBattleEvent : 엘모 땅으로 넘어갈 수 있어\n"));
-			m_pMain->m_byElmoradOpenFlag = 1;	// 엘모 땅으로 넘어갈 수 있어
+			m_pMain->m_byElmoradOpenFlag = 1;	// 엘모 땅으로 넘어갈 수 있어 [Korean comment]
 		}
 
 		SetByte(udp_buff, UDP_BATTLE_EVENT_PACKET, udp_index);
@@ -1525,11 +1525,11 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 
 		m_pMain->m_bVictory = nResult;
 		m_pMain->m_byOldVictory = nResult;
-		m_pMain->m_byKarusOpenFlag = 0;		// 카루스 땅으로 넘어갈 수 없도록
-		m_pMain->m_byElmoradOpenFlag = 0;	// 엘모 땅으로 넘어갈 수 없도록
+		m_pMain->m_byKarusOpenFlag = 0;		// 카루스 땅으로 넘어갈 수 없도록 [Korean comment]
+		m_pMain->m_byElmoradOpenFlag = 0;	// 엘모 땅으로 넘어갈 수 없도록 [Korean comment]
 		m_pMain->m_byBanishFlag = 1;
 
-		SetByte(udp_buff, UDP_BATTLE_EVENT_PACKET, udp_index);	// udp로 다른서버에 정보 전달
+		SetByte(udp_buff, UDP_BATTLE_EVENT_PACKET, udp_index);	// udp로 다른서버에 정보 전달 Info
 		SetByte(udp_buff, nType, udp_index);
 		SetByte(udp_buff, nResult, udp_index);
 	}
@@ -1642,7 +1642,7 @@ void CAISocket::RecvNpcEventItem(char* pBuf)
 	int nItemNumber = 0, nCount = 0;
 	CUser* pUser = nullptr;
 
-	sUid = GetShort(pBuf, index);	// Item을 가져갈 사람의 아이디... (이것을 참조해서 작업하셈~)
+	sUid = GetShort(pBuf, index);	// Item을 가져갈 사람의 아이디... (이것을 참조해서 작업하셈~) [Korean comment]
 	sNid = GetShort(pBuf, index);
 	nItemNumber = GetDWORD(pBuf, index);
 	nCount = GetDWORD(pBuf, index);

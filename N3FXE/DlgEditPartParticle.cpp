@@ -329,7 +329,7 @@ bool CDlgEditPartParticle::LoadPartScript(const char* szPath)
 	}
 
 	//////////////////////////////////////////////////
-	//각 컨트롤 셋팅...
+	//각 컨트롤 셋팅... [Korean comment]
 	m_bOnGround = pPart->m_bOnGround;
 	m_bAlphaBlend = pPart->m_bAlpha;
 
@@ -510,7 +510,7 @@ void CDlgEditPartParticle::OnPartParticleBtnLoadTex()
 			MessageBox("파일 이름끝이 0000이 아니던데요..-.-;;","ERR05",MB_OK);
 		}		
 
-		//파일 갯수 세는 기능 넣을까 말까..^^
+		//파일 갯수 세는 기능 넣을까 말까..^^ File
 
 		UpdateData(FALSE);
 	}

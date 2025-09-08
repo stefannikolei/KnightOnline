@@ -84,7 +84,7 @@ bool CUIPartyBBS::Load(HANDLE hFile)
 	}
 #endif
 
-	m_iCurPage = 0; // 현재 페이지..
+	m_iCurPage = 0; // 현재 페이지.. [Korean comment]
 
 	return true;
 }
@@ -145,18 +145,18 @@ bool CUIPartyBBS::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		else if(pSender == m_pBtn_Register)
 		{
 			std::string szMsg = fmt::format_text_resource(IDS_PARTY_BBS_REGISTER);
-			CGameProcedure::MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_PARTY_BBS_REGISTER); // 기사단 해체 물어보기..
+			CGameProcedure::MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_PARTY_BBS_REGISTER); // 기사단 해체 물어보기.. [Korean comment]
 		}
 		else if(pSender == m_pBtn_RegisterCancel)
 		{
 			std::string szMsg = fmt::format_text_resource(IDS_PARTY_BBS_REGISTER_CANCEL);
-			CGameProcedure::MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_PARTY_BBS_REGISTER_CANCEL); // 기사단 해체 물어보기..
+			CGameProcedure::MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_PARTY_BBS_REGISTER_CANCEL); // 기사단 해체 물어보기.. [Korean comment]
 		}
 		else if(pSender == m_pBtn_Whisper)
 		{
 			RequestWhisper();
 		}
-		else if(pSender == m_pBtn_Party) // 파티 신청
+		else if(pSender == m_pBtn_Party) // 파티 신청 [Korean comment]
 		{
 			RequestParty();
 		}
@@ -174,7 +174,7 @@ bool CUIPartyBBS::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 void CUIPartyBBS::MsgSend_RefreshData(int iCurPage)
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
+	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면 [Korean comment]
 
 	float fTime = CN3Base::TimeGet();
 	if( fTime - m_fTime < 3.0f )
@@ -199,7 +199,7 @@ void CUIPartyBBS::MsgRecv_RefreshData(Packet& pkt)
 
 	uint8_t byType = pkt.read<uint8_t>();
 	uint8_t byResult = pkt.read<uint8_t>();
-	if(byResult != 0x01) return; //실패했다면
+	if(byResult != 0x01) return; //실패했다면 [Korean comment]
 
 	switch( byType )
 	{
@@ -250,7 +250,7 @@ void CUIPartyBBS::MsgRecv_RefreshData(Packet& pkt)
 
 void CUIPartyBBS::MsgSend_Register()
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
+	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면 [Korean comment]
 
 	uint8_t byBuff[4];
 	int iOffset=0;
@@ -264,7 +264,7 @@ void CUIPartyBBS::MsgSend_Register()
 
 void CUIPartyBBS::MsgSend_RegisterCancel()
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
+	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면 [Korean comment]
 
 	uint8_t byBuff[4];
 	int iOffset=0;
@@ -279,7 +279,7 @@ void CUIPartyBBS::MsgSend_RegisterCancel()
 
 void CUIPartyBBS::RefreshPage()
 {
-	if(m_pText_Page) m_pText_Page->SetStringAsInt(m_iCurPage+1); // 페이지 표시..
+	if(m_pText_Page) m_pText_Page->SetStringAsInt(m_iCurPage+1); // 페이지 표시.. [Korean comment]
 
 	ResetContent();
 
@@ -319,12 +319,12 @@ void CUIPartyBBS::PartyStringSet(uint8_t byType)
 
 		std::string szMsg = fmt::format_text_resource(IDS_WANT_PARTY_MEMBER, iLMin, iLMax);
 		CGameBase::s_pPlayer->InfoStringSet(szMsg, 0xff00ff00);
-		CGameProcedure::s_pProcMain->MsgSend_StateChange(N3_SP_STATE_CHANGE_RECRUIT_PARTY, 0x02); // 파티 요청.. 취소
+		CGameProcedure::s_pProcMain->MsgSend_StateChange(N3_SP_STATE_CHANGE_RECRUIT_PARTY, 0x02); // 파티 요청.. 취소 [Korean comment]
 	}
 	else
 	{
 		CGameBase::s_pPlayer->InfoStringSet("", 0);
-		CGameProcedure::s_pProcMain->MsgSend_StateChange(N3_SP_STATE_CHANGE_RECRUIT_PARTY, 0x01); // 파티 요청..
+		CGameProcedure::s_pProcMain->MsgSend_StateChange(N3_SP_STATE_CHANGE_RECRUIT_PARTY, 0x01); // 파티 요청.. [Korean comment]
 	}
 }
 
@@ -453,7 +453,7 @@ void CUIPartyBBS::RequestWhisper()
 		if( i == m_iCurIndex )
 		{
 			__InfoPartyBBS IPB = (*it);
-			//나 자신에게는 귓속말을 못하게 한다...
+			//나 자신에게는 귓속말을 못하게 한다... [Korean comment]
 			if (lstrcmpi(IPB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) != 0)
 				CGameProcedure::s_pProcMain->MsgSend_ChatSelectTarget(IPB.szID);
 			break;
@@ -475,14 +475,14 @@ void CUIPartyBBS::RequestParty()
 		{
 			__InfoPartyBBS IPB = (*it);
 
-			// 나 자신에게는 파티 신청을 못하게 한다...
+			// 나 자신에게는 파티 신청을 못하게 한다... [Korean comment]
 			if (lstrcmpi(IPB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) != 0)
 			{
 				std::string szMsg;
 				if (CGameProcedure::s_pProcMain->MsgSend_PartyOrForceCreate(0, IPB.szID))
-					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE); // 파티
+					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE); // 파티 [Korean comment]
 				else
-					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE_FAILED); // 파티 초대 실패
+					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE_FAILED); // 파티 초대 실패 [Korean comment]
 				CGameProcedure::s_pProcMain->MsgOutput(IPB.szID + szMsg, 0xffffff00);
 				break;
 			}

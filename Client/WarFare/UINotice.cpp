@@ -59,7 +59,7 @@ bool CUINotice::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
 	if(nullptr == pSender) return false;
 
-	//s_CameraData.vp;  //불러 오는 과정을 살펴본다 
+	//s_CameraData.vp;  //불러 오는 과정을 살펴본다  [Korean comment]
 	//uint32_t mm = s_CameraData.vp.Height;
 	//uint32_t ss = s_CameraData.vp.Width;	
 
@@ -87,7 +87,7 @@ void CUINotice::GenerateText()
 {
 	if(nullptr == m_pText_Notice) return;
 	
-	// 글자수를 센다..
+	// 글자수를 센다.. [Korean comment]
 	int iTextLen = 0;
 	it_String it = m_Texts.begin(), itEnd = m_Texts.end();
 	for(; it != itEnd; it++)
@@ -97,7 +97,7 @@ void CUINotice::GenerateText()
 
 	std::vector<char> szBuff(iTextLen * 2, 0);
 
-	// 글자들을 붙이고  // LineFeed, Carriage return 을 붙인다.
+	// 글자들을 붙이고  // LineFeed, Carriage return 을 붙인다. [Korean comment]
 	it = m_Texts.begin(); itEnd = m_Texts.end();
 	for(; it != itEnd; it++)
 	{
@@ -105,7 +105,7 @@ void CUINotice::GenerateText()
 		lstrcat(&(szBuff[0]), "\n");
 	}
 
-	m_pText_Notice->SetString(&(szBuff[0])); // 글자 적용..
+	m_pText_Notice->SetString(&(szBuff[0])); // 글자 적용.. [Korean comment]
 }
 
 bool CUINotice::OnKeyPress(int iKey)

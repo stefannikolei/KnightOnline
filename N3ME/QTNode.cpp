@@ -61,7 +61,7 @@ void CQTNode::Init(int level, CLyTerrain* pTerrain)
 
 	int i;
 
-	// 자식노드만들기..
+	// 자식노드만들기.. [Korean comment]
 	if(level != m_pRefTerrain->m_iMaxLevel)
 	{
 		for(i=0;i<DIR_NUM;i++)
@@ -82,11 +82,11 @@ void CQTNode::Init(int level, CLyTerrain* pTerrain)
 
 //
 //	LinkFriend..
-//	친구들 연결하기..
+//	친구들 연결하기.. [Korean comment]
 //	- 원래는 Init함수에 넣을려고 했었는데,
-//	 친구들이 미처 만들어지기 전에 연결을
-//	 시도하는 경우가 있기땜에 모든 노드들을
-//	 다 생성한 다음에 친구연결을 시도해야한다.
+//	 친구들이 미처 만들어지기 전에 연결을 [Korean comment]
+//	 시도하는 경우가 있기땜에 모든 노드들을 [Korean comment]
+//	 다 생성한 다음에 친구연결을 시도해야한다. Create
 //
 void CQTNode::LinkFriend()
 {
@@ -169,7 +169,7 @@ void CQTNode::Release()
 
 
 //
-//	Center point를 설정하기..
+//	Center point를 설정하기.. Set
 //
 void CQTNode::SetCenterPoint(int x, int z)
 {
@@ -202,7 +202,7 @@ void CQTNode::SetCenterPoint(int x, int z)
 //
 void CQTNode::SetMinMaxY()
 {
-	if(m_Level == m_pRefTerrain->m_iMaxLevel)	//젤 마지막 노드일때..
+	if(m_Level == m_pRefTerrain->m_iMaxLevel)	//젤 마지막 노드일때.. [Korean comment]
 	{
 		for(int x=-1; x<2; x++)
 		{
@@ -215,7 +215,7 @@ void CQTNode::SetMinMaxY()
 		return;
 	}
 
-	//젤 마지막 노드가 아닐때...
+	//젤 마지막 노드가 아닐때... [Korean comment]
 	int i;
 	for(i=0;i<DIR_NUM;i++)
 	{
@@ -261,31 +261,31 @@ void CQTNode::SetWholeClipped()
 
 //
 //	tick...
-//	쿼드트리의 실체...^^
+//	쿼드트리의 실체...^^ [Korean comment]
 //	일단 가시영역안에 드는지 검사(IntersectRect()..)를 하고..
-//	가시영역안에 들면 그릴것인지 더 내려갈 것인지 검사..
+//	가시영역안에 들면 그릴것인지 더 내려갈 것인지 검사.. Check
 //
 void CQTNode::Tick()
 {
-	m_State = QTNODESTATE_CLIPPED;	//상태 초기화..
+	m_State = QTNODESTATE_CLIPPED;	//상태 초기화.. Initialize
 
-	//가시영역안에드는지검사.
+	//가시영역안에드는지검사. Check
 	RECT rt;
-	int Range = 1 << (m_pRefTerrain->m_iMaxLevel - m_Level);	// 중심점부터 가장자리까지 거리.
+	int Range = 1 << (m_pRefTerrain->m_iMaxLevel - m_Level);	// 중심점부터 가장자리까지 거리. [Korean comment]
 	SetRect(&rt, m_CenterX - Range, m_CenterZ - Range, m_CenterX + Range, m_CenterZ + Range);
 	
 	RECT rt1;
-	if(IntersectRect(&rt1, &rt, &(m_pRefTerrain->m_VisibleRect))==0) return;	//가시영역안에 들지 않으면 나가..
+	if(IntersectRect(&rt1, &rt, &(m_pRefTerrain->m_VisibleRect))==0) return;	//가시영역안에 들지 않으면 나가.. [Korean comment]
 
-	//그릴것인지 더 내려 갈 것인지 검사..
+	//그릴것인지 더 내려 갈 것인지 검사.. Check
 	if(IsRender(&(m_pRefTerrain->m_EyePos)))
 	{
-		// 그만 내려가는 경우..
+		// 그만 내려가는 경우.. [Korean comment]
 		m_pRefTerrain->m_RenderNodes.push_back(this);
 		return;
 	}
 
-	//내려가는 경우..	
+	//내려가는 경우..	 [Korean comment]
 	int i;
 	for(i=0;i<DIR_NUM;i++)
 	{
@@ -297,10 +297,10 @@ void CQTNode::Tick()
 
 //
 //	IsRender..
-//	내려가는 걸 그만두고 그릴것인지, 아니면 더 내려갈것인지 검사...
+//	내려가는 걸 그만두고 그릴것인지, 아니면 더 내려갈것인지 검사... Check
 //	return true -> 그만 내려가고 Render;
-//	return false -> 더 내려감...
-//	여기에 들어가는게 지형 디테일 방법의 핵심...^^
+//	return false -> 더 내려감... [Korean comment]
+//	여기에 들어가는게 지형 디테일 방법의 핵심...^^ [Korean comment]
 //
 bool CQTNode::IsRender(POINT* pEye)
 {
@@ -326,7 +326,7 @@ bool CQTNode::IsRender(POINT* pEye)
 		return false;
 	}
 	
-	// 높이가 어느수준이상이면 나눈다.
+	// 높이가 어느수준이상이면 나눈다. [Korean comment]
 	float height = m_MaxY - m_MinY;
 	//if( height > (1<<(DiffLevel+1)) )
 	if( height > m_pRefTerrain->m_iHeightLimit )
@@ -335,7 +335,7 @@ bool CQTNode::IsRender(POINT* pEye)
 		return false;
 	}
 
-	//거리에 따라..
+	//거리에 따라.. [Korean comment]
 	int Dist = Distance(pEye->x, pEye->y, m_CenterX, m_CenterZ);
 	if( Dist < ( m_pRefTerrain->m_iDistLimit + (1<<(DiffLevel+1))) )
 	{
@@ -354,7 +354,7 @@ bool CQTNode::IsRender(POINT* pEye)
 
 
 //
-//	간단한 거리계산 방법..
+//	간단한 거리계산 방법.. Calculate
 //
 inline int CQTNode::Distance(int sx, int sz, int tx, int tz)
 {
@@ -386,7 +386,7 @@ void CQTNode::Render()
 
 
 //
-//	가장 디테일한 타일을 그리는 함수..
+//	가장 디테일한 타일을 그리는 함수.. Function
 //
 void CQTNode::RenderMaxLevel()
 {
@@ -415,7 +415,7 @@ void CQTNode::RenderMaxLevel()
 	cx = m_CenterX - 1;
 	cz = m_CenterZ - 1;
 
-	//lightmap을 그리기 위한 준비..
+	//lightmap을 그리기 위한 준비.. Draw
 	//
 	CN3Texture* pRefLightMapTex[4];
 	int NumLightMapUse = 0;
@@ -454,7 +454,7 @@ void CQTNode::RenderMaxLevel()
 		}
 
 		tmpTIdx = m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.TexIdx.TexID;
-		if((m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.Attr.Group<=0) || m_pRefTerrain->GetTileTex(tmpTIdx)==nullptr)	//타일이 없을때...
+		if((m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.Attr.Group<=0) || m_pRefTerrain->GetTileTex(tmpTIdx)==nullptr)	//타일이 없을때... [Korean comment]
 		{
 			int NumTileInColorTex = m_pRefTerrain->m_iColorMapTexSize / m_pRefTerrain->m_iColorMapPixelPerUnitDistance;
 			u1 = (float)(cx % NumTileInColorTex);
@@ -522,7 +522,7 @@ void CQTNode::RenderMaxLevel()
 							0,0);
 			}
 
-			else	//순수하게 타일만 찍는 경우..
+			else	//순수하게 타일만 찍는 경우.. [Korean comment]
 			{
 				dir1 = m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.Dir;
 				dir2 = m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo2.Dir;
@@ -588,7 +588,7 @@ void CQTNode::RenderMaxLevel()
 		}
 
 		tmpTIdx = m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.TexIdx.TexID;
-		if((m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.Attr.Group<=0) || m_pRefTerrain->GetTileTex(tmpTIdx)==nullptr)	//타일이 없을때...
+		if((m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.Attr.Group<=0) || m_pRefTerrain->GetTileTex(tmpTIdx)==nullptr)	//타일이 없을때... [Korean comment]
 		{
 			int NumTileInColorTex = m_pRefTerrain->m_iColorMapTexSize / m_pRefTerrain->m_iColorMapPixelPerUnitDistance;
 			u1 = (float)(cx % NumTileInColorTex);
@@ -1006,7 +1006,7 @@ void CQTNode::RenderNormalLevel()
 	__VertexT1* pVertices;
 	m_pRefTerrain->m_ColorMapVB->Lock( 0, 0, (void**)&pVertices, 0 );
 
-	//점만들기..
+	//점만들기.. [Korean comment]
 	int NumTileInColorTex = m_pRefTerrain->m_iColorMapTexSize / m_pRefTerrain->m_iColorMapPixelPerUnitDistance;
 	//float cx = (float)((m_CenterX % NumTileInColorTex) * m_pRefTerrain->m_iColorMapPixelPerUnitDistance);
 	//float cz = (float)(((NumTileInColorTex-m_CenterZ) % NumTileInColorTex) * m_pRefTerrain->m_iColorMapPixelPerUnitDistance);
@@ -1026,9 +1026,9 @@ void CQTNode::RenderNormalLevel()
 					(cz + (float)half) / (float)NumTileInColorTex);
 	VC++;
 
-	//왼쪽변..
+	//왼쪽변.. [Korean comment]
 	int interval = 1;
-	int sp;	//시작점..
+	int sp;	//시작점.. [Korean comment]
 	float UVInterval;
 	if(m_Level<LeftLevel)
 	{
@@ -1053,7 +1053,7 @@ void CQTNode::RenderNormalLevel()
 					(float)(cz - half) / (float)NumTileInColorTex);
 	VC++;
 	
-	//윗쪽변..
+	//윗쪽변.. [Korean comment]
 	if(m_Level<TopLevel)
 	{
 		if(TopLevel==m_pRefTerrain->m_iMaxLevel) interval = 1;
@@ -1076,7 +1076,7 @@ void CQTNode::RenderNormalLevel()
 					(float)(cz - half) / (float)NumTileInColorTex);
 	VC++;
 	
-	//오른쪽변..
+	//오른쪽변.. [Korean comment]
 	if(m_Level<RightLevel)
 	{
 		if(RightLevel==m_pRefTerrain->m_iMaxLevel) interval = 1;
@@ -1100,7 +1100,7 @@ void CQTNode::RenderNormalLevel()
 					(float)(cz + half) / (float)NumTileInColorTex);
 	VC++;
 	
-	//아랫변..
+	//아랫변.. [Korean comment]
 	if(m_Level<BottomLevel)
 	{
 		if(BottomLevel==m_pRefTerrain->m_iMaxLevel) interval = 1;

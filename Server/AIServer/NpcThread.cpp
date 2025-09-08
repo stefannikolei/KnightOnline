@@ -55,7 +55,7 @@ UINT NpcThreadProc(LPVOID pParam /* NPC_THREAD_INFO ptr */)
 			//if((pNpc->m_tNpcType == NPCTYPE_DOOR || pNpc->m_tNpcType == NPCTYPE_ARTIFACT || pNpc->m_tNpcType == NPCTYPE_PHOENIX_GATE || pNpc->m_tNpcType == NPCTYPE_GATE_LEVER) && !pNpc->m_bFirstLive) continue;
 			//if( pNpc->m_bFirstLive ) continue;
 
-			// 잘못된 몬스터 (임시코드 2002.03.24)
+			// 잘못된 몬스터 (임시코드 2002.03.24) [Korean comment]
 			if (pNpc->m_sNid < 0)
 				continue;
 
@@ -72,7 +72,7 @@ UINT NpcThreadProc(LPVOID pParam /* NPC_THREAD_INFO ptr */)
 				if (pNpc->m_Delay < 0)
 					pNpc->m_Delay = 0;
 
-				//적발견시... (2002. 04.23수정, 부하줄이기)
+				//적발견시... (2002. 04.23수정, 부하줄이기) [Korean comment]
 				if (pNpc->m_NpcState == NPC_STANDING
 					&& pNpc->CheckFindEnemy())
 				{
@@ -93,16 +93,16 @@ UINT NpcThreadProc(LPVOID pParam /* NPC_THREAD_INFO ptr */)
 			if (10000 < dwTickTime)
 				pNpc->HpChange(pIOCP);
 
-			pNpc->DurationMagic_4(pIOCP, fTime2);		// 마법 처리...
-			pNpc->DurationMagic_3(pIOCP, fTime2);		// 지속마법..
+			pNpc->DurationMagic_4(pIOCP, fTime2);		// 마법 처리... Process
+			pNpc->DurationMagic_3(pIOCP, fTime2);		// 지속마법.. [Korean comment]
 
 			switch (pNpc->m_NpcState)
 			{
-				case NPC_LIVE:					// 방금 살아난 경우
+				case NPC_LIVE:					// 방금 살아난 경우 [Korean comment]
 					pNpc->NpcLive(pIOCP);
 					break;
 
-				case NPC_STANDING:						// 하는 일 없이 서있는 경우
+				case NPC_STANDING:						// 하는 일 없이 서있는 경우 [Korean comment]
 					pNpc->NpcStanding();
 					break;
 
@@ -170,15 +170,15 @@ UINT ZoneEventThreadProc(LPVOID pParam/* = nullptr */)
 			if (pMap == nullptr)
 				continue;
 
-			// 현재의 존이 던젼담당하는 존이 아니면 리턴..
+			// 현재의 존이 던젼담당하는 존이 아니면 리턴.. [Korean comment]
 			if (pMap->m_byRoomEvent == 0)
 				continue;
 
-			// 전체방이 클리어 되었다면
+			// 전체방이 클리어 되었다면 [Korean comment]
 			if (pMap->IsRoomStatusCheck())
 				continue;
 
-			// 방번호는 1번부터 시작
+			// 방번호는 1번부터 시작 [Korean comment]
 			for (auto& [_, pRoom] : pMap->m_arRoomEventArray)
 			{
 				if (pRoom == nullptr)
@@ -189,12 +189,12 @@ UINT ZoneEventThreadProc(LPVOID pParam/* = nullptr */)
 					|| pRoom->m_byStatus == 3)  
 					continue;
 
-				// 여기서 처리하는 로직...
+				// 여기서 처리하는 로직... Process
 				pRoom->MainRoom(fCurrentTime);
 			}
 		}
 
-		Sleep(1000);	// 1초당 한번
+		Sleep(1000);	// 1초당 한번 [Korean comment]
 	}
 
 	return 0;

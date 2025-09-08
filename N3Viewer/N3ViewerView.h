@@ -32,7 +32,7 @@ public:
 		__Vector3	vMin, vMax;
 	};
 	CN3Base*		m_pSelObjs[MAX_SELECT];
-	D3DCOLOR		m_crBkg; // 안개가 꺼졌을때 배경색
+	D3DCOLOR		m_crBkg; // 안개가 꺼졌을때 배경색 Color
 
 protected: // create from serialization only
 	CN3ViewerView();

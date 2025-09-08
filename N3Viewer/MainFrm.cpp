@@ -87,10 +87,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	EnableDocking(CBRS_ALIGN_ANY);
 	DockControlBar(&m_wndToolBar);
 
-	// Engine 생성
+	// Engine 생성 Create
 //	m_Eng.InitEnv();
 	if(!m_Eng.Init(TRUE, m_hWnd, 64, 64, 0, TRUE)) return -1;
-	m_Eng.GridCreate(1000, 1000); // 그리드 만들기..
+	m_Eng.GridCreate(1000, 1000); // 그리드 만들기.. [Korean comment]
 
 	return 0;
 }

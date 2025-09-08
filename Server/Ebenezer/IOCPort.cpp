@@ -93,7 +93,7 @@ DWORD WINAPI AcceptThread(LPVOID lp)
 				}
 
 				// Crytion
-				//pSocket->SendCryptionKey();	// 암호화
+				//pSocket->SendCryptionKey();	// 암호화 [Korean comment]
 				// ~
 				pSocket->Receive();
 
@@ -461,7 +461,7 @@ void CIOCPort::Init(int serversocksize, int clientsocksize, int workernum)
 	for (int i = 0; i < serversocksize; i++)
 		m_SockArrayInActive[i] = nullptr;
 
-	m_ClientSockArray = new CIOCPSocket2* [clientsocksize];		// 해당 서버가 클라이언트로서 다른 컴터에 붙는 소켓수
+	m_ClientSockArray = new CIOCPSocket2* [clientsocksize];		// 해당 서버가 클라이언트로서 다른 컴터에 붙는 소켓수 [Korean comment]
 	for (int i = 0; i < clientsocksize; i++)
 		m_ClientSockArray[i] = nullptr;
 

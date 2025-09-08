@@ -171,7 +171,7 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 	float fReConnectEndTime = 0.0f;
 	char pData[1024] = {};
 	BYTE byZoneNumber = GetByte(pBuf, index);
-	BYTE byReConnect = GetByte(pBuf, index);	// 0 : 처음접속, 1 : 재접속
+	BYTE byReConnect = GetByte(pBuf, index);	// 0 : 처음접속, 1 : 재접속 [Korean comment]
 
 	std::string logstr = fmt::format("Ebenezer connected to zone={}", byZoneNumber);
 	m_pMain->AddOutputMessage(logstr);
@@ -191,7 +191,7 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 	SetByte(pData, byReConnect, outindex);
 	Send(pData, outindex);
 
-	// 재접속해서 리스트 받기 (강제로)
+	// 재접속해서 리스트 받기 (강제로) [Korean comment]
 	if (byReConnect == 1)
 	{
 		if (m_pMain->m_sReSocketCount == 0)
@@ -226,7 +226,7 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 				m_pMain->m_sReSocketCount = 0;
 				m_pMain->AllNpcInfo();
 			}
-			// 하나의 떨어진 소켓이라면...
+			// 하나의 떨어진 소켓이라면... [Korean comment]
 			else
 			{
 				m_pMain->m_sReSocketCount = 0;
@@ -370,7 +370,7 @@ void CGameSocket::RecvUserInOut(char* pBuf)
 	region_x = (int) fX / VIEW_DIST;
 	region_z = (int) fZ / VIEW_DIST;
 
-	// 수정할것,,, : 지금 존 번호를 0으로 했는데.. 유저의 존 정보의 번호를 읽어야,, 함,,
+	// 수정할것,,, : 지금 존 번호를 0으로 했는데.. 유저의 존 정보의 번호를 읽어야,, 함,, Info
 	MAP* pMap = nullptr;
 
 	CUser* pUser = m_pMain->GetUserPtr(uid);
@@ -497,7 +497,7 @@ BOOL CGameSocket::SetUid(float x, float z, int id, int speed)
 		return FALSE;
 	}
 
-	// Zone번호도 받아야 함,,,
+	// Zone번호도 받아야 함,,, [Korean comment]
 	MAP* pMap = m_pMain->GetMapByIndex(pUser->m_sZoneIndex);
 	if (pMap == nullptr)
 	{
@@ -575,7 +575,7 @@ BOOL CGameSocket::SetUid(float x, float z, int id, int speed)
 	}
 
 	// dungeon work
-	// if( pUser->m_curZone == 던젼 ) 
+	// if( pUser->m_curZone == 던젼 )  [Korean comment]
 	int room = pMap->IsRoomCheck(x, z);
 
 	return TRUE;
@@ -636,7 +636,7 @@ void CGameSocket::RecvAttackReq(char* pBuf)
 		{
 			spdlog::error("GameSocket::RecvAttackReq: user is dead [userId={} charId={} isAlive={} hp={}]",
 				pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
-			// 죽은 유저이므로 게임서버에 죽은 처리를 한다...
+			// 죽은 유저이므로 게임서버에 죽은 처리를 한다... Process
 			Send_UserError(sid, tid);
 			return;
 		}
@@ -890,10 +890,10 @@ void CGameSocket::RecvCompressedData(char* pBuf)
 
 	uint32_t dwCrcValue = 0, dwActualCrcValue = 0;
 
-	sCompLen = GetShort(pBuf, index);	// 압축된 데이타길이얻기...
-	sOrgLen = GetShort(pBuf, index);	// 원래데이타길이얻기...
-	dwCrcValue = GetDWORD(pBuf, index);	// CRC값 얻기...
-	sCompCount = GetShort(pBuf, index);	// 압축 데이타 수 얻기...
+	sCompLen = GetShort(pBuf, index);	// 압축된 데이타길이얻기... [Korean comment]
+	sOrgLen = GetShort(pBuf, index);	// 원래데이타길이얻기... [Korean comment]
+	dwCrcValue = GetDWORD(pBuf, index);	// CRC값 얻기... [Korean comment]
+	sCompCount = GetShort(pBuf, index);	// 압축 데이타 수 얻기... [Korean comment]
 
 	decompressedBuffer.resize(sOrgLen);
 
@@ -924,7 +924,7 @@ void CGameSocket::RecvCompressedData(char* pBuf)
 void CGameSocket::RecvUserInfoAllData(char* pBuf)
 {
 	int index = 0;
-	BYTE		byCount = 0;			// 마리수
+	BYTE		byCount = 0;			// 마리수 [Korean comment]
 	short uid = -1, sHp, sMp, sZoneIndex, len;
 	BYTE bNation, bLevel, bZone, bAuthority = 1;
 	short sDamage, sAC, sPartyIndex = 0;
@@ -986,8 +986,8 @@ void CGameSocket::RecvUserInfoAllData(char* pBuf)
 
 		if (sPartyIndex != -1)
 		{
-			pUser->m_byNowParty = 1;					// 파티중
-			pUser->m_sPartyNumber = sPartyIndex;		// 파티 번호 셋팅
+			pUser->m_byNowParty = 1;					// 파티중 [Korean comment]
+			pUser->m_sPartyNumber = sPartyIndex;		// 파티 번호 셋팅 [Korean comment]
 			spdlog::debug("GameSocket::RecvUserInfoAllData: party info [userId={} charId={} partyNumber={}]",
 			uid, strName, pUser->m_sPartyNumber);
 		}
@@ -1116,7 +1116,7 @@ void CGameSocket::RecvHealMagic(char* pBuf)
 		{
 			spdlog::warn("GameSocket::RecvHealMagic:  user is dead [userId={} charId={} isAlive={} hp={}]",
 			pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
-			// 죽은 유저이므로 게임서버에 죽은 처리를 한다...
+			// 죽은 유저이므로 게임서버에 죽은 처리를 한다... Process
 			//Send_UserError(sid, tid);
 			return;
 		}
@@ -1137,15 +1137,15 @@ void CGameSocket::RecvTimeAndWeather(char* pBuf)
 	m_pMain->m_iWeather = GetByte(pBuf, index);
 	m_pMain->m_iAmount = GetShort(pBuf, index);
 
-	// 낮
+	// 낮 [Korean comment]
 	if (m_pMain->m_iHour >= 5
 		&& m_pMain->m_iHour < 21)
 		m_pMain->m_byNight = 1;
-	// 밤
+	// 밤 [Korean comment]
 	else
 		m_pMain->m_byNight = 2;
 
-	m_pMain->m_sErrorSocketCount = 0;	// Socket Check도 같이 하기 때문에...
+	m_pMain->m_sErrorSocketCount = 0;	// Socket Check도 같이 하기 때문에... [Korean comment]
 }
 
 void CGameSocket::RecvUserFail(char* pBuf)

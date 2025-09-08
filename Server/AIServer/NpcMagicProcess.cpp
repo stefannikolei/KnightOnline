@@ -327,7 +327,7 @@ void CNpcMagicProcess::ExecuteType3(int magicid, int tid, int data1, int data2, 
 	if (!pMagic)
 		return;
 
-	// 지역 공격,, 몬스터의 지역공격은 게임서버에서 처리한다.. 유저들을 상대로..
+	// 지역 공격,, 몬스터의 지역공격은 게임서버에서 처리한다.. 유저들을 상대로.. Process
 	if (tid == -1)
 		goto packet_send;
 
@@ -363,17 +363,17 @@ void CNpcMagicProcess::ExecuteType3(int magicid, int tid, int data1, int data2, 
 			else
 			{
 				damage = abs(damage);
-/*				if(pType->bAttribute == 3)   attack_type = 3; // 기절시키는 마법이라면.....
+/*				if(pType->bAttribute == 3)   attack_type = 3; // 기절시키는 마법이라면..... [Korean comment]
 				else attack_type = magicid;
 
 				if(pNpc->SetDamage(attack_type, damage, m_pSrcUser->m_strUserID, m_pSrcUser->m_iUserId + USER_BAND, m_pSrcUser->m_pIocport) == FALSE)	{
-					// Npc가 죽은 경우,,
-					pNpc->SendExpToUserList(); // 경험치 분배!!
+					// Npc가 죽은 경우,, [Korean comment]
+					pNpc->SendExpToUserList(); // 경험치 분배!! [Korean comment]
 					pNpc->SendDead(m_pSrcUser->m_pIocport);
 					m_pSrcUser->SendAttackSuccess(tid, MAGIC_ATTACK_TARGET_DEAD, damage, pNpc->m_iHP, MAGIC_ATTACK);
 				}
 				else	{
-					// 공격 결과 전송
+					// 공격 결과 전송 [Korean comment]
 					m_pSrcUser->SendAttackSuccess(tid, ATTACK_SUCCESS, damage, pNpc->m_iHP, MAGIC_ATTACK);
 				}	*/
 			}

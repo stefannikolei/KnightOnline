@@ -15,7 +15,7 @@ struct __PositionInfo
 {
 	__Vector3	vPos;
 	int			iID;
-	D3DCOLOR	crType; // 종류에 따른 색깔... 
+	D3DCOLOR	crType; // 종류에 따른 색깔...  Color
 };
 
 struct __DurationMagicImg
@@ -46,9 +46,9 @@ protected:
 	CN3UIProgress*	m_pProgress_ExpC;
 	CN3UIProgress*	m_pProgress_ExpP;
 
-	// 미니맵...
+	// 미니맵... [Korean comment]
 	CN3UIBase*		m_pGroup_MiniMap;
-	CN3UIImage*		m_pImage_Map; // 이 이미지에 미니맵 텍스처를 적용시킨다..
+	CN3UIImage*		m_pImage_Map; // 이 이미지에 미니맵 텍스처를 적용시킨다.. Texture
 	CN3UIButton*	m_pBtn_ZoomIn;
 	CN3UIButton*	m_pBtn_ZoomOut;
 	CN3UIButton*	m_pBtn_Quest;
@@ -57,18 +57,18 @@ protected:
 	// NOTE(srmeier): new components
 	CN3UIString*	m_pText_FPS;
 
-	float			m_fZoom; // 지도의 배율..
+	float			m_fZoom; // 지도의 배율.. [Korean comment]
 	float			m_fMapSizeX;
 	float			m_fMapSizeZ;
 	float			m_fYawPlayer;
 	__Vector3		m_vPosPlayer;
 	__Vector3		m_vViewPos;
 
-	__VertexTransformedColor	m_vArrows[6]; // 플레이어 위치 화살표..
+	__VertexTransformedColor	m_vArrows[6]; // 플레이어 위치 화살표.. Position
 	std::list<__PositionInfo>	m_Positions;
-	std::list<__PositionInfo>	m_PositionsTop; // 맨 위에 그릴 위치덜..
+	std::list<__PositionInfo>	m_PositionsTop; // 맨 위에 그릴 위치덜.. Position
 
-	//컬려있는 마법스킬 표시하기..
+	//컬려있는 마법스킬 표시하기.. [Korean comment]
 	std::list<__DurationMagicImg*> m_pMagic;
 	
 // Attributes
@@ -97,7 +97,7 @@ public:
 	bool	ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg); // 메시지를 받는다.. 보낸놈, msg
 
 	virtual void	Tick();
-	virtual void	Render(); // 미니맵 렌더링..
+	virtual void	Render(); // 미니맵 렌더링.. Rendering
 	virtual bool	Load(HANDLE hFile);
 	
 	virtual void	Release();

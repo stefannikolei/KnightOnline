@@ -191,9 +191,9 @@ protected:
 	int					_serverId;
 	int					_zoneId;
 
-	int					_packetCount;		// packet의 수를 체크
-	int					_sendPacketCount;	// packet의 수를 체크
-	int					_recvPacketCount;	// packet의 수를 체크
+	int					_packetCount;		// packet의 수를 체크 Check
+	int					_sendPacketCount;	// packet의 수를 체크 Check
+	int					_recvPacketCount;	// packet의 수를 체크 Check
 
 	HICON				_icon;
 

@@ -127,7 +127,7 @@ void CMainFrame::OnAdjustWindowSize()
 
 void CMainFrame::AdjustWindowSize() 
 {	
-	// 그림크기에 윈도우 사이즈 맞추기..
+	// 그림크기에 윈도우 사이즈 맞추기.. Window
 	DWORD dwStyle = this->GetStyle();
 	CRect rcFrm, rcView;
 	this->GetWindowRect(rcFrm);
@@ -160,7 +160,7 @@ void CMainFrame::OnFileConvert()
 	if(IDOK != nOK) return;
 
 	pDoc->m_pTex->Convert(dlg.m_Fmt, dlg.m_nWidth, dlg.m_nHeight, dlg.m_bMipMap);
-	pDoc->SetTitle(""); // 타이틀 바꾸기..
+	pDoc->SetTitle(""); // 타이틀 바꾸기.. [Korean comment]
 }
 
 void CMainFrame::OnToolConvertFilesAutomaticaly() 
@@ -228,9 +228,9 @@ void CMainFrame::OnToolConvertFilesManually()
 	CN3Texture Tex;
 	std::string szFN;
 	szFN = dlg.GetPathName();
-	Tex.LoadFromFile(szFN); // 첨 하나 읽어보고..
+	Tex.LoadFromFile(szFN); // 첨 하나 읽어보고.. [Korean comment]
 
-	CDlgFormat dlgFormat; // 포맷 정학...
+	CDlgFormat dlgFormat; // 포맷 정학... [Korean comment]
 	dlgFormat.m_nWidth = Tex.Width();
 	dlgFormat.m_nHeight = Tex.Height();
 	dlgFormat.m_bMipMap = Tex.MipMapCount() > 1 ? TRUE : FALSE;
@@ -265,11 +265,11 @@ void CMainFrame::OnToolCutBmp()
 	CFileDialog dlg(TRUE, "bmp", nullptr, dwFlags, "Bitmap file(*.bmp)|*.bmp||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
-	CDlgFormat dlgFmt; // 크기 및 저장 형식 지정.
+	CDlgFormat dlgFmt; // 크기 및 저장 형식 지정. Save
 	if(IDCANCEL == dlgFmt.DoModal()) return;
 
-	int nW = dlgFmt.m_nWidth; // 너비 
-	int nH = dlgFmt.m_nHeight; // 높이
+	int nW = dlgFmt.m_nWidth; // 너비  [Korean comment]
+	int nH = dlgFmt.m_nHeight; // 높이 [Korean comment]
 	D3DFORMAT fmtSave = dlgFmt.m_Fmt; // 포맷 - BitMap 일때는 무시..
 
 	int nYesNo = MessageBox("DXT File 로 저장하시겠습니까?", "저장 형식", MB_YESNO);
@@ -292,7 +292,7 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 	char szDir[_MAX_DIR];
 	char szFName[_MAX_FNAME];
 	_splitpath(lpszFileName, szDrive, szDir, szFName, nullptr);
-	CreateDirectory(szFName, nullptr);	// 하위 폴더 만들기
+	CreateDirectory(szFName, nullptr);	// 하위 폴더 만들기 [Korean comment]
 
 	int xx = BMF.Width() / iWidth;
 	int yy = BMF.Height() / iHeight;
@@ -342,18 +342,18 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 	CFile file;
 	CFileException fe;
 
-	// 읽기 모드로 파일 열기
+	// 읽기 모드로 파일 열기 Load
 	if (!file.Open(lpszFileName, CFile::modeRead|CFile::shareDenyWrite, &fe))
 	{
 		MessageBox("원본 bitmap을 열 수 없습니다.", "error");
 		return FALSE;
 	}
 
-	// 파일 길이
+	// 파일 길이 File
 	DWORD dwBitsSize;
 	dwBitsSize = file.GetLength();
 
-	// 파일 헤더 읽기
+	// 파일 헤더 읽기 Load
 	BITMAPFILEHEADER bmfHeader;
 	if (file.Read(&bmfHeader, sizeof(bmfHeader)) != sizeof(bmfHeader))
 	{
@@ -368,11 +368,11 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 		return FALSE;
 	}
 
-	// BITMAPINFOHEADER 얻기
+	// BITMAPINFOHEADER 얻기 [Korean comment]
 	BITMAPINFOHEADER bmInfoHeader;
 	if (file.Read(&bmInfoHeader, sizeof(bmInfoHeader)) != sizeof(bmInfoHeader)) return FALSE;
 
-	// 픽셀당 비트 수 확인
+	// 픽셀당 비트 수 확인 [Korean comment]
 	WORD wBitCount = bmInfoHeader.biBitCount;
 	if (24 != wBitCount)		// 24비트 bmp가 아니면 return해 버린다.
 	{
@@ -380,7 +380,7 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 		return FALSE;
 	}
 
-	// 가로, 세로로 나누어야 할 수 계산
+	// 가로, 세로로 나누어야 할 수 계산 Calculate
 	int iCX, iCY;
 	iCX = (bmInfoHeader.biWidth+iWidth-1) / iWidth;
 	iCY = (bmInfoHeader.biHeight+iHeight-1) / iHeight;
@@ -390,14 +390,14 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 		return FALSE;
 	}
 
-	// 실제 이미지 비트 주소
+	// 실제 이미지 비트 주소 [Korean comment]
 //	LPVOID pSrcImageBit;
 //	pSrcImageBit = (LPVOID)((BYTE*)pSrcDIB + (bmfHeader.bfOffBits - sizeof(bmfHeader)));
 
 	// 실제 이미지의 메모리상에 잡힌 가로 길이 (24bit)
 	int iRealWidthSrc = ((int)((bmInfoHeader.biWidth*3 + 3)/4))*4;	
 
-	// 새로 만들 이미지 메모리 할당
+	// 새로 만들 이미지 메모리 할당 [Korean comment]
 	int iRealWidthDest = ((int)((iWidth*3 + 3)/4))*4;	
 	int iDestDIBSize = sizeof(BITMAPINFOHEADER) + iRealWidthDest * iHeight;
 	LPVOID pDestDIB;
@@ -431,7 +431,7 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 	char szFName[_MAX_FNAME];
 	char szFNameDest[_MAX_FNAME];
 	_splitpath(lpszFileName, szDrive, szDir, szFName, nullptr);
-	CreateDirectory(szFName, nullptr);	// 하위 폴더 만들기
+	CreateDirectory(szFName, nullptr);	// 하위 폴더 만들기 [Korean comment]
 
 	// 쪼갠 정보를 tcd파일에 넣어서 저장
 	DWORD dwNum;
@@ -449,7 +449,7 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 	ProgressBar.Create("cutting bitmap..", 50, iCY*iCX);
 	ProgressBar.SetStep(1);
 
-	// 새로 쪼개서 저장하기
+	// 새로 쪼개서 저장하기 Save
 	BYTE *pTmpBitDest;
 	pTmpBitDest = ((BYTE*)pDestDIB) + sizeof(BITMAPINFOHEADER);
 	int i, j, y;
@@ -460,7 +460,7 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 			memset(pTmpBitDest, 0, iDestDIBSize - sizeof(BITMAPINFOHEADER));
 			for(y=0; y<iHeight; ++y)
 			{
-				if ( (iHeight*j + y) >= bmInfoHeader.biHeight) break;	// 맨 아래가 짤릴 경우가 있다
+				if ( (iHeight*j + y) >= bmInfoHeader.biHeight) break;	// 맨 아래가 짤릴 경우가 있다 [Korean comment]
 
 				// 원본파일의 읽어올 부분의 file position을 맞게 세팅한다.
 				file.Seek(bmfHeader.bfOffBits + 
@@ -469,7 +469,7 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 					CFile::begin);
 
 				if (i == (iCX-1))
-				{	// 맨 오른쪽 끝은 짤릴 가능성이 있다.
+				{	// 맨 오른쪽 끝은 짤릴 가능성이 있다. [Korean comment]
 					file.Read(pTmpBitDest + iRealWidthDest*(iHeight-1-y), bmInfoHeader.biWidth*3 - iRealWidthDest*(iCX-1));
 				}
 				else
@@ -478,7 +478,7 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 				}
 			}
 
-			// 저장하기
+			// 저장하기 Save
 			if(bSaveToDXT)
 			{
 				wsprintf(szFNameDest, "%s%s%s\\ConversionTmp.bmp", szDrive, szDir, szFName, szFName, i, iCY-1-j);
@@ -498,24 +498,24 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 			ProgressBar.StepIt();
 			this->UpdateWindow();
 
-			if(bSaveToDXT) // DXT 를 저장하려면..
+			if(bSaveToDXT) // DXT 를 저장하려면.. Save
 			{
 				char szDXT_FName[_MAX_PATH];
 				wsprintf(szDXT_FName, "%s%s%s\\%s_%02d%02d.DXT", szDrive, szDir, szFName, szFName, i, iCY-1-j);
 
 				CN3Texture TexTmp;
-				TexTmp.LoadFromFile(szFNameDest); // 로딩
-				if(true == TexTmp.Convert(fmtDXT)) // 변환
+				TexTmp.LoadFromFile(szFNameDest); // 로딩 [Korean comment]
+				if(true == TexTmp.Convert(fmtDXT)) // 변환 [Korean comment]
 				{
 					TexTmp.SaveToFile(szDXT_FName);
 				}
 
-				DeleteFile(szFNameDest); // 임시 비트맵 파일 지우기..
+				DeleteFile(szFNameDest); // 임시 비트맵 파일 지우기.. File
 			}
 		}
 	}
 
-	// 메모리 풀어줌
+	// 메모리 풀어줌 [Korean comment]
 	::GlobalFree(pDestDIB);
 	file.Close();
 	

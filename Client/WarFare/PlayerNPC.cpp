@@ -24,7 +24,7 @@ static char THIS_FILE[]=__FILE__;
 CPlayerNPC::CPlayerNPC()
 {
 	m_ePlayerType = PLAYER_NPC; // Player Type ... Base, NPC, OTher, MySelf
-	m_vPosFromServer = m_Chr.Pos(); // 서버에게 받은 위치.
+	m_vPosFromServer = m_Chr.Pos(); // 서버에게 받은 위치. Position
 }
 
 CPlayerNPC::~CPlayerNPC()
@@ -33,22 +33,22 @@ CPlayerNPC::~CPlayerNPC()
 
 void CPlayerNPC::Tick()
 {
-	if(m_pShapeExtraRef) // 오브젝트이면..
+	if(m_pShapeExtraRef) // 오브젝트이면.. Object
 	{
 		CPlayerBase::Tick();
 		return;
 	}
 
-	if(m_fTimeAfterDeath > 0) // 죽어야하거나 죽은 넘이면...
+	if(m_fTimeAfterDeath > 0) // 죽어야하거나 죽은 넘이면... [Korean comment]
 	{
 		if(m_fTimeAfterDeath > 3.0f)
-			this->Action(PSA_DYING, false); // 5 초가 지나야 죽는다.
+			this->Action(PSA_DYING, false); // 5 초가 지나야 죽는다. [Korean comment]
 		CPlayerBase::Tick();  // 회전, 지정된 에니메이션 Tick 및 색깔 지정 처리.. 등등..
 		return;
 	}
 
 	__Vector3 vPos = m_Chr.Pos();
-	if(	m_vPosFromServer.x != vPos.x || m_vPosFromServer.z != vPos.z ) // 조금 더 가야한다.
+	if(	m_vPosFromServer.x != vPos.x || m_vPosFromServer.z != vPos.z ) // 조금 더 가야한다. [Korean comment]
 	{
 		if(m_fMoveSpeedPerSec == 0)
 		{
@@ -57,69 +57,69 @@ void CPlayerNPC::Tick()
 		}
 
 		__Vector3 vOffset = m_vPosFromServer - vPos; vOffset.y = 0;
-		__Vector3 vDir = vOffset; vDir.Normalize();  // 방향.. 
+		__Vector3 vDir = vOffset; vDir.Normalize();  // 방향..  [Korean comment]
 
-		float fSpeedAbsolute = (m_fMoveSpeedPerSec > 0) ? m_fMoveSpeedPerSec : -m_fMoveSpeedPerSec; // 속도 절대값
-		float fDist = vOffset.Magnitude(); // 거리
-		if(fDist < fSpeedAbsolute * CN3Base::s_fSecPerFrm) // 움직이는 거리가 거의 다온거면..
+		float fSpeedAbsolute = (m_fMoveSpeedPerSec > 0) ? m_fMoveSpeedPerSec : -m_fMoveSpeedPerSec; // 속도 절대값 [Korean comment]
+		float fDist = vOffset.Magnitude(); // 거리 [Korean comment]
+		if(fDist < fSpeedAbsolute * CN3Base::s_fSecPerFrm) // 움직이는 거리가 거의 다온거면.. [Korean comment]
 		{
-			vPos.x = m_vPosFromServer.x; // 위치를 고정해주고..
-			vPos.z = m_vPosFromServer.z; // 위치를 고정해주고..
-//			m_fMoveSpeedPerSec = 0; // 움직이는 속도를 0으로!
-			this->ActionMove(PSM_STOP); // 움직이는 모션 처리..
+			vPos.x = m_vPosFromServer.x; // 위치를 고정해주고.. Position
+			vPos.z = m_vPosFromServer.z; // 위치를 고정해주고.. Position
+//			m_fMoveSpeedPerSec = 0; // 움직이는 속도를 0으로! [Korean comment]
+			this->ActionMove(PSM_STOP); // 움직이는 모션 처리.. Process
 		}
 		else 
 		{
-			float fYaw = (m_fMoveSpeedPerSec < 0) ? ::_Yaw2D(-vDir.x, -vDir.z) : ::_Yaw2D(vDir.x, vDir.z); // 방향을 계산해서..
-			this->RotateTo(fYaw, false); // 진행 방향으로 돌리고..
+			float fYaw = (m_fMoveSpeedPerSec < 0) ? ::_Yaw2D(-vDir.x, -vDir.z) : ::_Yaw2D(vDir.x, vDir.z); // 방향을 계산해서.. Calculate
+			this->RotateTo(fYaw, false); // 진행 방향으로 돌리고.. [Korean comment]
 
-			e_StateMove eMove = PSM_STOP; // 움직임...
-			// 플레이어면 걷는 속도가 기준 나머지는 덩치에 반비례..
+			e_StateMove eMove = PSM_STOP; // 움직임... [Korean comment]
+			// 플레이어면 걷는 속도가 기준 나머지는 덩치에 반비례.. [Korean comment]
 			float fStandWalk = ((PLAYER_OTHER == m_ePlayerType) ? (MOVE_SPEED_WHEN_WALK * 2.0f) : (MOVE_SPEED_WHEN_WALK * m_Chr.Radius() * 2.0f));
-			if(m_fMoveSpeedPerSec < 0) eMove = PSM_WALK_BACKWARD; // 뒤로 걷기..
-			else if(m_fMoveSpeedPerSec < fStandWalk) eMove = PSM_WALK; // 앞으로 걷기..
-			else eMove = PSM_RUN; // if(fDN > 5.0f) // 다음 위치의 거리가 일정 이상이면 뛰어간다.
-			this->ActionMove(eMove); // 움직이는 모션 처리..
+			if(m_fMoveSpeedPerSec < 0) eMove = PSM_WALK_BACKWARD; // 뒤로 걷기.. [Korean comment]
+			else if(m_fMoveSpeedPerSec < fStandWalk) eMove = PSM_WALK; // 앞으로 걷기.. [Korean comment]
+			else eMove = PSM_RUN; // if(fDN > 5.0f) // 다음 위치의 거리가 일정 이상이면 뛰어간다. Position
+			this->ActionMove(eMove); // 움직이는 모션 처리.. Process
 
-			vPos += vDir * (fSpeedAbsolute * s_fSecPerFrm); // 이동..
+			vPos += vDir * (fSpeedAbsolute * s_fSecPerFrm); // 이동.. Move
 		}
 
-		float fYTerrain = ACT_WORLD->GetHeightWithTerrain(vPos.x, vPos.z); // 지면의 높이값..
-		float fYMesh = ACT_WORLD->GetHeightNearstPosWithShape(vPos, 1.0f); // 충돌 체크 오브젝트의 높이값..
-		if(fYMesh != -FLT_MAX && fYMesh > fYTerrain && fYMesh < m_fYNext + 1.0f) m_fYNext = fYMesh; // 올라갈수 있는 오브젝트이고 높이값이 지면보다 높으면.
+		float fYTerrain = ACT_WORLD->GetHeightWithTerrain(vPos.x, vPos.z); // 지면의 높이값.. [Korean comment]
+		float fYMesh = ACT_WORLD->GetHeightNearstPosWithShape(vPos, 1.0f); // 충돌 체크 오브젝트의 높이값.. Check
+		if(fYMesh != -FLT_MAX && fYMesh > fYTerrain && fYMesh < m_fYNext + 1.0f) m_fYNext = fYMesh; // 올라갈수 있는 오브젝트이고 높이값이 지면보다 높으면. Object
 		else m_fYNext = fYTerrain;
-		this->PositionSet(vPos, false); // 위치 최종 적용..
+		this->PositionSet(vPos, false); // 위치 최종 적용.. Position
 	}
 
-	// 공격 중이거나 스킬 사용중이면..
+	// 공격 중이거나 스킬 사용중이면.. [Korean comment]
 	if (PSA_ATTACK == m_eState
 		|| PSA_SPELLMAGIC == m_eState)
 	{
 		CPlayerBase* pTarget = this->TargetPointerCheck(false);
-		CPlayerBase::ProcessAttack(pTarget); // 공격에 관한 루틴 처리.. 에니메이션 세팅과 충돌만 처리할뿐 패킷은 처리 안한다..
+		CPlayerBase::ProcessAttack(pTarget); // 공격에 관한 루틴 처리.. 에니메이션 세팅과 충돌만 처리할뿐 패킷은 처리 안한다.. Process
 	}
 
-	CPlayerBase::Tick(); // 회전. 이동, 에니메이션 틱.. 상태 바뀜 등을 처리한다.
+	CPlayerBase::Tick(); // 회전. 이동, 에니메이션 틱.. 상태 바뀜 등을 처리한다. Process
 }
 
 void CPlayerNPC::MoveTo(float fPosX, float fPosY, float fPosZ, float fSpeed, int iMoveMode)
 {
 	m_vPosFromServer.Set(fPosX, fPosY, fPosZ);
-	if(m_pShapeExtraRef) return; // 오브젝트 형식이면 움직일수가 없다..
+	if(m_pShapeExtraRef) return; // 오브젝트 형식이면 움직일수가 없다.. Object
 
-	// iMoveMode : 현재 움직이는 상태.. 0 -정지 1 움직임시작 2 - 1초마다 한번 연속움직임..
+	// iMoveMode : 현재 움직이는 상태.. 0 -정지 1 움직임시작 2 - 1초마다 한번 연속움직임.. Status
 	if(0 == iMoveMode) 
 	{
 	}
-	else if(iMoveMode) // 움직임 시작.. // 계속 움직임
+	else if(iMoveMode) // 움직임 시작.. // 계속 움직임 [Korean comment]
 	{
 		m_fMoveSpeedPerSec = fSpeed;
 		__Vector3 vPos = m_Chr.Pos(); vPos.y = 0;
 		__Vector3 vPosS(fPosX, 0, fPosZ);
 	
-		if(fSpeed) m_fMoveSpeedPerSec *= ((vPosS - vPos).Magnitude() / (fSpeed * PACKET_INTERVAL_MOVE)) * 0.85f; // 속도보간.. 동기화때문에 그런다.. 약간 줄여주는 이유는 멈칫하는걸 방지하기 위해서이다..
-		else m_fMoveSpeedPerSec = ((vPosS - vPos).Magnitude() / (fSpeed * PACKET_INTERVAL_MOVE)) * 0.85f; // 속도보간.. 동기화때문에 그런다.. 약간 줄여주는 이유는 멈칫하는걸 방지하기 위해서이다..
-		if(fSpeed < 0) m_fMoveSpeedPerSec *= -1.0f; // 뒤로 간다..
+		if(fSpeed) m_fMoveSpeedPerSec *= ((vPosS - vPos).Magnitude() / (fSpeed * PACKET_INTERVAL_MOVE)) * 0.85f; // 속도보간.. 동기화때문에 그런다.. 약간 줄여주는 이유는 멈칫하는걸 방지하기 위해서이다.. [Korean comment]
+		else m_fMoveSpeedPerSec = ((vPosS - vPos).Magnitude() / (fSpeed * PACKET_INTERVAL_MOVE)) * 0.85f; // 속도보간.. 동기화때문에 그런다.. 약간 줄여주는 이유는 멈칫하는걸 방지하기 위해서이다.. [Korean comment]
+		if(fSpeed < 0) m_fMoveSpeedPerSec *= -1.0f; // 뒤로 간다.. [Korean comment]
 	}
 	else
 	{

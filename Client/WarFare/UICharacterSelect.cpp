@@ -63,7 +63,7 @@ bool CUICharacterSelect::Load(HANDLE hFile)
 	N3_VERIFY_UI_COMPONENT(m_pBtnBack, GetChildByID("bt_back"));
 	N3_VERIFY_UI_COMPONENT(m_pUserInfoStr, GetChildByID<CN3UIString>("text00"));
 
-	// 위치를 화면 해상도에 맞게 바꾸기...
+	// 위치를 화면 해상도에 맞게 바꾸기... Position
 	POINT pt;
 	RECT rc = GetRegion();
 	float fRatio = (float) s_CameraData.vp.Width / (rc.right - rc.left);
@@ -144,7 +144,7 @@ bool CUICharacterSelect::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		}
 		else if (pSender == m_pBtnExit)
 		{
-//			CGameProcedure::ProcActiveSet((CGameProcedure*)CGameProcedure::s_pProcLogIn); // 로그인으로 돌아간다..
+//			CGameProcedure::ProcActiveSet((CGameProcedure*)CGameProcedure::s_pProcLogIn); // 로그인으로 돌아간다.. [Korean comment]
 			std::string szMsg = fmt::format_text_resource(IDS_CONFIRM_EXIT_GAME);
 			CGameProcedure::MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_EXIT);
 		}
@@ -154,7 +154,7 @@ bool CUICharacterSelect::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			CGameProcedure::s_pSocket->Disconnect();
 			CGameProcedure::s_bNeedReportConnectionClosed = true;
 
-			CGameProcedure::ProcActiveSet((CGameProcedure*) CGameProcedure::s_pProcLogIn); // 로그인으로 돌아간다..
+			CGameProcedure::ProcActiveSet((CGameProcedure*) CGameProcedure::s_pProcLogIn); // 로그인으로 돌아간다.. [Korean comment]
 		}
 		else if (pSender == m_pBtnDelete)
 		{
@@ -236,7 +236,7 @@ uint32_t CUICharacterSelect::MouseProc(uint32_t dwFlags, const POINT &ptCur, con
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
 	if (!m_bVisible) return dwRet;
 
-	// UI 움직이는 코드
+	// UI 움직이는 코드 [Korean comment]
 	if (UI_STATE_COMMON_MOVE == m_eState)
 	{
 		if (dwFlags&UI_MOUSE_LBCLICKED)
@@ -251,16 +251,16 @@ uint32_t CUICharacterSelect::MouseProc(uint32_t dwFlags, const POINT &ptCur, con
 		return dwRet;
 	}
 
-	if(false == IsIn(ptCur.x, ptCur.y))	// 영역 밖이면
+	if(false == IsIn(ptCur.x, ptCur.y))	// 영역 밖이면 [Korean comment]
 	{
 		if(false == IsIn(ptOld.x, ptOld.y))
 		{
-			return dwRet;// 이전 좌표도 영역 밖이면 
+			return dwRet;// 이전 좌표도 영역 밖이면  [Korean comment]
 		}
 	}
 	else
 	{
-		// tool tip 관련
+		// tool tip 관련 [Korean comment]
 		if (s_pTooltipCtrl != nullptr)
 			s_pTooltipCtrl->SetText(m_szToolTip, m_crToolTip);
 	}
@@ -268,20 +268,20 @@ uint32_t CUICharacterSelect::MouseProc(uint32_t dwFlags, const POINT &ptCur, con
 	if(m_pChildUI && m_pChildUI->IsVisible())
 		return dwRet;
 
-	// child에게 메세지 전달
+	// child에게 메세지 전달 [Korean comment]
 	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
 		uint32_t dwChildRet = pChild->MouseProc(dwFlags, ptCur, ptOld);
 		if (UI_MOUSEPROC_DONESOMETHING & dwChildRet)
-		{	// 이경우에는 먼가 포커스를 받은 경우이다.
+		{	// 이경우에는 먼가 포커스를 받은 경우이다. [Korean comment]
 
 			dwRet |= (UI_MOUSEPROC_CHILDDONESOMETHING|UI_MOUSEPROC_DONESOMETHING);
 			return dwRet;
 		}
 	}
 
-	// UI 움직이는 코드
+	// UI 움직이는 코드 [Korean comment]
 	if (UI_STATE_COMMON_MOVE != m_eState && 
 			PtInRect(&m_rcMovable, ptCur) && (dwFlags&UI_MOUSE_LBCLICK) )
 	{

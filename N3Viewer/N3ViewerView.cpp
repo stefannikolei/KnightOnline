@@ -71,7 +71,7 @@ CN3ViewerView::CN3ViewerView()
 	m_bViewClimbMesh = false;
 	m_bViewSelectedMeshWireFrame = false;
 
-	m_crBkg = 0xff606060; // 기본 배경색은 회색.
+	m_crBkg = 0xff606060; // 기본 배경색은 회색. Color
 }
 
 CN3ViewerView::~CN3ViewerView()
@@ -99,7 +99,7 @@ void CN3ViewerView::OnDraw(CDC* pDC)
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	
-	if(pCamera->m_bFogUse) // 안개 사용이면..
+	if(pCamera->m_bFogUse) // 안개 사용이면.. [Korean comment]
 	{
 		D3DCOLOR crFog = pCamera->m_FogColor;
 		pFrm->m_Eng.Clear(crFog);
@@ -121,8 +121,8 @@ void CN3ViewerView::OnDraw(CDC* pDC)
 	
 	if(MODE_NORMAL == pFrm->m_eMode)
 	{
-		pDoc->m_Scene.Render(); // Scene 렌더링..
-		if(pDoc->m_pSelectedObj) // 선택된것 렌더링..
+		pDoc->m_Scene.Render(); // Scene 렌더링.. Rendering
+		if(pDoc->m_pSelectedObj) // 선택된것 렌더링.. Rendering
 		{
 			DWORD dwType = pDoc->m_pSelectedObj->Type();
 			
@@ -138,10 +138,10 @@ void CN3ViewerView::OnDraw(CDC* pDC)
 				CN3Shape* pShape = (CN3Shape*)(pDoc->m_pSelectedObj);
 				int nPart = pFrm->GetViewProperty()->m_CBShapePart.GetCurSel();
 				CN3SPart* pPD = pShape->Part(nPart);
-				if(pPD) pPD->RenderSelected(m_bViewSelectedMeshWireFrame); // 선택된 부분만 렌더링..
+				if(pPD) pPD->RenderSelected(m_bViewSelectedMeshWireFrame); // 선택된 부분만 렌더링.. Rendering
 				else pShape->RenderSelected(m_bViewSelectedMeshWireFrame);
 
-				if(m_bViewObjectAxis && pFrm->GetViewProperty()->m_CBShapePart.GetSafeHwnd()) // 축 보이기..
+				if(m_bViewObjectAxis && pFrm->GetViewProperty()->m_CBShapePart.GetSafeHwnd()) // 축 보이기.. [Korean comment]
 				{
 					int nPart = pFrm->GetViewProperty()->m_CBShapePart.GetCurSel();
 					CN3SPart* pPart = pShape->Part(nPart);
@@ -157,7 +157,7 @@ void CN3ViewerView::OnDraw(CDC* pDC)
 
 		int nPart = -1;
 		int nPC = -1;
-		if(pFrm->m_DlgPMeshEdit.m_bPreview) // Preview 모드
+		if(pFrm->m_DlgPMeshEdit.m_bPreview) // Preview 모드 Mode
 		{
 			float fFrm = pDoc->m_Scene.m_fFrmCur;
 			pShape->Tick(fFrm); // 자동으로 LOD 계산..
@@ -180,7 +180,7 @@ void CN3ViewerView::OnDraw(CDC* pDC)
 				}
 				else
 				{
-					pPD->MeshInstance()->SetLOD(0); // 몽땅 보게끔..
+					pPD->MeshInstance()->SetLOD(0); // 몽땅 보게끔.. [Korean comment]
 				}
 			}
 		}
@@ -195,7 +195,7 @@ void CN3ViewerView::OnDraw(CDC* pDC)
 	pFrm->m_Eng.s_lpD3DDev->EndScene();
 	pFrm->m_Eng.Present(m_hWnd);
 
-	// 프레임 표시
+	// 프레임 표시 [Korean comment]
 #ifdef _DEBUG
 	static CString szInfo0, szInfo1, szInfo2;
 	szInfo0.Format("FPS : %6.2f", pFrm->m_Eng.s_fFrmPerSec);
@@ -271,7 +271,7 @@ void CN3ViewerView::OnLButtonDown(UINT nFlags, CPoint point)
 		pFrm->GetViewSceneTree()->SelectObject(TVI_ROOT, GetDocument()->m_pSelectedObj); // Tree Select
 		if(pDoc->m_pSelectedObj && pDoc->m_pSelectedObj->Type() & OBJ_SHAPE)
 		{
-			pFrm->GetViewProperty()->m_CBShapePart.SetCurSel(nPart); // 파트 선택..
+			pFrm->GetViewProperty()->m_CBShapePart.SetCurSel(nPart); // 파트 선택.. Select
 		}
 		pFrm->GetViewProperty()->UpdateInfo();
 		this->InvalidateRect(nullptr, FALSE);
@@ -330,7 +330,7 @@ CN3Base* CN3ViewerView::Pick(POINT point, int* pnPart)
 		if(nPart >= 0)
 		{
 			m_pSelObjs[0] = sort[i].pObj;
-			if(pnPart) *pnPart = nPart; // 몇번째 파트가 찍혔나...
+			if(pnPart) *pnPart = nPart; // 몇번째 파트가 찍혔나... [Korean comment]
 			return m_pSelObjs[0];
 		}
 	}

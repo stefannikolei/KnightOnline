@@ -30,10 +30,10 @@
 //#include "Imm.h"
 //#include "./N3Base/My_3DStruct.h"
 
-#include "packet.h"			// packet 정의
+#include "packet.h"			// packet 정의 [Korean comment]
 #include "global.h"			// 전역 funtion
 #include "define.h"			// define
-//#include "extern.h"			// 전역 객체
+//#include "extern.h"			// 전역 객체 [Korean comment]
 
 #include <shared/server_config.h>
 

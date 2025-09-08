@@ -84,7 +84,7 @@ enum e_GameOpcode
 	WIZ_MARKET_BBS					= 0x50,	// For the market bulletin board service...
 	WIZ_KICKOUT						= 0x51,	// Account ID forbid duplicate connection
 	WIZ_CLIENT_EVENT				= 0x52,	// Client Event (for quest)
-	WIZ_MAP_EVENT					= 0x53,	// 클라이언트에서 무슨 에코로 쓰고 있데요.
+	WIZ_MAP_EVENT					= 0x53,	// 클라이언트에서 무슨 에코로 쓰고 있데요. [Korean comment]
 	WIZ_WEIGHT_CHANGE				= 0x54,	// Notify change of weight
 	WIZ_SELECT_MSG					= 0x55,	// Select Event Message...
 	WIZ_NPC_SAY						= 0x56,	// Select Event Message...
@@ -639,9 +639,9 @@ constexpr uint8_t	AG_COMPRESSED_DATA		= 56;	// Packet Data compressed
 constexpr uint8_t	AG_ZONE_CHANGE			= 57;	// Zone change
 constexpr uint8_t	AG_MAGIC_ATTACK_REQ		= 58;	// Magic Attck Packet
 constexpr uint8_t	AG_MAGIC_ATTACK_RESULT	= 59;	// Magic Attck Packet
-constexpr uint8_t	AG_USER_INFO_ALL		= 60;	// User의 모든 정보 전송
+constexpr uint8_t	AG_USER_INFO_ALL		= 60;	// User의 모든 정보 전송 Info
 constexpr uint8_t	AG_LONG_MAGIC_ATTACK	= 61;	// Magic Attck Packet
-constexpr uint8_t	AG_PARTY_INFO_ALL		= 62;	// Party의 모든 정보 전송
+constexpr uint8_t	AG_PARTY_INFO_ALL		= 62;	// Party의 모든 정보 전송 Info
 constexpr uint8_t	AG_HEAL_MAGIC			= 63;	// Healing magic
 constexpr uint8_t	AG_TIME_WEATHER			= 64;	// time and whether info
 constexpr uint8_t	AG_BATTLE_EVENT			= 65;	// battle event
@@ -659,16 +659,16 @@ constexpr uint8_t	BATTLE_EVENT_KILL_USER	= 5;	// battle event result ( user kill
 // ---------------------------------------------------------------------
 // AI Server와 게임서버간의 User에 관련된 패킷은 101번 부터 시작
 // ---------------------------------------------------------------------
-constexpr uint8_t	AG_USER_INFO		= 101;	// User의 정보
+constexpr uint8_t	AG_USER_INFO		= 101;	// User의 정보 Info
 constexpr uint8_t	AG_USER_INOUT		= 102;	// User의 In,Out 정보
 constexpr uint8_t	AG_USER_MOVE		= 103;	// User의 move 정보
 constexpr uint8_t	AG_USER_MOVEEDGE	= 104;	// User의 move end 정보
 constexpr uint8_t	AG_USER_SET_HP		= 105;	// User의 HP
 constexpr uint8_t	AG_USER_LOG_OUT		= 106;	// User의 LogOut
 constexpr uint8_t	AG_USER_REGENE		= 107;	// User의 Regene
-constexpr uint8_t	AG_USER_EXP			= 108;	// User의 경험치
+constexpr uint8_t	AG_USER_EXP			= 108;	// User의 경험치 [Korean comment]
 constexpr uint8_t	AG_USER_UPDATE		= 109;	// User의 Update Info
-constexpr uint8_t	AG_USER_FAIL		= 110;	// 잘못된 유저 처리...
-constexpr uint8_t	AG_USER_PARTY		= 111;	// 파티처리 담당
+constexpr uint8_t	AG_USER_FAIL		= 110;	// 잘못된 유저 처리... Process
+constexpr uint8_t	AG_USER_PARTY		= 111;	// 파티처리 담당 Process
 constexpr uint8_t	AG_USER_VISIBILITY  = 112;	// updates invisibility status
 constexpr uint8_t	AG_NPC_HP_CHANGE	= 113;	// updates an NPC's HP

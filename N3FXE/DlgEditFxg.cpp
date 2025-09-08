@@ -100,7 +100,7 @@ BOOL CDlgEditFxg::OnInitDialog()
 		m_pJoint[i]->InsertString(0,"배꼽");
 		m_pJoint[i]->SetCurSel(0);
 
-		//	m_CBPartName들 채우기..
+		//	m_CBPartName들 채우기.. [Korean comment]
 		m_pJoint[i]->InsertString(1, "오른손");
 		m_pJoint[i]->InsertString(2, "왼손");		
 	}
@@ -122,7 +122,7 @@ bool CDlgEditFxg::LoadScript(const char* szPath)
 	}
 
 	//////////////////////////////////////////////////
-	//각 컨트롤 셋팅...
+	//각 컨트롤 셋팅... [Korean comment]
 	int cnt = pGroup->GetCount();
 	for(int i=0;i<cnt;i++)
 	{

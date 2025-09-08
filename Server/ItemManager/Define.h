@@ -87,7 +87,7 @@ typedef union {
 
 #define SLOT_MAX			14		// 착용 아템 MAX
 #define HAVE_MAX			28		// 소유 아템 MAX (인벤토리창)	
-#define ITEMCOUNT_MAX		9999	// 소모 아이템 소유 한계값
+#define ITEMCOUNT_MAX		9999	// 소모 아이템 소유 한계값 [Korean comment]
 #define WAREHOUSE_MAX		196		// 창고 아이템 MAX
 /////////////////////////////////////////////////////////////////////////////////
 // Structure Define

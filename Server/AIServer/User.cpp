@@ -34,15 +34,15 @@ static char THIS_FILE[] = __FILE__;
 #define MORAL_BAD		0x02
 #define MORAL_NEUTRAL	0x03
 
-// 운영자 아이디 넣기..
+// 운영자 아이디 넣기.. [Korean comment]
 /*const char* g_pszOPID[] =
 {
-	//"여우야2",
-	//"난강해",
-	//"이쁜여우2"
+	//"여우야2", [Korean comment]
+	//"난강해", [Korean comment]
+	//"이쁜여우2" [Korean comment]
 	//"Morpheus"
-//	"맨순",
-//	"민순"
+//	"맨순", [Korean comment]
+//	"민순" [Korean comment]
 };*/
 
 float surround_fx[8] = { 0.0f, -0.7071f, -1.0f, -0.7083f,  0.0f,  0.7059f,  1.0000f, 0.7083f };
@@ -67,39 +67,39 @@ void CUser::Initialize()
 	m_MagicProcess.m_pMain = m_pMain;
 	m_MagicProcess.m_pSrcUser = this;
 
-	memset(m_strUserID, 0, sizeof(m_strUserID));// 캐릭터의 이름
-	m_iUserId = -1;								// User의 번호
-	m_bLive = USER_DEAD;						// 죽었니? 살았니?
+	memset(m_strUserID, 0, sizeof(m_strUserID));// 캐릭터의 이름 Character
+	m_iUserId = -1;								// User의 번호 [Korean comment]
+	m_bLive = USER_DEAD;						// 죽었니? 살았니? [Korean comment]
 	m_curx = 0.0f;								// 현재 X 좌표
 	m_cury = 0.0f;								// 현재 Y 좌표
 	m_curz = 0.0f;								// 현재 Z 좌표
 	m_fWill_x = 0.0f;
 	m_fWill_y = 0.0f;
 	m_fWill_z = 0.0f;
-	m_curZone = -1;								// 현재 존
+	m_curZone = -1;								// 현재 존 [Korean comment]
 	m_sZoneIndex = -1;
-	m_bNation = 0;								// 소속국가
-	m_sLevel = 0;								// 레벨
+	m_bNation = 0;								// 소속국가 [Korean comment]
+	m_sLevel = 0;								// 레벨 [Korean comment]
 	m_sHP = 0;									// HP
 	m_sMP = 0;									// MP
 	m_sSP = 0;									// SP
 	m_sMaxHP = 0;								// MaxHP
 	m_sMaxMP = 0;								// MaxMP
 	m_sMaxSP = 0;								// MaxSP
-	m_state = 0;								// User의 상태
+	m_state = 0;								// User의 상태 Status
 	m_sRegionX = 0;								// 현재 영역 X 좌표
 	m_sRegionZ = 0;								// 현재 영역 Z 좌표
 	m_sOldRegionX = 0;
 	m_sOldRegionZ = 0;
-	m_bResHp = 0;								// 회복량
+	m_bResHp = 0;								// 회복량 [Korean comment]
 	m_bResMp = 0;
 	m_bResSta = 0;
 	m_sHitDamage = 0;							// Hit
 	m_sAC = 0;
 	m_sItemAC = 0;
-	m_fHitrate = 0.0f;							// 타격 성공률
-	m_fAvoidrate = 0;							// 회피 성공률
-	m_bLogOut = FALSE;							// Logout 중인가?
+	m_fHitrate = 0.0f;							// 타격 성공률 [Korean comment]
+	m_fAvoidrate = 0;							// 회피 성공률 [Korean comment]
+	m_bLogOut = FALSE;							// Logout 중인가? [Korean comment]
 	m_byNowParty = 0;
 	m_sPartyTotalLevel = 0;
 	m_byPartyTotalMan = 0;
@@ -126,7 +126,7 @@ void CUser::Attack(int sid, int tid)
 	if (pNpc->m_iHP == 0)
 		return;
 
-	// 경비병이면 타겟을 해당 유저로
+	// 경비병이면 타겟을 해당 유저로 [Korean comment]
 /*	if (pNpc->m_tNpcType == NPCTYPE_GUARD)
 	{
 		pNpc->m_Target.id = m_iUserId + USER_BAND;
@@ -138,10 +138,10 @@ void CUser::Attack(int sid, int tid)
 	}	*/
 
 	int nDefence = 0, nFinalDamage = 0;
-	// NPC 방어값 
+	// NPC 방어값  [Korean comment]
 	nDefence = pNpc->GetDefense();
 
-	// 명중이면 //Damage 처리 ----------------------------------------------------------------//
+	// 명중이면 //Damage 처리 ----------------------------------------------------------------// Process
 	nFinalDamage = GetDamage(tid);
 
 	if (m_byIsOP == AUTHORITY_MANAGER)
@@ -154,17 +154,17 @@ void CUser::Attack(int sid, int tid)
 	// Calculate Target HP	 -------------------------------------------------------//
 	short sOldNpcHP = pNpc->m_iHP;
 
-	// Npc가 죽은 경우,,
+	// Npc가 죽은 경우,, [Korean comment]
 	if (!pNpc->SetDamage(0, nFinalDamage, m_strUserID, m_iUserId + USER_BAND, m_pIocport))
 	{
-		pNpc->SendExpToUserList(); // 경험치 분배!!
+		pNpc->SendExpToUserList(); // 경험치 분배!! [Korean comment]
 		pNpc->SendDead(m_pIocport);
 		SendAttackSuccess(tid, ATTACK_TARGET_DEAD, nFinalDamage, pNpc->m_iHP);
 
-	//	CheckMaxValue(m_dwXP, 1);		// 몹이 죽을때만 1 증가!	
+	//	CheckMaxValue(m_dwXP, 1);		// 몹이 죽을때만 1 증가!	 [Korean comment]
 	//	SendXP();
 	}
-	// 공격 결과 전송
+	// 공격 결과 전송 [Korean comment]
 	else
 	{
 		SendAttackSuccess(tid, ATTACK_SUCCESS, nFinalDamage, pNpc->m_iHP);
@@ -287,7 +287,7 @@ void CUser::SetDamage(int damage, int tid)
 	}
 
 	//SendHP();
-	// 버디중이면 다른 버디원에게 날린다.
+	// 버디중이면 다른 버디원에게 날린다. [Korean comment]
 }
 
 void CUser::Dead(int tid, int nDamage)
@@ -301,7 +301,7 @@ void CUser::Dead(int tid, int nDamage)
 
 	InitNpcAttack();
 
-	// region에서 삭제...
+	// region에서 삭제... Delete
 	MAP* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 	{
@@ -369,7 +369,7 @@ void CUser::SendHP()
 	if (m_bLive == USER_DEAD)
 		return;
 
-	// HP 변동량을 게임서버로...
+	// HP 변동량을 게임서버로... [Korean comment]
 	int send_index = 0;
 	char buff[256] = {};
 
@@ -485,7 +485,7 @@ void CUser::SetPartyExp(int iNpcExp, int iLoyalty, int iPartyLevel, int iMan)
 	SendExp(iNpcExp, iLoyalty);
 }
 
-//  경험치를 보낸다. (레벨업일때 관련 수치를 준다)
+//  경험치를 보낸다. (레벨업일때 관련 수치를 준다) [Korean comment]
 void CUser::SendExp(int iExp, int iLoyalty, int tType)
 {
 	int send_index = 0;
@@ -528,8 +528,8 @@ short CUser::GetDamage(int tid, int magicid)
 		|| pNpc->m_tNpcType == NPC_SPECIAL_GATE)
 		return damage;
 
-	Attack = (float) m_fHitrate;						// 공격민첩
-	Avoid = (float) pNpc->m_sEvadeRate;					// 방어민첩	
+	Attack = (float) m_fHitrate;						// 공격민첩 [Korean comment]
+	Avoid = (float) pNpc->m_sEvadeRate;					// 방어민첩	 [Korean comment]
 	Hit = m_sHitDamage;									// 공격자 Hit 
 //	Ac = (short) (pNpc->m_sDefense) + pNpc->m_sLevel;	// 방어자 Ac 2002.07.06
 	Ac = (short) (pNpc->m_sDefense);					// 방어자 Ac 
@@ -620,7 +620,7 @@ short CUser::GetDamage(int tid, int magicid)
 	// Normal Hit.
 	else
 	{
-		result = GetHitRate(Attack / Avoid);		// 타격비 구하기
+		result = GetHitRate(Attack / Avoid);		// 타격비 구하기 [Korean comment]
 	}
 
 	switch (result)
@@ -628,7 +628,7 @@ short CUser::GetDamage(int tid, int magicid)
 		case GREAT_SUCCESS:
 		case SUCCESS:
 		case NORMAL:
-			// 스킬 공격
+			// 스킬 공격 [Korean comment]
 			if (magicid > 0)
 			{
 				damage = (short) Hit;
@@ -643,7 +643,7 @@ short CUser::GetDamage(int tid, int magicid)
 					damage = (short) ((float) (Hit * 0.6f) + 1.0f * (float) random + 0.99);
 				}
 			}
-			//일반 공격	
+			//일반 공격	 [Korean comment]
 			else
 			{
 				damage = (short) (HitB);
@@ -652,7 +652,7 @@ short CUser::GetDamage(int tid, int magicid)
 			}
 			break;
 
-		case FAIL:  // 사장님 요구 
+		case FAIL:  // 사장님 요구  [Korean comment]
 			damage = 0;
 			break;
 	}
@@ -889,8 +889,8 @@ void CUser::SendSystemMsg(const std::string_view msg, BYTE type, int nWho)
 	char buff[1024] = {};
 
 	SetByte(buff, AG_SYSTEM_MSG, send_index);
-	SetByte(buff, type, send_index);				// 채팅형식
-	SetShort(buff, nWho, send_index);				// 누구에게
+	SetByte(buff, type, send_index);				// 채팅형식 [Korean comment]
+	SetShort(buff, nWho, send_index);				// 누구에게 [Korean comment]
 	SetShort(buff, m_iUserId, send_index);
 	SetString2(buff, msg, send_index);
 
@@ -1082,7 +1082,7 @@ void CUser::HealAreaCheck(int rx, int rz)
 			vEnd.Set(pNpc->m_fCurX, pNpc->m_fCurY, pNpc->m_fCurZ);
 			fDis = pNpc->GetDistance(vStart, vEnd);
 
-			// NPC가 반경안에 있을 경우...
+			// NPC가 반경안에 있을 경우... [Korean comment]
 			if (fDis > fRadius)
 				continue;
 

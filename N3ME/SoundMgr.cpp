@@ -192,7 +192,7 @@ void CSoundMgr::Render()
 	D3DXMATRIX mtx;
 	D3DXMatrixIdentity(&mtx);
 		
-	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtx); // 월드 행렬 적용..
+	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtx); // 월드 행렬 적용.. [Korean comment]
 	
 	// set texture
 	hr = s_lpD3DDev->SetTexture(0, nullptr);
@@ -213,7 +213,7 @@ void CSoundMgr::Render()
 
 	hr = s_lpD3DDev->SetFVF(FVF_XYZCOLOR);
 
-	//이미 만들어진 길 그리기...
+	//이미 만들어진 길 그리기... Draw
 	std::list<CSoundCell*>::iterator itSound;
 
 	CSoundCell* pSound;
@@ -225,10 +225,10 @@ void CSoundMgr::Render()
 		pSound->Render(0xff0000ff);
 	}
 
-	//대화상자에서 선택된 길 그리기.
+	//대화상자에서 선택된 길 그리기. Draw
 	if(m_pDlgSound->m_pSelSound) m_pDlgSound->m_pSelSound->Render(0xff00ff00);
 
-	//만들고 있는 길 & 영역 그리기..
+	//만들고 있는 길 & 영역 그리기.. Draw
 	m_pCurrSound->Render(0xffff0000);
 
 	// restore
@@ -239,14 +239,14 @@ void CSoundMgr::Render()
 
 bool CSoundMgr::Load(HANDLE hFile)
 {
-	//dlg 클리어..
+	//dlg 클리어.. [Korean comment]
 	m_pDlgSound->Clear();
 
 	DWORD dwRWC;
 	ReadFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
 	if(!m_pDlgSound->LoadSoundGroup(hFile)) return false;
 
-	//m_pSound클리어...
+	//m_pSound클리어... [Korean comment]
 	std::list<CSoundCell*>::iterator it;
 	for(it = m_pSound.begin(); it != m_pSound.end(); it++)
 	{
@@ -264,7 +264,7 @@ bool CSoundMgr::Load(HANDLE hFile)
 		pSoundCell->Load(hFile);
 
 		m_pSound.push_back(pSoundCell);
-		//dlg에 추가...
+		//dlg에 추가... Add
 		m_pDlgSound->AddSoundInfo(pSoundCell);		
 	}
 	m_pRefMapMng->Invalidate();
@@ -298,8 +298,8 @@ void CSoundMgr::SaveGameData(HANDLE hFile)
 	char* pSound = (char*)GlobalAlloc(GMEM_FIXED, sizeof(char)*m_MapSize*m_MapSize);
 	memset(pSound, -1, sizeof(char)*m_MapSize*m_MapSize);
 
-	//sound cell들을 면적순으로(큰게 앞으로 오게..)정렬하고...
-	//면적순으로 정리하면서 아이디정렬도 하고...
+	//sound cell들을 면적순으로(큰게 앞으로 오게..)정렬하고... [Korean comment]
+	//면적순으로 정리하면서 아이디정렬도 하고... [Korean comment]
 	//
 	//
 	SCSort();
@@ -330,7 +330,7 @@ void CSoundMgr::SaveGameData(HANDLE hFile)
 			AfxMessageBox("Sound Group이 유효하지 않습니다.ㅠ.ㅠ");
 			return;
 		}
-		//sound group을 어케 저장한담?
+		//sound group을 어케 저장한담? Save
 		for(int j=0;j<4;j++)
 		{
 			int str_size = 0;
@@ -373,7 +373,7 @@ void CSoundMgr::SaveGameData(HANDLE hFile)
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // related sort list...
 // list의 sort함수 베꼈당..-.-
-// 제대로 동작 안하더라..ㅠ.ㅠ
+// 제대로 동작 안하더라..ㅠ.ㅠ [Korean comment]
 //
 
 void CSoundMgr::SCSort()

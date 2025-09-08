@@ -21,7 +21,7 @@ constexpr int MAX_TYPE4_BUFF		= 9;
 constexpr int MAX_ITEM				= 28;
 
 constexpr int NPC_HAVE_ITEM_LIST	= 6;
-constexpr int ZONEITEM_MAX			= 2'100'000'000;	// 존에 떨어지는 최대 아이템수...
+constexpr int ZONEITEM_MAX			= 2'100'000'000;	// 존에 떨어지는 최대 아이템수... [Korean comment]
 
 constexpr int SERVER_INFO_START		= 1;
 constexpr int SERVER_INFO_END		= 2;
@@ -36,7 +36,7 @@ constexpr int MAX_MESSAGE_EVENT		= 10;
 constexpr int MAX_COUPON_ID_LENGTH	= 20;
 constexpr int MAX_CURRENT_EVENT		= 20;
 
-// 지금 쓰이는것만 정의 해 놨습니다.
+// 지금 쓰이는것만 정의 해 놨습니다. [Korean comment]
 // logic관련 define
 enum e_LogicCheck
 {
@@ -157,7 +157,7 @@ enum e_Exec
 	EXEC_ROB_EXAM							= 0x47
 };
 
-// EVENT 시작 번호들 :)
+// EVENT 시작 번호들 :) [Korean comment]
 constexpr int EVENT_POTION			= 1;
 constexpr int EVENT_FT_1			= 20;
 constexpr int EVENT_FT_3			= 36;
@@ -200,7 +200,7 @@ constexpr int BBS_CHECK_TIME		= 36000;
 // UserInOut //
 #define USER_IN					0X01
 #define USER_OUT				0X02
-#define USER_REGENE				0X03	// Userin하고 같은것인데 효과를 주기위해서.. 분리(게임시작, 리젠. 소환시)
+#define USER_REGENE				0X03	// Userin하고 같은것인데 효과를 주기위해서.. 분리(게임시작, 리젠. 소환시) [Korean comment]
 #define USER_WARP				0X04
 #define USER_SUMMON				0X05
 #define NPC_IN					0X01
@@ -240,11 +240,11 @@ constexpr int BBS_CHECK_TIME		= 36000;
 // ==================================================================
 //	About Map Object
 // ==================================================================
-#define USER_BAND				0			// Map 위에 유저가 있다.
+#define USER_BAND				0			// Map 위에 유저가 있다. [Korean comment]
 #define NPC_BAND				10000		// Map 위에 NPC(몹포함)가 있다.
 #define INVALID_BAND			30000		// 잘못된 ID BAND
 
-#define EVENT_MONSTER			20			// Event monster 총 수
+#define EVENT_MONSTER			20			// Event monster 총 수 [Korean comment]
 
 ///////////////// snow event define //////////////////////////////
 #define SNOW_EVENT_MONEY		2000

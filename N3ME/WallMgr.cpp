@@ -33,15 +33,15 @@ CWallMgr::CWallMgr()
 	m_BaseCube[6].Set(0, 0, 1); // 뒤쪽 LB
 	m_BaseCube[7].Set(1, 0, 1);	// 뒤쪽 RB
 	
-	m_pRefMapMng = nullptr;	// 지형 참조 포인터..
-	m_pWalls.clear();		// 벽들...
+	m_pRefMapMng = nullptr;	// 지형 참조 포인터.. [Korean comment]
+	m_pWalls.clear();		// 벽들... [Korean comment]
 
 	m_pDlg = new CDlgMakeWall;
 	m_pDlg->Create(IDD_MAKE_WALL);
 	m_pDlg->ShowWindow(FALSE);
 	m_pDlg->m_pRefWallMgr = this;
 
-	m_bActive = false; // 이기능이 활성화 되어 있는지...1:활성화, 0:비활성화..
+	m_bActive = false; // 이기능이 활성화 되어 있는지...1:활성화, 0:비활성화.. [Korean comment]
 	m_pCurrWall = nullptr;
 }
 
@@ -228,7 +228,7 @@ void CWallMgr::Render()
 	D3DXMATRIX mtx;
 	D3DXMatrixIdentity(&mtx);
 		
-	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtx); // 월드 행렬 적용..
+	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtx); // 월드 행렬 적용.. [Korean comment]
 	
 	// set texture
 	hr = s_lpD3DDev->SetTexture(0, nullptr);
@@ -249,7 +249,7 @@ void CWallMgr::Render()
 
 	hr = s_lpD3DDev->SetFVF(FVF_XYZCOLOR);
 
-	//이미 만들어진 길 그리기...
+	//이미 만들어진 길 그리기... Draw
 	std::list<CWall*>::iterator itWall;
 	std::list<__Vector3>::iterator itVertex;
 
@@ -280,7 +280,7 @@ void CWallMgr::Render()
 		}
 	}
 
-	//다이얼로그 창에서 선택된 길 그리기..
+	//다이얼로그 창에서 선택된 길 그리기.. Window
 	CWall* pSelWall = m_pDlg->m_pSelWall;
 	if(pSelWall)
 	{
@@ -303,7 +303,7 @@ void CWallMgr::Render()
 		}
 	}
 
-	//만들고 있는 길 & 영역 그리기..
+	//만들고 있는 길 & 영역 그리기.. Draw
 	if(m_pCurrWall)
 	{
 		for(itVertex = m_pCurrWall->m_Wall.begin(); itVertex != m_pCurrWall->m_Wall.end(); itVertex++)

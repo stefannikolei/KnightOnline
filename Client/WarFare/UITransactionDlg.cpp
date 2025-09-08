@@ -123,13 +123,13 @@ void CUITransactionDlg::Render()
 		}
 	}
 
-	// 갯수 표시되야 할 아이템 갯수 표시..
+	// 갯수 표시되야 할 아이템 갯수 표시.. [Korean comment]
 	for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
 	{
 		if ( m_pMyTradeInv[i] && ( (m_pMyTradeInv[i]->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) || 
 			(m_pMyTradeInv[i]->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL) ) )
 		{
-			// string 얻기..
+			// string 얻기.. [Korean comment]
 			CN3UIString* pStr = GetChildStringByiOrder(i);
 			if(pStr) 
 			{
@@ -154,7 +154,7 @@ void CUITransactionDlg::Render()
 		}
 		else
 		{
-			// string 얻기..
+			// string 얻기.. [Korean comment]
 			CN3UIString* pStr = GetChildStringByiOrder(i);
 			if(pStr) 
 				pStr->SetVisible(false);
@@ -294,7 +294,7 @@ void CUITransactionDlg::EnterTransactionState()
 
 	std::string szIconFN;
 	__IconItemSkill*	spItem = nullptr;
-	__TABLE_ITEM_BASIC*	pItem = nullptr;													// 아이템 테이블 구조체 포인터..
+	__TABLE_ITEM_BASIC*	pItem = nullptr;													// 아이템 테이블 구조체 포인터.. [Korean comment]
 	__TABLE_ITEM_EXT*	pItemExt = nullptr;
 
 	int iOrg = m_iTradeID/1000;
@@ -313,7 +313,7 @@ void CUITransactionDlg::EnterTransactionState()
 			break;
 
 		pItem = CGameBase::s_pTbl_Items_Basic.GetIndexedData(i);
-		if(nullptr == pItem) // 아이템이 없으면..
+		if(nullptr == pItem) // 아이템이 없으면.. [Korean comment]
 		{
 			__ASSERT(0, "아이템 포인터 테이블에 없음!!");
 			CLogWriter::Write("CUITransactionDlg::EnterTransactionState - Invalid Item ID : {}, {}", iOrg, iExt);
@@ -327,7 +327,7 @@ void CUITransactionDlg::EnterTransactionState()
 			continue;
 
 		pItemExt = CGameBase::s_pTbl_Items_Exts[pItem->byExtIndex].Find(iExt);	
-		if(nullptr == pItemExt) // 아이템이 없으면..
+		if(nullptr == pItemExt) // 아이템이 없으면.. [Korean comment]
 		{
 			__ASSERT(0, "아이템 포인터 테이블에 없음!!");
 			CLogWriter::Write("CUITransactionDlg::EnterTransactionState - Invalid Item ID : {}, {}", iOrg, iExt);
@@ -339,13 +339,13 @@ void CUITransactionDlg::EnterTransactionState()
 
 		e_PartPosition ePart;
 		e_PlugPosition ePlug;
-		e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug); // 아이템에 따른 파일 이름을 만들어서
+		e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug); // 아이템에 따른 파일 이름을 만들어서 File
 		__ASSERT(ITEM_TYPE_UNKNOWN != eType, "Unknown Item");
 
 		spItem = new __IconItemSkill;
 		spItem->pItemBasic	= pItem;
 		spItem->pItemExt	= pItemExt;
-		spItem->szIconFN	= szIconFN; // 아이콘 파일 이름 복사..
+		spItem->szIconFN	= szIconFN; // 아이콘 파일 이름 복사.. File
 		spItem->iCount		= 1;
 		spItem->iDurability = pItem->siMaxDurability+pItemExt->siMaxDurability;
 
@@ -520,7 +520,7 @@ void CUITransactionDlg::ItemCountOK()
 
 	switch (CN3UIWndBase::s_pCountableItemEdit->GetCallerWndDistrict())
 	{
-		case UIWND_DISTRICT_TRADE_NPC:		// 사는 경우..
+		case UIWND_DISTRICT_TRADE_NPC:		// 사는 경우.. [Korean comment]
 			spItem = m_pMyTrade[m_iCurPage][CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
 
 			switch (spItem->pItemBasic->byContable)
@@ -529,7 +529,7 @@ void CUITransactionDlg::ItemCountOK()
 				case UIITEM_TYPE_SOMOONE:
 					iWeight = spItem->pItemBasic->siWeight;
 
-					// 무게 체크..
+					// 무게 체크.. Check
 					if ( (pInfoExt->iWeight + iWeight) > pInfoExt->iWeightMax)
 					{	 
 						std::string szMsg = fmt::format_text_resource(IDS_ITEM_WEIGHT_OVERFLOW);	
@@ -597,7 +597,7 @@ void CUITransactionDlg::ItemCountOK()
 
 					iWeight = iGold * spItem->pItemBasic->siWeight;
 
-					// 무게 체크..
+					// 무게 체크.. Check
 					if ( (pInfoExt->iWeight + iWeight) > pInfoExt->iWeightMax)
 					{
 						std::string szMsg = fmt::format_text_resource(IDS_ITEM_WEIGHT_OVERFLOW);	
@@ -609,13 +609,13 @@ void CUITransactionDlg::ItemCountOK()
 
 			s_bWaitFromServer = true;
 
-			if ( m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] )	// 해당 위치에 아이콘이 있으면..
+			if ( m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] )	// 해당 위치에 아이콘이 있으면.. Position
 			{
-				//  숫자 업데이트..
+				//  숫자 업데이트.. Update
 				m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount += iGold;
 
 				// 표시는 아이콘 렌더링할때.. Inventory의 Render에서..
-				// 서버에게 보냄..
+				// 서버에게 보냄.. [Korean comment]
 				SendToServerBuyMsg(CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID+
 					CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID, 
 					CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder, iGold);
@@ -627,11 +627,11 @@ void CUITransactionDlg::ItemCountOK()
 				spItemNew				= new __IconItemSkill;
 				spItemNew->pItemBasic	= spItem->pItemBasic;
 				spItemNew->pItemExt		= spItem->pItemExt;
-				spItemNew->szIconFN		= spItem->szIconFN; // 아이콘 파일 이름 복사..
+				spItemNew->szIconFN		= spItem->szIconFN; // 아이콘 파일 이름 복사.. File
 				spItemNew->iCount		= iGold;
 				spItemNew->iDurability  = spItem->pItemBasic->siMaxDurability+spItem->pItemExt->siMaxDurability;
 
-				// 아이콘 리소스 만들기..
+				// 아이콘 리소스 만들기.. [Korean comment]
 				spItemNew->pUIIcon = new CN3UIIcon;
 				float fUVAspect		= (float)45.0f/(float)64.0f;
 				spItemNew->pUIIcon->Init(this); 
@@ -649,7 +649,7 @@ void CUITransactionDlg::ItemCountOK()
 
 				m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = spItemNew;
 
-				// 서버에게 보냄..
+				// 서버에게 보냄.. [Korean comment]
 				SendToServerBuyMsg(CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID+
 					CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID, 
 					CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder, iGold);
@@ -658,7 +658,7 @@ void CUITransactionDlg::ItemCountOK()
 			if (CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic) PlayItemSound(CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic);
 			break;
 
-		case UIWND_DISTRICT_TRADE_MY:		//  파는 경우..
+		case UIWND_DISTRICT_TRADE_MY:		//  파는 경우.. [Korean comment]
 			spItem = m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
 
 			if ( iGold <= 0 ) return;
@@ -668,7 +668,7 @@ void CUITransactionDlg::ItemCountOK()
 
 			if ( (spItem->iCount - iGold) > 0 )
 			{	
-				//  숫자 업데이트..
+				//  숫자 업데이트.. Update
 				spItem->iCount -= iGold;
 			}
 			else
@@ -676,7 +676,7 @@ void CUITransactionDlg::ItemCountOK()
 				spItem->pUIIcon->SetVisible(false);
 			}
 
-			// 서버에게 보냄..
+			// 서버에게 보냄.. [Korean comment]
 			SendToServerSellMsg(CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID+
 				CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID, 
 				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder, iGold);
@@ -691,7 +691,7 @@ void CUITransactionDlg::ItemCountCancel()
 	// Sound..
 	if (CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic) PlayItemSound(CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic);
 
-	// 취소..
+	// 취소.. [Korean comment]
 	s_bWaitFromServer				= false;
 	s_sRecoveryJobInfo.pItemSource	= nullptr;
 	s_sRecoveryJobInfo.pItemTarget	= nullptr;
@@ -830,7 +830,7 @@ void CUITransactionDlg::ReceiveResultTradeMoveFail()
 
 void CUITransactionDlg::ReceiveItemDropByTradeSuccess()
 {
-	// 원래 아이템을 삭제해야 하지만.. 되살릴 방법이 없기 때문에 원래 위치로 옮기고.. 
+	// 원래 아이템을 삭제해야 하지만.. 되살릴 방법이 없기 때문에 원래 위치로 옮기고..  Delete
 	__IconItemSkill* spItem;
 	spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource;
 
@@ -843,12 +843,12 @@ void CUITransactionDlg::ReceiveItemDropByTradeSuccess()
 		spItem->pUIIcon->SetMoveRect(pArea->GetRegion());
 	}
 
-	// Invisible로 하고 삭제는 서버가 성공을 줄때 한다..
+	// Invisible로 하고 삭제는 서버가 성공을 줄때 한다.. Delete
 	spItem->pUIIcon->SetVisible(false);
 
 	if( (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) || (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL) )
 	{
-		// 활이나 물약등 아이템인 경우..
+		// 활이나 물약등 아이템인 경우.. [Korean comment]
 		spItem->pUIIcon->SetVisible(true);
 	}
 }
@@ -866,7 +866,7 @@ bool CUITransactionDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 	e_UIWND_DISTRICT eUIWnd = UIWND_DISTRICT_UNKNOWN;
 	if (!m_bVisible) return false;
 
-	// 내가 가졌던 아이콘이 아니면..
+	// 내가 가졌던 아이콘이 아니면.. [Korean comment]
 	if ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd != m_eUIWnd )
 		FAIL_RETURN
 	if ( (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_TRADE_NPC) &&
@@ -933,13 +933,13 @@ bool CUITransactionDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 	switch (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict)
 	{
 		case UIWND_DISTRICT_TRADE_NPC:
-			if (eUIWnd == UIWND_DISTRICT_TRADE_MY)		// 사는 경우..
+			if (eUIWnd == UIWND_DISTRICT_TRADE_MY)		// 사는 경우.. [Korean comment]
 			{
 				if( (CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) ||
 					(CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL) )
 				{
-					// 활이나 물약등 아이템인 경우..
-					// 면저 인벤토리에 해당 아이콘이 있는지 알아본다..
+					// 활이나 물약등 아이템인 경우.. [Korean comment]
+					// 면저 인벤토리에 해당 아이콘이 있는지 알아본다.. [Korean comment]
 					bFound = false;
 
 					for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
@@ -958,12 +958,12 @@ bool CUITransactionDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 						}
 					}
 
-					// 못찾았으면.. 
+					// 못찾았으면..  [Korean comment]
 					if ( !bFound )
 					{
-						if ( m_pMyTradeInv[iDestiOrder] )	// 해당 위치에 아이콘이 있으면..
+						if ( m_pMyTradeInv[iDestiOrder] )	// 해당 위치에 아이콘이 있으면.. Position
 						{
-							// 인벤토리 빈슬롯을 찾아 들어간다..
+							// 인벤토리 빈슬롯을 찾아 들어간다.. [Korean comment]
 							for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
 							{
 								if ( !m_pMyTradeInv[i] )
@@ -974,7 +974,7 @@ bool CUITransactionDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 								}
 							}
 
-							if ( !bFound )	// 빈 슬롯을 찾지 못했으면..
+							if ( !bFound )	// 빈 슬롯을 찾지 못했으면.. [Korean comment]
 							{
 								s_bWaitFromServer				= false;
 								s_sRecoveryJobInfo.pItemSource	= nullptr;
@@ -1006,7 +1006,7 @@ bool CUITransactionDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 						FAIL_RETURN	
 					}
 
-					// 무게 체크..
+					// 무게 체크.. Check
 					if ( (pInfoExt->iWeight + CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->siWeight) > pInfoExt->iWeightMax)
 					{	 
 						std::string szMsg = fmt::format_text_resource(IDS_ITEM_WEIGHT_OVERFLOW);	
@@ -1018,10 +1018,10 @@ bool CUITransactionDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 						FAIL_RETURN	
 					}
 
-					// 일반 아이템인 경우..
-					if ( m_pMyTradeInv[iDestiOrder] )	// 해당 위치에 아이콘이 있으면..
+					// 일반 아이템인 경우.. [Korean comment]
+					if ( m_pMyTradeInv[iDestiOrder] )	// 해당 위치에 아이콘이 있으면.. Position
 					{
-						// 인벤토리 빈슬롯을 찾아 들어간다..
+						// 인벤토리 빈슬롯을 찾아 들어간다.. [Korean comment]
 						bFound = false;
 						for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
 						{
@@ -1033,7 +1033,7 @@ bool CUITransactionDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 							}
 						}
 
-						if ( !bFound )	// 빈 슬롯을 찾지 못했으면..
+						if ( !bFound )	// 빈 슬롯을 찾지 못했으면.. [Korean comment]
 						{
 							s_bWaitFromServer				= false;
 							s_sRecoveryJobInfo.pItemSource	= nullptr;
@@ -1055,18 +1055,18 @@ bool CUITransactionDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 					e_PlugPosition ePlug;
 					
 					__IconItemSkill* spItemTrade = m_pMyTrade[m_iCurPage][s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
-					CGameBase::MakeResrcFileNameForUPC(spItemTrade->pItemBasic, spItemTrade->pItemExt, nullptr, &szIconFN, ePart, ePlug); // 아이템에 따른 파일 이름을 만들어서
+					CGameBase::MakeResrcFileNameForUPC(spItemTrade->pItemBasic, spItemTrade->pItemExt, nullptr, &szIconFN, ePart, ePlug); // 아이템에 따른 파일 이름을 만들어서 File
 
 					__IconItemSkill* spItemNew;
 					spItemNew				= new __IconItemSkill;
 					spItemNew->pItemBasic	= m_pMyTrade[m_iCurPage][CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pItemBasic;
 					spItemNew->pItemExt		= m_pMyTrade[m_iCurPage][CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pItemExt;
-					spItemNew->szIconFN		= szIconFN; // 아이콘 파일 이름 복사..
+					spItemNew->szIconFN		= szIconFN; // 아이콘 파일 이름 복사.. File
 					spItemNew->iCount		= 1;
 					spItemNew->iDurability	= m_pMyTrade[m_iCurPage][CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pItemBasic->siMaxDurability
 						+m_pMyTrade[m_iCurPage][CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pItemExt->siMaxDurability;
 
-					// 아이콘 리소스 만들기..
+					// 아이콘 리소스 만들기.. [Korean comment]
 					spItemNew->pUIIcon = new CN3UIIcon;
 					float fUVAspect		= (float)45.0f/(float)64.0f;
 					spItemNew->pUIIcon->Init(this); 
@@ -1096,14 +1096,14 @@ bool CUITransactionDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 			break;
 
 		case UIWND_DISTRICT_TRADE_MY:
-			if (eUIWnd == UIWND_DISTRICT_TRADE_NPC)		// 파는 경우..
+			if (eUIWnd == UIWND_DISTRICT_TRADE_NPC)		// 파는 경우.. [Korean comment]
 			{
 				s_bWaitFromServer = false;
 
 				if (s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
 					|| s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
 				{
-					// 활이나 물약등 아이템인 경우..
+					// 활이나 물약등 아이템인 경우.. [Korean comment]
 					s_pCountableItemEdit->Open(UIWND_TRANSACTION, s_sSelectedIconInfo.UIWndSelect.UIWndDistrict, false);
 				}
 				else
@@ -1119,7 +1119,7 @@ bool CUITransactionDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 			}
 			else	
 			{
-				// 이동.. 
+				// 이동..  Move
 				__IconItemSkill *spItemSource, *spItemTarget = nullptr;
 				spItemSource = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource;
 
@@ -1132,7 +1132,7 @@ bool CUITransactionDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 				}
 
 				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder				= iDestiOrder;
-				if ( m_pMyTradeInv[iDestiOrder] )	// 해당 위치에 아이콘이 있으면..
+				if ( m_pMyTradeInv[iDestiOrder] )	// 해당 위치에 아이콘이 있으면.. Position
 				{
 					CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget					= m_pMyTradeInv[iDestiOrder];
 					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd			= UIWND_TRANSACTION;
@@ -1185,7 +1185,7 @@ void CUITransactionDlg::ReceiveResultTradeFromServer(byte bResult, byte bType, i
 	switch ( CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict )
 	{
 		case UIWND_DISTRICT_TRADE_NPC:
-			if ( bResult != 0x01 )	// 실패라면.. 
+			if ( bResult != 0x01 )	// 실패라면..  [Korean comment]
 			{	
 				if( (CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) ||
 					(CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL) )
@@ -1194,22 +1194,22 @@ void CUITransactionDlg::ReceiveResultTradeFromServer(byte bResult, byte bType, i
 
 					if ( (m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount - iGold) > 0 )
 					{	
-						//  숫자 업데이트..
+						//  숫자 업데이트.. Update
 						m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount -= iGold;
 					}
 					else
 					{
-						// 아이템 삭제.. 현재 인벤토리 윈도우만.. 
+						// 아이템 삭제.. 현재 인벤토리 윈도우만..  Delete
 						__IconItemSkill* spItem;
 						spItem = m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 
-						// 인벤토리에서도 지운다..
+						// 인벤토리에서도 지운다.. [Korean comment]
 						m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
 
-						// iOrder로 내 매니저의 아이템을 리스트에서 삭제한다..
+						// iOrder로 내 매니저의 아이템을 리스트에서 삭제한다.. Delete
 						RemoveChild(spItem->pUIIcon);
 
-						// 아이콘 리소스 삭제...
+						// 아이콘 리소스 삭제... Delete
 						spItem->pUIIcon->Release();
 						delete spItem->pUIIcon;
 						spItem->pUIIcon = nullptr;
@@ -1219,17 +1219,17 @@ void CUITransactionDlg::ReceiveResultTradeFromServer(byte bResult, byte bType, i
 				}
 				else
 				{
-					// 아이템 삭제.. 현재 인벤토리 윈도우만.. 
+					// 아이템 삭제.. 현재 인벤토리 윈도우만..  Delete
 					__IconItemSkill* spItem;
 					spItem = m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 
-					// 인벤토리에서도 지운다..
+					// 인벤토리에서도 지운다.. [Korean comment]
 					m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
 
-					// iOrder로 내 매니저의 아이템을 리스트에서 삭제한다..
+					// iOrder로 내 매니저의 아이템을 리스트에서 삭제한다.. Delete
 					RemoveChild(spItem->pUIIcon);
 
-					// 아이콘 리소스 삭제...
+					// 아이콘 리소스 삭제... Delete
 					spItem->pUIIcon->Release();
 					delete spItem->pUIIcon;
 					spItem->pUIIcon = nullptr;
@@ -1256,24 +1256,24 @@ void CUITransactionDlg::ReceiveResultTradeFromServer(byte bResult, byte bType, i
 			break;
 
 		case UIWND_DISTRICT_TRADE_MY:
-			if ( bResult != 0x01 )	// 실패라면.. 
+			if ( bResult != 0x01 )	// 실패라면..  [Korean comment]
 			{	
 				if( (CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) ||
 					(CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL) )
 				{
 					int iGold = CN3UIWndBase::s_pCountableItemEdit->GetQuantity();
 
-					if (m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->IsVisible()) // 기존 아이콘이 보인다면..
+					if (m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->IsVisible()) // 기존 아이콘이 보인다면.. [Korean comment]
 					{
-						// 숫자만 바꿔준다..
+						// 숫자만 바꿔준다.. [Korean comment]
 						m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount += iGold;
 					}
 					else
 					{
-						// 기존 아이콘이 안 보인다면..
+						// 기존 아이콘이 안 보인다면.. [Korean comment]
 						m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount = iGold;
 
-						// 아이콘이 보이게..
+						// 아이콘이 보이게.. [Korean comment]
 						m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->SetVisible(true);
 					}
 				}
@@ -1286,24 +1286,24 @@ void CUITransactionDlg::ReceiveResultTradeFromServer(byte bResult, byte bType, i
 			}
 			else
 			{
-				// 활이나 물약등 아이템인 경우 기존 아이콘이 안보인다면.. 아이템 삭제..
+				// 활이나 물약등 아이템인 경우 기존 아이콘이 안보인다면.. 아이템 삭제.. Delete
 				if( ( ((CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) || 
 					(CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL))
 					&&	!m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->pUIIcon->IsVisible()) ||
 					((CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable != UIITEM_TYPE_COUNTABLE) &&
 					(CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->byContable != UIITEM_TYPE_COUNTABLE_SMALL)) )
 				{
-					// 아이템 삭제.. 현재 내 영역 윈도우만.. 
+					// 아이템 삭제.. 현재 내 영역 윈도우만..  Delete
 					__IconItemSkill* spItem;
 					spItem = m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
 
-					// 내 영역에서도 지운다..
+					// 내 영역에서도 지운다.. [Korean comment]
 					m_pMyTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
 
-					// iOrder로 내 매니저의 아이템을 리스트에서 삭제한다..
+					// iOrder로 내 매니저의 아이템을 리스트에서 삭제한다.. Delete
 					RemoveChild(spItem->pUIIcon);
 
-					// 아이콘 리소스 삭제...
+					// 아이콘 리소스 삭제... Delete
 					spItem->pUIIcon->Release();
 					delete spItem->pUIIcon;
 					spItem->pUIIcon = nullptr;
@@ -1311,7 +1311,7 @@ void CUITransactionDlg::ReceiveResultTradeFromServer(byte bResult, byte bType, i
 					spItem = nullptr;
 				}
 
-				// 성공이면.. 돈 업데이트..
+				// 성공이면.. 돈 업데이트.. Update
 				pInfoExt->iGold = iMoney;
 
 				CGameProcedure::s_pProcMain->m_pUIInventory->GoldUpdate();
@@ -1374,7 +1374,7 @@ uint32_t CUITransactionDlg::MouseProc(uint32_t dwFlags, const POINT& ptCur, cons
 	if (!m_bVisible) return dwRet;
 	if (s_bWaitFromServer) { dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);  return dwRet; }
 
-	// 드래그 되는 아이콘 갱신..
+	// 드래그 되는 아이콘 갱신.. [Korean comment]
 	if ( (GetState() == UI_STATE_ICON_MOVING) && 
 			(CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd == UIWND_TRANSACTION) )
 	{
@@ -1560,9 +1560,9 @@ bool CUITransactionDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			break;
 
 		case UIMSG_ICON_UP:
-			// 아이콘 매니저 윈도우들을 돌아 다니면서 검사..
+			// 아이콘 매니저 윈도우들을 돌아 다니면서 검사.. Check
 			if ( !CGameProcedure::s_pUIMgr->BroadcastIconDropMsg(CN3UIWndBase::s_sSelectedIconInfo.pItemSelect) )
-				// 아이콘 위치 원래대로..
+				// 아이콘 위치 원래대로.. Position
 				IconRestore();
 			// Sound..
 			if (CN3UIWndBase::s_sSelectedIconInfo.pItemSelect) PlayItemSound(CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemBasic);

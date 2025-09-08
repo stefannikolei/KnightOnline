@@ -17,7 +17,7 @@ class CUIWareHouseDlg : public CN3UIWndBase
 	friend class CUIInventory;
 
 public:
-// 직접 접근해야 할 객체 참조 포인터
+// 직접 접근해야 할 객체 참조 포인터 [Korean comment]
 	__IconItemSkill*		m_pMyWare[MAX_ITEM_WARE_PAGE][MAX_ITEM_TRADE];
 	__IconItemSkill*		m_pMyWareInv[MAX_ITEM_INVENTORY];
 	CN3UIString*			m_pStrMyGold;

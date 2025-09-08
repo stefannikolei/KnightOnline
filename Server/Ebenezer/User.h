@@ -21,7 +21,7 @@
 
 #include <list>
 typedef	 std::list<_EXCHANGE_ITEM*>		ItemList;
-typedef  std::list<int>				UserEventList;	// 이밴트를 위하여 ^^;
+typedef  std::list<int>				UserEventList;	// 이밴트를 위하여 ^^; [Korean comment]
 
 #define BANISH_DELAY_TIME    30
 
@@ -37,35 +37,35 @@ public:
 	short	m_RegionZ;						// 현재 영역 Z 좌표
 
 	int		m_iMaxExp;						// 다음 레벨이 되기 위해 필요한 Exp량
-	int		m_iMaxWeight;					// 들 수 있는 최대 무게
-	BYTE    m_sSpeed;						// 스피드
+	int		m_iMaxWeight;					// 들 수 있는 최대 무게 [Korean comment]
+	BYTE    m_sSpeed;						// 스피드 [Korean comment]
 
-	short	m_sBodyAc;						// 맨몸 방어력
+	short	m_sBodyAc;						// 맨몸 방어력 [Korean comment]
 
-	short	m_sTotalHit;					// 총 타격공격력	
-	short	m_sTotalAc;						// 총 방어력
-	float	m_sTotalHitrate;				// 총 공격성공 민첩성
-	float	m_sTotalEvasionrate;			// 총 방어 민첩성
+	short	m_sTotalHit;					// 총 타격공격력	 [Korean comment]
+	short	m_sTotalAc;						// 총 방어력 [Korean comment]
+	float	m_sTotalHitrate;				// 총 공격성공 민첩성 [Korean comment]
+	float	m_sTotalEvasionrate;			// 총 방어 민첩성 [Korean comment]
 
 	short   m_sItemMaxHp;                   // 아이템 총 최대 HP Bonus
 	short   m_sItemMaxMp;                   // 아이템 총 최대 MP Bonus
-	int		m_iItemWeight;					// 아이템 총무게
-	short	m_sItemHit;						// 아이템 총타격치
-	short	m_sItemAc;						// 아이템 총방어력
-	short	m_sItemStr;						// 아이템 총힘 보너스
-	short	m_sItemSta;						// 아이템 총체력 보너스
-	short	m_sItemDex;						// 아이템 총민첩성 보너스
-	short	m_sItemIntel;					// 아이템 총지능 보너스
-	short	m_sItemCham;					// 아이템 총매력보너스
-	short	m_sItemHitrate;					// 아이템 총타격율
-	short	m_sItemEvasionrate;				// 아이템 총회피율
+	int		m_iItemWeight;					// 아이템 총무게 [Korean comment]
+	short	m_sItemHit;						// 아이템 총타격치 [Korean comment]
+	short	m_sItemAc;						// 아이템 총방어력 [Korean comment]
+	short	m_sItemStr;						// 아이템 총힘 보너스 [Korean comment]
+	short	m_sItemSta;						// 아이템 총체력 보너스 [Korean comment]
+	short	m_sItemDex;						// 아이템 총민첩성 보너스 [Korean comment]
+	short	m_sItemIntel;					// 아이템 총지능 보너스 [Korean comment]
+	short	m_sItemCham;					// 아이템 총매력보너스 [Korean comment]
+	short	m_sItemHitrate;					// 아이템 총타격율 [Korean comment]
+	short	m_sItemEvasionrate;				// 아이템 총회피율 [Korean comment]
 
-	BYTE	m_bFireR;						// 불 마법 저항력
-	BYTE	m_bColdR;						// 얼음 마법 저항력
-	BYTE	m_bLightningR;					// 전기 마법 저항력
-	BYTE	m_bMagicR;						// 기타 마법 저항력
-	BYTE	m_bDiseaseR;					// 저주 마법 저항력
-	BYTE	m_bPoisonR;						// 독 마법 저항력
+	BYTE	m_bFireR;						// 불 마법 저항력 [Korean comment]
+	BYTE	m_bColdR;						// 얼음 마법 저항력 [Korean comment]
+	BYTE	m_bLightningR;					// 전기 마법 저항력 [Korean comment]
+	BYTE	m_bMagicR;						// 기타 마법 저항력 [Korean comment]
+	BYTE	m_bDiseaseR;					// 저주 마법 저항력 [Korean comment]
+	BYTE	m_bPoisonR;						// 독 마법 저항력 [Korean comment]
 
 	BYTE    m_bMagicTypeLeftHand;			// The type of magic item in user's left hand  
 	BYTE    m_bMagicTypeRightHand;			// The type of magic item in user's right hand
@@ -88,16 +88,16 @@ public:
 	float	m_fWill_z;
 	float	m_fWill_y;
 
-	BYTE	m_bResHpType;					// HP 회복타입
-	BYTE	m_bWarp;						// 존이동중...
-	BYTE	m_bNeedParty;					// 파티....구해요
+	BYTE	m_bResHpType;					// HP 회복타입 Type
+	BYTE	m_bWarp;						// 존이동중... Move
+	BYTE	m_bNeedParty;					// 파티....구해요 [Korean comment]
 
 	short	m_sPartyIndex;
-	short	m_sExchangeUser;				// 교환중인 유저
+	short	m_sExchangeUser;				// 교환중인 유저 [Korean comment]
 	BYTE	m_bExchangeOK;
 
 	ItemList	m_ExchangeItemList;
-	_ITEM_DATA	m_MirrorItem[HAVE_MAX];			// 교환시 백업 아이템 리스트를 쓴다.
+	_ITEM_DATA	m_MirrorItem[HAVE_MAX];			// 교환시 백업 아이템 리스트를 쓴다. [Korean comment]
 
 	short	m_sPrivateChatUser;
 
@@ -171,7 +171,7 @@ public:
 
 	float	m_fLastTrapAreaTime;		// The last moment you were in the trap area.
 
-	BOOL	m_bZoneChangeFlag;			// 성용씨 미워!!
+	BOOL	m_bZoneChangeFlag;			// 성용씨 미워!! [Korean comment]
 
 	BYTE	m_bRegeneType;				// Did you die and go home or did you type '/town'?
 
@@ -179,16 +179,16 @@ public:
 
 	BOOL	m_bZoneChangeSameZone;		// Did the server change when you warped?
 
-	// 이밴트용 관련.... 정애씨 이거 보면 코카스 쏠께요 ^^;
-//	int					m_iSelMsgEvent[5];	// 실행중인 선택 메세지박스 이벤트
-	int					m_iSelMsgEvent[MAX_MESSAGE_EVENT];	// 실행중인 선택 메세지박스 이벤트
+	// 이밴트용 관련.... 정애씨 이거 보면 코카스 쏠께요 ^^; [Korean comment]
+//	int					m_iSelMsgEvent[5];	// 실행중인 선택 메세지박스 이벤트 Select
+	int					m_iSelMsgEvent[MAX_MESSAGE_EVENT];	// 실행중인 선택 메세지박스 이벤트 Select
 	short				m_sEventNid;		// 마지막으로 선택한 이벤트 NPC 번호
-	UserEventList		m_arUserEvent;		// 실행한 이벤트 리스트
+	UserEventList		m_arUserEvent;		// 실행한 이벤트 리스트 [Korean comment]
 
 	char	m_strCouponId[MAX_COUPON_ID_LENGTH];		// What was the number of the coupon?
 	int		m_iEditBoxEvent;
 
-	short	m_sEvent[MAX_CURRENT_EVENT];				// 이미 실행된 이밴트 리스트들 :)
+	short	m_sEvent[MAX_CURRENT_EVENT];				// 이미 실행된 이밴트 리스트들 :) [Korean comment]
 
 	bool				m_bIsPartyLeader;
 	BYTE				m_byInvisibilityState;

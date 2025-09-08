@@ -215,13 +215,13 @@ void CN3ViewerDoc::OnFileImport()
 			pPart->TexAlloc(1);
 			pPart->TexSet(0, pTex->FileName());
 
-			pShape->FindMinMax(); // 큰값, 작은값 찾기..
+			pShape->FindMinMax(); // 큰값, 작은값 찾기.. [Korean comment]
 
 			continue;
 		}
 		else continue;
 
-		pBase->LoadFromFile(std::string(FileName)); // 파일에서 읽는다..
+		pBase->LoadFromFile(std::string(FileName)); // 파일에서 읽는다.. File
 		m_pSelectedObj = pBase;
 
 		if(lstrcmpi(szExt, "N3PMesh") == 0)

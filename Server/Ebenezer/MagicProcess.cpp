@@ -19,21 +19,21 @@ static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
-#define MORAL_SELF				1		// 나 자신..
-#define MORAL_FRIEND_WITHME		2		// 나를 포함한 우리편(국가) 중 하나 ..
-#define MORAL_FRIEND_EXCEPTME	3		// 나를 뺀 우리편 중 하나 
-#define MORAL_PARTY				4		// 나를 포함한 우리파티 중 하나..
-#define MORAL_NPC				5		// NPC중 하나.
-#define MORAL_PARTY_ALL			6		// 나를 호함한 파티 모두..
+#define MORAL_SELF				1		// 나 자신.. [Korean comment]
+#define MORAL_FRIEND_WITHME		2		// 나를 포함한 우리편(국가) 중 하나 .. [Korean comment]
+#define MORAL_FRIEND_EXCEPTME	3		// 나를 뺀 우리편 중 하나  [Korean comment]
+#define MORAL_PARTY				4		// 나를 포함한 우리파티 중 하나.. [Korean comment]
+#define MORAL_NPC				5		// NPC중 하나. [Korean comment]
+#define MORAL_PARTY_ALL			6		// 나를 호함한 파티 모두.. [Korean comment]
 #define MORAL_ENEMY				7		// 울편을 제외한 모든 적중 하나(NPC포함)
-#define MORAL_ALL				8		// 겜상에 존재하는 모든 것중 하나.
-#define MORAL_AREA_ENEMY		10		// 지역에 포함된 적
-#define MORAL_AREA_FRIEND		11		// 지역에 포함된 우리편
-#define MORAL_AREA_ALL			12		// 지역에 포함된 모두
-#define MORAL_SELF_AREA			13		// 나를 중심으로 한 지역
-// 비러머글 클랜소환
-#define MORAL_CLAN				14		// 클랜 맴버 중 한명...
-#define MORAL_CLAN_ALL			15		// 나를 포함한 클랜 맴버 다...
+#define MORAL_ALL				8		// 겜상에 존재하는 모든 것중 하나. [Korean comment]
+#define MORAL_AREA_ENEMY		10		// 지역에 포함된 적 [Korean comment]
+#define MORAL_AREA_FRIEND		11		// 지역에 포함된 우리편 [Korean comment]
+#define MORAL_AREA_ALL			12		// 지역에 포함된 모두 [Korean comment]
+#define MORAL_SELF_AREA			13		// 나를 중심으로 한 지역 [Korean comment]
+// 비러머글 클랜소환 [Korean comment]
+#define MORAL_CLAN				14		// 클랜 맴버 중 한명... [Korean comment]
+#define MORAL_CLAN_ALL			15		// 나를 포함한 클랜 맴버 다... [Korean comment]
 //
 
 #define MORAL_UNDEAD			16		// Undead Monster
@@ -90,14 +90,14 @@ void CMagicProcess::MagicPacket(char* pBuf, int len)
 	data5 = GetShort(pBuf, index);
 	data6 = GetShort(pBuf, index);
 
-	// 눈싸움전쟁존에서 눈싸움중이라면 공격은 눈을 던지는 것만 가능하도록,,,
+	// 눈싸움전쟁존에서 눈싸움중이라면 공격은 눈을 던지는 것만 가능하도록,,, [Korean comment]
 	if (m_pSrcUser != nullptr)
 	{
 		if (m_pSrcUser->m_pUserData->m_bZone == ZONE_SNOW_BATTLE
 			&& m_pMain->m_byBattleOpen == SNOW_BATTLE)
 		{
 			if (magicid != SNOW_EVENT_SKILL)
-				return;		// 하드 코딩 싫어,,, 
+				return;		// 하드 코딩 싫어,,,  [Korean comment]
 		}
 	}
 
@@ -234,7 +234,7 @@ void CMagicProcess::MagicPacket(char* pBuf, int len)
 		}
 	}
 
-	// 비러머글 클랜 소환 >.<
+	// 비러머글 클랜 소환 >.< [Korean comment]
 	// Make sure the source is a user!
 	if (sid >= 0
 		&& sid < MAX_USER)
@@ -508,7 +508,7 @@ void CMagicProcess::MagicPacket(char* pBuf, int len)
 			}
 		}
 	}
-	// 원래 이한줄만 있었음.....
+	// 원래 이한줄만 있었음..... [Korean comment]
 	else if (command == MAGIC_CASTING)
 	{
 		goto return_echo;
@@ -618,7 +618,7 @@ model::Magic* CMagicProcess::IsAvailable(int magicid, int tid, int sid, BYTE typ
 	// Target existence check routine for NPC.
 	else if (tid >= NPC_BAND)
 	{
-		// 포인터 참조하면 안됨
+		// 포인터 참조하면 안됨 [Korean comment]
 		if (!m_pMain->m_bPointCheckFlag)
 			goto fail_return;
 
@@ -895,7 +895,7 @@ model::Magic* CMagicProcess::IsAvailable(int magicid, int tid, int sid, BYTE typ
 				{
 					if (pTable->UseItem != 0)
 					{
-						// 이것두 성래씨 요청에 의해 하는 짓입니다 --;
+						// 이것두 성래씨 요청에 의해 하는 짓입니다 --; [Korean comment]
 						// This checks if such an item exists.
 						model::Item* pItem = m_pMain->m_ItemTableMap.GetData(pTable->UseItem);
 						if (pItem == nullptr)
@@ -952,7 +952,7 @@ model::Magic* CMagicProcess::IsAvailable(int magicid, int tid, int sid, BYTE typ
 						if (pTUser == nullptr)
 							goto fail_return;
 
-						// 비러머글 부활 --;
+						// 비러머글 부활 --; [Korean comment]
 						if (pType->Type == 3
 							&& pTUser->m_pUserData->m_bLevel <= 5)
 						{
@@ -1092,7 +1092,7 @@ BYTE CMagicProcess::ExecuteType1(int magicid, int sid, int tid, int data1, int d
 
 		m_pSrcUser->GoldChange(tid, 0);
 
-		// 기범이의 완벽한 보호 코딩!!!
+		// 기범이의 완벽한 보호 코딩!!! [Korean comment]
 		pTUser->InitType3();	// Init Type 3.....
 		pTUser->InitType4();	// Init Type 4.....
 //
@@ -1211,7 +1211,7 @@ BYTE CMagicProcess::ExecuteType2(int magicid, int sid, int tid, int data1, int d
 
 		m_pSrcUser->GoldChange(tid, 0);
 
-		// 기범이의 완벽한 보호 코딩!!!
+		// 기범이의 완벽한 보호 코딩!!! [Korean comment]
 		pTUser->InitType3();	// Init Type 3.....
 		pTUser->InitType4();	// Init Type 4.....
 //
@@ -1372,7 +1372,7 @@ void CMagicProcess::ExecuteType3(int magicid, int sid, int tid, int data1, int d
 			damage = pType->FirstDamage;
 		}
 
-		// 눈싸움전쟁존에서 눈싸움중이라면 공격은 눈을 던지는 것만 가능하도록,,,
+		// 눈싸움전쟁존에서 눈싸움중이라면 공격은 눈을 던지는 것만 가능하도록,,, [Korean comment]
 		if (m_pSrcUser != nullptr)
 		{
 			if (m_pSrcUser->m_pUserData->m_bZone == ZONE_SNOW_BATTLE
@@ -1418,7 +1418,7 @@ void CMagicProcess::ExecuteType3(int magicid, int sid, int tid, int data1, int d
 						if (m_pSrcUser->m_pUserData->m_bZone == ZONE_SNOW_BATTLE
 							&& m_pMain->m_byBattleOpen == SNOW_BATTLE)
 						{
-							m_pSrcUser->GoldGain(SNOW_EVENT_MONEY);	// 10000노아를 주는 부분,,,,,
+							m_pSrcUser->GoldGain(SNOW_EVENT_MONEY);	// 10000노아를 주는 부분,,,,, [Korean comment]
 							spdlog::get(logger::EbenezerEvent)->info("{} killed {}",
 								m_pSrcUser->m_pUserData->m_id, pTUser->m_pUserData->m_id);
 
@@ -1449,7 +1449,7 @@ void CMagicProcess::ExecuteType3(int magicid, int sid, int tid, int data1, int d
 						}
 					}
 
-					// 기범이의 완벽한 보호 코딩!!!
+					// 기범이의 완벽한 보호 코딩!!! [Korean comment]
 					pTUser->InitType3();	// Init Type 3.....
 					pTUser->InitType4();	// Init Type 4.....
 
@@ -1522,7 +1522,7 @@ void CMagicProcess::ExecuteType3(int magicid, int sid, int tid, int data1, int d
 						m_pSrcUser->GoldChange(casted_member[j], 0);
 					}
 
-					// 기범이의 완벽한 보호 코딩 !!!
+					// 기범이의 완벽한 보호 코딩 !!! [Korean comment]
 					pTUser->InitType3();	// Init Type 3.....
 					pTUser->InitType4();	// Init Type 4..... 
 
@@ -1545,7 +1545,7 @@ void CMagicProcess::ExecuteType3(int magicid, int sid, int tid, int data1, int d
 					m_pSrcUser->SendTargetHP(0, casted_member[j], damage);     // Change the HP of the target. 
 			}
 
-			// 여기도 보호 코딩 했슴...
+			// 여기도 보호 코딩 했슴... [Korean comment]
 			if (pTUser->m_bResHpType != USER_DEAD)
 			{
 				if (pType->TimeDamage < 0)
@@ -1822,7 +1822,7 @@ void CMagicProcess::ExecuteType4(int magicid, int sid, int tid, int data1, int d
 		if (tid != -1
 			&& pMagic->Type1 == 4)
 		{
-			// 비러머글 하피 >.<
+			// 비러머글 하피 >.< [Korean comment]
 			if (sid >= 0
 				&& sid < MAX_USER)
 				m_pSrcUser->MSpChange(-(pMagic->ManaCost));
@@ -1860,7 +1860,7 @@ void CMagicProcess::ExecuteType4(int magicid, int sid, int tid, int data1, int d
 		}
 		//  end of Send Party Packet.....//
 //	
-		pTUser->Send2AI_UserUpdateInfo();	// AI Server에 바끤 데이타 전송....
+		pTUser->Send2AI_UserUpdateInfo();	// AI Server에 바끤 데이타 전송.... [Korean comment]
 
 		if (pMagic->Type2 == 0
 			|| pMagic->Type2 == 4)
@@ -2118,7 +2118,7 @@ void CMagicProcess::ExecuteType5(int magicid, int sid, int tid, int data1, int d
 
 			pTUser->SetSlotItemValue();
 			pTUser->SetUserAbility();
-			pTUser->Send2AI_UserUpdateInfo();	// AI Server에 바끤 데이타 전송....
+			pTUser->Send2AI_UserUpdateInfo();	// AI Server에 바끤 데이타 전송.... [Korean comment]
 
 			/*	Send Party Packet.....
 			if (m_sPartyIndex != -1) {
@@ -2197,7 +2197,7 @@ void CMagicProcess::ExecuteType5(int magicid, int sid, int tid, int data1, int d
 
 				pTUser->SetSlotItemValue();
 				pTUser->SetUserAbility();
-				pTUser->Send2AI_UserUpdateInfo();	// AI Server에 바끤 데이타 전송....
+				pTUser->Send2AI_UserUpdateInfo();	// AI Server에 바끤 데이타 전송.... [Korean comment]
 
 				buff_test = 0;
 				for (i = 0; i < MAX_TYPE4_BUFF; i++)
@@ -2368,7 +2368,7 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 		if (pTMap == nullptr)
 			continue;
 
-		// 비러머글 대만 써비스 >.<
+		// 비러머글 대만 써비스 >.< [Korean comment]
 		model::Home* pHomeInfo = m_pMain->m_HomeTableMap.GetData(pTUser->m_pUserData->m_bNation);
 		if (pHomeInfo == nullptr)
 			return;
@@ -2461,9 +2461,9 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 						pTUser->Warp(send_buff);
 					}
 				}
-// 비러머글 대만 써비스 >.<
-				// 전쟁존 --;
-				// 개척존 --;
+// 비러머글 대만 써비스 >.< [Korean comment]
+				// 전쟁존 --; [Korean comment]
+				// 개척존 --; [Korean comment]
 				else if (pTUser->m_pUserData->m_bZone == ZONE_BATTLE)
 				{
 					SetShort(send_buff, (WORD) ((pHomeInfo->BattleZoneX * 10) + x), send_index);
@@ -2801,7 +2801,7 @@ short CMagicProcess::GetMagicDamage(int sid, int tid, int total_hit, int attribu
 //
 	}
 
-	damage = damage / 3;	// 성래씨 요청 
+	damage = damage / 3;	// 성래씨 요청  [Korean comment]
 
 	return damage;
 }
@@ -2837,7 +2837,7 @@ BOOL CMagicProcess::UserRegionCheck(int sid, int tid, int magicid, int radius, s
 	{
 		// Check that it's your party.
 		case MORAL_PARTY_ALL:
-			// 비러머글 전쟁존 파티 소환 >.<
+			// 비러머글 전쟁존 파티 소환 >.< [Korean comment]
 			if (pTUser->m_sPartyIndex == -1)
 			{
 				if (sid == tid)
@@ -2881,7 +2881,7 @@ BOOL CMagicProcess::UserRegionCheck(int sid, int tid, int magicid, int radius, s
 				goto final_test;
 			break;
 
-		// 비러머글 클랜 소환!!!
+		// 비러머글 클랜 소환!!! [Korean comment]
 		case MORAL_CLAN_ALL:
 			if (pTUser->m_pUserData->m_bKnights == -1)
 			{
@@ -3108,7 +3108,7 @@ void CMagicProcess::Type4Cancel(int magicid, short tid)
 		pTUser->m_bType4Buff[buff_type - 1] = 0;
 		pTUser->SetSlotItemValue();
 		pTUser->SetUserAbility();
-		pTUser->Send2AI_UserUpdateInfo();	// AI Server에 바끤 데이타 전송....
+		pTUser->Send2AI_UserUpdateInfo();	// AI Server에 바끤 데이타 전송.... [Korean comment]
 
 		/*	Send Party Packet.....
 		if (m_sPartyIndex != -1) {

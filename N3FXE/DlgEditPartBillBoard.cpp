@@ -167,7 +167,7 @@ void CDlgEditPartBillBoard::OnPartBoardBtnLoadTex()
 			_makepath(szPath, szDrive, szDir, (LPCTSTR)strFName, szExt);
 			m_strTexName = szPath;
 
-			//파일 갯수 세는 기능 넣을까 말까..
+			//파일 갯수 세는 기능 넣을까 말까.. File
 		}
 		else
 		{
@@ -344,7 +344,7 @@ bool CDlgEditPartBillBoard::LoadPartScript(const char* szPath)
 	}
 
 	//////////////////////////////////////////////////
-	//각 컨트롤 셋팅...
+	//각 컨트롤 셋팅... [Korean comment]
 	m_bOnGround = pPart->m_bOnGround;
 	m_bAlphaBlend = pPart->m_bAlpha;
 	m_bTexLoop = pPart->m_bTexLoop;

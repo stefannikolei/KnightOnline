@@ -46,13 +46,13 @@ void CUIRepairTooltipDlg::Release()
 
 void CUIRepairTooltipDlg::InitPos()
 {
-	N3_VERIFY_UI_COMPONENT(m_pStr[0], GetChildByID<CN3UIString>("string_repairgold"));				//이름 
+	N3_VERIFY_UI_COMPONENT(m_pStr[0], GetChildByID<CN3UIString>("string_repairgold"));				//이름  Name
 	m_pStr[0]->SetString("0");	
-	N3_VERIFY_UI_COMPONENT(m_pStr[1], GetChildByID<CN3UIString>("string_dur_max"));					//이름 
+	N3_VERIFY_UI_COMPONENT(m_pStr[1], GetChildByID<CN3UIString>("string_dur_max"));					//이름  Name
 	m_pStr[1]->SetString("0");	
-	N3_VERIFY_UI_COMPONENT(m_pStr[2], GetChildByID<CN3UIString>("string_dur_current"));				//이름 
+	N3_VERIFY_UI_COMPONENT(m_pStr[2], GetChildByID<CN3UIString>("string_dur_current"));				//이름  Name
 	m_pStr[2]->SetString("0");	
-	N3_VERIFY_UI_COMPONENT(m_pStr[3], GetChildByID<CN3UIString>("string_title"));					//이름 
+	N3_VERIFY_UI_COMPONENT(m_pStr[3], GetChildByID<CN3UIString>("string_title"));					//이름  Name
 	m_pStr[3]->SetString("0");	
 	BackupStrColor();
 }

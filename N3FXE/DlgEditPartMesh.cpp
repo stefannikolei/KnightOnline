@@ -256,7 +256,7 @@ bool CDlgEditPartMesh::LoadPartScript(const char* szPath)
 	}
 
 	//////////////////////////////////////////////////
-	//각 컨트롤 셋팅...
+	//각 컨트롤 셋팅... [Korean comment]
 	m_bOnGround = pPart->m_bOnGround;
 	m_bAlphaBlend = pPart->m_bAlpha;
 

@@ -118,7 +118,7 @@ void CDTexGroup::DelAttrByDTexID(int DTexID)
 			DTEXTILEATTR* pTile = *it;
 			if(pTile->TexID == DTexID)
 			{
-				//지우자...
+				//지우자... [Korean comment]
 				delete (*it);
 				it = m_Attributes[i].erase(it);
 			}
@@ -129,7 +129,7 @@ void CDTexGroup::DelAttrByDTexID(int DTexID)
 
 
 //
-//	DTexMng에 있는 정보들 청소...
+//	DTexMng에 있는 정보들 청소... Info
 //	DTex에 저장되어 있는 현재 그룹 정보를 NONE으로 셋팅..
 //
 void CDTexGroup::ClearDTex()

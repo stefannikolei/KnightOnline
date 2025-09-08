@@ -19,17 +19,17 @@ bool useNpcTrace = false;
 constexpr int MAX_MAXWEAPON_CLASSES		= _countof(model::MakeWeapon::Class);
 constexpr int MAX_ITEM_GRADECODE_GRADES	= _countof(model::MakeItemGradeCode::Grade);
 
-#define ATROCITY_ATTACK_TYPE 1				// 선공
-#define TENDER_ATTACK_TYPE	 0				// 후공	
+#define ATROCITY_ATTACK_TYPE 1				// 선공 [Korean comment]
+#define TENDER_ATTACK_TYPE	 0				// 후공	 [Korean comment]
 
-// 행동변경 관련 
+// 행동변경 관련  Change
 #define NO_ACTION				0
-#define ATTACK_TO_TRACE			1				// 공격에서 추격
+#define ATTACK_TO_TRACE			1				// 공격에서 추격 [Korean comment]
 #define MONSTER_CHANGED			1 
-#define LONG_ATTACK_RANGE		30				// 장거리 공격 유효거리
-#define SHORT_ATTACK_RANGE		3				// 직접공격 유효거리
+#define LONG_ATTACK_RANGE		30				// 장거리 공격 유효거리 [Korean comment]
+#define SHORT_ATTACK_RANGE		3				// 직접공격 유효거리 [Korean comment]
 
-// 무기 관련
+// 무기 관련 [Korean comment]
 #define WEAPON_ITEM				1
 #define DEFENCR_ITEM			2
 #define ACCESSORY_ITEM			3
@@ -93,7 +93,7 @@ inline BOOL CNpc::SetUid(float x, float z, int id)
 	}
 
 	// map 이동이 불가능이면 npc등록 실패.. 
-	// 작업 : 이 부분을 나중에 수정 처리....
+	// 작업 : 이 부분을 나중에 수정 처리.... Process
 	// if(pMap->m_pMap[x1][z1].m_sEvent == 0) return FALSE;
 	if (nRX > pMap->GetXRegionMax()
 		|| nRZ > pMap->GetZRegionMax()
@@ -143,10 +143,10 @@ CNpc::CNpc()
 	m_Delay = 0;
 	m_fDelayTime = TimeGet();
 
-	m_tNpcAttType = ATROCITY_ATTACK_TYPE;		// 공격 성향
-	m_tNpcOldAttType = ATROCITY_ATTACK_TYPE;		// 공격 성향
-	m_tNpcLongType = 0;		// 원거리(1), 근거리(0)
-	m_tNpcGroupType = 0;	// 도움을 주는냐(1), 안주는냐?(0)
+	m_tNpcAttType = ATROCITY_ATTACK_TYPE;		// 공격 성향 [Korean comment]
+	m_tNpcOldAttType = ATROCITY_ATTACK_TYPE;		// 공격 성향 [Korean comment]
+	m_tNpcLongType = 0;		// 원거리(1), 근거리(0) [Korean comment]
+	m_tNpcGroupType = 0;	// 도움을 주는냐(1), 안주는냐?(0) [Korean comment]
 	m_byNpcEndAttType = 1;
 	m_byWhatAttackType = 0;
 	m_byMoveType = 1;
@@ -171,7 +171,7 @@ CNpc::CNpc()
 	m_fHPChangeTime = TimeGet();
 	m_fFaintingTime = 0.0f;
 
-	::ZeroMemory(m_pMap, sizeof(m_pMap));// 일차원 맵으로 초기화한다.
+	::ZeroMemory(m_pMap, sizeof(m_pMap));// 일차원 맵으로 초기화한다. Initialize
 
 	m_iRegion_X = 0;
 	m_iRegion_Z = 0;
@@ -202,11 +202,11 @@ CNpc::~CNpc()
 }
 
 ///////////////////////////////////////////////////////////////////////
-//	길찾기 데이터를 지운다.
+//	길찾기 데이터를 지운다. Data
 //
 void CNpc::ClearPathFindData()
 {
-	::ZeroMemory(m_pMap, sizeof(m_pMap));	// 일차원 맵을 위해
+	::ZeroMemory(m_pMap, sizeof(m_pMap));	// 일차원 맵을 위해 [Korean comment]
 
 	m_bPathFlag = FALSE;
 	m_sStepCount = 0;
@@ -225,7 +225,7 @@ void CNpc::ClearPathFindData()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//	유저리스트를 초기화한다.
+//	유저리스트를 초기화한다. Initialize
 //
 void CNpc::InitUserList()
 {
@@ -280,69 +280,69 @@ void CNpc::Load(const model::Npc* pNpcTable, bool transformSpeeds)
 		m_strName = *pNpcTable->Name;				// MONSTER(NPC) Name
 
 	m_sPid = pNpcTable->PictureId;					// MONSTER(NPC) Picture ID
-	m_sSize = pNpcTable->Size;						// 캐릭터의 비율(100 퍼센트 기준)
-	m_iWeapon_1 = pNpcTable->Weapon1;				// 착용무기
-	m_iWeapon_2 = pNpcTable->Weapon2;				// 착용무기
-	m_byGroup = pNpcTable->Group;					// 소속집단
-	m_byActType = pNpcTable->ActType;				// 행동패턴
-	m_byRank = pNpcTable->Rank;						// 작위
-	m_byTitle = pNpcTable->Title;					// 지위
+	m_sSize = pNpcTable->Size;						// 캐릭터의 비율(100 퍼센트 기준) Character
+	m_iWeapon_1 = pNpcTable->Weapon1;				// 착용무기 [Korean comment]
+	m_iWeapon_2 = pNpcTable->Weapon2;				// 착용무기 [Korean comment]
+	m_byGroup = pNpcTable->Group;					// 소속집단 [Korean comment]
+	m_byActType = pNpcTable->ActType;				// 행동패턴 [Korean comment]
+	m_byRank = pNpcTable->Rank;						// 작위 [Korean comment]
+	m_byTitle = pNpcTable->Title;					// 지위 [Korean comment]
 	m_iSellingGroup = pNpcTable->SellingGroup;
 	m_sLevel = pNpcTable->Level;					// level
-	m_iExp = pNpcTable->Exp;						// 경험치
+	m_iExp = pNpcTable->Exp;						// 경험치 [Korean comment]
 	m_iLoyalty = pNpcTable->Loyalty;				// loyalty
 	m_iHP = pNpcTable->HitPoints;					// 최대 HP
 	m_iMaxHP = pNpcTable->HitPoints;				// 현재 HP
 	m_sMP = pNpcTable->ManaPoints;					// 최대 MP
 	m_sMaxMP = pNpcTable->ManaPoints;				// 현재 MP
-	m_sAttack = pNpcTable->Attack;					// 공격값
-	m_sDefense = pNpcTable->Armor;					// 방어값
-	m_sHitRate = pNpcTable->HitRate;				// 타격성공률
-	m_sEvadeRate = pNpcTable->EvadeRate;			// 회피성공률
-	m_sDamage = pNpcTable->Damage;					// 기본 데미지
-	m_sAttackDelay = pNpcTable->AttackDelay;		// 공격딜레이
+	m_sAttack = pNpcTable->Attack;					// 공격값 [Korean comment]
+	m_sDefense = pNpcTable->Armor;					// 방어값 [Korean comment]
+	m_sHitRate = pNpcTable->HitRate;				// 타격성공률 [Korean comment]
+	m_sEvadeRate = pNpcTable->EvadeRate;			// 회피성공률 [Korean comment]
+	m_sDamage = pNpcTable->Damage;					// 기본 데미지 [Korean comment]
+	m_sAttackDelay = pNpcTable->AttackDelay;		// 공격딜레이 [Korean comment]
 
-	m_sSpeed = MONSTER_SPEED;						// 이동속도
+	m_sSpeed = MONSTER_SPEED;						// 이동속도 Move
 
-	m_fSpeed_1 = (float) pNpcTable->WalkSpeed;		// 기본 이동 타입
-	m_fSpeed_2 = (float) pNpcTable->RunSpeed;		// 뛰는 이동 타입..
-	m_fOldSpeed_1 = (float) pNpcTable->WalkSpeed;	// 기본 이동 타입
-	m_fOldSpeed_2 = (float) pNpcTable->RunSpeed;	// 뛰는 이동 타입..
+	m_fSpeed_1 = (float) pNpcTable->WalkSpeed;		// 기본 이동 타입 Type
+	m_fSpeed_2 = (float) pNpcTable->RunSpeed;		// 뛰는 이동 타입.. Type
+	m_fOldSpeed_1 = (float) pNpcTable->WalkSpeed;	// 기본 이동 타입 Type
+	m_fOldSpeed_2 = (float) pNpcTable->RunSpeed;	// 뛰는 이동 타입.. Type
 
 	if (transformSpeeds)
 	{
 		constexpr float dbSpeed = MONSTER_SPEED;
 
-		m_fSpeed_1		*= (dbSpeed / 1000.0f);		// 기본 이동 타입
-		m_fSpeed_2		*= (dbSpeed / 1000.0f);		// 뛰는 이동 타입..
-		m_fOldSpeed_1	*= (dbSpeed / 1000.0f);		// 기본 이동 타입
-		m_fOldSpeed_2	*= (dbSpeed / 1000.0f);		// 뛰는 이동 타입..
+		m_fSpeed_1		*= (dbSpeed / 1000.0f);		// 기본 이동 타입 Type
+		m_fSpeed_2		*= (dbSpeed / 1000.0f);		// 뛰는 이동 타입.. Type
+		m_fOldSpeed_1	*= (dbSpeed / 1000.0f);		// 기본 이동 타입 Type
+		m_fOldSpeed_2	*= (dbSpeed / 1000.0f);		// 뛰는 이동 타입.. Type
 	}
 
-	m_sStandTime = pNpcTable->StandTime;			// 서있는 시간
-	m_iMagic1 = pNpcTable->Magic1;					// 사용마법 1
-	m_iMagic2 = pNpcTable->Magic2;					// 사용마법 2
-	m_iMagic3 = pNpcTable->Magic3;					// 사용마법 3
-	m_sFireR = pNpcTable->FireResist;				// 화염 저항력
-	m_sColdR = pNpcTable->ColdResist;				// 냉기 저항력
-	m_sLightningR = pNpcTable->LightningResist;		// 전기 저항력
-	m_sMagicR = pNpcTable->MagicResist;				// 마법 저항력
-	m_sDiseaseR = pNpcTable->DiseaseResist;			// 저주 저항력
-	m_sPoisonR = pNpcTable->PoisonResist;			// 독 저항력
-	m_sLightR = pNpcTable->LightResist;				// 빛 저항력
+	m_sStandTime = pNpcTable->StandTime;			// 서있는 시간 Time
+	m_iMagic1 = pNpcTable->Magic1;					// 사용마법 1 [Korean comment]
+	m_iMagic2 = pNpcTable->Magic2;					// 사용마법 2 [Korean comment]
+	m_iMagic3 = pNpcTable->Magic3;					// 사용마법 3 [Korean comment]
+	m_sFireR = pNpcTable->FireResist;				// 화염 저항력 [Korean comment]
+	m_sColdR = pNpcTable->ColdResist;				// 냉기 저항력 [Korean comment]
+	m_sLightningR = pNpcTable->LightningResist;		// 전기 저항력 [Korean comment]
+	m_sMagicR = pNpcTable->MagicResist;				// 마법 저항력 [Korean comment]
+	m_sDiseaseR = pNpcTable->DiseaseResist;			// 저주 저항력 [Korean comment]
+	m_sPoisonR = pNpcTable->PoisonResist;			// 독 저항력 [Korean comment]
+	m_sLightR = pNpcTable->LightResist;				// 빛 저항력 [Korean comment]
 	m_fBulk = (float) (((double) pNpcTable->Bulk / 100) * ((double) pNpcTable->Size / 100));
-	m_bySearchRange = pNpcTable->SearchRange;		// 적 탐지 범위
-	m_byAttackRange = pNpcTable->AttackRange;		// 사정거리
-	m_byTracingRange = pNpcTable->TracingRange;		// 추격거리
+	m_bySearchRange = pNpcTable->SearchRange;		// 적 탐지 범위 [Korean comment]
+	m_byAttackRange = pNpcTable->AttackRange;		// 사정거리 [Korean comment]
+	m_byTracingRange = pNpcTable->TracingRange;		// 추격거리 [Korean comment]
 	m_tNpcType = pNpcTable->Type;					// NPC Type
-	m_byFamilyType = pNpcTable->Family;				// 몹들사이에서 가족관계를 결정한다.
-	m_iMoney = pNpcTable->Money;					// 떨어지는 돈
-	m_iItem = pNpcTable->Item;						// 떨어지는 아이템
+	m_byFamilyType = pNpcTable->Family;				// 몹들사이에서 가족관계를 결정한다. [Korean comment]
+	m_iMoney = pNpcTable->Money;					// 떨어지는 돈 [Korean comment]
+	m_iItem = pNpcTable->Item;						// 떨어지는 아이템 [Korean comment]
 	m_tNpcLongType = pNpcTable->DirectAttack;
 	m_byWhatAttackType = pNpcTable->DirectAttack;
 }
 
-//	NPC 기본정보 초기화
+//	NPC 기본정보 초기화 Initialize
 void CNpc::Init()
 {
 	if (m_ZoneIndex == -1)
@@ -359,7 +359,7 @@ void CNpc::Init()
 		return;
 	}
 
-	m_pOrgMap = pMap->m_pMap;	// MapInfo 정보 셋팅
+	m_pOrgMap = pMap->m_pMap;	// MapInfo 정보 셋팅 Info
 }
 
 //	NPC 기본위치 정보 초기화(패스 따라 움직이는 NPC의 진형을 맞추어 준다..
@@ -413,12 +413,12 @@ void CNpc::InitMagicValuable()
 	}
 }
 
-// NPC 상태별로 분화한다.
+// NPC 상태별로 분화한다. Status
 void CNpc::NpcLive(CIOCPort* pIOCP)
 {
-	// Dungeon Work : 변하는 몬스터의 경우 변하게 처리..
+	// Dungeon Work : 변하는 몬스터의 경우 변하게 처리.. Process
 	if (m_byRegenType == 2
-		// 리젠이 되지 못하도록,,, 
+		// 리젠이 되지 못하도록,,,  [Korean comment]
 		|| (m_byRegenType == 1 && m_byChangeType == 100))
 	{
 		m_NpcState = NPC_LIVE;
@@ -427,7 +427,7 @@ void CNpc::NpcLive(CIOCPort* pIOCP)
 		return;
 	}
 
-	// 몬스터의 정보를 바꾸어 준다..
+	// 몬스터의 정보를 바꾸어 준다.. Info
 	if (m_byChangeType == 1)
 	{
 		m_byChangeType = 2;
@@ -449,7 +449,7 @@ void CNpc::NpcLive(CIOCPort* pIOCP)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//	NPC가 공격하는 경우.
+//	NPC가 공격하는 경우. [Korean comment]
 //
 void CNpc::NpcFighting(CIOCPort* pIOCP)
 {
@@ -466,7 +466,7 @@ void CNpc::NpcFighting(CIOCPort* pIOCP)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//	NPC가 유저를 추적하는 경우.
+//	NPC가 유저를 추적하는 경우. [Korean comment]
 //
 void CNpc::NpcTracing(CIOCPort* pIOCP)
 {
@@ -491,7 +491,7 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 
 	NpcTrace("NpcTracing()");
 
-	// 고정 경비병은 추적이 되지 않도록한다.
+	// 고정 경비병은 추적이 되지 않도록한다. [Korean comment]
 	if (m_tNpcType == NPC_DOOR
 		|| m_tNpcType == NPC_ARTIFACT
 		|| m_tNpcType == NPC_PHOENIX_GATE
@@ -512,20 +512,20 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 	*/
 	int nFlag = IsCloseTarget(m_byAttackRange, 1);
 
-	// 근접전을 벌일만큼 가까운 거리인가?
+	// 근접전을 벌일만큼 가까운 거리인가? [Korean comment]
 	if (nFlag == 1)
 	{
 		//TRACE(_T("Npc-NpcTracing : trace->attack으로 바뀜 : nid=(%d, %hs), x=%.2f, z=%.2f\n"), m_sNid+NPC_BAND, m_strName, m_fCurX, m_fCurZ);
-		NpcMoveEnd(pIOCP);	// 이동 끝..
+		NpcMoveEnd(pIOCP);	// 이동 끝.. Move
 		m_NpcState = NPC_FIGHTING;
 		m_Delay = 0;
 		m_fDelayTime = TimeGet();
 		return;
 	}
-	else if (nFlag == -1)		// 타겟이 없어짐...
+	else if (nFlag == -1)		// 타겟이 없어짐... [Korean comment]
 	{
 		InitTarget();
-		NpcMoveEnd(pIOCP);	// 이동 끝..
+		NpcMoveEnd(pIOCP);	// 이동 끝.. Move
 		m_NpcState = NPC_STANDING;
 		m_Delay = m_sStandTime;
 		m_fDelayTime = TimeGet();
@@ -535,7 +535,7 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 	else if (nFlag == 2
 		&& m_tNpcLongType == 2)
 	{
-		NpcMoveEnd(pIOCP);	// 이동 끝..
+		NpcMoveEnd(pIOCP);	// 이동 끝.. Move
 		m_NpcState = NPC_FIGHTING;
 		m_Delay = 0;
 		m_fDelayTime = TimeGet();
@@ -555,7 +555,7 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 			spdlog::error("Npc::NpcTracing: pathfinding failed, set state to NPC_STANDING [serial={} npcId={} npcName={}]",
 				m_sNid + NPC_BAND, m_sSid, m_strName);
 			InitTarget();
-			NpcMoveEnd(pIOCP);	// 이동 끝..
+			NpcMoveEnd(pIOCP);	// 이동 끝.. Move
 			m_NpcState = NPC_STANDING;
 			m_Delay = m_sStandTime;
 			m_fDelayTime = TimeGet();
@@ -567,7 +567,7 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 	{
 //		TRACE(_T("StepMove : x=%.2f, z=%.2f\n"), m_fCurX, m_fCurZ);
 
-		// 한칸 움직임(걷는동작, 달릴때는 2칸)
+		// 한칸 움직임(걷는동작, 달릴때는 2칸) [Korean comment]
 		if (!StepMove(1, pIOCP))
 		{
 			m_NpcState = NPC_STANDING;
@@ -581,7 +581,7 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 	else // if (m_bPathFlag == TRUE)
 	{
 //		TRACE(_T("StepNoPathMove : x=%.2f, z=%.2f\n"), m_fCurX, m_fCurZ);
-		if (!StepNoPathMove(1))	// 한칸 움직임(걷는동작, 달릴때는 2칸)
+		if (!StepNoPathMove(1))	// 한칸 움직임(걷는동작, 달릴때는 2칸) [Korean comment]
 		{
 			m_NpcState = NPC_STANDING;
 			m_Delay = m_sStandTime;
@@ -592,7 +592,7 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 		}
 	}
 
-	// 이동이 끝났으면
+	// 이동이 끝났으면 Move
 	if (IsMovingEnd())
 	{
 		memset(pBuf, 0, sizeof(pBuf));
@@ -632,7 +632,7 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 		if (nRet == 0)
 		{
 			InitTarget();
-			NpcMoveEnd(pIOCP);	// 이동 끝..
+			NpcMoveEnd(pIOCP);	// 이동 끝.. Move
 			m_NpcState = NPC_STANDING;
 			m_Delay = m_sStandTime;
 			m_fDelayTime = TimeGet();
@@ -650,7 +650,7 @@ void CNpc::NpcAttacking(CIOCPort* pIOCP)
 
 	if (m_iHP <= 0)
 	{
-		Dead(pIOCP);		 // 바로 몬스터를 죽인다.. (경험치 배분 안함)
+		Dead(pIOCP);		 // 바로 몬스터를 죽인다.. (경험치 배분 안함) [Korean comment]
 		return;
 	}
 
@@ -658,7 +658,7 @@ void CNpc::NpcAttacking(CIOCPort* pIOCP)
 
 	int ret = IsCloseTarget(m_byAttackRange);
 
-	// 공격할 수 있는만큼 가까운 거리인가?
+	// 공격할 수 있는만큼 가까운 거리인가? [Korean comment]
 	if (ret == 1)
 	{
 		m_NpcState = NPC_FIGHTING;
@@ -669,7 +669,7 @@ void CNpc::NpcAttacking(CIOCPort* pIOCP)
 
 	//if(m_tNpcType == NPCTYPE_DOOR || m_tNpcType == NPCTYPE_ARTIFACT || m_tNpcType == NPCTYPE_PHOENIX_GATE || m_tNpcType == NPCTYPE_GATE_LEVER)		return;		// 성문 NPC는 공격처리 안하게
 
-	// 작업 : 이 부분에서.. 경비병도 공격이 가능하게...
+	// 작업 : 이 부분에서.. 경비병도 공격이 가능하게... [Korean comment]
 	if (m_tNpcType == NPC_DOOR
 		|| m_tNpcType == NPC_ARTIFACT
 		|| m_tNpcType == NPC_PHOENIX_GATE
@@ -686,7 +686,7 @@ void CNpc::NpcAttacking(CIOCPort* pIOCP)
 
 	int nValue = GetTargetPath();
 
-	// 타겟이 없어지거나,, 멀어졌음으로...
+	// 타겟이 없어지거나,, 멀어졌음으로... [Korean comment]
 	if (nValue == -1)
 	{
 		if (RandomMove() == FALSE)
@@ -706,8 +706,8 @@ void CNpc::NpcAttacking(CIOCPort* pIOCP)
 	}
 	else if (nValue == 0)
 	{
-		m_fSecForMetor = m_fSpeed_2;			// 공격일때는 뛰는 속도로... 
-		IsNoPathFind(m_fSecForMetor);			// 타겟 방향으로 바로 간다..
+		m_fSecForMetor = m_fSpeed_2;			// 공격일때는 뛰는 속도로...  [Korean comment]
+		IsNoPathFind(m_fSecForMetor);			// 타겟 방향으로 바로 간다.. [Korean comment]
 	}
 
 	m_NpcState = NPC_TRACING;
@@ -716,7 +716,7 @@ void CNpc::NpcAttacking(CIOCPort* pIOCP)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//	NPC가 이동하는 경우.
+//	NPC가 이동하는 경우. Move
 //
 void CNpc::NpcMoving(CIOCPort* pIOCP)
 {
@@ -747,19 +747,19 @@ void CNpc::NpcMoving(CIOCPort* pIOCP)
 		}
 	}
 
-	// 적을 찾는다. 
+	// 적을 찾는다.  [Korean comment]
 	if (FindEnemy())
 	{
 		/*if (m_tNpcType == NPCTYPE_GUARD)
 		{
-			NpcMoveEnd(pIOCP);	// 이동 끝..
+			NpcMoveEnd(pIOCP);	// 이동 끝.. Move
 			m_NpcState = NPC_FIGHTING;
 			m_Delay = 0;
 			m_fDelayTime = TimeGet();
 		}
 		else*/
 		{
-			NpcMoveEnd(pIOCP);	// 이동 끝..
+			NpcMoveEnd(pIOCP);	// 이동 끝.. Move
 			m_NpcState = NPC_ATTACKING;
 			m_Delay = m_sSpeed;
 			m_fDelayTime = TimeGet();
@@ -767,7 +767,7 @@ void CNpc::NpcMoving(CIOCPort* pIOCP)
 		return;
 	}
 
-	// 이동이 끝났으면
+	// 이동이 끝났으면 Move
 	if (IsMovingEnd())
 	{
 		m_fCurX = m_fPrevX;
@@ -799,7 +799,7 @@ void CNpc::NpcMoving(CIOCPort* pIOCP)
 
 	if (!m_bPathFlag)
 	{
-		// 한칸 움직임(걷는동작, 달릴때는 2칸)
+		// 한칸 움직임(걷는동작, 달릴때는 2칸) [Korean comment]
 		if (!StepMove(1, pIOCP))
 		{
 			m_NpcState = NPC_STANDING;
@@ -810,7 +810,7 @@ void CNpc::NpcMoving(CIOCPort* pIOCP)
 	}
 	else // if (m_bPathFlag)
 	{
-		// 한칸 움직임(걷는동작, 달릴때는 2칸)
+		// 한칸 움직임(걷는동작, 달릴때는 2칸) [Korean comment]
 		if (!StepNoPathMove(1))
 		{
 			m_NpcState = NPC_STANDING;
@@ -820,7 +820,7 @@ void CNpc::NpcMoving(CIOCPort* pIOCP)
 		}
 	}
 
-	// 이동이 끝났으면
+	// 이동이 끝났으면 Move
 	if (IsMovingEnd())
 	{
 		memset(pBuf, 0, sizeof(pBuf));
@@ -855,7 +855,7 @@ void CNpc::NpcMoving(CIOCPort* pIOCP)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//	NPC가 서있는경우.
+//	NPC가 서있는경우. [Korean comment]
 //
 void CNpc::NpcStanding()
 {
@@ -864,7 +864,7 @@ void CNpc::NpcStanding()
 	char send_buff[128];
 	int send_index = 0;
 
-/*	if(m_pMain->m_byNight == 2)	{	// 밤이면
+/*	if(m_pMain->m_byNight == 2)	{	// 밤이면 [Korean comment]
 		m_NpcState = NPC_SLEEPING;
 		m_Delay = 0;
 		m_fDelayTime = TimeGet();
@@ -881,9 +881,9 @@ void CNpc::NpcStanding()
 
 /*	BOOL bCheckRange = FALSE;
 	bCheckRange = IsInRange( (int)m_fCurX, (int)m_fCurZ);
-	if( bCheckRange )	{	// 활동영역안에 있다면
+	if( bCheckRange )	{	// 활동영역안에 있다면 [Korean comment]
 		if( m_tNpcAttType != m_tNpcOldAttType )	{
-			m_tNpcAttType = ATROCITY_ATTACK_TYPE;	// 공격성향으로
+			m_tNpcAttType = ATROCITY_ATTACK_TYPE;	// 공격성향으로 [Korean comment]
 			//TRACE(_T("공격성향이 선공으로 변함\n"));
 		}
 	}
@@ -895,7 +895,7 @@ void CNpc::NpcStanding()
 	}	*/
 
 	// dungeon work
-	// 던젼 존인지를 먼저 판단
+	// 던젼 존인지를 먼저 판단 [Korean comment]
 	CRoomEvent* pRoom = pMap->m_arRoomEventArray.GetData(m_byDungeonFamily);
 	if (pRoom != nullptr)
 	{
@@ -939,7 +939,7 @@ void CNpc::NpcStanding()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//	타겟과의 거리를 사정거리 범위로 유지한다.(셀단위)
+//	타겟과의 거리를 사정거리 범위로 유지한다.(셀단위) [Korean comment]
 //
 void CNpc::NpcBack(CIOCPort* pIOCP)
 {
@@ -947,7 +947,7 @@ void CNpc::NpcBack(CIOCPort* pIOCP)
 		&& m_Target.id < NPC_BAND)
 	{
 		if (m_pMain->GetUserPtr((m_Target.id - USER_BAND)) == nullptr)
-		{	// Target User 가 존재하는지 검사
+		{	// Target User 가 존재하는지 검사 Check
 			m_NpcState = NPC_STANDING;
 			m_Delay = m_sSpeed;//STEP_DELAY;
 			m_fDelayTime = TimeGet();
@@ -990,7 +990,7 @@ void CNpc::NpcBack(CIOCPort* pIOCP)
 		}
 	}
 
-	// 이동이 끝났으면
+	// 이동이 끝났으면 Move
 	if (IsMovingEnd())
 	{
 		m_fCurX = m_fPrevX;
@@ -1018,7 +1018,7 @@ void CNpc::NpcBack(CIOCPort* pIOCP)
 //		TRACE(_T("** NpcBack 이동이 끝남,, stand로\n"));
 		m_NpcState = NPC_STANDING;
 
-		//영역 밖에 있으면 서있는 시간을 짧게...
+		//영역 밖에 있으면 서있는 시간을 짧게... Time
 		m_Delay = m_sStandTime;
 		m_fDelayTime = TimeGet();
 
@@ -1072,7 +1072,7 @@ void CNpc::NpcBack(CIOCPort* pIOCP)
 }
 
 ///////////////////////////////////////////////////////////////////////
-// NPC 가 처음 생기거나 죽었다가 살아날 때의 처리
+// NPC 가 처음 생기거나 죽었다가 살아날 때의 처리 Process
 //
 BOOL CNpc::SetLive(CIOCPort* pIOCP)
 {
@@ -1095,7 +1095,7 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 
 	InitTarget();
 	ClearPathFindData();
-	InitUserList();					// 타겟을위한 리스트를 초기화.
+	InitUserList();					// 타겟을위한 리스트를 초기화. Initialize
 	//InitPos();
 
 	CNpc* pNpc = nullptr;
@@ -1123,7 +1123,7 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 		return TRUE;
 	}
 
-	// NPC 초기위치 결정 ------------------------//
+	// NPC 초기위치 결정 ------------------------// Position
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
@@ -1132,7 +1132,7 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 		return FALSE;
 	}
 
-	// NPC 가 처음 살아나는 경우	
+	// NPC 가 처음 살아나는 경우	 [Korean comment]
 	if (m_bFirstLive)
 	{
 		m_nInitX = m_fPrevX = m_fCurX;
@@ -1243,12 +1243,12 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 
 	//SetUid(m_fCurX, m_fCurZ, m_sNid + NPC_BAND);
 
-	// 상태이상 정보 초기화
+	// 상태이상 정보 초기화 Initialize
 	m_fHPChangeTime = TimeGet();
 	m_fFaintingTime = 0.0f;
 	InitMagicValuable();
 
-	// NPC 가 처음 살아나는 경우
+	// NPC 가 처음 살아나는 경우 [Korean comment]
 	if (m_bFirstLive)
 	{
 		NpcTypeParser();
@@ -1258,7 +1258,7 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 
 		//TRACE(_T("Npc - SerLive :  cur = %d\n"), m_pMain->m_CurrentNPC);
 
-		// 몬스터 총 수와 초기화한 몬스터의 수가 같다면
+		// 몬스터 총 수와 초기화한 몬스터의 수가 같다면 Initialize
 		if (m_pMain->m_TotalNPC == m_pMain->m_CurrentNPC)
 		{
 			std::string logstr = fmt::format("All NPCs initialized [count={}]",
@@ -1271,7 +1271,7 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 	}
 
 	// 해야 할 일 : Npc의 초기 방향,, 결정하기..
-	// Npc인 경우 초기 방향이 중요함으로써..
+	// Npc인 경우 초기 방향이 중요함으로써.. [Korean comment]
 	if (m_byMoveType == 3
 		&& m_sMaxPathCount == 2)
 	{
@@ -1286,12 +1286,12 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 		m_byDirection = (uint8_t) fDir;
 	}
 
-	// 처음에 죽어있다가 살아나는 몬스터
+	// 처음에 죽어있다가 살아나는 몬스터 [Korean comment]
 	if (m_bySpecialType == 5
 		&& m_byChangeType == 0)
 		return FALSE;
 
-	// 몬스터의 출현,,,
+	// 몬스터의 출현,,, [Korean comment]
 	if (m_bySpecialType == 5
 		&& m_byChangeType == 3)
 	{
@@ -1315,11 +1315,11 @@ BOOL CNpc::SetLive(CIOCPort* pIOCP)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//	주변에 적이 없거나 수동몹의 경우 임의의 점으로 길찾기를 한 후 움직인다.
+//	주변에 적이 없거나 수동몹의 경우 임의의 점으로 길찾기를 한 후 움직인다. [Korean comment]
 //
 BOOL CNpc::RandomMove()
 {
-	// 보통이동일때는 걷는 속도로 맞추어준다...
+	// 보통이동일때는 걷는 속도로 맞추어준다... Move
 	m_fSecForMetor = m_fSpeed_1;
 
 	if (m_bySearchRange == 0)
@@ -1359,7 +1359,7 @@ BOOL CNpc::RandomMove()
 			//TRACE(_T("초기위치를 벗어났군,,,  patten=%d \n"), m_iPattenFrame);
 		}
 
-		// 처음위치로 돌아가도록...
+		// 처음위치로 돌아가도록... Position
 		if (m_iPattenFrame == 0)
 		{
 			m_pPattenPos.x = (short) m_nInitX;
@@ -1407,7 +1407,7 @@ BOOL CNpc::RandomMove()
 			m_sPathCount = 0;
 
 		// 나의 위치가,, 패스 리스트에서 멀어졌다면,, 현재의 m_sPathCount나 다음의 m_sPathCount의 위치를 
-		// 판단해서 가까운 위치로 길찾기를 한다,,
+		// 판단해서 가까운 위치로 길찾기를 한다,, Position
 		if (m_sPathCount != 0
 			&& !IsInPathRange())
 		{
@@ -1434,7 +1434,7 @@ BOOL CNpc::RandomMove()
 			}
 			else
 			{
-				//m_byPathCount; 번호를 더해주기
+				//m_byPathCount; 번호를 더해주기 [Korean comment]
 				if (nPathCount < 0)
 					return FALSE;
 
@@ -1466,7 +1466,7 @@ BOOL CNpc::RandomMove()
 		}
 
 		// 나의 위치가,, 패스 리스트에서 멀어졌다면,, 현재의 m_sPathCount나 다음의 m_sPathCount의 위치를 
-		// 판단해서 가까운 위치로 길찾기를 한다,,
+		// 판단해서 가까운 위치로 길찾기를 한다,, Position
 		if (m_sPathCount != 0
 			&& !IsInPathRange())
 		{
@@ -1532,7 +1532,7 @@ BOOL CNpc::RandomMove()
 	}
 	
 
-	// 작업할것 :	 던젼 몬스터의 경우 일정영역을 벗어나지 못하도록 체크하는 루틴 	
+	// 작업할것 :	 던젼 몬스터의 경우 일정영역을 벗어나지 못하도록 체크하는 루틴 	 Check
 	if (m_tNpcType == NPC_DUNGEON_MONSTER)
 	{
 		if (!IsInRange((int) fDestX, (int) fDestZ))
@@ -1541,7 +1541,7 @@ BOOL CNpc::RandomMove()
 
 	fDis = GetDistance(vStart, vEnd);
 
-	// 100미터 보다 넓으면 스탠딩상태로..
+	// 100미터 보다 넓으면 스탠딩상태로.. Status
 	if (fDis > NPC_MAX_MOVE_RANGE)
 	{
 		if (m_byMoveType == 2
@@ -1557,7 +1557,7 @@ BOOL CNpc::RandomMove()
 		return FALSE;
 	}
 
-	// 이동거리 안에 목표점이 있다면 바로 이동하게 처리...
+	// 이동거리 안에 목표점이 있다면 바로 이동하게 처리... Process
 	if (fDis <= m_fSecForMetor)
 	{
 		ClearPathFindData();
@@ -1574,7 +1574,7 @@ BOOL CNpc::RandomMove()
 		return TRUE;
 	}
 
-	// 일시적으로 보정한다.
+	// 일시적으로 보정한다. [Korean comment]
 	float fTempRange = (float) fDis + 2;
 	int min_x = (int) (m_fCurX - fTempRange) / TILE_SIZE;
 	if (min_x < 0)
@@ -1630,10 +1630,10 @@ BOOL CNpc::RandomMove()
 	return FALSE;
 }
 
-// Target User와 반대 방향으로 랜덤하게 움직인다.
+// Target User와 반대 방향으로 랜덤하게 움직인다. [Korean comment]
 BOOL CNpc::RandomBackMove()
 {
-	// 도망갈때도.. 속도를 뛰는 속도로 맞추어준다..
+	// 도망갈때도.. 속도를 뛰는 속도로 맞추어준다.. [Korean comment]
 	m_fSecForMetor = m_fSpeed_2;
 
 	if (m_bySearchRange == 0)
@@ -1653,7 +1653,7 @@ BOOL CNpc::RandomBackMove()
 	int max_zz = pMap->m_sizeMap.cy;
 	int x = 0, y = 0;
 
-	// 일시적으로 보정한다.
+	// 일시적으로 보정한다. [Korean comment]
 	float fTempRange = (float) m_bySearchRange * 2;
 	int min_x = (int) (m_fCurX - fTempRange) / TILE_SIZE;
 	if (min_x < 0)
@@ -1675,7 +1675,7 @@ BOOL CNpc::RandomBackMove()
 	float fDis = 0.0f;
 	vStart.Set(m_fCurX, m_fCurY, m_fCurZ);
 
-	// Target 을 구한다.
+	// Target 을 구한다. [Korean comment]
 	int nID = m_Target.id;
 	CUser* pUser = nullptr;
 
@@ -1703,7 +1703,7 @@ BOOL CNpc::RandomBackMove()
 			else
 				iDir = 2;
 		}
-		// z축으로
+		// z축으로 [Korean comment]
 		else
 		{
 			iRandomZ = myrand((int) m_bySearchRange, (int) (m_bySearchRange * 1.5));
@@ -1752,7 +1752,7 @@ BOOL CNpc::RandomBackMove()
 		vEnd.Set(fDestX, 0, fDestZ);
 		fDis = GetDistance(vStart, vEnd);
 
-		// 20미터 이상이면 20미터로 맞춘다,,
+		// 20미터 이상이면 20미터로 맞춘다,, [Korean comment]
 		if (fDis > 20)
 		{
 			vEnd22 = GetVectorPosition(vStart, vEnd, 20);
@@ -1802,7 +1802,7 @@ BOOL CNpc::IsInPathRange()
 		int x = 0;
 	}
 
-	float fPathRange = 40.0f;	// 오차 패스 범위 
+	float fPathRange = 40.0f;	// 오차 패스 범위  [Korean comment]
 	__Vector3 vStart, vEnd;
 	float fDistance = 0.0f;
 	vStart.Set(m_fCurX, m_fCurY, m_fCurZ);
@@ -1871,11 +1871,11 @@ int CNpc::GetNearPathPoint()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
-//	NPC 가 초기 생성위치 안에 있는지 검사
+//	NPC 가 초기 생성위치 안에 있는지 검사 Create
 //
 BOOL CNpc::IsInRange(int nX, int nZ)
 {
-	// NPC 가 초기 위치를 벗어났는지 판단한다.
+	// NPC 가 초기 위치를 벗어났는지 판단한다. Position
 	BOOL bFlag_1 = FALSE, bFlag_2 = FALSE;
 	if (m_nLimitMinX < m_nLimitMaxX)
 	{
@@ -1907,7 +1907,7 @@ BOOL CNpc::IsInRange(int nX, int nZ)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-//	PathFind 를 수행한다.
+//	PathFind 를 수행한다. [Korean comment]
 //
 int CNpc::PathFind(CPoint start, CPoint end, float fDistance)
 {
@@ -1919,7 +1919,7 @@ int CNpc::PathFind(CPoint start, CPoint end, float fDistance)
 		|| end.y < 0)
 		return -1;
 
-	// 같은 타일 안에서,, 조금 움직임이 있었다면,,
+	// 같은 타일 안에서,, 조금 움직임이 있었다면,, [Korean comment]
 	if (start.x == end.x
 		&& start.y == end.y)
 	{
@@ -1932,7 +1932,7 @@ int CNpc::PathFind(CPoint start, CPoint end, float fDistance)
 		return 1;
 	}
 
-	// 여기에서 패스파인드를 실행할건지.. 바로 목표점으로 갈건인지를 판단..
+	// 여기에서 패스파인드를 실행할건지.. 바로 목표점으로 갈건인지를 판단.. [Korean comment]
 	if (IsPathFindCheck(fDistance))
 	{
 		m_bPathFlag = TRUE;
@@ -2044,7 +2044,7 @@ int CNpc::PathFind(CPoint start, CPoint end, float fDistance)
 }
 
 
-//	NPC 사망처리
+//	NPC 사망처리 Process
 void CNpc::Dead(CIOCPort* pIOCP, int iDeadType)
 {
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
@@ -2060,7 +2060,7 @@ void CNpc::Dead(CIOCPort* pIOCP, int iDeadType)
 	m_Delay = m_sRegenTime;
 	m_fDelayTime = TimeGet();
 	m_bFirstLive = FALSE;
-	m_byDeadType = 100;		// 전쟁이벤트중에서 죽는 경우
+	m_byDeadType = 100;		// 전쟁이벤트중에서 죽는 경우 [Korean comment]
 
 	if (m_iRegion_X > pMap->GetXRegionMax()
 		|| m_iRegion_Z > pMap->GetZRegionMax())
@@ -2088,7 +2088,7 @@ void CNpc::Dead(CIOCPort* pIOCP, int iDeadType)
 		SendAll(pIOCP, buff, send_index);
 	}
 
-	// Dungeon Work : 변하는 몬스터의 경우 변하게 처리..
+	// Dungeon Work : 변하는 몬스터의 경우 변하게 처리.. Process
 	if (m_bySpecialType == 1
 		|| m_bySpecialType == 4)
 	{
@@ -2097,7 +2097,7 @@ void CNpc::Dead(CIOCPort* pIOCP, int iDeadType)
 			m_byChangeType = 1;
 			//ChangeMonsterInfomation( 1 );
 		}
-		// 대장 몬스터의 죽음 (몬스터 타입이 대장몬스터인지도 검사해야 함)
+		// 대장 몬스터의 죽음 (몬스터 타입이 대장몬스터인지도 검사해야 함) Check
 		else if (m_byChangeType == 2)
 		{
 			if (m_byDungeonFamily < 0
@@ -2122,15 +2122,15 @@ void CNpc::Dead(CIOCPort* pIOCP, int iDeadType)
 		return;
 	}
 	if( pMap->m_arDungeonBossMonster[m_byDungeonFamily] == 0 )	{
-		m_byRegenType = 2;				// 리젠이 안되도록..
+		m_byRegenType = 2;				// 리젠이 안되도록.. [Korean comment]
 	}	*/
 
-	// 몬스터 소환 테스트
+	// 몬스터 소환 테스트 [Korean comment]
 	//if(m_sNid == 0)
 	//	m_pMain->MonsterSummon("클립토돈", m_sCurZone, 2605.0, 1375.0);
 }
 
-//	NPC 주변의 적을 찾는다.
+//	NPC 주변의 적을 찾는다. [Korean comment]
 BOOL CNpc::FindEnemy()
 {
 	if (m_tNpcType == NPC_DOOR
@@ -2155,10 +2155,10 @@ BOOL CNpc::FindEnemy()
 	{
 		bCheckRange = IsInRange((int) m_fCurX, (int) m_fCurZ);
 
-		// 활동영역안에 있다면
+		// 활동영역안에 있다면 [Korean comment]
 		if (bCheckRange)
 		{
-			// 공격성향으로
+			// 공격성향으로 [Korean comment]
 			if (m_tNpcAttType != m_tNpcOldAttType)
 			{
 				m_tNpcAttType = ATROCITY_ATTACK_TYPE;
@@ -2245,7 +2245,7 @@ BOOL CNpc::FindEnemy()
 			x = m_iRegion_X + (m_iFind_X[l]);
 			y = m_iRegion_Z + (m_iFind_Y[l]);
 
-			// 이부분 수정요망,,
+			// 이부분 수정요망,, [Korean comment]
 			if (x < 0
 				|| y < 0
 				|| x > pMap->GetXRegionMax()
@@ -2263,7 +2263,7 @@ BOOL CNpc::FindEnemy()
 
 	fCompareDis = 0.0f;
 
-	// 타입이 경비병인 경우에는 같은 나라의 몬스터가 아닌경우에는 몬스터를 공격하도록 한다..
+	// 타입이 경비병인 경우에는 같은 나라의 몬스터가 아닌경우에는 몬스터를 공격하도록 한다.. Type
 	if (m_tNpcType == NPC_GUARD
 		|| m_tNpcType == NPC_PATROL_GUARD
 		|| m_tNpcType == NPC_STORE_GUARD
@@ -2284,7 +2284,7 @@ BOOL CNpc::FindEnemy()
 			x = m_iRegion_X + (m_iFind_X[l]);
 			y = m_iRegion_Z + (m_iFind_Y[l]);
 
-			// 이부분 수정요망,,
+			// 이부분 수정요망,, [Korean comment]
 			if (x < 0
 				|| y < 0
 				|| x > pMap->GetXRegionMax()
@@ -2299,7 +2299,7 @@ BOOL CNpc::FindEnemy()
 		&& fCompareDis <= fSearchRange)
 		return TRUE;
 
-	// 아무도 없으므로 리스트에 관리하는 유저를 초기화한다.
+	// 아무도 없으므로 리스트에 관리하는 유저를 초기화한다. Initialize
 	InitUserList();
 	InitTarget();
 	return FALSE;
@@ -2389,7 +2389,7 @@ int CNpc::FindEnemyRegion()
 			break;
 	}
 
-	// 임시로 보정(문제시),, 하기 위한것..
+	// 임시로 보정(문제시),, 하기 위한것.. [Korean comment]
 	if (iRetValue <= 0)
 		iRetValue = 0;
 
@@ -2519,7 +2519,7 @@ float CNpc::FindEnemyExpand(int nRX, int nRZ, float fCompDis, int nType)
 	int* pIDList = nullptr;
 	int iLevelComprison = 0;
 
-	// user을 타겟으로 잡는 경우
+	// user을 타겟으로 잡는 경우 [Korean comment]
 	if (nType == 1)
 	{
 		int nUserid = 0, count = 0;
@@ -2558,18 +2558,18 @@ float CNpc::FindEnemyExpand(int nRX, int nRZ, float fCompDis, int nType)
 				|| pUser->m_bLive != USER_LIVE)
 				continue;
 
-			// 같은 국가의 유저는 공격을 하지 않도록 한다...
+			// 같은 국가의 유저는 공격을 하지 않도록 한다... [Korean comment]
 			if (m_byGroup == pUser->m_bNation)
 				continue;
 
-			// 운영자 무시
+			// 운영자 무시 [Korean comment]
 			if (pUser->m_byIsOP == MANAGER_USER)
 				continue;
 
 			vUser.Set(pUser->m_curx, pUser->m_cury, pUser->m_curz);
 			fDis = GetDistance(vUser, vNpc);
 
-			// 작업 : 여기에서 나의 공격거리에 있는 유저인지를 판단
+			// 작업 : 여기에서 나의 공격거리에 있는 유저인지를 판단 [Korean comment]
 			if (fDis > fSearchRange)
 				continue;
 
@@ -2578,8 +2578,8 @@ float CNpc::FindEnemyExpand(int nRX, int nRZ, float fCompDis, int nType)
 				target_uid = pUser->m_iUserId;
 				fComp = fDis;
 
-				//후공몹...
-				// 날 공격한 놈을 찾는다.
+				//후공몹... [Korean comment]
+				// 날 공격한 놈을 찾는다. [Korean comment]
 				if (m_tNpcAttType == 0)
 				{
 					if (IsDamagedUserList(pUser)
@@ -2592,12 +2592,12 @@ float CNpc::FindEnemyExpand(int nRX, int nRZ, float fCompDis, int nType)
 						m_Target.z = pUser->m_curz;
 					}
 				}
-				// 선공몹...
+				// 선공몹... [Korean comment]
 				else
 				{
 					iLevelComprison = pUser->m_sLevel - m_sLevel;
 
-					// 작업할 것 : 타입에 따른 공격성향으로..
+					// 작업할 것 : 타입에 따른 공격성향으로.. Type
 					//if(iLevelComprison > ATTACK_LIMIT_LEVEL)	continue;
 
 					m_Target.id = target_uid;
@@ -2610,7 +2610,7 @@ float CNpc::FindEnemyExpand(int nRX, int nRZ, float fCompDis, int nType)
 			}
 		}
 	}
-	// 경비병이 몬스터를 타겟으로 잡는 경우
+	// 경비병이 몬스터를 타겟으로 잡는 경우 [Korean comment]
 	else if (nType == 2)
 	{
 		int nNpcid = 0, count = 0;
@@ -2664,14 +2664,14 @@ float CNpc::FindEnemyExpand(int nRX, int nRZ, float fCompDis, int nType)
 					continue;
 			}
 
-			// 같은 국가의 몬스터는 공격을 하지 않도록 한다...
+			// 같은 국가의 몬스터는 공격을 하지 않도록 한다... [Korean comment]
 			if (m_byGroup == pNpc->m_byGroup)
 				continue;
 
 			vMon.Set(pNpc->m_fCurX, pNpc->m_fCurY, pNpc->m_fCurZ);
 			fDis = GetDistance(vMon, vNpc);
 
-			// 작업 : 여기에서 나의 공격거리에 있는 유저인지를 판단
+			// 작업 : 여기에서 나의 공격거리에 있는 유저인지를 판단 [Korean comment]
 			if (fDis > fSearchRange)
 				continue;
 
@@ -2720,7 +2720,7 @@ int CNpc::GetMyField()
 	return iRet;
 }
 
-//	주변에 나를 공격한 유저가 있는지 알아본다
+//	주변에 나를 공격한 유저가 있는지 알아본다 [Korean comment]
 BOOL CNpc::IsDamagedUserList(CUser* pUser)
 {
 	if (pUser == nullptr)
@@ -2735,14 +2735,14 @@ BOOL CNpc::IsDamagedUserList(CUser* pUser)
 	return FALSE;
 }
 
-//	타겟이 둘러 쌓여 있으면 다음 타겟을 찾는다.
+//	타겟이 둘러 쌓여 있으면 다음 타겟을 찾는다. [Korean comment]
 int CNpc::IsSurround(CUser* pUser)
 {
-	//원거리는 통과
+	//원거리는 통과 [Korean comment]
 	if (m_tNpcLongType)
 		return 0;
 
-	// User가 없으므로 타겟지정 실패..
+	// User가 없으므로 타겟지정 실패.. [Korean comment]
 	if (pUser == nullptr)
 		return -2;
 
@@ -2753,11 +2753,11 @@ int CNpc::IsSurround(CUser* pUser)
 		return nDir;
 	}
 
-	// 타겟이 둘러 쌓여 있음...
+	// 타겟이 둘러 쌓여 있음... [Korean comment]
 	return -1;
 }
 
-//	x, y 가 움직일 수 있는 좌표인지 판단
+//	x, y 가 움직일 수 있는 좌표인지 판단 [Korean comment]
 BOOL CNpc::IsMovable(float x, float z)
 {
 	if (x < 0
@@ -2785,7 +2785,7 @@ BOOL CNpc::IsMovable(float x, float z)
 	return TRUE;
 }
 
-//	Path Find 로 찾은길을 다 이동 했는지 판단
+//	Path Find 로 찾은길을 다 이동 했는지 판단 Move
 BOOL CNpc::IsMovingEnd()
 {
 	//if(m_fCurX == m_fEndPoint_X && m_fCurZ == m_fEndPoint_Y) 
@@ -2800,7 +2800,7 @@ BOOL CNpc::IsMovingEnd()
 	return FALSE;
 }
 
-//	Step 수 만큼 타켓을 향해 이동한다.
+//	Step 수 만큼 타켓을 향해 이동한다. Move
 BOOL CNpc::StepMove(int nStep, CIOCPort* pIOCP)
 {
 	if (m_NpcState != NPC_MOVING
@@ -2829,7 +2829,7 @@ BOOL CNpc::StepMove(int nStep, CIOCPort* pIOCP)
 	vStart.Set(fOldCurX, 0, fOldCurZ);
 	vEnd.Set(m_pPoint[m_iAniFrameCount].fXPos, 0, m_pPoint[m_iAniFrameCount].fZPos);
 
-	// 안전 코드..
+	// 안전 코드.. [Korean comment]
 	if (m_pPoint[m_iAniFrameCount].fXPos < 0
 		|| m_pPoint[m_iAniFrameCount].fZPos < 0)
 	{
@@ -3045,7 +3045,7 @@ int CNpc::IsCloseTarget(int nRange, int Flag)
 
 	fDis = fDis - m_fBulk;
 
-	// 작업할것 :	 던젼 몬스터의 경우 일정영역을 벗어나지 못하도록 체크하는 루틴 	
+	// 작업할것 :	 던젼 몬스터의 경우 일정영역을 벗어나지 못하도록 체크하는 루틴 	 Check
 	if (m_tNpcType == NPC_DUNGEON_MONSTER)
 	{
 		if (!IsInRange((int) vUser.x, (int) vUser.z))
@@ -3082,8 +3082,8 @@ int CNpc::IsCloseTarget(int nRange, int Flag)
 	m_Target.x = fX;
 	m_Target.z = fZ;
 
-	//if( m_tNpcLongType && m_tNpcType != NPC_BOSS_MONSTER)	{		// 장거리 공격이 가능한것은 공격거리로 판단..
-	// 장거리 공격이 가능한것은 공격거리로 판단..
+	//if( m_tNpcLongType && m_tNpcType != NPC_BOSS_MONSTER)	{		// 장거리 공격이 가능한것은 공격거리로 판단.. [Korean comment]
+	// 장거리 공격이 가능한것은 공격거리로 판단.. [Korean comment]
 	if (m_tNpcLongType == 1)
 	{
 		if (fDis < LONG_ATTACK_RANGE)
@@ -3093,16 +3093,16 @@ int CNpc::IsCloseTarget(int nRange, int Flag)
 			&& fDis <= nRange)
 			return 2;
 	}
-	// 단거리(직접공격)
+	// 단거리(직접공격) [Korean comment]
 	else
 	{
-		// 몬스터의 이동하면서이 거리체크시
+		// 몬스터의 이동하면서이 거리체크시 Check
 		if (Flag == 1)
 		{
 			if (fDis < (SHORT_ATTACK_RANGE + m_fBulk))
 				return 1;
 
-			// 유저의 현재좌표를 기준으로
+			// 유저의 현재좌표를 기준으로 [Korean comment]
 			if (fDis > (SHORT_ATTACK_RANGE + m_fBulk)
 				&& fDis <= nRange)
 				return 2;
@@ -3139,20 +3139,20 @@ int CNpc::GetTargetPath(int option)
 	if (m_byInitMoveType >= 100)
 		nInitType = m_byInitMoveType - 100;
 
-	// 행동 타입 수정
+	// 행동 타입 수정 Type
 	if (m_tNpcType != 0)
 	{
-		// 자기 자리로 돌아갈 수 있도록..
+		// 자기 자리로 돌아갈 수 있도록.. [Korean comment]
 		//if(m_byMoveType != m_byInitMoveType)
 		//	m_byMoveType = m_byInitMoveType;
 
-		// 자기 자리로 돌아갈 수 있도록..
+		// 자기 자리로 돌아갈 수 있도록.. [Korean comment]
 		if (m_byMoveType != nInitType)
 			m_byMoveType = nInitType;
 	}
 	// ~sungyong 2002.06.12
 
-	// 추격할때는 뛰는 속도로 맞추어준다...
+	// 추격할때는 뛰는 속도로 맞추어준다... [Korean comment]
 	m_fSecForMetor = m_fSpeed_2;
 	CUser* targetUser = nullptr;
 	CNpc* npcTarget = nullptr;
@@ -3194,14 +3194,14 @@ int CNpc::GetTargetPath(int option)
 			return -1;
 		}
 
-		// magic이나 활등으로 공격 당했다면...
+		// magic이나 활등으로 공격 당했다면... [Korean comment]
 		if (option == 1)
 		{
 			vNpc.Set(m_fCurX, m_fCurY, m_fCurZ);
 			vUser.Set(targetUser->m_curx, targetUser->m_cury, targetUser->m_curz);
 			fDis = GetDistance(vNpc, vUser);
 
-			// 너무 거리가 멀어서,, 추적이 안되게..
+			// 너무 거리가 멀어서,, 추적이 안되게.. [Korean comment]
 			if (fDis >= NPC_MAX_MOVE_RANGE)
 				return -1;
 
@@ -3209,10 +3209,10 @@ int CNpc::GetTargetPath(int option)
 		}
 		else
 		{
-			// 일시적으로 보정한다.
+			// 일시적으로 보정한다. [Korean comment]
 			chaseRange = (float) m_bySearchRange;
 
-			// 공격받은 상태면 찾을 범위 증가.
+			// 공격받은 상태면 찾을 범위 증가. Status
 			if (IsDamagedUserList(targetUser))
 				chaseRange = (float) m_byTracingRange;
 			else
@@ -3237,7 +3237,7 @@ int CNpc::GetTargetPath(int option)
 			return -1;
 		}
 
-		chaseRange = (float) m_byTracingRange;				// 일시적으로 보정한다.
+		chaseRange = (float) m_byTracingRange;				// 일시적으로 보정한다. [Korean comment]
 	}
 
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
@@ -3285,9 +3285,9 @@ int CNpc::GetTargetPath(int option)
 		vNpc.Set(m_fCurX, m_fCurY, m_fCurZ);
 		vUser.Set(targetUser->m_curx, targetUser->m_cury, targetUser->m_curz);
 
-		// 여기에서 유저의 어느 방향으로 공격할것인지를 판단...(셋팅)
+		// 여기에서 유저의 어느 방향으로 공격할것인지를 판단...(셋팅) [Korean comment]
 		// 이 부분에서 Npc의 공격점을 알아와서 공격하도록 한다,,
-		IsSurround(targetUser);	//둘러 쌓여 있으면 무시한다.(원거리, 근거리 무시)
+		IsSurround(targetUser);	//둘러 쌓여 있으면 무시한다.(원거리, 근거리 무시) [Korean comment]
 
 		//vEnd22 = CalcAdaptivePosition(vNpc, vUser, 2.0+m_fBulk);
 
@@ -3358,10 +3358,10 @@ int CNpc::GetTargetPath(int option)
 		return -1;
 	}
 
-	// 던젼 몬스터는 무조건 패스파인딩을 하도록..
+	// 던젼 몬스터는 무조건 패스파인딩을 하도록.. [Korean comment]
 	if (m_tNpcType != NPC_DUNGEON_MONSTER)
 	{
-		// 공격대상이 있으면 패스파인딩을 하지 않고 바로 타겟으로 가게 한다.
+		// 공격대상이 있으면 패스파인딩을 하지 않고 바로 타겟으로 가게 한다. [Korean comment]
 		if (m_Target.id != -1)
 			return 0;
 	}
@@ -3372,7 +3372,7 @@ int CNpc::GetTargetPath(int option)
 	end.x = (int) (vEnd22.x / TILE_SIZE) - min_x;
 	end.y = (int) (vEnd22.z / TILE_SIZE) - min_z;
 
-	// 작업할것 :	 던젼 몬스터의 경우 일정영역을 벗어나지 못하도록 체크하는 루틴 	
+	// 작업할것 :	 던젼 몬스터의 경우 일정영역을 벗어나지 못하도록 체크하는 루틴 	 Check
 	if (m_tNpcType == NPC_DUNGEON_MONSTER)
 	{
 		if (!IsInRange((int) vEnd22.x, (int) vEnd22.z))
@@ -3393,7 +3393,7 @@ int CNpc::Attack(CIOCPort* pIOCP)
 	if (pIOCP == nullptr)
 		return 10000;
 
-	// 텔레포트 가능하게,, (렌덤으로,, )
+	// 텔레포트 가능하게,, (렌덤으로,, ) [Korean comment]
 	int nRandom = 0, nPercent = 1000;
 	int send_index = 0;
 	BOOL bTeleport = FALSE;
@@ -3408,7 +3408,7 @@ int CNpc::Attack(CIOCPort* pIOCP)
 	}	*/
 
 	// if (m_tNpcLongType == 1 && m_tNpcType != NPC_BOSS_MONSTER)
-	// 장거리 공격이 가능한것은 공격거리로 판단..
+	// 장거리 공격이 가능한것은 공격거리로 판단.. [Korean comment]
 	if (m_tNpcLongType == 1)
 	{
 		m_Delay = LongAndMagicAttack(pIOCP);
@@ -3422,7 +3422,7 @@ int CNpc::Attack(CIOCPort* pIOCP)
 
 	if (ret == 0)
 	{
-		// 고정 경비병은 추적을 하지 않도록..
+		// 고정 경비병은 추적을 하지 않도록.. [Korean comment]
 		if (m_tNpcType == NPC_DOOR
 			|| m_tNpcType == NPC_ARTIFACT
 			|| m_tNpcType == NPC_PHOENIX_GATE
@@ -3438,14 +3438,14 @@ int CNpc::Attack(CIOCPort* pIOCP)
 
 		m_sStepCount = 0;
 		m_byActionFlag = ATTACK_TO_TRACE;
-		m_NpcState = NPC_TRACING;			// 공격하고 도망가는 유저를 따라 잡기위해(반응을 좀더 빠르게) 
+		m_NpcState = NPC_TRACING;			// 공격하고 도망가는 유저를 따라 잡기위해(반응을 좀더 빠르게)  [Korean comment]
 		return 0;							// IsCloseTarget()에 유저 x, y값을 갱신하고 Delay = 0으로 줌
 	}
 	else if (ret == 2)
 	{
-		//if(m_tNpcType == NPC_BOSS_MONSTER)	{		// 대장 몬스터이면.....
+		//if(m_tNpcType == NPC_BOSS_MONSTER)	{		// 대장 몬스터이면..... [Korean comment]
 
-		// 직접, 간접(롱)공격이 가능한 몬스터 이므로 장거리 공격을 할 수 있다.
+		// 직접, 간접(롱)공격이 가능한 몬스터 이므로 장거리 공격을 할 수 있다. [Korean comment]
 		if (m_tNpcLongType == 2)
 		{
 			m_Delay = LongAndMagicAttack(pIOCP);
@@ -3453,7 +3453,7 @@ int CNpc::Attack(CIOCPort* pIOCP)
 		}
 		else
 		{
-			// 고정 경비병은 추적을 하지 않도록..
+			// 고정 경비병은 추적을 하지 않도록.. [Korean comment]
 			if (m_tNpcType == NPC_DOOR
 				|| m_tNpcType == NPC_ARTIFACT
 				|| m_tNpcType == NPC_PHOENIX_GATE
@@ -3469,7 +3469,7 @@ int CNpc::Attack(CIOCPort* pIOCP)
 
 			m_sStepCount = 0;
 			m_byActionFlag = ATTACK_TO_TRACE;
-			m_NpcState = NPC_TRACING;			// 공격하고 도망가는 유저를 따라 잡기위해(반응을 좀더 빠르게) 
+			m_NpcState = NPC_TRACING;			// 공격하고 도망가는 유저를 따라 잡기위해(반응을 좀더 빠르게)  [Korean comment]
 			return 0;							// IsCloseTarget()에 유저 x, y값을 갱신하고 Delay = 0으로 줌
 		}
 	}
@@ -3483,9 +3483,9 @@ int CNpc::Attack(CIOCPort* pIOCP)
 	CNpc* pNpc = nullptr;
 	CUser* pUser = nullptr;
 	int		nDamage = 0;
-	int nID = m_Target.id;					// Target 을 구한다.
+	int nID = m_Target.id;					// Target 을 구한다. [Korean comment]
 
-	// 회피값/명중판정/데미지 계산 -----------------------------------------//
+	// 회피값/명중판정/데미지 계산 -----------------------------------------// Calculate
 	// Target 이 User 인 경우
 	if (nID >= USER_BAND
 		&& nID < NPC_BAND)
@@ -3500,7 +3500,7 @@ int CNpc::Attack(CIOCPort* pIOCP)
 			return nStandingTime;
 		}
 
-		// User 가 이미 죽은경우
+		// User 가 이미 죽은경우 [Korean comment]
 		if (pUser->m_bLive == USER_DEAD)
 		{
 			//SendAttackSuccess(pIOCP, ATTACK_TARGET_DEAD_OK, pUser->m_iUserId, 0, pUser->m_iHP);
@@ -3517,7 +3517,7 @@ int CNpc::Attack(CIOCPort* pIOCP)
 			return nStandingTime;
 		}
 
-		// 운영자는 공격을 안하게..
+		// 운영자는 공격을 안하게.. [Korean comment]
 		if (pUser->m_byIsOP == MANAGER_USER)
 		{
 			InitTarget();
@@ -3535,15 +3535,15 @@ int CNpc::Attack(CIOCPort* pIOCP)
 			}
 		}*/
 
-		// if (m_tNpcType == NPC_BOSS_MONSTER)	// 대장 몬스터이면.....
+		// if (m_tNpcType == NPC_BOSS_MONSTER)	// 대장 몬스터이면..... [Korean comment]
 
-		// 지역 마법 사용 몬스터이면.....
+		// 지역 마법 사용 몬스터이면..... [Korean comment]
 		if (m_byWhatAttackType == 4
 			|| m_byWhatAttackType == 5)
 		{
 			nRandom = myrand(1, 10000);
 
-			// 지역마법공격...
+			// 지역마법공격... [Korean comment]
 			if (nRandom < nPercent)
 			{
 				memset(buff, 0, sizeof(buff));
@@ -3551,7 +3551,7 @@ int CNpc::Attack(CIOCPort* pIOCP)
 				SetByte(buff, MAGIC_EFFECTING, send_index);
 				SetDWORD(buff, m_iMagic2, send_index);			// Area Magic
 				SetShort(buff, m_sNid + NPC_BAND, send_index);
-				SetShort(buff, -1, send_index);					// tid는 반드시 -1
+				SetShort(buff, -1, send_index);					// tid는 반드시 -1 [Korean comment]
 				SetShort(buff, (short) m_fCurX, send_index);	// target point
 				SetShort(buff, (short) m_fCurY, send_index);
 				SetShort(buff, (short) m_fCurZ, send_index);
@@ -3561,20 +3561,20 @@ int CNpc::Attack(CIOCPort* pIOCP)
 
 				m_MagicProcess.MagicPacket(buff, send_index, pIOCP);
 				//TRACE(_T("++++ AreaMagicAttack --- sid=%d, magicid=%d\n"), m_sNid+NPC_BAND, m_iMagic2);
-				return m_sAttackDelay + 1000;	// 지역마법은 조금 시간이 걸리도록.....
+				return m_sAttackDelay + 1000;	// 지역마법은 조금 시간이 걸리도록..... Time
 			}
 		}
 		else
 		{
-			// 독 공격하는 몬스터라면... (10%의 공격으로)
+			// 독 공격하는 몬스터라면... (10%의 공격으로) [Korean comment]
 			if (m_byWhatAttackType == 2)
 			{
 				nRandom = myrand(1, 10000);
 
-				// sungyong test ,, 무조건 독공격만 
+				// sungyong test ,, 무조건 독공격만  [Korean comment]
 				//nRandom = 100;
 
-				// 독공격...
+				// 독공격... [Korean comment]
 				if (nRandom < nPercent)
 				{
 					memset(buff, 0, sizeof(buff));
@@ -3600,8 +3600,8 @@ int CNpc::Attack(CIOCPort* pIOCP)
 			}
 		}
 
-		// 명중이면 //Damage 처리 ----------------------------------------------------------------//
-		nDamage = GetFinalDamage(pUser);	// 최종 대미지
+		// 명중이면 //Damage 처리 ----------------------------------------------------------------// Process
+		nDamage = GetFinalDamage(pUser);	// 최종 대미지 [Korean comment]
 
 		// sungyong test
 		if (m_pMain->m_byTestMode)
@@ -3623,7 +3623,7 @@ int CNpc::Attack(CIOCPort* pIOCP)
 			SendAttackSuccess(pIOCP, ATTACK_FAIL, pUser->m_iUserId, nDamage, pUser->m_sHP);
 		}
 
-		// 방어측 내구도 감소
+		// 방어측 내구도 감소 [Korean comment]
 	}
 	else if (nID >= NPC_BAND
 		&& m_Target.id < INVALID_BAND)
@@ -3665,8 +3665,8 @@ int CNpc::Attack(CIOCPort* pIOCP)
 		// MoveAttack
 		//MoveAttack(pIOCP);
 
-		// 명중이면 //Damage 처리 ----------------------------------------------------------------//
-		nDamage = GetNFinalDamage(pNpc);	// 최종 대미지
+		// 명중이면 //Damage 처리 ----------------------------------------------------------------// Process
+		nDamage = GetNFinalDamage(pNpc);	// 최종 대미지 [Korean comment]
 
 		if (pUser != nullptr)
 		{
@@ -3704,19 +3704,19 @@ int CNpc::LongAndMagicAttack(CIOCPort* pIOCP)
 	{
 		m_sStepCount = 0;
 		m_byActionFlag = ATTACK_TO_TRACE;
-		m_NpcState = NPC_TRACING;			// 공격하고 도망가는 유저를 따라 잡기위해(반응을 좀더 빠르게) 
+		m_NpcState = NPC_TRACING;			// 공격하고 도망가는 유저를 따라 잡기위해(반응을 좀더 빠르게)  [Korean comment]
 		return 0;							// IsCloseTarget()에 유저 x, y값을 갱신하고 Delay = 0으로 줌
 	}
 	else if (ret == 2)
 	{
-		//if(m_tNpcType != NPC_BOSS_MONSTER)	{		// 대장 몬스터이면.....
+		//if(m_tNpcType != NPC_BOSS_MONSTER)	{		// 대장 몬스터이면..... [Korean comment]
 
-		// 장거리 몬스터이면.....
+		// 장거리 몬스터이면..... [Korean comment]
 		if (m_tNpcLongType == 1)
 		{
 			m_sStepCount = 0;
 			m_byActionFlag = ATTACK_TO_TRACE;
-			m_NpcState = NPC_TRACING;			// 공격하고 도망가는 유저를 따라 잡기위해(반응을 좀더 빠르게) 
+			m_NpcState = NPC_TRACING;			// 공격하고 도망가는 유저를 따라 잡기위해(반응을 좀더 빠르게)  [Korean comment]
 			return 0;							// IsCloseTarget()에 유저 x, y값을 갱신하고 Delay = 0으로 줌
 		}
 	}
@@ -3731,9 +3731,9 @@ int CNpc::LongAndMagicAttack(CIOCPort* pIOCP)
 	CNpc* pNpc = nullptr;
 	CUser* pUser = nullptr;
 	int nDamage = 0;
-	int nID = m_Target.id;					// Target 을 구한다.
+	int nID = m_Target.id;					// Target 을 구한다. [Korean comment]
 
-	// 회피값/명중판정/데미지 계산 -----------------------------------------//
+	// 회피값/명중판정/데미지 계산 -----------------------------------------// Calculate
 
 	// Target 이 User 인 경우
 	if (nID >= USER_BAND
@@ -3749,7 +3749,7 @@ int CNpc::LongAndMagicAttack(CIOCPort* pIOCP)
 			return nStandingTime;
 		}
 
-		// User 가 이미 죽은경우
+		// User 가 이미 죽은경우 [Korean comment]
 		if (pUser->m_bLive == USER_DEAD)
 		{
 			SendAttackSuccess(pIOCP, ATTACK_TARGET_DEAD_OK, pUser->m_iUserId, 0, 0);
@@ -3765,7 +3765,7 @@ int CNpc::LongAndMagicAttack(CIOCPort* pIOCP)
 			return nStandingTime;
 		}
 
-		// 운영자는 공격을 안하게..
+		// 운영자는 공격을 안하게.. [Korean comment]
 		if (pUser->m_byIsOP == MANAGER_USER)
 		{
 			InitTarget();
@@ -3783,7 +3783,7 @@ int CNpc::LongAndMagicAttack(CIOCPort* pIOCP)
 			}
 		}	*/
 
-		// 조건을 판단해서 마법 공격 사용 (지금은 마법 1만 사용토록 하자)
+		// 조건을 판단해서 마법 공격 사용 (지금은 마법 1만 사용토록 하자) [Korean comment]
 		SetByte(buff, MAGIC_CASTING, send_index);
 		SetDWORD(buff, m_iMagic1, send_index);			// FireBall
 		SetShort(buff, m_sNid + NPC_BAND, send_index);
@@ -3850,9 +3850,9 @@ int CNpc::TracingAttack(CIOCPort* pIOCP)		// 0:attack fail, 1:attack success
 
 	int nDamage = 0;
 
-	int nID = m_Target.id;					// Target 을 구한다.
+	int nID = m_Target.id;					// Target 을 구한다. [Korean comment]
 
-	// 회피값/명중판정/데미지 계산 -----------------------------------------//
+	// 회피값/명중판정/데미지 계산 -----------------------------------------// Calculate
 	// Target 이 User 인 경우
 	if (nID >= USER_BAND
 		&& nID < NPC_BAND)
@@ -3863,7 +3863,7 @@ int CNpc::TracingAttack(CIOCPort* pIOCP)		// 0:attack fail, 1:attack success
 		if (pUser == nullptr)
 			return 0;
 
-		// User 가 이미 죽은경우
+		// User 가 이미 죽은경우 [Korean comment]
 		if (pUser->m_bLive == USER_DEAD)
 		{
 			SendAttackSuccess(pIOCP, ATTACK_TARGET_DEAD_OK, pUser->m_iUserId, 0, 0);
@@ -3873,12 +3873,12 @@ int CNpc::TracingAttack(CIOCPort* pIOCP)		// 0:attack fail, 1:attack success
 		if (pUser->m_state == STATE_DISCONNECTED)
 			return 0;
 
-		// 운영자는 공격을 안하게..
+		// 운영자는 공격을 안하게.. [Korean comment]
 		if (pUser->m_byIsOP == MANAGER_USER)
 			return 0;
 
-		// 명중이면 //Damage 처리 ----------------------------------------------------------------//
-		nDamage = GetFinalDamage(pUser);	// 최종 대미지
+		// 명중이면 //Damage 처리 ----------------------------------------------------------------// Process
+		nDamage = GetFinalDamage(pUser);	// 최종 대미지 [Korean comment]
 
 		// sungyong test
 		if (m_pMain->m_byTestMode)
@@ -3899,7 +3899,7 @@ int CNpc::TracingAttack(CIOCPort* pIOCP)		// 0:attack fail, 1:attack success
 			SendAttackSuccess(pIOCP, ATTACK_FAIL, pUser->m_iUserId, nDamage, pUser->m_sHP);
 		}
 
-		// 방어측 내구도 감소
+		// 방어측 내구도 감소 [Korean comment]
 	}
 	else if (nID >= NPC_BAND
 		&& m_Target.id < INVALID_BAND)
@@ -3917,8 +3917,8 @@ int CNpc::TracingAttack(CIOCPort* pIOCP)		// 0:attack fail, 1:attack success
 			return 0;
 		}
 
-		// 명중이면 //Damage 처리 ----------------------------------------------------------------//
-		nDamage = GetNFinalDamage(pNpc);	// 최종 대미지
+		// 명중이면 //Damage 처리 ----------------------------------------------------------------// Process
+		nDamage = GetNFinalDamage(pNpc);	// 최종 대미지 [Korean comment]
 		//TRACE(_T("Npc-Attack() : [mon: x=%.2f, z=%.2f], [user : x=%.2f, z=%.2f]\n"), m_fCurX, m_fCurZ, pUser->m_curx, pUser->m_curz);
 
 		if (nDamage > 0)
@@ -4016,20 +4016,20 @@ void CNpc::MoveAttack(CIOCPort* pIOCP)
 	vDistance = vUser - vNpc;
 	fDis = vDistance.Magnitude();
 
-	// target과의 거리가 3미터 미만이면 멈춘상태에서 공격이고..
+	// target과의 거리가 3미터 미만이면 멈춘상태에서 공격이고.. Status
 	if ((int) fDis < 3)
 		return;
 
-	// 장거리 공격이 가능한것은 공격거리로 판단..
+	// 장거리 공격이 가능한것은 공격거리로 판단.. [Korean comment]
 	/*if (m_tNpcLongType != 0)
 	{
 		if ((int)fDis > nRange)
 			return FALSE;
 	}
-	// 단거리(직접공격)
+	// 단거리(직접공격) [Korean comment]
 	else
 	{
-		// 작업 :공격가능거리를 2.5로 임시 수정함..
+		// 작업 :공격가능거리를 2.5로 임시 수정함.. [Korean comment]
 		if (fDis > 2.5f)
 			return FALSE;
 	}*/
@@ -4046,7 +4046,7 @@ void CNpc::MoveAttack(CIOCPort* pIOCP)
 			m_sNid + NPC_BAND, m_sSid, m_strName, m_fCurX, m_fCurZ);
 	}
 
-	// 이동공격.. 
+	// 이동공격..  Move
 	memset(pBuf, 0, sizeof(pBuf));
 	index = 0;
 	SetByte(pBuf, MOVE_RESULT, index);
@@ -4059,7 +4059,7 @@ void CNpc::MoveAttack(CIOCPort* pIOCP)
 	//TRACE(_T("Npc moveattack --> nid = %d, cur=[x=%.2f, y=%.2f, metor=%.2f]\n"), m_sNid+NPC_BAND, m_fCurX, m_fCurZ, fDis);
 	SendAll(pIOCP, pBuf, index);   // thread 에서 send
 
-	// 이동 끝
+	// 이동 끝 Move
 	memset(pBuf, 0, sizeof(pBuf));
 	index = 0;
 	SetByte(pBuf, MOVE_RESULT, index);
@@ -4095,10 +4095,10 @@ int CNpc::GetNFinalDamage(CNpc* pNpc)
 	if (pNpc == nullptr)
 		return damage;
 
-	// 공격민첩
+	// 공격민첩 [Korean comment]
 	Attack = (float) m_sHitRate;
 
-	// 방어민첩
+	// 방어민첩 [Korean comment]
 	Avoid = (float) pNpc->m_sEvadeRate;
 
 	//공격자 Hit 
@@ -4107,7 +4107,7 @@ int CNpc::GetNFinalDamage(CNpc* pNpc)
 	// 방어자 Ac 
 	Ac = (short) pNpc->m_sDefense;
 
-	// 타격비 구하기
+	// 타격비 구하기 [Korean comment]
 	result = GetHitRate(Attack / Avoid);
 
 	switch (result)
@@ -4173,7 +4173,7 @@ BOOL CNpc::IsCompStatus(CUser* pUser)
 	return FALSE;
 }
 
-//	Target 의 위치가 다시 길찾기를 할 정도로 변했는지 판단
+//	Target 의 위치가 다시 길찾기를 할 정도로 변했는지 판단 Position
 BOOL CNpc::IsChangePath(int nStep)
 {
 	// 패스파인드의 마지막 좌표를 가지고,, Target이 내 공격거리에 있는지를 판단,,
@@ -4201,7 +4201,7 @@ BOOL CNpc::IsChangePath(int nStep)
 	return TRUE;
 }
 
-//	Target 의 현재 위치를 얻는다.
+//	Target 의 현재 위치를 얻는다. Position
 BOOL CNpc::GetTargetPos(float& x, float& z)
 {
 	// Target 이 User 인 경우
@@ -4251,10 +4251,10 @@ BOOL CNpc::ResetPath()
 		return FALSE;
 	}
 
-	// 타겟 방향으로 바로 간다..
+	// 타겟 방향으로 바로 간다.. [Korean comment]
 	if (nValue == 0)
 	{
-		m_fSecForMetor = m_fSpeed_2;	// 공격일때는 뛰는 속도로... 
+		m_fSecForMetor = m_fSpeed_2;	// 공격일때는 뛰는 속도로...  [Korean comment]
 		IsNoPathFind(m_fSecForMetor);
 	}
 
@@ -4277,8 +4277,8 @@ int CNpc::GetFinalDamage(CUser* pUser, int type)
 	if (pUser == nullptr)
 		return damage;
 
-	Attack = (float) m_sHitRate;								// 공격민첩
-	Avoid = (float) pUser->m_fAvoidrate;						// 방어민첩	
+	Attack = (float) m_sHitRate;								// 공격민첩 [Korean comment]
+	Avoid = (float) pUser->m_fAvoidrate;						// 방어민첩	 [Korean comment]
 	Hit = m_sDamage;											// 공격자 Hit 		
 //	Ac = (short) pUser->m_sAC;									// 방어자 Ac 
 
@@ -4295,7 +4295,7 @@ int CNpc::GetFinalDamage(CUser* pUser, int type)
 
 	int nMaxDamage = (int) (2.6 * m_sDamage);
 
-	// 타격비 구하기
+	// 타격비 구하기 [Korean comment]
 	result = GetHitRate(Attack / Avoid);
 
 //	TRACE(_T("Hitrate : %d     %f/%f\n"), result, Attack, Avoid);
@@ -4442,11 +4442,11 @@ void CNpc::ChangeTarget(int nAttackType, CUser* pUser, CIOCPort* pIOCP)
 	if (pUser->m_bLive == USER_DEAD)
 		return;
 
-	// 같은 국가는 공격을 안하도록...
+	// 같은 국가는 공격을 안하도록... [Korean comment]
 	if (pUser->m_bNation == m_byGroup)
 		return;
 
-	// 운영자는 무시...^^
+	// 운영자는 무시...^^ [Korean comment]
 	if (pUser->m_byIsOP == MANAGER_USER)
 		return;
 	
@@ -4460,7 +4460,7 @@ void CNpc::ChangeTarget(int nAttackType, CUser* pUser, CIOCPort* pIOCP)
 		|| m_tNpcType == NPC_DESTORY_ARTIFACT)	
 		return;
 
-	// 기절상태이면 무시..
+	// 기절상태이면 무시.. Status
 	if (m_NpcState == NPC_FAINTING)
 		return;
 
@@ -4471,7 +4471,7 @@ void CNpc::ChangeTarget(int nAttackType, CUser* pUser, CIOCPort* pIOCP)
 
 	if (pUser == preUser)
 	{
-		// 가족타입이면 시야안에 같은 타입에게 목표 지정
+		// 가족타입이면 시야안에 같은 타입에게 목표 지정 Type
 		if (m_tNpcGroupType)
 		{
 			m_Target.failCount = 0;
@@ -4496,7 +4496,7 @@ void CNpc::ChangeTarget(int nAttackType, CUser* pUser, CIOCPort* pIOCP)
 		preDamage = 0;
 		lastDamage = 0;
 
-		// 몬스터 자신을 가장 강하게 타격한 유저
+		// 몬스터 자신을 가장 강하게 타격한 유저 [Korean comment]
 		if (iRandom >= 0
 			&& iRandom < 50)
 		{
@@ -4506,7 +4506,7 @@ void CNpc::ChangeTarget(int nAttackType, CUser* pUser, CIOCPort* pIOCP)
 			if (preDamage > lastDamage)
 				return;
 		}
-		// 가장 가까운 플레이어
+		// 가장 가까운 플레이어 [Korean comment]
 		else if (iRandom >= 50
 			&& iRandom < 80)
 		{
@@ -4520,7 +4520,7 @@ void CNpc::ChangeTarget(int nAttackType, CUser* pUser, CIOCPort* pIOCP)
 				return;
 		}
 
-		// 몬스터가 유저에게 가장 많이 타격을 줄 수 있는 유저
+		// 몬스터가 유저에게 가장 많이 타격을 줄 수 있는 유저 [Korean comment]
 		if (iRandom >= 80
 			&& iRandom < 95)
 		{
@@ -4531,13 +4531,13 @@ void CNpc::ChangeTarget(int nAttackType, CUser* pUser, CIOCPort* pIOCP)
 				return;
 		}
 
-		// Heal Magic을 사용한 유저
+		// Heal Magic을 사용한 유저 [Korean comment]
 		if (iRandom >= 95
 			&& iRandom < 101)
 		{
 		}
 	}
-	// Heal magic에 반응하지 않도록..
+	// Heal magic에 반응하지 않도록.. [Korean comment]
 	else if (preUser == nullptr
 		&& nAttackType == 1004)
 	{
@@ -4553,24 +4553,24 @@ void CNpc::ChangeTarget(int nAttackType, CUser* pUser, CIOCPort* pIOCP)
 
 	int nValue = 0;
 
-	// 어슬렁 거리는데 공격하면 바로 반격
+	// 어슬렁 거리는데 공격하면 바로 반격 [Korean comment]
 	if (m_NpcState == NPC_STANDING
 		|| m_NpcState == NPC_MOVING
 		|| m_NpcState == NPC_SLEEPING)
 	{
-		// 가까이 있으면 반격으로 이어지구
+		// 가까이 있으면 반격으로 이어지구 [Korean comment]
 		if (IsCloseTarget(pUser, m_byAttackRange))
 		{
 			m_NpcState = NPC_FIGHTING;
 			m_Delay = 0;
 			m_fDelayTime = TimeGet();
 		}
-		// 바로 도망가면 좌표를 갱신하고 추적	
+		// 바로 도망가면 좌표를 갱신하고 추적	 [Korean comment]
 		else
 		{
 			nValue = GetTargetPath(1);
 
-			// 반격 동작후 약간의 딜레이 시간이 있음	
+			// 반격 동작후 약간의 딜레이 시간이 있음	 Time
 			if (nValue == 1)
 			{
 				m_NpcState = NPC_TRACING;
@@ -4585,7 +4585,7 @@ void CNpc::ChangeTarget(int nAttackType, CUser* pUser, CIOCPort* pIOCP)
 			}
 			else if (nValue == 0)
 			{
-				m_fSecForMetor = m_fSpeed_2;	// 공격일때는 뛰는 속도로... 
+				m_fSecForMetor = m_fSpeed_2;	// 공격일때는 뛰는 속도로...  [Korean comment]
 				IsNoPathFind(m_fSecForMetor);
 				m_NpcState = NPC_TRACING;
 				m_Delay = 0;
@@ -4593,9 +4593,9 @@ void CNpc::ChangeTarget(int nAttackType, CUser* pUser, CIOCPort* pIOCP)
 			}
 		}
 	}
-//	else m_NpcState = NPC_ATTACKING;	// 한참 공격하는데 누가 방해하면 목표를 바꿈
+//	else m_NpcState = NPC_ATTACKING;	// 한참 공격하는데 누가 방해하면 목표를 바꿈 [Korean comment]
 
-// 가족타입이면 시야안에 같은 타입에게 목표 지정
+// 가족타입이면 시야안에 같은 타입에게 목표 지정 Type
 	if (m_tNpcGroupType)
 	{
 		m_Target.failCount = 0;
@@ -4648,7 +4648,7 @@ void CNpc::ChangeNTarget(CNpc* pNpc, CIOCPort* pIOCP)
 		preDamage = GetNFinalDamage(preNpc);
 		lastDamage = GetNFinalDamage(pNpc);
 
-		// 조건을 검색,,   (거리와 유저의 공격력을 판단해서,,)
+		// 조건을 검색,,   (거리와 유저의 공격력을 판단해서,,) Color
 		vNpc.Set(m_fCurX, m_fCurY, m_fCurZ);
 		vMonster.Set(preNpc->m_fCurX, 0, preNpc->m_fCurZ);
 		fDist = GetDistance(vNpc, vMonster);
@@ -4668,24 +4668,24 @@ void CNpc::ChangeNTarget(CNpc* pNpc, CIOCPort* pIOCP)
 
 	int nValue = 0;
 
-	// 어슬렁 거리는데 공격하면 바로 반격
+	// 어슬렁 거리는데 공격하면 바로 반격 [Korean comment]
 	if (m_NpcState == NPC_STANDING
 		|| m_NpcState == NPC_MOVING
 		|| m_NpcState == NPC_SLEEPING)
 	{	
-		// 가까이 있으면 반격으로 이어지구
+		// 가까이 있으면 반격으로 이어지구 [Korean comment]
 		if (IsCloseTarget(m_byAttackRange) == 1)
 		{
 			m_NpcState = NPC_FIGHTING;
 			m_Delay = 0;
 			m_fDelayTime = TimeGet();
 		}
-		// 바로 도망가면 좌표를 갱신하고 추적	
+		// 바로 도망가면 좌표를 갱신하고 추적	 [Korean comment]
 		else
 		{
 			nValue = GetTargetPath();
 
-			// 반격 동작후 약간의 딜레이 시간이 있음	
+			// 반격 동작후 약간의 딜레이 시간이 있음	 Time
 			if (nValue == 1)
 			{
 				m_NpcState = NPC_TRACING;
@@ -4700,7 +4700,7 @@ void CNpc::ChangeNTarget(CNpc* pNpc, CIOCPort* pIOCP)
 			}
 			else if (nValue == 0)
 			{
-				m_fSecForMetor = m_fSpeed_2;	// 공격일때는 뛰는 속도로... 
+				m_fSecForMetor = m_fSpeed_2;	// 공격일때는 뛰는 속도로...  [Korean comment]
 				IsNoPathFind(m_fSecForMetor);
 				m_NpcState = NPC_TRACING;
 				m_Delay = 0;
@@ -4708,16 +4708,16 @@ void CNpc::ChangeNTarget(CNpc* pNpc, CIOCPort* pIOCP)
 			}
 		}
 	}
-//	else m_NpcState = NPC_ATTACKING;	// 한참 공격하는데 누가 방해하면 목표를 바꿈
+//	else m_NpcState = NPC_ATTACKING;	// 한참 공격하는데 누가 방해하면 목표를 바꿈 [Korean comment]
 
-	if (m_tNpcGroupType)					// 가족타입이면 시야안에 같은 타입에게 목표 지정
+	if (m_tNpcGroupType)					// 가족타입이면 시야안에 같은 타입에게 목표 지정 Type
 	{
 		m_Target.failCount = 0;
 		FindFriend();
 	}
 }
 
-//	NPC 의 방어력을 얻어온다.
+//	NPC 의 방어력을 얻어온다. [Korean comment]
 int CNpc::GetDefense()
 {
 	return m_sDefense;
@@ -4740,7 +4740,7 @@ BOOL CNpc::SetDamage(int nAttackType, int nDamage, const char* sourceName, int u
 	if (nDamage < 0)
 		return TRUE;
 
-	// Npc의 포인터가 잘못된 경우에는 리턴..
+	// Npc의 포인터가 잘못된 경우에는 리턴.. [Korean comment]
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
@@ -4757,7 +4757,7 @@ BOOL CNpc::SetDamage(int nAttackType, int nDamage, const char* sourceName, int u
 	if (uid >= USER_BAND
 		&& uid < NPC_BAND)
 	{
-		pUser = m_pMain->GetUserPtr(uid);	// 해당 사용자인지 인증
+		pUser = m_pMain->GetUserPtr(uid);	// 해당 사용자인지 인증 [Korean comment]
 		if (pUser == nullptr)
 			return TRUE;
 	}
@@ -4774,7 +4774,7 @@ BOOL CNpc::SetDamage(int nAttackType, int nDamage, const char* sourceName, int u
 	}
 
 	userDamage = nDamage;
-													// 잉여 데미지는 소용없다.		
+													// 잉여 데미지는 소용없다.		 [Korean comment]
 	if ((m_iHP - nDamage) < 0)
 		userDamage = m_iHP;
 
@@ -4800,7 +4800,7 @@ BOOL CNpc::SetDamage(int nAttackType, int nDamage, const char* sourceName, int u
 		}
 	}
 
-	// Does the player limit affect the final damage? || 인원 제한이 최종 대미지에 영향을 미치나?
+	// Does the player limit affect the final damage? || 인원 제한이 최종 대미지에 영향을 미치나? [Korean comment]
 	for (i = 0; i < NPC_HAVE_USER_LIST; i++)
 	{
 		if (m_DamagedUserList[i].iUid == -1)
@@ -4854,11 +4854,11 @@ go_result:
 	if (uid >= USER_BAND
 		&& uid < NPC_BAND)
 	{
-		// 기절 시키는 스킬을 사용했다면..
+		// 기절 시키는 스킬을 사용했다면.. [Korean comment]
 		if (nAttackType == 3
 			&& m_NpcState != NPC_FAINTING)
 		{
-			// 확률 계산..
+			// 확률 계산.. Calculate
 			iLightningR = 10 + (40 - 40 * ((double) m_sLightningR / 80));
 			if (COMPARE(iRandom, 0, iLightningR))
 			{
@@ -4886,7 +4886,7 @@ go_result:
 	return TRUE;
 }
 
-// Heal계열 마법공격
+// Heal계열 마법공격 [Korean comment]
 BOOL CNpc::SetHMagicDamage(int nDamage, CIOCPort* pIOCP)
 {
 	if (m_NpcState == NPC_DEAD)
@@ -4898,7 +4898,7 @@ BOOL CNpc::SetHMagicDamage(int nDamage, CIOCPort* pIOCP)
 	if (nDamage <= 0)
 		return FALSE;
 
-	// 죽기직전일때는 회복 안됨...
+	// 죽기직전일때는 회복 안됨... [Korean comment]
 	if (m_iHP < 1)
 		return FALSE;
 
@@ -4925,7 +4925,7 @@ BOOL CNpc::SetHMagicDamage(int nDamage, CIOCPort* pIOCP)
 	return TRUE;
 }
 
-//	NPC 사망처리시 경험치 분배를 계산한다.(일반 유저와 버디 사용자구분)
+//	NPC 사망처리시 경험치 분배를 계산한다.(일반 유저와 버디 사용자구분) Calculate
 void CNpc::SendExpToUserList()
 {
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
@@ -4952,9 +4952,9 @@ void CNpc::SendExpToUserList()
 	_PARTY_GROUP* pParty = nullptr;
 	char strMaxDamageUser[MAX_ID_SIZE + 1] = {};
 
-	IsUserInSight();	// 시야권내에 있는 유저 셋팅..
+	IsUserInSight();	// 시야권내에 있는 유저 셋팅.. [Korean comment]
 
-	// 일단 리스트를 검색한다.
+	// 일단 리스트를 검색한다. Color
 	for (i = 0; i < NPC_HAVE_USER_LIST; i++)
 	{
 		if (m_DamagedUserList[i].iUid < 0
@@ -4966,7 +4966,7 @@ void CNpc::SendExpToUserList()
 		if (pUser == nullptr)
 			continue;
 
-		// 파티 소속
+		// 파티 소속 [Korean comment]
 		if (pUser->m_byNowParty == 1)
 		{
 			totalDamage = GetPartyDamage(pUser->m_sPartyNumber);
@@ -5014,7 +5014,7 @@ void CNpc::SendExpToUserList()
 					++nPartyLoyalty;
 			}
 
-			// 파티원 전체를 돌면서 경험치 분배
+			// 파티원 전체를 돌면서 경험치 분배 [Korean comment]
 			if (i != 0)
 			{
 				BOOL bFlag = FALSE;
@@ -5040,7 +5040,7 @@ void CNpc::SendExpToUserList()
 				if (count == i)
 					bFlag = TRUE;
 
-				// 여기에서 또 작업...
+				// 여기에서 또 작업... [Korean comment]
 				if (bFlag)
 				{
 					int uid = 0;
@@ -5069,7 +5069,7 @@ void CNpc::SendExpToUserList()
 							if (pPartyUser == nullptr)
 								continue;
 
-							// monster와 거리를 판단
+							// monster와 거리를 판단 [Korean comment]
 							if (!IsInExpRange(pPartyUser))
 								continue;
 
@@ -5127,7 +5127,7 @@ void CNpc::SendExpToUserList()
 						if (pPartyUser == nullptr)
 							continue;
 
-						// monster와 거리를 판단
+						// monster와 거리를 판단 [Korean comment]
 						if (!IsInExpRange(pPartyUser))
 							continue;
 
@@ -5158,11 +5158,11 @@ void CNpc::SendExpToUserList()
 			}
 			//nExp = 
 		}
-		// 부대 소속
+		// 부대 소속 [Korean comment]
 		else if (pUser->m_byNowParty == 2)
 		{
 		}
-		// 개인
+		// 개인 [Korean comment]
 		else
 		{
 			totalDamage = m_DamagedUserList[i].nDamage;
@@ -5215,14 +5215,14 @@ void CNpc::SendExpToUserList()
 		}
 	}
 
-	// 전쟁중
+	// 전쟁중 [Korean comment]
 	if (m_pMain->m_byBattleEvent == BATTLEZONE_OPEN)
 	{
-		// 죽었을때 데미지를 많이 입힌 유저를 기록해 주세여
+		// 죽었을때 데미지를 많이 입힌 유저를 기록해 주세여 [Korean comment]
 		if (m_bySpecialType >= 90
 			&& m_bySpecialType <= 100)
 		{
-			// 몬스터에게 가장 데미지를 많이 입힌 유저의 이름을 전송
+			// 몬스터에게 가장 데미지를 많이 입힌 유저의 이름을 전송 Name
 			if (strlen(strMaxDamageUser) != 0)
 			{
 				char send_buff[100] = {};
@@ -5306,7 +5306,7 @@ int CNpc::SendDead(CIOCPort* pIOCP, int type)
 		|| m_iHP > 0)
 		return 0;
 
-	// 아이템 떨구기(경비면이면 안떨어트림)
+	// 아이템 떨구기(경비면이면 안떨어트림) [Korean comment]
 	if (type != 0)
 		GiveNpcHaveItem(pIOCP);
 
@@ -5331,7 +5331,7 @@ BOOL CNpc::IsCloseTarget(CUser* pUser, int nRange)
 	vUser.Set(pUser->m_curx, pUser->m_cury, pUser->m_curz);
 	fDis = GetDistance(vNpc, vUser);
 
-	// 공격받은 상태기 때문에 2배의 거리감지영역,,
+	// 공격받은 상태기 때문에 2배의 거리감지영역,, Status
 	if ((int) fDis > nRange * 2)
 		return FALSE;
 
@@ -5346,8 +5346,8 @@ BOOL CNpc::IsCloseTarget(CUser* pUser, int nRange)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// 시야 범위내의 내동료를 찾는다.
-// type = 0: 같은 그룹이면서 같은 패밀리 타입만 도움, 1:그룹이나 패밀리에 관계없이 도움, 
+// 시야 범위내의 내동료를 찾는다. [Korean comment]
+// type = 0: 같은 그룹이면서 같은 패밀리 타입만 도움, 1:그룹이나 패밀리에 관계없이 도움,  Type
 //        2:사제NPC가 같은 아군의 상태를 체크해서 치료할 목적으로,, 리턴으로 치료될 아군의 NID를 리턴한다
 int CNpc::FindFriend(int type)
 {
@@ -5483,7 +5483,7 @@ void CNpc::FindFriendRegion(int x, int z, MAP* pMap, _TargetHealer* pHealer, int
 			vEnd.Set(pNpc->m_fCurX, pNpc->m_fCurY, pNpc->m_fCurZ);
 			fDis = GetDistance(vStart, vEnd);
 
-			// 여기에서 나의 공격거리에 있는 유저인지를 판단
+			// 여기에서 나의 공격거리에 있는 유저인지를 판단 [Korean comment]
 			if (fDis > fSearchRange)
 				continue;
 
@@ -5495,8 +5495,8 @@ void CNpc::FindFriendRegion(int x, int z, MAP* pMap, _TargetHealer* pHealer, int
 						&& pNpc->m_NpcState == NPC_FIGHTING)
 						continue;
 
-					pNpc->m_Target.id = m_Target.id;		// 모든 동료에게 도움을 요청한다.
-					pNpc->m_Target.x = m_Target.x;			// 같은 목표를 공격하자고...
+					pNpc->m_Target.id = m_Target.id;		// 모든 동료에게 도움을 요청한다. [Korean comment]
+					pNpc->m_Target.x = m_Target.x;			// 같은 목표를 공격하자고... [Korean comment]
 					pNpc->m_Target.y = m_Target.y;
 					pNpc->m_Target.z = m_Target.z;
 					pNpc->m_Target.failCount = 0;
@@ -5513,8 +5513,8 @@ void CNpc::FindFriendRegion(int x, int z, MAP* pMap, _TargetHealer* pHealer, int
 						&& pNpc->m_NpcState == NPC_FIGHTING)
 						continue;
 
-					pNpc->m_Target.id = m_Target.id;		// 같은 타입의 동료에게 도움을 요청한다.
-					pNpc->m_Target.x = m_Target.x;			// 같은 목표를 공격하자고...
+					pNpc->m_Target.id = m_Target.id;		// 같은 타입의 동료에게 도움을 요청한다. Type
+					pNpc->m_Target.x = m_Target.x;			// 같은 목표를 공격하자고... [Korean comment]
 					pNpc->m_Target.y = m_Target.y;
 					pNpc->m_Target.z = m_Target.z;
 					pNpc->m_Target.failCount = 0;
@@ -5526,10 +5526,10 @@ void CNpc::FindFriendRegion(int x, int z, MAP* pMap, _TargetHealer* pHealer, int
 				if (pHealer == nullptr)
 					continue;
 
-				// HP상태를 체크
+				// HP상태를 체크 Check
 				iHP = pNpc->m_iMaxHP * 0.9;
 
-				// HP 체크
+				// HP 체크 Check
 				if (pNpc->m_iHP <= iHP)
 				{
 					iCompValue = (pNpc->m_iMaxHP - pNpc->m_iHP) / (pNpc->m_iMaxHP * 0.01);
@@ -5560,14 +5560,14 @@ void CNpc::NpcStrategy(BYTE type)
 	}
 }
 
-//	NPC 정보를 버퍼에 저장한다.
+//	NPC 정보를 버퍼에 저장한다. Save
 void CNpc::FillNpcInfo(char* temp_send, int& index, BYTE flag)
 {
 	SetByte(temp_send, AG_NPC_INFO, index);
 	if (m_bySpecialType == 5 && m_byChangeType == 0)
-		SetByte(temp_send, 0, index);					// region에 등록하지 말아라
+		SetByte(temp_send, 0, index);					// region에 등록하지 말아라 [Korean comment]
 	else
-		SetByte(temp_send, 1, index);					// region에 등록		
+		SetByte(temp_send, 1, index);					// region에 등록		 [Korean comment]
 	SetShort(temp_send, m_sNid + NPC_BAND, index);
 	SetShort(temp_send, m_sSid, index);
 	SetShort(temp_send, m_sPid, index);
@@ -5603,9 +5603,9 @@ void CNpc::SendNpcInfoAll(char* temp_send, int& index, int count)
 {
 	if (m_bySpecialType == 5
 		&& m_byChangeType == 0)
-		SetByte(temp_send, 0, index);					// region에 등록하지 말아라
+		SetByte(temp_send, 0, index);					// region에 등록하지 말아라 [Korean comment]
 	else
-		SetByte(temp_send, 1, index);					// region에 등록		
+		SetByte(temp_send, 1, index);					// region에 등록		 [Korean comment]
 	SetShort(temp_send, m_sNid + NPC_BAND, index);
 	SetShort(temp_send, m_sSid, index);
 	SetShort(temp_send, m_sPid, index);
@@ -5752,7 +5752,7 @@ inline float CNpc::RandomGenf(float max, float min)
 
 //////////////////////////////////////////////////////////////////////
 // 인자: 현재 위치, 방향, random각, 이동거리
-// 반환값: 최종위치
+// 반환값: 최종위치 Position
 //////////////////////////////////////////////////////////////////////
 __Vector3 CNpc::MyFunc(__Vector3 vCur, __Vector3 vDir, float fYDegree, float fDistance)
 {
@@ -5860,7 +5860,7 @@ BOOL CNpc::GetUserInView()
 		return FALSE;
 	}
 
-	//if( m_ZoneIndex > 5 || m_ZoneIndex < 0) return FALSE;		// 임시코드 ( 2002.03.24 )
+	//if( m_ZoneIndex > 5 || m_ZoneIndex < 0) return FALSE;		// 임시코드 ( 2002.03.24 ) [Korean comment]
 	int max_xx = pMap->m_sizeRegion.cx;
 	int max_zz = pMap->m_sizeRegion.cy;
 	int min_x = (int) (m_fCurX - NPC_VIEW_RANGE) / VIEW_DIST;
@@ -5939,7 +5939,7 @@ BOOL CNpc::GetUserInViewRange(int x, int z)
 		if (pUser == nullptr)
 			continue;
 
-		// 가시 거리 계산 
+		// 가시 거리 계산  Calculate
 		vEnd.Set(pUser->m_curx, 0, pUser->m_curz);
 		fDis = GetDistance(vStart, vEnd);
 		if (fDis <= NPC_VIEW_RANGE)
@@ -6008,7 +6008,7 @@ __Vector3 CNpc::CalcAdaptivePosition(__Vector3 vPosOrig, __Vector3 vPosDest, flo
 	return vReturn;
 }
 
-//	현재 몹을 기준으로 한 화면 범위안에 있는지 판단
+//	현재 몹을 기준으로 한 화면 범위안에 있는지 판단 [Korean comment]
 void CNpc::IsUserInSight()
 {
 	CUser* pUser = nullptr;
@@ -6035,13 +6035,13 @@ void CNpc::IsUserInSight()
 
 		if ((int) fDis <= iSearchRange)
 		{
-			// 갖고있는 리스트상의 유저와 같다면
+			// 갖고있는 리스트상의 유저와 같다면 [Korean comment]
 			if (m_DamagedUserList[i].iUid == pUser->m_iUserId)
 			{
 				// 최종 ID를 비교해서 동일하면	
 				if (_stricmp(m_DamagedUserList[i].strUserID, pUser->m_strUserID) == 0)
 				{
-					// 이때서야 존재한다는 표시를 한다
+					// 이때서야 존재한다는 표시를 한다 [Korean comment]
 					m_DamagedUserList[i].bIs = TRUE;
 				}
 			}
@@ -6168,13 +6168,13 @@ BYTE CNpc::GetHitRate(float rate)
 
 BOOL CNpc::IsLevelCheck(int iLevel)
 {
-	// 몬스터의 레벨보다 낮으면,,,  바로 공격
+	// 몬스터의 레벨보다 낮으면,,,  바로 공격 [Korean comment]
 	if (iLevel <= m_sLevel)
 		return FALSE;
 
 	int compLevel = iLevel - m_sLevel;
 
-	// 레벨을 비교해서 8미만이면 바로 공격
+	// 레벨을 비교해서 8미만이면 바로 공격 [Korean comment]
 	if (compLevel < 8)
 		return FALSE;
 
@@ -6192,7 +6192,7 @@ BOOL CNpc::IsHPCheck(int iHP)
 	return FALSE;
 }
 
-// 패스 파인드를 할것인지를 체크하는 루틴..
+// 패스 파인드를 할것인지를 체크하는 루틴.. Check
 BOOL CNpc::IsPathFindCheck(float fDistance)
 {
 	int nX = 0, nZ = 0;
@@ -6292,7 +6292,7 @@ BOOL CNpc::IsPathFindCheck(float fDistance)
 	return TRUE;
 }
 
-// 패스 파인드를 하지 않고 공격대상으로 가는 루틴..
+// 패스 파인드를 하지 않고 공격대상으로 가는 루틴.. [Korean comment]
 void CNpc::IsNoPathFind(float fDistance)
 {
 	ClearPathFindData();
@@ -6309,7 +6309,7 @@ void CNpc::IsNoPathFind(float fDistance)
 
 	fDis = GetDistance(vStart, vEnd);
 
-	// 100미터 보다 넓으면 스탠딩상태로..
+	// 100미터 보다 넓으면 스탠딩상태로.. Status
 	if (fDis > NPC_MAX_MOVE_RANGE)
 	{
 		ClearPathFindData();
@@ -6383,7 +6383,7 @@ void CNpc::IsNoPathFind(float fDistance)
 	m_iAniFrameIndex = count;
 }
 
-//	NPC 가 가진 아이템을 떨군다.
+//	NPC 가 가진 아이템을 떨군다. [Korean comment]
 void CNpc::GiveNpcHaveItem(CIOCPort* pIOCP)
 {
 	char pBuf[1024] = {};
@@ -6416,7 +6416,7 @@ void CNpc::GiveNpcHaveItem(CIOCPort* pIOCP)
 		m_GiveItemList[0].sSid = TYPE_MONEY_SID;
 		if (iMoney > 32767)
 		{
-			iMoney = 32000;						// sungyong : short형이기 때문에,,
+			iMoney = 32000;						// sungyong : short형이기 때문에,, [Korean comment]
 			m_GiveItemList[0].count = iMoney;
 		}
 		else
@@ -6440,10 +6440,10 @@ void CNpc::GiveNpcHaveItem(CIOCPort* pIOCP)
 			if (iPer == 0)
 				continue;
 
-			// 우선 기본테이블를 참조하기위해	
+			// 우선 기본테이블를 참조하기위해	 [Korean comment]
 			if (iRandom <= iPer)
 			{
-				// 아이템 생성..
+				// 아이템 생성.. Create
 				if (j == 1)
 				{
 					iMakeItemCode = ItemProdution(m_pMain->m_NpcItem.m_ppItem[i][j]);
@@ -6456,7 +6456,7 @@ void CNpc::GiveNpcHaveItem(CIOCPort* pIOCP)
 				{
 					m_GiveItemList[nCount].sSid = m_pMain->m_NpcItem.m_ppItem[i][j];
 
-					// 화살이라면
+					// 화살이라면 [Korean comment]
 					if (COMPARE(m_GiveItemList[nCount].sSid, ARROW_MIN, ARROW_MAX))
 						m_GiveItemList[nCount].count = 20;
 					else
@@ -6535,7 +6535,7 @@ int	CNpc::GetPartyDamage(int iNumber)
 	int nDamage = 0;
 	CUser* pUser = nullptr;
 
-	// 일단 리스트를 검색한다.
+	// 일단 리스트를 검색한다. Color
 	for (i = 0; i < NPC_HAVE_USER_LIST; i++)
 	{
 		if (m_DamagedUserList[i].iUid < 0
@@ -6559,7 +6559,7 @@ int	CNpc::GetPartyDamage(int iNumber)
 
 void CNpc::NpcTypeParser()
 {
-	// 선공인지 후공인지를 결정한다
+	// 선공인지 후공인지를 결정한다 [Korean comment]
 	switch (m_byActType)
 	{
 		case 1:
@@ -6604,11 +6604,11 @@ void CNpc::HpChange(CIOCPort* pIOCP)
 	if (m_NpcState == NPC_DEAD)
 		return;
 
-	// 죽기직전일때는 회복 안됨...
+	// 죽기직전일때는 회복 안됨... [Korean comment]
 	if (m_iHP < 1)
 		return;
 
-	// HP가 만빵이기 때문에.. 
+	// HP가 만빵이기 때문에..  [Korean comment]
 	if (m_iHP == m_iMaxHP) 
 		return;
 
@@ -6656,7 +6656,7 @@ BOOL CNpc::IsInExpRange(CUser* pUser)
 
 BOOL CNpc::CheckFindEnemy()
 {
-	// 경비병은 몬스터도 공격하므로 제외
+	// 경비병은 몬스터도 공격하므로 제외 [Korean comment]
 	if (m_tNpcType == NPC_GUARD
 		|| m_tNpcType == NPC_PATROL_GUARD
 		|| m_tNpcType == NPC_STORE_GUARD
@@ -6706,10 +6706,10 @@ void CNpc::MSpChange(int type, int amount)
 
 void CNpc::ItemWoreOut(int type, int damage)
 {
-	// 몬스터의 방어구 내구력 감소로직..
+	// 몬스터의 방어구 내구력 감소로직.. [Korean comment]
 }
 
-// 아이템 제작
+// 아이템 제작 [Korean comment]
 int	CNpc::ItemProdution(int item_number)
 {
 	int iItemNumber = 0, iRandom = 0, i = 0, iItemGrade = 0, iItemLevel = 0;
@@ -6727,11 +6727,11 @@ int	CNpc::ItemProdution(int item_number)
 
 	iItemLevel = m_sLevel / 5;
 
-	// 무기구 아이템
+	// 무기구 아이템 [Korean comment]
 	if (COMPARE(iRandom, 1, 4001))
 	{
 		iDefault = 100000000;
-		// 무기의 종류를 결정(단검, 검, 도끼,,,,)
+		// 무기의 종류를 결정(단검, 검, 도끼,,,,) Type
 		iRandom = myrand(1, 10000);	
 		if (COMPARE(iRandom, 1, 701))
 			iRand2 = 10000000;
@@ -6757,28 +6757,28 @@ int	CNpc::ItemProdution(int item_number)
 		if (iTemp1 == 0)
 			return 0;
 
-		// 루팅분포표 참조
+		// 루팅분포표 참조 [Korean comment]
 		iItemCode = iTemp1 * 100000;
 
-		// 종족(엘모, 카루스)
+		// 종족(엘모, 카루스) [Korean comment]
 		iRand3 = myrand(1, 10000);
 		if (COMPARE(iRand3, 1, 5000))
 			iRand3 = 10000;
 		else
 			iRand3 = 50000;
 
-		// 한손, 양손무기인지를 결정
+		// 한손, 양손무기인지를 결정 [Korean comment]
 		iRand4 = myrand(1, 10000);
 		if (COMPARE(iRand4, 1, 5000))
 			iRand4 = 0;
 		else
 			iRand4 = 5000000;
 
-		// 레이매직표 적용
+		// 레이매직표 적용 [Korean comment]
 		iRandom = GetItemCodeNumber(iItemLevel, 1);
 		//TRACE(_T("ItemProdution : GetItemCodeNumber() = %d, iRand2=%d, iRand3=%d, iRand4=%d\n"), iRandom, iRand2, iRand3, iRand4);
 
-		// 잘못된 아이템 생성실패
+		// 잘못된 아이템 생성실패 Create
 		if (iRandom == -1)
 			return 0;
 
@@ -6787,7 +6787,7 @@ int	CNpc::ItemProdution(int item_number)
 
 		//TRACE(_T("ItemProdution : Weapon Success item_number = %d, default=%d, itemcode=%d, iRand2=%d, iRand3=%d, iRand4=%d, iRand5, iItemGrade=%d\n"), iItemNumber, iDefault, iItemCode, iRand2, iRand3, iRand4, iRand5, iItemGrade);
 	}
-	// 방어구 아이템
+	// 방어구 아이템 [Korean comment]
 	else if (COMPARE(iRandom, 4001, 8001))
 	{
 		iDefault = 200000000;
@@ -6797,48 +6797,48 @@ int	CNpc::ItemProdution(int item_number)
 		if (iTemp1 == 0)
 			return 0;
 
-		// 루팅분포표 참조
+		// 루팅분포표 참조 [Korean comment]
 		iItemCode = iTemp1 * 1000000;
 
-		// 종족
+		// 종족 [Korean comment]
 		if (m_byMaxDamagedNation == KARUS_MAN)
 		{
-			// 직업의 갑옷을 결정		
+			// 직업의 갑옷을 결정		 [Korean comment]
 			iRandom = myrand(0, 10000);
 			if (COMPARE(iRandom, 0, 2000))
 			{
 				iRand2 = 0;
-				iRand3 = 10000;							// 전사갑옷은 아크투아렉만 가지도록
+				iRand3 = 10000;							// 전사갑옷은 아크투아렉만 가지도록 [Korean comment]
 			}
 			else if (COMPARE(iRandom, 2000, 4000))
 			{
 				iRand2 = 40000000;
-				iRand3 = 20000;							// 로그갑옷은 투아렉만 가지도록
+				iRand3 = 20000;							// 로그갑옷은 투아렉만 가지도록 [Korean comment]
 			}
 			else if (COMPARE(iRandom, 4000, 6000))
 			{
 				iRand2 = 60000000;
-				iRand3 = 30000;							// 마법사갑옷은 링클 투아렉만 가지도록
+				iRand3 = 30000;							// 마법사갑옷은 링클 투아렉만 가지도록 [Korean comment]
 			}
 			else if (COMPARE(iRandom, 6000, 10001))
 			{
 				iRand2 = 80000000;
 				iRandom = myrand(0, 10000);
 				if (COMPARE(iRandom, 0, 5000))
-					iRand3 = 20000;						// 사제갑옷은 투아렉
+					iRand3 = 20000;						// 사제갑옷은 투아렉 [Korean comment]
 				else									
-					iRand3 = 40000;						// 사제갑옷은 퓨리투아렉
+					iRand3 = 40000;						// 사제갑옷은 퓨리투아렉 [Korean comment]
 			}
 		}
 		else if (m_byMaxDamagedNation == ELMORAD_MAN)
 		{
-			// 직업의 갑옷을 결정
+			// 직업의 갑옷을 결정 [Korean comment]
 			iRandom = myrand(0, 10000);
 			if (COMPARE(iRandom, 0, 3300))
 			{
 				iRand2 = 0;
 
-				// 전사갑옷은 모든 종족이 가짐
+				// 전사갑옷은 모든 종족이 가짐 [Korean comment]
 				iItemKey = myrand(0, 10000);
 				if (COMPARE(iItemKey, 0, 3333))
 					iRand3 = 110000;
@@ -6851,7 +6851,7 @@ int	CNpc::ItemProdution(int item_number)
 			{
 				iRand2 = 40000000;
 
-				// 로그갑옷은 남자와 여자만 가짐
+				// 로그갑옷은 남자와 여자만 가짐 [Korean comment]
 				iItemKey = myrand(0, 10000);
 				if (COMPARE(iItemKey, 0, 5000))
 					iRand3 = 120000;
@@ -6862,7 +6862,7 @@ int	CNpc::ItemProdution(int item_number)
 			{
 				iRand2 = 60000000;
 
-				// 마법사갑옷은 남자와 여자만 가짐
+				// 마법사갑옷은 남자와 여자만 가짐 [Korean comment]
 				iItemKey = myrand(0, 10000);
 				if (COMPARE(iItemKey, 0, 5000))
 					iRand3 = 120000;
@@ -6873,7 +6873,7 @@ int	CNpc::ItemProdution(int item_number)
 			{
 				iRand2 = 80000000;
 
-				// 사제갑옷은 남자와 여자만 가짐
+				// 사제갑옷은 남자와 여자만 가짐 [Korean comment]
 				iItemKey = myrand(0, 10000);
 				if (COMPARE(iItemKey, 0, 5000))
 					iRand3 = 120000;
@@ -6883,7 +6883,7 @@ int	CNpc::ItemProdution(int item_number)
 
 		}
 
-		// 몸의 부위 아이템 결정
+		// 몸의 부위 아이템 결정 [Korean comment]
 		iTemp2 = myrand(0, 10000);
 		if (COMPARE(iTemp2, 0, 2000))
 			iRand4 = 1000;
@@ -6896,25 +6896,25 @@ int	CNpc::ItemProdution(int item_number)
 		else if (COMPARE(iTemp2, 8000, 10001))
 			iRand4 = 5000;
 
-		// 레이매직표 적용
+		// 레이매직표 적용 [Korean comment]
 		iRandom = GetItemCodeNumber(iItemLevel, 2);
 
-		// 잘못된 아이템 생성실패
+		// 잘못된 아이템 생성실패 Create
 		if (iRandom == -1)
 			return 0;
 
 		iRand5 = iRandom * 10;
 
-		// iItemGrade : 아이템 등급생성표 적용
+		// iItemGrade : 아이템 등급생성표 적용 Create
 		iItemNumber = iDefault + iRand2 + iItemCode + iRand3 + iRand4 + iRand5 + iItemGrade;
 		//TRACE(_T("ItemProdution : Defensive Success item_number = %d, default=%d, iRand2=%d, itemcode=%d, iRand3=%d, iRand4=%d, iRand5, iItemGrade=%d\n"), iItemNumber, iDefault, iRand2, iItemCode, iRand3, iRand4, iRand5, iItemGrade);
 	}
-	// 악세사리 아이템
+	// 악세사리 아이템 [Korean comment]
 	else if (COMPARE(iRandom, 8001, 10001))
 	{
 		iDefault = 300000000;
 
-		// 악세사리 종류결정(귀고리, 목걸이, 반지, 벨트)
+		// 악세사리 종류결정(귀고리, 목걸이, 반지, 벨트) Type
 		iRandom = myrand(0, 10000);
 		if (COMPARE(iRandom, 0, 2500))
 			iRand2 = 10000000;
@@ -6925,18 +6925,18 @@ int	CNpc::ItemProdution(int item_number)
 		else if (COMPARE(iRandom, 7500, 10001))
 			iRand2 = 40000000;
 
-		// 종족(엘모라드, 카루스)
+		// 종족(엘모라드, 카루스) [Korean comment]
 		iRand3 = myrand(1, 10000);
 		if (COMPARE(iRand3, 1, 5000))
 			iRand3 = 110000;
 		else
 			iRand3 = 150000;
 
-		// 레이매직표 적용
+		// 레이매직표 적용 [Korean comment]
 		iRandom = GetItemCodeNumber(iItemLevel, 3);
 		//TRACE(_T("ItemProdution : GetItemCodeNumber() = %d\n"), iRandom);
 
-		// 잘못된 아이템 생성실패
+		// 잘못된 아이템 생성실패 Create
 		if (iRandom == -1)
 			return 0;
 
@@ -6977,13 +6977,13 @@ int CNpc::GetWeaponItemCodeNumber(int item_type)
 	int iPercent = 0, iItem_level = 0;
 	model::MakeWeapon* pItemData = nullptr;
 
-	// 무기구
+	// 무기구 [Korean comment]
 	if (item_type == 1)
 	{
 		iItem_level = m_sLevel / 10;
 		pItemData = m_pMain->m_MakeWeaponTableMap.GetData(iItem_level);
 	}
-	// 방어구
+	// 방어구 [Korean comment]
 	else if (item_type == 2)
 	{
 		iItem_level = m_sLevel / 10;
@@ -7036,46 +7036,46 @@ int CNpc::GetItemCodeNumber(int level, int item_type)
 
 	switch (iItemType)
 	{
-		// 잘못된 아이템
+		// 잘못된 아이템 [Korean comment]
 		case 0:
 			iItemCode = 0;
 			break;
 
 		// lare item
 		case 1:
-			// 무기구
+			// 무기구 [Korean comment]
 			if (item_type == 1)
 				iItemCode = myrand(16, 24);
-			// 방어구
+			// 방어구 [Korean comment]
 			else if (item_type == 2)
 				iItemCode = myrand(12, 24);
-			// 악세사리
+			// 악세사리 [Korean comment]
 			else if (item_type == 3)
 				iItemCode = myrand(0, 10);
 			break;
 
 		// magic item
 		case 2:
-			// 무기구
+			// 무기구 [Korean comment]
 			if (item_type == 1)
 				iItemCode = myrand(6, 15);
-			// 방어구
+			// 방어구 [Korean comment]
 			else if (item_type == 2)
 				iItemCode = myrand(6, 11);
-			// 악세사리
+			// 악세사리 [Korean comment]
 			else if (item_type == 3)
 				iItemCode = myrand(0, 10);
 			break;
 
 		// general item
 		case 3:
-			// 무기구
+			// 무기구 [Korean comment]
 			if (item_type == 1)
 				iItemCode = 5;
-			// 방어구
+			// 방어구 [Korean comment]
 			else if (item_type == 2)
 				iItemCode = 5;
-			// 악세사리
+			// 악세사리 [Korean comment]
 			else if (item_type == 3)
 				iItemCode = myrand(0, 10);
 			break;
@@ -7089,7 +7089,7 @@ void CNpc::DurationMagic_4(CIOCPort* pIOCP, float currenttime)
 	int send_index = 0, buff_type = 0;
 	char send_buff[128] = {};
 
-	// Dungeon Work : 던젼몬스터의 경우 해당 대장몬스터가 죽은경우 나의 상태를 죽은 상태로....
+	// Dungeon Work : 던젼몬스터의 경우 해당 대장몬스터가 죽은경우 나의 상태를 죽은 상태로.... Status
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
 	{
@@ -7119,16 +7119,16 @@ void CNpc::DurationMagic_4(CIOCPort* pIOCP, float currenttime)
 			}
 			else
 			{
-				//if( pMap->m_arDungeonBossMonster[m_byDungeonFamily] == 0 )	{	// 대장 몬스터가 죽은 경우
+				//if( pMap->m_arDungeonBossMonster[m_byDungeonFamily] == 0 )	{	// 대장 몬스터가 죽은 경우 [Korean comment]
 
-				// 방이 클리어 된경우
+				// 방이 클리어 된경우 [Korean comment]
 				if (pRoom->m_byStatus == 3)
 				{
 					if (m_NpcState != NPC_DEAD)
 					{
 						if (m_byRegenType == 0)
 						{
-							m_byRegenType = 2;      // 리젠이 되지 않도록,,
+							m_byRegenType = 2;      // 리젠이 되지 않도록,, [Korean comment]
 							Dead(pIOCP, 1);
 							return;
 						}
@@ -7150,7 +7150,7 @@ void CNpc::DurationMagic_4(CIOCPort* pIOCP, float currenttime)
 				m_MagicType4[i].byAmount = 0;
 				buff_type = i + 1;
 
-				// 속도 관련... 능력치..
+				// 속도 관련... 능력치.. [Korean comment]
 				if (i == 5)
 				{
 					m_fSpeed_1 = m_fOldSpeed_1;
@@ -7169,18 +7169,18 @@ void CNpc::DurationMagic_4(CIOCPort* pIOCP, float currenttime)
 	}	*/
 }
 
-// 변화되는 몬스터의 정보를 바꾸어준다...
+// 변화되는 몬스터의 정보를 바꾸어준다... Info
 void CNpc::ChangeMonsterInfo(int iChangeType)
 {
 	// sungyong test
 	//m_sChangeSid = 500;		m_byChangeType = 2;
 
-	// 변하지 않는 몬스터
+	// 변하지 않는 몬스터 [Korean comment]
 	if (m_sChangeSid == 0
 		|| m_byChangeType == 0)
 		return;
 
-	// 죽은 상태
+	// 죽은 상태 Status
 	if (m_NpcState != NPC_DEAD)
 		return;
 
@@ -7188,10 +7188,10 @@ void CNpc::ChangeMonsterInfo(int iChangeType)
 	if (m_byInitMoveType >= 0
 		&& m_byInitMoveType < 100)
 	{
-		// 다른 몬스터로 변환..
+		// 다른 몬스터로 변환.. [Korean comment]
 		if (iChangeType == 1)
 			pNpcTable = m_pMain->m_MonTableMap.GetData(m_sChangeSid);
-		// 원래의 몬스터로 변환..
+		// 원래의 몬스터로 변환.. [Korean comment]
 		else if (iChangeType == 2)
 			pNpcTable = m_pMain->m_MonTableMap.GetData(m_sSid);
 
@@ -7203,10 +7203,10 @@ void CNpc::ChangeMonsterInfo(int iChangeType)
 	}
 	else if (m_byInitMoveType >= 100)
 	{
-		// 다른 몬스터로 변환..
+		// 다른 몬스터로 변환.. [Korean comment]
 		if (iChangeType == 1)
 			pNpcTable = m_pMain->m_NpcTableMap.GetData(m_sChangeSid);
-		// 원래의 몬스터로 변환..
+		// 원래의 몬스터로 변환.. [Korean comment]
 		else if (iChangeType == 2)
 			pNpcTable = m_pMain->m_NpcTableMap.GetData(m_sSid);
 
@@ -7217,7 +7217,7 @@ void CNpc::ChangeMonsterInfo(int iChangeType)
 		}
 	}
 
-	// 정보수정......
+	// 정보수정...... Info
 	Load(pNpcTable, false);
 }
 
@@ -7230,7 +7230,7 @@ void CNpc::DurationMagic_3(CIOCPort* pIOCP, float currenttime)
 		if (m_MagicType3[i].byHPDuration == 0)
 			continue;
 
-		// 2초간격으로
+		// 2초간격으로 [Korean comment]
 		if (currenttime < (m_MagicType3[i].fStartTime + m_MagicType3[i].byHPInterval))
 			continue;
 
@@ -7241,16 +7241,16 @@ void CNpc::DurationMagic_3(CIOCPort* pIOCP, float currenttime)
 		if (m_MagicType3[i].sHPAmount >= 0)
 		{
 		}
-		// damage 계산식...
+		// damage 계산식... Calculate
 		else
 		{
 			duration_damage = m_MagicType3[i].sHPAmount;
 			duration_damage = abs(duration_damage);
 
-			// Npc가 죽은 경우,,
+			// Npc가 죽은 경우,, [Korean comment]
 			if (!SetDamage(0, duration_damage, "**duration**", m_MagicType3[i].sHPAttackUserID, pIOCP))
 			{
-				SendExpToUserList(); // 경험치 분배!!
+				SendExpToUserList(); // 경험치 분배!! [Korean comment]
 				SendDead(pIOCP);
 				SendAttackSuccess(pIOCP, MAGIC_ATTACK_TARGET_DEAD, m_MagicType3[i].sHPAttackUserID, duration_damage, m_iHP, 1, DURATION_ATTACK);
 				//TRACE(_T("&&&& Duration Magic attack .. pNpc->m_byHPInterval[%d] = %d &&&& \n"), i, m_MagicType3[i].byHPInterval);
@@ -7269,7 +7269,7 @@ void CNpc::DurationMagic_3(CIOCPort* pIOCP, float currenttime)
 		}
 
 		if (currenttime >= (m_MagicType3[i].fStartTime + m_MagicType3[i].byHPDuration))
-		{	// 총 공격시간..
+		{	// 총 공격시간.. Time
 			m_MagicType3[i].fStartTime = 0.0f;
 			m_MagicType3[i].byHPDuration = 0;
 			m_MagicType3[i].byHPInterval = 2;
@@ -7281,7 +7281,7 @@ void CNpc::DurationMagic_3(CIOCPort* pIOCP, float currenttime)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//	NPC가 잠자는경우.
+//	NPC가 잠자는경우. [Korean comment]
 //
 void CNpc::NpcSleeping(CIOCPort* pIOCP)
 {
@@ -7297,13 +7297,13 @@ void CNpc::NpcSleeping(CIOCPort* pIOCP)
 	// ~sungyong test
 
 
-	// 낮
+	// 낮 [Korean comment]
 	if (m_pMain->m_byNight == 1)
 	{
 		m_NpcState = NPC_STANDING;
 		m_Delay = 0;
 	}
-	// 밤
+	// 밤 [Korean comment]
 	else
 	{
 		m_NpcState = NPC_SLEEPING;
@@ -7314,7 +7314,7 @@ void CNpc::NpcSleeping(CIOCPort* pIOCP)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// 몬스터가 기절상태로..........
+// 몬스터가 기절상태로.......... Status
 void CNpc::NpcFainting(CIOCPort* pIOCP, float currenttime)
 {
 	NpcTrace("NpcFainting()");
@@ -7330,7 +7330,7 @@ void CNpc::NpcFainting(CIOCPort* pIOCP, float currenttime)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// 몬스터가 치료상태로..........
+// 몬스터가 치료상태로.......... Status
 void CNpc::NpcHealing(CIOCPort* pIOCP)
 {
 	NpcTrace("NpcHealing()");
@@ -7344,7 +7344,7 @@ void CNpc::NpcHealing(CIOCPort* pIOCP)
 		return;
 	}
 
-	// 치료대상이 치료가 다 됐는지를 판단.. 
+	// 치료대상이 치료가 다 됐는지를 판단..  [Korean comment]
 	CNpc* pNpc = nullptr;
 	int nID = m_Target.id;
 	BOOL bFlag = FALSE;
@@ -7358,7 +7358,7 @@ void CNpc::NpcHealing(CIOCPort* pIOCP)
 
 	if (ret == 0)
 	{
-		// 고정 경비병은 추적을 하지 않도록..
+		// 고정 경비병은 추적을 하지 않도록.. [Korean comment]
 		if (m_tNpcType == NPC_DOOR
 			|| m_tNpcType == NPC_ARTIFACT
 			|| m_tNpcType == NPC_PHOENIX_GATE
@@ -7376,16 +7376,16 @@ void CNpc::NpcHealing(CIOCPort* pIOCP)
 
 		m_sStepCount = 0;
 		m_byActionFlag = ATTACK_TO_TRACE;
-		m_NpcState = NPC_TRACING;			// 공격하고 도망가는 유저를 따라 잡기위해(반응을 좀더 빠르게) 
+		m_NpcState = NPC_TRACING;			// 공격하고 도망가는 유저를 따라 잡기위해(반응을 좀더 빠르게)  [Korean comment]
 		m_Delay = 0;
 		m_fDelayTime = TimeGet();
 		return;							// IsCloseTarget()에 유저 x, y값을 갱신하고 Delay = 0으로 줌
 	}
 	else if (ret == 2)
 	{
-		//if(m_tNpcType == NPC_BOSS_MONSTER)	{		// 대장 몬스터이면.....
+		//if(m_tNpcType == NPC_BOSS_MONSTER)	{		// 대장 몬스터이면..... [Korean comment]
 
-		// 직접, 간접(롱)공격이 가능한 몬스터 이므로 장거리 공격을 할 수 있다.
+		// 직접, 간접(롱)공격이 가능한 몬스터 이므로 장거리 공격을 할 수 있다. [Korean comment]
 		if (m_tNpcLongType == 2)
 		{
 			m_Delay = LongAndMagicAttack(pIOCP);
@@ -7394,7 +7394,7 @@ void CNpc::NpcHealing(CIOCPort* pIOCP)
 		}
 		else
 		{
-			// 고정 경비병은 추적을 하지 않도록..
+			// 고정 경비병은 추적을 하지 않도록.. [Korean comment]
 			if (m_tNpcType == NPC_DOOR
 				|| m_tNpcType == NPC_ARTIFACT
 				|| m_tNpcType == NPC_PHOENIX_GATE
@@ -7412,7 +7412,7 @@ void CNpc::NpcHealing(CIOCPort* pIOCP)
 
 			m_sStepCount = 0;
 			m_byActionFlag = ATTACK_TO_TRACE;
-			m_NpcState = NPC_TRACING;			// 공격하고 도망가는 유저를 따라 잡기위해(반응을 좀더 빠르게) 
+			m_NpcState = NPC_TRACING;			// 공격하고 도망가는 유저를 따라 잡기위해(반응을 좀더 빠르게)  [Korean comment]
 			m_Delay = 0;
 			m_fDelayTime = TimeGet();
 			return;								// IsCloseTarget()에 유저 x, y값을 갱신하고 Delay = 0으로 줌
@@ -7444,15 +7444,15 @@ void CNpc::NpcHealing(CIOCPort* pIOCP)
 			return;
 		}
 
-		// 치료 체크여부 
+		// 치료 체크여부  Check
 		iHP = pNpc->m_iMaxHP * 0.9;		// 90퍼센트의 HP
 
-		// Heal 완료상태..
+		// Heal 완료상태.. Status
 		if (pNpc->m_iHP >= iHP)
 		{
 			InitTarget();
 		}
-		// Heal 해주기
+		// Heal 해주기 [Korean comment]
 		else
 		{
 			memset(buff, 0x00, 256);
@@ -7477,7 +7477,7 @@ void CNpc::NpcHealing(CIOCPort* pIOCP)
 		}
 	}
 
-	// 새로운 치료대상을 찾아서 힐해준다
+	// 새로운 치료대상을 찾아서 힐해준다 [Korean comment]
 	int iMonsterNid = FindFriend(2);
 	if (iMonsterNid == 0)
 	{
@@ -7544,7 +7544,7 @@ int CNpc::GetPartyExp(int party_level, int man, int nNpcExp)
 	return nPartyExp;
 }
 
-// iChangeType - 0:능력치 다운, 1:능력치 회복
+// iChangeType - 0:능력치 다운, 1:능력치 회복 [Korean comment]
 void CNpc::ChangeAbility(int iChangeType)
 {
 	if (iChangeType > 2)
@@ -7570,8 +7570,8 @@ void CNpc::ChangeAbility(int iChangeType)
 		}
 	}
 
-	// 정보수정......
-	// 능력치 다운
+	// 정보수정...... Info
+	// 능력치 다운 [Korean comment]
 	if (iChangeType == BATTLEZONE_OPEN)
 	{
 		nHP			= static_cast<int>(pNpcTable->HitPoints * 0.5);
@@ -7587,43 +7587,43 @@ void CNpc::ChangeAbility(int iChangeType)
 
 		m_iMaxHP	= nHP;
 
-		// HP도 바꿔야 겠군,,
+		// HP도 바꿔야 겠군,, [Korean comment]
 		if (m_iHP > nHP)
 			HpChange(&m_pMain->m_Iocport);
 
 		m_sDefense = nAC;
 		m_sDamage = nDamage;
-		m_sFireR = nFireR;				// 화염 저항력
-		m_sColdR = nColdR;				// 냉기 저항력
-		m_sLightningR = nLightningR;	// 전기 저항력
-		m_sMagicR = nMagicR;			// 마법 저항력
-		m_sDiseaseR = nDiseaseR;		// 저주 저항력
-		m_sPoisonR = nPoisonR;			// 독 저항력
-		m_sLightR = nLightR;			// 빛 저항력
+		m_sFireR = nFireR;				// 화염 저항력 [Korean comment]
+		m_sColdR = nColdR;				// 냉기 저항력 [Korean comment]
+		m_sLightningR = nLightningR;	// 전기 저항력 [Korean comment]
+		m_sMagicR = nMagicR;			// 마법 저항력 [Korean comment]
+		m_sDiseaseR = nDiseaseR;		// 저주 저항력 [Korean comment]
+		m_sPoisonR = nPoisonR;			// 독 저항력 [Korean comment]
+		m_sLightR = nLightR;			// 빛 저항력 [Korean comment]
 		//TRACE(_T("-- ChangeAbility down : nid=%d, name=%hs, hp:%d->%d, damage=%d->%d\n"), m_sNid+NPC_BAND, m_strName, pNpcTable->m_iMaxHP, nHP, pNpcTable->m_sDamage, nDamage); 
 	}
-	// 능력치 회복
+	// 능력치 회복 [Korean comment]
 	else if (iChangeType == BATTLEZONE_CLOSE)
 	{
 		m_iMaxHP = pNpcTable->HitPoints;			// 현재 HP
 		//TRACE(_T("++ ChangeAbility up : nid=%d, name=%hs, hp:%d->%d, damage=%d->%d\n"), m_sNid+NPC_BAND, m_strName, m_iHP, m_iMaxHP, pNpcTable->m_sDamage, nDamage); 
 
-		// HP도 바꿔야 겠군,,
+		// HP도 바꿔야 겠군,, [Korean comment]
 		if (m_iMaxHP > m_iHP)
 		{
 			m_iHP = m_iMaxHP - 50;
 			HpChange(&m_pMain->m_Iocport);
 		}
 
-		m_sDamage = pNpcTable->Damage;				// 기본 데미지
-		m_sDefense = pNpcTable->Armor;				// 방어값
-		m_sFireR = pNpcTable->FireResist;			// 화염 저항력
-		m_sColdR = pNpcTable->ColdResist;			// 냉기 저항력
-		m_sLightningR = pNpcTable->LightningResist;	// 전기 저항력
-		m_sMagicR = pNpcTable->MagicResist;			// 마법 저항력
-		m_sDiseaseR = pNpcTable->DiseaseResist;		// 저주 저항력
-		m_sPoisonR = pNpcTable->PoisonResist;		// 독 저항력
-		m_sLightR = pNpcTable->LightResist;			// 빛 저항력
+		m_sDamage = pNpcTable->Damage;				// 기본 데미지 [Korean comment]
+		m_sDefense = pNpcTable->Armor;				// 방어값 [Korean comment]
+		m_sFireR = pNpcTable->FireResist;			// 화염 저항력 [Korean comment]
+		m_sColdR = pNpcTable->ColdResist;			// 냉기 저항력 [Korean comment]
+		m_sLightningR = pNpcTable->LightningResist;	// 전기 저항력 [Korean comment]
+		m_sMagicR = pNpcTable->MagicResist;			// 마법 저항력 [Korean comment]
+		m_sDiseaseR = pNpcTable->DiseaseResist;		// 저주 저항력 [Korean comment]
+		m_sPoisonR = pNpcTable->PoisonResist;		// 독 저항력 [Korean comment]
+		m_sLightR = pNpcTable->LightResist;			// 빛 저항력 [Korean comment]
 	}
 }
 

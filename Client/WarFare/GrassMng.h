@@ -28,9 +28,9 @@ class CGrassMng   : public CGameBase
 protected:
 
 //	std::list<class CGrassBoard*>	m_Grasses;
-	CGrassBoard		m_pGrasses[GRASS_TILENUM][GRASS_TILENUM];	//	풀 뿌려지는 영역
+	CGrassBoard		m_pGrasses[GRASS_TILENUM][GRASS_TILENUM];	//	풀 뿌려지는 영역 [Korean comment]
 //	__Vector3		m_pCount[GRASS_MAX];
-	float			m_fChkRange[4];	//	카메라와의 위치검색용
+	float			m_fChkRange[4];	//	카메라와의 위치검색용 Position
 
 //	__Vector3		m_vCamPo;
 	bool			m_bChkZoneChange;
@@ -38,7 +38,7 @@ protected:
 
 	CN3Texture*		m_txTexture[8];
 #ifdef _DEBUG
-	char			m_strFileName[8][_MAX_PATH];	//	나중에 디버거를 위해 그림의 이름을 백업 받는다
+	char			m_strFileName[8][_MAX_PATH];	//	나중에 디버거를 위해 그림의 이름을 백업 받는다 Name
 #endif
 	int				m_iFileMaxNum;
 
@@ -62,7 +62,7 @@ public:
 
 	bool	ChangeZone();
 
-	bool	IsInRect(float fPoX,float fPoY,float* fRange);	//	영역내에 있는지 확인
+	bool	IsInRect(float fPoX,float fPoY,float* fRange);	//	영역내에 있는지 확인 [Korean comment]
 public:
 	CGrassMng();
 	virtual ~CGrassMng();

@@ -1289,7 +1289,7 @@ void CAujardDlg::ModifyKnightsMember(char* buffer, BYTE command)
 		|| userId >= MAX_USER)
 		return;
 
-/*	if( remove_flag == 0 && command == KNIGHTS_REMOVE )	{		// 없는 유저 추방시에는 디비에서만 처리한다
+/*	if( remove_flag == 0 && command == KNIGHTS_REMOVE )	{		// 없는 유저 추방시에는 디비에서만 처리한다 Process
 		result = m_DBAgent.UpdateKnights( command, userid, knightindex, remove_flag );
 		TRACE(_T("ModifyKnights - command=%d, nid=%d, index=%d, result=%d \n"), command, uid, knightindex, result);
 		return;
@@ -1621,7 +1621,7 @@ void CAujardDlg::CouponEvent(char* data)
 		nLen = GetShort(data, index);
 		GetString(strAccountName, data, nLen, index);
 		nEventNum = GetDWORD(data, index);
-		// 비러머글 대사문 >.<
+		// 비러머글 대사문 >.< [Korean comment]
 		nMessageNum = GetDWORD(data, index);
 		// TODO: Not implemented. Allow nResult to default to 0
 		// nResult = _dbAgent.CheckCouponEvent(strAccountName);
@@ -1630,7 +1630,7 @@ void CAujardDlg::CouponEvent(char* data)
 		SetShort(send_buff, nSid, send_index);
 		SetByte(send_buff, nResult, send_index);
 		SetDWORD(send_buff, nEventNum, send_index);
-		// 비러머글 대사문 >.<
+		// 비러머글 대사문 >.< [Korean comment]
 		SetDWORD(send_buff, nMessageNum, send_index);
 		//
 

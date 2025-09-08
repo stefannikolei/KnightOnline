@@ -32,16 +32,16 @@ CKnights::~CKnights()
 void CKnights::InitializeValue()
 {
 	m_sIndex = 0;
-	m_byFlag = 0;			// 1 : Clan, 2 : 기사단
+	m_byFlag = 0;			// 1 : Clan, 2 : 기사단 [Korean comment]
 	m_byNation = 0;			// nation
-	m_byGrade = 0;			// clan 등급 (1 ~ 5등급)
-	m_byRanking = 0;		// clan 등급 (1 ~ 5등)
+	m_byGrade = 0;			// clan 등급 (1 ~ 5등급) [Korean comment]
+	m_byRanking = 0;		// clan 등급 (1 ~ 5등) [Korean comment]
 	m_sMembers = 0;
 	memset(m_strName, 0, sizeof(m_strName));
 	memset(m_strChief, 0, sizeof(m_strChief));
-	memset(m_strViceChief_1, 0, sizeof(m_strViceChief_1));	// 부단장 1
-	memset(m_strViceChief_2, 0, sizeof(m_strViceChief_2));	// 부단장 2 (기사단에서는 장교)
-	memset(m_strViceChief_3, 0, sizeof(m_strViceChief_3));	// 부단장 3 (기사단에서는 사용하지 않음)
+	memset(m_strViceChief_1, 0, sizeof(m_strViceChief_1));	// 부단장 1 [Korean comment]
+	memset(m_strViceChief_2, 0, sizeof(m_strViceChief_2));	// 부단장 2 (기사단에서는 장교) [Korean comment]
+	memset(m_strViceChief_3, 0, sizeof(m_strViceChief_3));	// 부단장 3 (기사단에서는 사용하지 않음) [Korean comment]
 	memset(m_Image, 0, sizeof(m_Image));
 	m_nMoney = 0;
 	m_sAllianceKnights = 0;

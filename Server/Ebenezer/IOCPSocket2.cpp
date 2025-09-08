@@ -151,7 +151,7 @@ int CIOCPSocket2::Send(char* pBuf, long length, int dwFlag)
 		m_Sen_val++;
 		m_Sen_val &= 0x00ffffff;
 
-		pTIBuf[0] = 0xfc; // 암호가 정확한지
+		pTIBuf[0] = 0xfc; // 암호가 정확한지 [Korean comment]
 		pTIBuf[1] = 0x1e;
 		memcpy(pTIBuf + 2, &m_Sen_val, sizeof(WORD) + 1);
 		memcpy(pTIBuf + 5, pBuf, length);
@@ -324,7 +324,7 @@ void CIOCPSocket2::ReceivedData(int length)
 	{
 		if (pData != nullptr)
 		{
-			Parsing(len, pData); // 실제 파싱 함수...
+			Parsing(len, pData); // 실제 파싱 함수... Function
 
 			delete[] pData;
 			pData = nullptr;

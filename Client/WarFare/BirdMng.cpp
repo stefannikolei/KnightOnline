@@ -41,7 +41,7 @@ void CBirdMng::LoadFromFile(const std::string& szFN)
 	Release();
 
 	if(szFN.empty()) return;
-	FILE* stream = fopen(szFN.c_str(), "r"); //text파일로 만든다 
+	FILE* stream = fopen(szFN.c_str(), "r"); //text파일로 만든다  File
 	if (stream == nullptr)
 		return;
 

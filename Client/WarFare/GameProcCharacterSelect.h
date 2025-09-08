@@ -80,7 +80,7 @@ public:
 	class CN3Shape*			m_pActiveBg;
 
 	class CN3Chr*			m_pChrs[MAX_AVAILABLE_CHARACTER];
-	__CharacterSelectInfo	m_InfoChrs[MAX_AVAILABLE_CHARACTER]; // 이미 만들어진 캐릭터 정보..
+	__CharacterSelectInfo	m_InfoChrs[MAX_AVAILABLE_CHARACTER]; // 이미 만들어진 캐릭터 정보.. Character
 
 	class CN3Camera*		m_pCamera;
 	class CN3Light*			m_pLights[8];

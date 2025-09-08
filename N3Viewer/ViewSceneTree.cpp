@@ -143,7 +143,7 @@ void CViewSceneTree::UpdateTreeItem(HTREEITEM hParent, CN3Base *pBase)
 	else if(dwType & OBJ_SHAPE)
 	{
 		CN3Shape* pShape = (CN3Shape*)pBase;
-		if(pShape->IsPMeshProcessed()) nItem = 6; // PMesh 처리가 되어 있는가...??
+		if(pShape->IsPMeshProcessed()) nItem = 6; // PMesh 처리가 되어 있는가...?? Process
 		else nItem = 7;
 	}
 	else if(dwType & OBJ_CHARACTER) nItem = 8;
@@ -347,7 +347,7 @@ void CViewSceneTree::OnRclick(NMHDR* pNMHDR, LRESULT* pResult)
 		CMenu popup;
 		popup.LoadMenu(IDR_POPUP_SCENE);
 		CMenu* pSubMenu = popup.GetSubMenu(0);
-		pSubMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, this); // 편집 메뉴를 펼친다..
+		pSubMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, this); // 편집 메뉴를 펼친다.. Menu
 	}
 
 	*pResult = 0;
@@ -407,7 +407,7 @@ void CViewSceneTree::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 
 	CN3BaseFileAccess* pBFA = (CN3BaseFileAccess*)pBase;
 	if(pTDI->item.pszText)
-		pBFA->FileNameSet(pTDI->item.pszText); // 파일 이름 정하기..
+		pBFA->FileNameSet(pTDI->item.pszText); // 파일 이름 정하기.. File
 
 	*pResult = 1;
 }

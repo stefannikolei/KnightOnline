@@ -14,7 +14,7 @@ public:
 	class CN3Camera*		m_pCamera;
 	class CN3Light*			m_pLights[3];
 
-	bool					m_bLogIn; // 로그인 중복 방지..
+	bool					m_bLogIn; // 로그인 중복 방지.. [Korean comment]
 	std::string				m_szRegistrationSite;
 
 	float					m_fTimeUntilNextGameConnectionAttempt;
@@ -28,7 +28,7 @@ public:
 	void MsgRecv_GameServerGroupList(Packet& pkt);
 	void MsgRecv_AccountLogIn(int iCmd, Packet& pkt);
 	int	 MsgRecv_VersionCheck(Packet& pkt) override;
-	int	 MsgRecv_GameServerLogIn(Packet& pkt) override; // 국가 번호를 리턴한다.
+	int	 MsgRecv_GameServerLogIn(Packet& pkt) override; // 국가 번호를 리턴한다. [Korean comment]
 
 	bool MsgSend_AccountLogIn(enum e_LogInClassification eLIC);
 
@@ -41,7 +41,7 @@ protected:
 	bool ProcessPacket(Packet& pkt) override;
 
 public:
-	void ConnectToGameServer(); // 고른 게임 서버에 접속
+	void ConnectToGameServer(); // 고른 게임 서버에 접속 [Korean comment]
 	CGameProcLogIn_1098();
 	~CGameProcLogIn_1098() override;
 };

@@ -30,8 +30,8 @@ public:
 	// MaxValue : progress bar의 step의 최대값
 
 	CStatusBar* GetStatusBar();		// MainFrame에서 StatusBar 포인터 얻어오기
-	void Resize();					// 위치와 크기 조정
-	void Clear();					// 초기화
+	void Resize();					// 위치와 크기 조정 Position
+	void Clear();					// 초기화 Initialize
 
 // Overrides
 	// ClassWizard generated virtual function overrides

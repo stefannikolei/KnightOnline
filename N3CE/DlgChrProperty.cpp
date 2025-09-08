@@ -61,7 +61,7 @@ BOOL CDlgChrProperty::OnInitDialog()
 	CString str, strTmp;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 캐릭터
+	// 캐릭터 Character
 	m_LPChr.AddPropItem("Joint File", "", PIT_FILE, "N3 Joint File(*.N3Joint)|*.N3Joint||");
 	m_LPChr.AddPropItem("Collision Mesh File", "", PIT_FILE, "N3 Vector Mesh(*.N3VMesh)|*.N3VMesh||");
 	m_LPChr.AddPropItem("Collision Mesh Delete", "Collision Mesh 삭제", PIT_BUTTON, "");
@@ -88,11 +88,11 @@ BOOL CDlgChrProperty::OnInitDialog()
 	m_LPCPlug.AddPropItem("Plug Offset", "", PIT_EDIT, "");
 	m_LPCPlug.AddPropItem("Plug Rotation", "Reset", PIT_BUTTON, "");
 	m_LPCPlug.AddPropItem("Plug Scale", "", PIT_EDIT, "");
-	// 캐릭터
+	// 캐릭터 Character
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////
-	// Material 등록 정보
+	// Material 등록 정보 Info
 	m_LPMaterial.AddPropItem("Render Flags", "0", PIT_EDIT, "", 0);
 	strTmp = "Null|D3DBLEND_ZERO|D3DBLEND_ONE|D3DBLEND_SRCCOLOR|D3DBLEND_INVSRCCOLOR|D3DBLEND_SRCALPHA|D3DBLEND_INVSRCALPHA|D3DBLEND_DESTALPHA|\
 D3DBLEND_INVDESTALPHA|D3DBLEND_DESTCOLOR|D3DBLEND_INVDESTCOLOR|D3DBLEND_SRCALPHASAT|D3DBLEND_BOTHSRCALPHA|D3DBLEND_BOTHINVSRCALPHA|";
@@ -113,10 +113,10 @@ D3DTOP_BUMPENVMAP|D3DTOP_BUMPENVMAPLUMINANCE|D3DTOP_DOTPRODUCT|D3DTOP_MULTIPLYAD
 	m_LPMaterial.AddPropItem("Diffuse Color", "", PIT_COLOR, "");
 	m_LPMaterial.AddPropItem("Specular Color", "", PIT_COLOR, "");
 	m_LPMaterial.AddPropItem("Emissive Color", "", PIT_COLOR, "");
-	// Material 등록 정보
+	// Material 등록 정보 Info
 	/////////////////////////////////////
 
-	// 창크기 및 위치 조정하기.
+	// 창크기 및 위치 조정하기. Window
 	m_LPChr.GetWindowRect(&rc); 
 	nH = m_LPChr.GetItemHeight(0) * m_LPChr.GetCount() + 4;
 	m_LPChr.SetWindowPos(NULL, rc.left, y, rc.Width(), nH, SWP_NOZORDER);
@@ -148,11 +148,11 @@ D3DTOP_BUMPENVMAP|D3DTOP_BUMPENVMAPLUMINANCE|D3DTOP_DOTPRODUCT|D3DTOP_MULTIPLYAD
 	m_LPMaterial.SetWindowPos(NULL, rc.left, y, rc.Width(), nH, SWP_NOZORDER);
 	y += nH + 4;
 
-	// 대화상자 전체 크기..
+	// 대화상자 전체 크기.. Size
 	this->GetWindowRect(&rc);
 	this->SetWindowPos(NULL, 0, 0, rc.Width(), y + GetSystemMetrics(SM_CYCAPTION) + 5, SWP_NOZORDER | SWP_NOMOVE);
 
-	// 중간 분할선 조정
+	// 중간 분할선 조정 [Korean comment]
 	int nW = 100;
 	m_LPChr.SetDividerWidth(nW);
 	m_LPCPart.SetDividerWidth(nW);
@@ -234,7 +234,7 @@ void CDlgChrProperty::UpdateInfo()
 		}
 	}
 
-	// 붙이는 오브젝트(무기, 장신구 등...) 정보 표시
+	// 붙이는 오브젝트(무기, 장신구 등...) 정보 표시 Object
 	int nPlug = m_CBChrPlug.GetCurSel();
 	int nPlugCount = pChr->PlugCount();
 	m_CBChrPlug.ResetContent();
@@ -286,7 +286,7 @@ void CDlgChrProperty::UpdateInfo()
 	m_LPCPart.Invalidate(); // Property List Update
 	m_LPCPlug.Invalidate(); // Property List Update
 
-	// 재질
+	// 재질 [Korean comment]
 	if(pMtl)
 	{
 		pItem = m_LPMaterial.GetPropItem("Render Flags");
@@ -439,7 +439,7 @@ BOOL CDlgChrProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 			else if(pItem->m_propName == "Plug Type") pPlug->m_Type = (e_PlugType)pItem->m_crColor;
 			else if(pItem->m_propName == "Plug Joint")
 			{
-				int nJI = atoi(pItem->m_curValue); // Joint Index 가 영역을 벗어나지 못하도록...
+				int nJI = atoi(pItem->m_curValue); // Joint Index 가 영역을 벗어나지 못하도록... [Korean comment]
 				int nJC = 0;
 				CN3Joint* pJ = pChr->Joint();
 				if(pJ) pJ->NodeCount(nJC); // Joint Node Count;

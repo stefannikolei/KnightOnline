@@ -2,7 +2,7 @@
 //
 //	LyTerrainDef.h
 //	- 이것저것 Terrain에 관련된 자료형정의, 상수정의...
-//	- 쿼드트리 이용한 지형...^^
+//	- 쿼드트리 이용한 지형...^^ [Korean comment]
 //
 //	By Donghoon..
 //
@@ -19,7 +19,7 @@
 // Constant Definitions..
 const int N3ME_DATA_VERSION = 3;
 //version info...
-//이전 데이터들은 버전 정보를 갖고 있지 않다.
+//이전 데이터들은 버전 정보를 갖고 있지 않다. Data
 //1 : 초기 데이터에 lightmap정보를 더한 것..
 //2 : version 1에 풀 정보(풀과 DTex의 그룹과의 관계에 관한 정보)를 더한 것.
 //3 : 개선된 lightmap..^^
@@ -39,14 +39,14 @@ const int MAX_TILEVB_SIZE = 16;	//타일찍는 VB의 최대 사이즈.
 const int MAX_LIGHTMAPVB_SIZE = 16;		//라이트맵 쓰는 VB의 최대 사이즈.
 
 const int DTEX_SIZE = 1024; // Detail Texture Size
-const int NUM_DTEXTILE = 8; // Detail Texture 분할 수..
+const int NUM_DTEXTILE = 8; // Detail Texture 분할 수.. [Korean comment]
 
 const int LIGHTMAP_TEX_SIZE = 8;//32;
 
 const int DISTANCE_TABLE_SIZE = 64;
 
-const int NOTMOVE_HEIGHT = 10;	// 높이차가 커서 갈 수 없는 타일의 최소값..
-								// 10이하면 움직일 수 있고, 이상이면 갈 수 없다.
+const int NOTMOVE_HEIGHT = 10;	// 높이차가 커서 갈 수 없는 타일의 최소값.. [Korean comment]
+								// 10이하면 움직일 수 있고, 이상이면 갈 수 없다. [Korean comment]
  
 
 const int MAX_BRUSH_SIZE	= 21;
@@ -64,7 +64,7 @@ enum {DTEX_FULL=0, DTEX_1PER2, DTEX_1PER4, DTEX_3PER4, DTEX_1PER8, DTEX_7PER8, D
 
 // Structure Definitions..
 
-//맵에디터..
+//맵에디터.. [Korean comment]
 typedef struct __DTexAttr
 {
 	int Group;
@@ -105,7 +105,7 @@ typedef struct __DTexInfo
 
 typedef struct __MapData
 {
-	float	fHeight;	//지형의 높이값..
+	float	fHeight;	//지형의 높이값.. [Korean comment]
 	//float	u1,v1;
 	//__Vector3 Normal;
 	DTEXINFO DTexInfo1;
@@ -119,11 +119,11 @@ typedef struct __MapData
 
 typedef struct __GameMapData
 {
-	float	fHeight;		//지형의 높이값..
+	float	fHeight;		//지형의 높이값.. [Korean comment]
 	DWORD	bIsTileFull		:1;	//타일이 Full 이면 true 아니면 false..
-	DWORD	Tex1Dir			:5;		//툴에서 사용하는 인덱스가 아님..
+	DWORD	Tex1Dir			:5;		//툴에서 사용하는 인덱스가 아님.. Index
 	DWORD	Tex2Dir			:5;	
-	DWORD	Tex1Idx			:10;		//툴에서 사용하는 인덱스가 아님..
+	DWORD	Tex1Idx			:10;		//툴에서 사용하는 인덱스가 아님.. Index
 	DWORD	Tex2Idx			:10;
 	
 	__GameMapData()

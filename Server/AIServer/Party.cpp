@@ -115,7 +115,7 @@ void CParty::PartyInsert(char* pBuf)
 
 	pParty = m_pMain->m_PartyMap.GetData(sPartyIndex);
 
-	// 이상한 경우
+	// 이상한 경우 [Korean comment]
 	if (!pParty)
 		return;
 
@@ -153,7 +153,7 @@ void CParty::PartyRemove(char* pBuf)
 
 	pParty = m_pMain->m_PartyMap.GetData(sPartyIndex);
 
-	// 이상한 경우
+	// 이상한 경우 [Korean comment]
 	if (!pParty)
 		return;
 
@@ -190,7 +190,7 @@ void CParty::PartyDelete(char* pBuf)
 
 	pParty = m_pMain->m_PartyMap.GetData(sPartyIndex);
 
-	// 이상한 경우
+	// 이상한 경우 [Korean comment]
 	if (!pParty)
 		return;
 

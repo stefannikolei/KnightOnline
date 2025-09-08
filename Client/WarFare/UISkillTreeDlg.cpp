@@ -31,9 +31,9 @@ static char THIS_FILE[]=__FILE__;
 
 CUISkillTreeDlg::CUISkillTreeDlg()
 {
-	m_bOpenningNow = false; // 열리고 있다..
-	m_bClosingNow = false;	// 닫히고 있다..
-	m_fMoveDelta = 0.0f; // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
+	m_bOpenningNow = false; // 열리고 있다.. [Korean comment]
+	m_bClosingNow = false;	// 닫히고 있다.. [Korean comment]
+	m_fMoveDelta = 0.0f; // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다.. Calculate
 
 	m_iRBtnDownOffs = -1;
 
@@ -79,9 +79,9 @@ void CUISkillTreeDlg::Release()
 {
 	CN3UIBase::Release();
 
-	m_bOpenningNow = false; // 열리고 있다..
-	m_bClosingNow = false;	// 닫히고 있다..
-	m_fMoveDelta = 0.0f; // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
+	m_bOpenningNow = false; // 열리고 있다.. [Korean comment]
+	m_bClosingNow = false;	// 닫히고 있다.. [Korean comment]
+	m_fMoveDelta = 0.0f; // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다.. Calculate
 
 	int i, j, k;
 
@@ -142,7 +142,7 @@ void CUISkillTreeDlg::UpdateDisableCheck()
 
 void CUISkillTreeDlg::Tick()
 {
-	if(m_bOpenningNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면..
+	if(m_bOpenningNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면.. [Korean comment]
 	{
 		POINT ptCur = this->GetPos();
 		RECT rc = this->GetRegion();
@@ -155,7 +155,7 @@ void CUISkillTreeDlg::Tick()
 
 		int iXLimit = CN3Base::s_CameraData.vp.Width - (int)fWidth;
 		ptCur.x = CN3Base::s_CameraData.vp.Width - (int)m_fMoveDelta;
-		if(ptCur.x <= iXLimit) // 다열렸다!!
+		if(ptCur.x <= iXLimit) // 다열렸다!! [Korean comment]
 		{
 			ptCur.x = iXLimit;
 			m_bOpenningNow = false;
@@ -163,7 +163,7 @@ void CUISkillTreeDlg::Tick()
 
 		this->SetPos(ptCur.x, ptCur.y);
 	}
-	else if(m_bClosingNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면..
+	else if(m_bClosingNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면.. [Korean comment]
 	{
 		POINT ptCur = this->GetPos();
 		RECT rc = this->GetRegion();
@@ -176,12 +176,12 @@ void CUISkillTreeDlg::Tick()
 
 		int iXLimit = CN3Base::s_CameraData.vp.Width;
 		ptCur.x = CN3Base::s_CameraData.vp.Width - (int)(fWidth - m_fMoveDelta);
-		if(ptCur.x >= iXLimit) // 다 닫혔다..!!
+		if(ptCur.x >= iXLimit) // 다 닫혔다..!! [Korean comment]
 		{
 			ptCur.x = iXLimit;
 			m_bClosingNow = false;
 
-			this->SetVisibleWithNoSound(false, false, true); // 다 닫혔으니 눈에서 안보이게 한다.
+			this->SetVisibleWithNoSound(false, false, true); // 다 닫혔으니 눈에서 안보이게 한다. [Korean comment]
 		}
 
 		this->SetPos(ptCur.x, ptCur.y);
@@ -194,10 +194,10 @@ uint32_t CUISkillTreeDlg::MouseProc(uint32_t dwFlags, const POINT& ptCur, const 
 {
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
 	if ( !IsVisible() ) { dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);  return dwRet; }
-	// 실제로 쓰진 않는다..
+	// 실제로 쓰진 않는다.. [Korean comment]
 	if (s_bWaitFromServer) { dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);  return dwRet; }
 
-	// 드래그 되는 아이콘 갱신..
+	// 드래그 되는 아이콘 갱신.. [Korean comment]
 	if ( GetState() == UI_STATE_ICON_MOVING ) 
 	{
 		if(CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo)
@@ -302,7 +302,7 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				int iRBtn = GetIndexInArea(ptCur);
 				if (iRBtn != -1 && m_iRBtnDownOffs != -1 && m_iRBtnDownOffs == iRBtn)
 				{
-					// 들어갈 자리가 있는지 검사..
+					// 들어갈 자리가 있는지 검사.. Check
 					CUIHotKeyDlg* pDlg = CGameProcedure::s_pProcMain->m_pUIHotKeyDlg;
 					int iIndex;
 					if (pDlg->GetEmptySlotIndex(iIndex))
@@ -315,7 +315,7 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 							spSkillCopy->pSkill = spSkill->pSkill;
 							spSkillCopy->szIconFN = spSkill->szIconFN;
 
-							// 아이콘 로드하기.. ^^
+							// 아이콘 로드하기.. ^^ Load
 							spSkillCopy->pUIIcon = new CN3UIIcon;
 							spSkillCopy->pUIIcon->Init(this);
 							spSkillCopy->pUIIcon->SetTex(spSkill->szIconFN);
@@ -345,12 +345,12 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			// Get Item..
 			spSkill = GetHighlightIconItem((CN3UIIcon* )pSender);
 
-			// 복사본을 만든다.. 
+			// 복사본을 만든다..  [Korean comment]
 			spSkillCopy = new __IconItemSkill();
 			spSkillCopy->pSkill = spSkill->pSkill;
 			spSkillCopy->szIconFN = spSkill->szIconFN;
 
-			// 아이콘 로드하기.. ^^
+			// 아이콘 로드하기.. ^^ Load
 			spSkillCopy->pUIIcon = new CN3UIIcon;
 			spSkillCopy->pUIIcon->Init(this);
 			spSkillCopy->pUIIcon->SetTex(spSkill->szIconFN);
@@ -382,7 +382,7 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			break;
 
 		case UIMSG_ICON_UP:
-			// Hot Key 윈도우를 돌아 다니면서 검사..
+			// Hot Key 윈도우를 돌아 다니면서 검사.. Check
 			{
 				CUIHotKeyDlg* pDlg = CGameProcedure::s_pProcMain->m_pUIHotKeyDlg;
 				if ( !IsIn(ptCur.x, ptCur.y) && pDlg->IsIn(ptCur.x, ptCur.y) )
@@ -393,10 +393,10 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 						spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 						if (spSkill)
 						{
-							// 매니저에서 제거..
+							// 매니저에서 제거.. Remove
 							RemoveChild(spSkill->pUIIcon);
 
-							// 리소스 제거..
+							// 리소스 제거.. Remove
 							spSkill->pUIIcon->Release();
 							delete spSkill->pUIIcon;
 							spSkill->pUIIcon = nullptr;
@@ -411,10 +411,10 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 					spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 					if (spSkill)
 					{
-						// 매니저에서 제거..
+						// 매니저에서 제거.. Remove
 						RemoveChild(spSkill->pUIIcon);
 
-						// 리소스 제거..
+						// 리소스 제거.. Remove
 						spSkill->pUIIcon->Release();
 						delete spSkill->pUIIcon;
 						spSkill->pUIIcon = nullptr;
@@ -459,7 +459,7 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 	iCurKindOfBackup	= m_iCurKindOf;
 	iCurSkillPageBackup	= m_iCurSkillPage;
 
-	int iSkillExtra;			// 스킬창의 값..
+	int iSkillExtra;			// 스킬창의 값.. Window
 	int iSkillPoint;
 	std::string str;
 	CN3UIString* pStrName, *pStrName2;
@@ -481,14 +481,14 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 		return;
 	}
 
-	// 전직하지 않은 상태면.. 전문스킬은 올릴수 없다..
+	// 전직하지 않은 상태면.. 전문스킬은 올릴수 없다.. Status
 	switch (iValue)
 	{
 		case 5:	case 6:	case 7: case 8:
 			{
 				switch ( CGameBase::s_pPlayer->m_InfoBase.eNation )
 				{
-					case NATION_KARUS:			// 카루스..
+					case NATION_KARUS:			// 카루스.. [Korean comment]
 						switch ( CGameBase::s_pPlayer->m_InfoBase.eClass )
 						{
 							case CLASS_KA_WARRIOR:
@@ -504,7 +504,7 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 						}
 						break;
 				
-					case NATION_ELMORAD:		// 엘모라도..
+					case NATION_ELMORAD:		// 엘모라도.. [Korean comment]
 						switch ( CGameBase::s_pPlayer->m_InfoBase.eClass )
 						{
 							case CLASS_EL_WARRIOR:
@@ -567,7 +567,7 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 	{
 		switch ( CGameBase::s_pPlayer->m_InfoBase.eNation )
 		{
-			case NATION_KARUS:			// 카루스..
+			case NATION_KARUS:			// 카루스.. [Korean comment]
 				switch ( CGameBase::s_pPlayer->m_InfoBase.eClass )
 				{
 					case CLASS_KA_BERSERKER:
@@ -580,7 +580,7 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 				}
 				break;
 
-			case NATION_ELMORAD:		// 엘모라도..
+			case NATION_ELMORAD:		// 엘모라도.. [Korean comment]
 				switch ( CGameBase::s_pPlayer->m_InfoBase.eClass )
 				{
 					case CLASS_EL_BLADE:
@@ -599,7 +599,7 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 	{
 		switch ( CGameBase::s_pPlayer->m_InfoBase.eNation )
 		{
-			case NATION_KARUS:			// 카루스..
+			case NATION_KARUS:			// 카루스.. [Korean comment]
 				switch ( CGameBase::s_pPlayer->m_InfoBase.eClass )
 				{
 					case CLASS_KA_HUNTER:
@@ -612,7 +612,7 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 				}
 				break;
 
-			case NATION_ELMORAD:		// 엘모라도..
+			case NATION_ELMORAD:		// 엘모라도.. [Korean comment]
 				switch ( CGameBase::s_pPlayer->m_InfoBase.eClass )
 				{
 					case CLASS_EL_RANGER:
@@ -667,7 +667,7 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 	str = pStrName2->GetString();
 	iSkillPoint = atoi(str.c_str());
 
-	// 자기 자신 레벨보다 높일수 없다..
+	// 자기 자신 레벨보다 높일수 없다.. [Korean comment]
 	if ( iSkillPoint >= CGameBase::s_pPlayer->m_InfoBase.iLevel )
 	{
 		std::string szMsg = fmt::format_text_resource(IDS_SKILL_UP_INVALID);
@@ -675,14 +675,14 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 		return;
 	}
 
-	// 써버에게 보내고.. 숫자 업데이트..	
+	// 써버에게 보내고.. 숫자 업데이트..	 Update
 	uint8_t byBuff[4];
 	int iOffset = 0;
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_SKILLPT_CHANGE);
 	CAPISocket::MP_AddByte(byBuff, iOffset, (uint8_t)iValue);
 	CGameProcedure::s_pSocket->Send(byBuff, iOffset);
 
-	// 스킬 포인트 업데이트..
+	// 스킬 포인트 업데이트.. Update
 	iSkillExtra--;
 	pStrName->SetStringAsInt(iSkillExtra);
 	m_iSkillInfo[0] = iSkillExtra;
@@ -719,7 +719,7 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 			break;
 	}
 
-	switch(iValue)		// 스킬 아이콘 업데이트..
+	switch(iValue)		// 스킬 아이콘 업데이트.. Update
 	{
 		case 5:
 		case 6:
@@ -1118,7 +1118,7 @@ void CUISkillTreeDlg::InitIconUpdate()
 	int j, k, iDivide;
 	__TABLE_UPC_SKILL* pUSkill = nullptr;
 
-	// 기존 아이콘 모두 클리어..
+	// 기존 아이콘 모두 클리어.. [Korean comment]
 	for(int i = 0; i < MAX_SKILL_KIND_OF; i++ )
 		for( j = 0; j < MAX_SKILL_PAGE_NUM; j++ )
 			for( k = 0; k < MAX_SKILL_IN_PAGE; k++ )
@@ -1126,10 +1126,10 @@ void CUISkillTreeDlg::InitIconUpdate()
 				{
 					__IconItemSkill* spSkill = m_pMySkillTree[i][j][k];
 
-					// 매니저에서 제거..
+					// 매니저에서 제거.. Remove
 					RemoveChild(spSkill->pUIIcon);
 
-					// 리소스 제거..
+					// 리소스 제거.. Remove
 					spSkill->pUIIcon->Release();
 					delete spSkill->pUIIcon;
 					spSkill->pUIIcon = nullptr;
@@ -1139,7 +1139,7 @@ void CUISkillTreeDlg::InitIconUpdate()
 				}
 
 
-	// 아이디 = 직업 코드*1000 + 001부터.. (직업 코드+1)*100 + 001까지..
+	// 아이디 = 직업 코드*1000 + 001부터.. (직업 코드+1)*100 + 001까지.. [Korean comment]
 	int iSkillIDFirst, iSkillIndexFirst, iSkillIndexLast, iModulo;
 	iSkillIDFirst = CGameBase::s_pPlayer->m_InfoBase.eClass * 1000 + 1;
 	iSkillIndexLast = CGameBase::s_pTbl_Skill.GetSize();
@@ -1147,7 +1147,7 @@ void CUISkillTreeDlg::InitIconUpdate()
 	if (!CGameBase::s_pTbl_Skill.IDToIndex(iSkillIDFirst, &iSkillIndexFirst))
 	{
 		PageButtonInitialize();
-		return;		// 첫번째 스킬이 없으면.. 안된다..
+		return;		// 첫번째 스킬이 없으면.. 안된다.. [Korean comment]
 	}
 
 	if ( CGameBase::s_pPlayer->m_InfoBase.eClass <= CLASS_EL_DRUID )
@@ -1170,12 +1170,12 @@ void CUISkillTreeDlg::InitIconUpdate()
 		if ( pUSkill == nullptr ) continue;
 		if ( pUSkill->dwID >= UIITEM_TYPE_USABLE_ID_MIN) continue;
 
-		// 조건이 충족 되는지 확인한다..
+		// 조건이 충족 되는지 확인한다.. [Korean comment]
 		iModulo = pUSkill->iNeedSkill % 10;
 		switch ( iModulo )
 		{
 			case 0:																				// Basic Skills..
-				if (pUSkill->iNeedLevel <= CGameBase::s_pPlayer->m_InfoBase.iLevel)		// 내 레벨보다 같거나 작으면..
+				if (pUSkill->iNeedLevel <= CGameBase::s_pPlayer->m_InfoBase.iLevel)		// 내 레벨보다 같거나 작으면.. [Korean comment]
 					AddSkillToPage(pUSkill);
 				else
 					AddSkillToPage(pUSkill, 0, false);
@@ -1476,13 +1476,13 @@ stop:
 	__IconItemSkill* spSkill = new __IconItemSkill();
 	spSkill->pSkill = pUSkill;
 
-	// 아이콘 이름 만들기.. ^^
+	// 아이콘 이름 만들기.. ^^ Name
 	if (bHasLevelToUse)
 		spSkill->szIconFN = fmt::format("UI\\skillicon_{:02}_{}.dxt", pUSkill->dwID % 100, pUSkill->dwID / 100);
 	else
 		spSkill->szIconFN = "UI\\skillicon_enigma.dxt";
 	
-	// 아이콘 로드하기.. ^^
+	// 아이콘 로드하기.. ^^ Load
 	spSkill->pUIIcon = new CN3UIIcon;
 	spSkill->pUIIcon->Init(this);
 	spSkill->pUIIcon->SetTex(spSkill->szIconFN);
@@ -1498,7 +1498,7 @@ stop:
 		spSkill->pUIIcon->SetMoveRect(pArea->GetRegion());
 	}
 
-	// 아이콘 정보 저장..
+	// 아이콘 정보 저장.. Save
 	m_pMySkillTree[iOffset][i][j] = spSkill;
 }
 
@@ -1528,7 +1528,7 @@ bool CUISkillTreeDlg::CheckSkillCanBeUse(__TABLE_UPC_SKILL* pUSkill)
 
 void CUISkillTreeDlg::Open()
 {
-	// 스르륵 열린다!!
+	// 스르륵 열린다!! [Korean comment]
 	SetVisible(true);
 	this->SetPos(CN3Base::s_CameraData.vp.Width, 10);
 	m_fMoveDelta = 0;
@@ -1545,10 +1545,10 @@ void CUISkillTreeDlg::Close()
 	spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 	if (spSkill)
 	{
-		// 매니저에서 제거..
+		// 매니저에서 제거.. Remove
 		RemoveChild(spSkill->pUIIcon);
 
-		// 리소스 제거..
+		// 리소스 제거.. Remove
 		spSkill->pUIIcon->Release();
 		delete spSkill->pUIIcon;
 		spSkill->pUIIcon = nullptr;
@@ -1559,15 +1559,15 @@ void CUISkillTreeDlg::Close()
 	SetState(UI_STATE_COMMON_NONE);
 	CN3UIWndBase::AllHighLightIconFree();
 
-	// 스르륵 닫힌다..!!
-//	SetVisible(false); // 다 닫히고 나서 해준다..
+	// 스르륵 닫힌다..!! [Korean comment]
+//	SetVisible(false); // 다 닫히고 나서 해준다.. [Korean comment]
 	RECT rc = this->GetRegion();
 	this->SetPos(CN3Base::s_CameraData.vp.Width - (rc.right - rc.left), 10);
 	m_fMoveDelta = 0;
 	m_bOpenningNow = false;
 	m_bClosingNow = true;
 
-	if(m_pSnd_CloseUI) m_pSnd_CloseUI->Play(); // 닫는 소리..
+	if(m_pSnd_CloseUI) m_pSnd_CloseUI->Play(); // 닫는 소리.. [Korean comment]
 
 	m_iRBtnDownOffs = -1;
 }
@@ -1610,7 +1610,7 @@ RECT CUISkillTreeDlg::GetSampleRect()
 	return rect;
 }
 
-void CUISkillTreeDlg::SetPageInIconRegion(int iKindOf, int iPageNum)		// 아이콘 역역에서 현재 페이지 설정..
+void CUISkillTreeDlg::SetPageInIconRegion(int iKindOf, int iPageNum)		// 아이콘 역역에서 현재 페이지 설정.. Set
 {
 	if ( (iKindOf >= MAX_SKILL_KIND_OF) || (iPageNum >= MAX_SKILL_PAGE_NUM) )
 		return;
@@ -1708,7 +1708,7 @@ void CUISkillTreeDlg::AllClearImageByName(std::string_view svHeaderID, bool bVis
 	}
 }
 
-// 문자 역역에서 현재 페이지 설정..
+// 문자 역역에서 현재 페이지 설정.. Set
 void CUISkillTreeDlg::SetPageInCharRegion()
 {
 	AllClearImageByName("public", false);

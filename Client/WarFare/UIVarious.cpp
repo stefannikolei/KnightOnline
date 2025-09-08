@@ -176,7 +176,7 @@ bool CUIState::Load(HANDLE hFile)
 	return true;
 }
 
-void CUIState::UpdateBonusPointAndButtons(int iBonusPointRemain) // 보너스 포인트 적용이 가능한가??
+void CUIState::UpdateBonusPointAndButtons(int iBonusPointRemain) // 보너스 포인트 적용이 가능한가?? [Korean comment]
 {
 	bool bEnable = false;
 	if(iBonusPointRemain > 0) bEnable = true;
@@ -184,7 +184,7 @@ void CUIState::UpdateBonusPointAndButtons(int iBonusPointRemain) // 보너스 �
 
 	if(m_pText_BonusPoint) m_pText_BonusPoint->SetStringAsInt(iBonusPointRemain);
 
-	if(m_pBtn_Strength)		m_pBtn_Strength->SetVisible(bEnable); // 경험치 체인지..
+	if(m_pBtn_Strength)		m_pBtn_Strength->SetVisible(bEnable); // 경험치 체인지.. [Korean comment]
 	if(m_pBtn_Stamina)		m_pBtn_Stamina->SetVisible(bEnable);
 	if(m_pBtn_Dexterity)	m_pBtn_Dexterity->SetVisible(bEnable);
 	if(m_pBtn_Intelligence)	m_pBtn_Intelligence->SetVisible(bEnable);
@@ -203,13 +203,13 @@ void CUIState::UpdateLevel(int iVal)
 		m_pText_Level->SetStringAsInt(iVal);
 }
 
-void CUIState::UpdateRealmPoint(int iLoyalty, int iLoyaltyMonthly) // 국가 기여도는 10을 나누어서 표시
+void CUIState::UpdateRealmPoint(int iLoyalty, int iLoyaltyMonthly) // 국가 기여도는 10을 나누어서 표시 [Korean comment]
 {
 	if (m_pText_RealmPoint == nullptr)
 		return;
 
 	std::string buff = fmt::format("{} / {}", iLoyalty, iLoyaltyMonthly);
-	m_pText_RealmPoint->SetString(buff); // 국가 기여도는 10을 나누어서 표시
+	m_pText_RealmPoint->SetString(buff); // 국가 기여도는 10을 나누어서 표시 [Korean comment]
 }
 
 void CUIState::UpdateHP(int iVal, int iValMax)
@@ -482,7 +482,7 @@ bool CUIState::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
 	if (dwMsg == UIMSG_BUTTON_CLICK)					
 	{
-		if(pSender == m_pBtn_Strength) // 경험치 체인지..
+		if(pSender == m_pBtn_Strength) // 경험치 체인지.. [Korean comment]
 			this->MsgSendAblityPointChange(0x01, +1);
 		else if(pSender == m_pBtn_Stamina)
 			this->MsgSendAblityPointChange(0x02, +1);
@@ -1033,7 +1033,7 @@ CUIFriends::CUIFriends()
 
 CUIFriends::~CUIFriends()
 {
-	this->SaveListToTextFile(""); // 몽땅 저장..
+	this->SaveListToTextFile(""); // 몽땅 저장.. Save
 }
 
 bool CUIFriends::Load(HANDLE hFile)
@@ -1057,7 +1057,7 @@ bool CUIFriends::Load(HANDLE hFile)
 	if (pFile)
 	{
 		char szLine[256] = "";
-		char* pszResult = fgets(szLine, 256, pFile); // 줄을 읽고..
+		char* pszResult = fgets(szLine, 256, pFile); // 줄을 읽고.. [Korean comment]
 		while(pszResult)
 		{
 			int iLen = lstrlen(szLine);
@@ -1072,7 +1072,7 @@ bool CUIFriends::Load(HANDLE hFile)
 				if(!szTmp.empty())
 					this->MemberAdd(szTmp, -1, false, false);
 			}
-			pszResult = fgets(szLine, 256, pFile); // 첫째 줄을 읽고..
+			pszResult = fgets(szLine, 256, pFile); // 첫째 줄을 읽고.. [Korean comment]
 		}
 		fclose(pFile);
 
@@ -1082,7 +1082,7 @@ bool CUIFriends::Load(HANDLE hFile)
 	return true;
 }
 
-void CUIFriends::SaveListToTextFile(const std::string& szID) // 문자열이 있으면 추가하고.. 없으면 몽땅 저장..
+void CUIFriends::SaveListToTextFile(const std::string& szID) // 문자열이 있으면 추가하고.. 없으면 몽땅 저장.. Save
 {
 	// TEMP: to avoid the "_.txt" file in the data directory
 	return;
@@ -1151,29 +1151,29 @@ bool CUIFriends::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 					m_iPageCur = iPageMax - 1;
 			}
 			
-			if(iPagePrev != m_iPageCur) // 페이지가 변경될때 
+			if(iPagePrev != m_iPageCur) // 페이지가 변경될때  Change
 			{
 				this->UpdateList();
 				this->MsgSend_MemberInfo(false);
 			}
 		}
-		else if(pSender == m_pBtn_Refresh) // 새 화면으로 갱신...
+		else if(pSender == m_pBtn_Refresh) // 새 화면으로 갱신... [Korean comment]
 		{
 			this->MsgSend_MemberInfo(true);
 		}
-		else if(pSender == m_pBtn_Add) // 추가.
+		else if(pSender == m_pBtn_Add) // 추가. Add
 		{
 			CPlayerOther* pUPC = CGameProcedure::s_pOPMgr->UPCGetByID(CGameBase::s_pPlayer->m_iIDTarget, false);
 			if (pUPC != nullptr)
 			{
-				if(this->MemberAdd(pUPC->IDString(), pUPC->IDNumber(), true, false)) // 추가 성공이면..
+				if(this->MemberAdd(pUPC->IDString(), pUPC->IDNumber(), true, false)) // 추가 성공이면.. Add
 				{
-					this->SaveListToTextFile(pUPC->IDString()); // 파일에 추가 저장..
+					this->SaveListToTextFile(pUPC->IDString()); // 파일에 추가 저장.. Save
 					this->MsgSend_MemberInfo(pUPC->IDString());
 				}
 			}
 		}
-		else if(pSender == m_pBtn_Delete) // 멤버 삭제
+		else if(pSender == m_pBtn_Delete) // 멤버 삭제 Delete
 		{
 			if(m_pList_Friends)
 			{
@@ -1182,10 +1182,10 @@ bool CUIFriends::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				m_pList_Friends->GetString(iSel, szID);
 
 				if(this->MemberDelete(szID))
-					this->UpdateList(); // 리스트 업데이트..
+					this->UpdateList(); // 리스트 업데이트.. Update
 			}
 		}
-		else if(pSender == m_pBtn_Whisper) // 귓속말
+		else if(pSender == m_pBtn_Whisper) // 귓속말 [Korean comment]
 		{
 			if(m_pList_Friends)
 			{
@@ -1195,7 +1195,7 @@ bool CUIFriends::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				pProcMain->MsgSend_ChatSelectTarget(szID);
 			}
 		}
-		else if(pSender == m_pBtn_Party) // 파티 신청
+		else if(pSender == m_pBtn_Party) // 파티 신청 [Korean comment]
 		{
 			int iSel = m_pList_Friends->GetCurSel();
 			std::string szID;
@@ -1205,9 +1205,9 @@ bool CUIFriends::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			{
 				std::string szMsg;
 				if (pProcMain->MsgSend_PartyOrForceCreate(0, szID))
-					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE); // 파티
+					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE); // 파티 [Korean comment]
 				else
-					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE_FAILED); // 파티 초대 실패
+					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE_FAILED); // 파티 초대 실패 [Korean comment]
 				pProcMain->MsgOutput(it->second.szName + szMsg, 0xffffff00);
 			}
 		}
@@ -1264,7 +1264,7 @@ void CUIFriends::UpdateList()
 	if (iSkip >= m_MapFriends.size())
 		return;
 
-	if(m_pText_Page) m_pText_Page->SetStringAsInt(m_iPageCur+1); // 페이지 표시..
+	if(m_pText_Page) m_pText_Page->SetStringAsInt(m_iPageCur+1); // 페이지 표시.. [Korean comment]
 
 	auto it = m_MapFriends.begin();
 	std::advance(it, iSkip);
@@ -1285,7 +1285,7 @@ void CUIFriends::UpdateList()
 		m_pList_Friends->SetFontColor(iIndex, crStatus);		
 	}
 
-	m_pList_Friends->SetCurSel(iSelPrev); // 전의 선택으로 돌리기..	
+	m_pList_Friends->SetCurSel(iSelPrev); // 전의 선택으로 돌리기..	 Select
 }
 
 void CUIFriends::MsgSend_MemberInfo(bool bDisableInterval)
@@ -1395,9 +1395,9 @@ CUIVarious::CUIVarious()
 	m_pPageQuest = nullptr;
 	m_pPageFriends = nullptr;
 
-	m_bOpenningNow = false; // 열리고 있다..
-	m_bClosingNow = false;	// 닫히고 있다..
-	m_fMoveDelta = 0; // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
+	m_bOpenningNow = false; // 열리고 있다.. [Korean comment]
+	m_bClosingNow = false;	// 닫히고 있다.. [Korean comment]
+	m_fMoveDelta = 0; // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다.. Calculate
 }
 
 CUIVarious::~CUIVarious()
@@ -1419,9 +1419,9 @@ void CUIVarious::Release()
 	m_pPageQuest = nullptr;
 	m_pPageFriends = nullptr;
 
-	m_bOpenningNow = false; // 열리고 있다..
-	m_bClosingNow = false;	// 닫히고 있다..
-	m_fMoveDelta = 0; // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
+	m_bOpenningNow = false; // 열리고 있다.. [Korean comment]
+	m_bClosingNow = false;	// 닫히고 있다.. [Korean comment]
+	m_fMoveDelta = 0; // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다.. Calculate
 }
 
 bool CUIVarious::Load(HANDLE hFile)
@@ -1465,10 +1465,10 @@ bool CUIVarious::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
 	if (dwMsg == UIMSG_BUTTON_CLICK)					
 	{
-		if(pSender == m_pBtn_Close)			this->Close(); // 닫는다..
+		if(pSender == m_pBtn_Close)			this->Close(); // 닫는다.. [Korean comment]
 		else if(pSender == m_pBtn_State)	this->UpdatePageButtons(m_pBtn_State);
-		else if(pSender == m_pBtn_Quest)	this->UpdatePageButtons(m_pBtn_Quest);		// 퀘스트...
-		else if(pSender == m_pBtn_Knights)	this->UpdatePageButtons(m_pBtn_Knights);	// 기사단... 잠시 막자..
+		else if(pSender == m_pBtn_Quest)	this->UpdatePageButtons(m_pBtn_Quest);		// 퀘스트... [Korean comment]
+		else if(pSender == m_pBtn_Knights)	this->UpdatePageButtons(m_pBtn_Knights);	// 기사단... 잠시 막자.. [Korean comment]
 		else if(pSender == m_pBtn_Friends)	this->UpdatePageButtons(m_pBtn_Friends);
 	}
 
@@ -1501,12 +1501,12 @@ void CUIVarious::UpdatePageButtons(CN3UIButton* pButtonToActive)
 	}
 
 	if(pButtonToActive == m_pBtn_Friends && m_pPageFriends)
-		m_pPageFriends->MsgSend_MemberInfo(false); // 이러면 친구리스트를 업데이트한다..
+		m_pPageFriends->MsgSend_MemberInfo(false); // 이러면 친구리스트를 업데이트한다.. Update
 }
 
 void CUIVarious::Open()
 {
-	// 스르륵 열린다!!
+	// 스르륵 열린다!! [Korean comment]
 	this->SetVisible(true);
 	RECT rc = this->GetRegion();
 	this->SetPos(-(rc.right - rc.left), 80);
@@ -1514,7 +1514,7 @@ void CUIVarious::Open()
 	m_bOpenningNow = true;
 	m_bClosingNow = false;
 
-	// 기사단 리스트가 없으면 요청해서 받는다.
+	// 기사단 리스트가 없으면 요청해서 받는다. [Korean comment]
 //	__InfoPlayerMySelf*	pInfoExt = &(CGameBase::s_pPlayer->m_InfoExt);
 //	if(m_pPageKnights->NeedMemberListRequest() && pInfoExt->iKnightsID > 0)
 //	{
@@ -1526,14 +1526,14 @@ void CUIVarious::Open()
 
 void CUIVarious::Close()
 {
-	// 스르륵 닫힌다..!!
-//	SetVisible(false); // 다 닫히고 나서 해준다..
+	// 스르륵 닫힌다..!! [Korean comment]
+//	SetVisible(false); // 다 닫히고 나서 해준다.. [Korean comment]
 	this->SetPos(0, 80);
 	m_fMoveDelta = 0;
 	m_bOpenningNow = false;
 	m_bClosingNow = true;
 
-	if(m_pSnd_CloseUI) m_pSnd_CloseUI->Play(); // 닫는 소리..
+	if(m_pSnd_CloseUI) m_pSnd_CloseUI->Play(); // 닫는 소리.. [Korean comment]
 }
 
 void CUIVarious::Tick()
@@ -1546,7 +1546,7 @@ void CUIVarious::Tick()
 		m_pPageKnights->m_fTimeLimit_Remove += CN3Base::s_fSecPerFrm;
 	}
 
-	if(m_bOpenningNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면..
+	if(m_bOpenningNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면.. [Korean comment]
 	{
 		POINT ptCur = this->GetPos();
 		RECT rc = this->GetRegion();
@@ -1559,7 +1559,7 @@ void CUIVarious::Tick()
 
 		int iXLimit = 0;
 		ptCur.x = (int)(m_fMoveDelta - fWidth);
-		if(ptCur.x >= iXLimit) // 다열렸다!!
+		if(ptCur.x >= iXLimit) // 다열렸다!! [Korean comment]
 		{
 			ptCur.x = iXLimit;
 			m_bOpenningNow = false;
@@ -1567,7 +1567,7 @@ void CUIVarious::Tick()
 
 		this->SetPos(ptCur.x, ptCur.y);
 	}
-	else if(m_bClosingNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면..
+	else if(m_bClosingNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면.. [Korean comment]
 	{
 		POINT ptCur = this->GetPos();
 		RECT rc = this->GetRegion();
@@ -1580,12 +1580,12 @@ void CUIVarious::Tick()
 
 		int iXLimit = (int)-fWidth;
 		ptCur.x = (int)-m_fMoveDelta;
-		if(ptCur.x <= iXLimit) // 다 닫혔다..!!
+		if(ptCur.x <= iXLimit) // 다 닫혔다..!! [Korean comment]
 		{
 			ptCur.x = iXLimit;
 			m_bClosingNow = false;
 
-			this->SetVisibleWithNoSound(false, false, true); // 다 닫혔으니 눈에서 안보이게 한다.
+			this->SetVisibleWithNoSound(false, false, true); // 다 닫혔으니 눈에서 안보이게 한다. [Korean comment]
 			CGameProcedure::s_pUIMgr->ReFocusUI();//this_ui
 		}
 
@@ -1601,20 +1601,20 @@ void CUIVarious::UpdateAllStates(const __InfoPlayerBase* pInfoBase, const __Info
 	
 	std::string szVal;
 	
-	if(m_pPageState->m_pText_Class) // 직업
+	if(m_pPageState->m_pText_Class) // 직업 [Korean comment]
 	{
 		CGameBase::GetTextByClass(pInfoBase->eClass, szVal);
 		m_pPageState->m_pText_Class->SetString(szVal);
 	}
 
-	// 종족
+	// 종족 [Korean comment]
 	if(m_pPageState->m_pText_Race) 
 	{
 		CGameBase::GetTextByRace(pInfoBase->eRace, szVal);
 		m_pPageState->m_pText_Race->SetString(szVal);
 	}
 	
-	// 국가
+	// 국가 [Korean comment]
 	if(m_pPageState->m_pText_Nation)
 	{
 		CGameBase::GetTextByNation(pInfoBase->eNation, szVal);
@@ -1629,7 +1629,7 @@ void CUIVarious::UpdateAllStates(const __InfoPlayerBase* pInfoBase, const __Info
 	
 	m_pPageState->UpdateAttackPoint(pInfoExt->iAttack, pInfoExt->iAttack_Delta);
 	m_pPageState->UpdateGuardPoint(pInfoExt->iGuard, pInfoExt->iGuard_Delta);
-	m_pPageState->UpdateBonusPointAndButtons(pInfoExt->iBonusPointRemain);  // 보너스 포인트 적용이 가능한가??
+	m_pPageState->UpdateBonusPointAndButtons(pInfoExt->iBonusPointRemain);  // 보너스 포인트 적용이 가능한가?? [Korean comment]
 	
 	m_pPageState->UpdateStrength(pInfoExt->iStrength, pInfoExt->iStrength_Delta);
 	m_pPageState->UpdateStamina(pInfoExt->iStamina, pInfoExt->iStamina_Delta);
@@ -1644,10 +1644,10 @@ void CUIVarious::UpdateAllStates(const __InfoPlayerBase* pInfoBase, const __Info
 	m_pPageState->UpdateRegistLight(pInfoExt->iRegistLight, pInfoExt->iRegistLight_Delta);
 	m_pPageState->UpdateRegistPoison(pInfoExt->iRegistPoison, pInfoExt->iRegistPoison_Delta);
 
-	// 기사단 관련 정보 업데이트...
-	m_pPageState->UpdateRealmPoint(pInfoExt->iRealmPoint, pInfoExt->iRealmPointMonthly); // Edited by @Demircivi while integrating monthly np system.  // 국가 기여도는 10을 나누어서 표시
+	// 기사단 관련 정보 업데이트... Update
+	m_pPageState->UpdateRealmPoint(pInfoExt->iRealmPoint, pInfoExt->iRealmPointMonthly); // Edited by @Demircivi while integrating monthly np system.  // 국가 기여도는 10을 나누어서 표시 [Korean comment]
 
-	// 캐릭터 능력치 포인트 이미지 업데이트..
+	// 캐릭터 능력치 포인트 이미지 업데이트.. Update
 	if (m_pPageState->m_pImg_Str) m_pPageState->m_pImg_Str->SetVisible(false);
 	if (m_pPageState->m_pImg_Sta) m_pPageState->m_pImg_Sta->SetVisible(false);
 	if (m_pPageState->m_pImg_Dex) m_pPageState->m_pImg_Dex->SetVisible(false);

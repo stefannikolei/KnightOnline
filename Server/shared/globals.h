@@ -13,9 +13,9 @@ constexpr int MAX_NPC_NAME_SIZE	= 30;
 constexpr int MAX_PW_SIZE		= 12;
 constexpr int MAX_IP_SIZE		= 15;	// IPv4 addresses are max ###.###.###.### (3*4 + 3), or 15 bytes
 
-constexpr int MAX_ITEM_COUNT	= 9999;	// 한 슬롯에 가지는 최대 화살/송편 개수
+constexpr int MAX_ITEM_COUNT	= 9999;	// 한 슬롯에 가지는 최대 화살/송편 개수 Count
 constexpr int MAX_QUEST			= 100;
-constexpr int MAX_LEVEL			= 80;	// 최고렙...
+constexpr int MAX_LEVEL			= 80;	// 최고렙... [Korean comment]
 constexpr int MAX_GOLD			= 2'100'000'000;
 constexpr int VIEW_DISTANCE		= 48;
 
@@ -52,22 +52,22 @@ enum e_NpcType : uint8_t
 
 	NPC_GENERAL				= 1,
 	NPC_EVENT				= 2, // can only use regular attacks on them, damage output is always 20.
-	NPC_BOSS				= 3, // 대장 몬스터
+	NPC_BOSS				= 3, // 대장 몬스터 [Korean comment]
 	NPC_BOSS_MONSTER		= NPC_BOSS,
 
-	NPC_DUNGEON_MONSTER		= 4, // 던젼 몬스터
-	NPC_TRAP_MONSTER		= 5, // 함정 몬스터
+	NPC_DUNGEON_MONSTER		= 4, // 던젼 몬스터 [Korean comment]
+	NPC_TRAP_MONSTER		= 5, // 함정 몬스터 [Korean comment]
 	NPC_UNK_6				= 6,
 	NPC_REFUGEE				= 10,
-	NPC_GUARD				= 11, // 붙박이형 경비병
-	NPC_PATROL_GUARD		= 12, // 일반 필드에서 정찰을 담당하는 정찰병
-	NPC_STORE_GUARD			= 13, // 일반 필드에서 상점주변을 보호하는 경비병
+	NPC_GUARD				= 11, // 붙박이형 경비병 [Korean comment]
+	NPC_PATROL_GUARD		= 12, // 일반 필드에서 정찰을 담당하는 정찰병 [Korean comment]
+	NPC_STORE_GUARD			= 13, // 일반 필드에서 상점주변을 보호하는 경비병 [Korean comment]
 	NPC_WAR_GUARD			= 14,
 	NPC_PET					= 15,
 	NPC_GUARD_SUMMON		= 16,
 
 	NPC_MERCHANT			= 21, // 상점주인 NPC
-	NPC_TINKER				= 22, // 대장장이
+	NPC_TINKER				= 22, // 대장장이 [Korean comment]
 	NPC_SELITH				= 23, // Selith[special store]
 	NPC_ANVIL				= 24,
 	NPC_MARK				= 25,
@@ -96,15 +96,15 @@ enum e_NpcType : uint8_t
 	NPC_SENTINEL_PATRICK	= 47, // need to check which quests he handles (was it the beginner quests, or was that isaac?)
 	NPC_TRADER_KIM			= 48, // Offering Trader Kim
 	NPC_PRIEST_IRIS			= 49, // [Priest] Iris
-	NPC_GATE				= 50, // 성문 (6->50)
+	NPC_GATE				= 50, // 성문 (6->50) [Korean comment]
 	NPC_DOOR				= NPC_GATE,
 
-	NPC_PHOENIX_GATE		= 51, // 깨지지 않는 문 (8->51)
-	NPC_SPECIAL_GATE		= 52, // 깨지지 않는 문이면서 2분마다 열렸다 닫혔다 하는 문
+	NPC_PHOENIX_GATE		= 51, // 깨지지 않는 문 (8->51) [Korean comment]
+	NPC_SPECIAL_GATE		= 52, // 깨지지 않는 문이면서 2분마다 열렸다 닫혔다 하는 문 [Korean comment]
 	NPC_VICTORY_GATE		= 53,
-	NPC_GATE_LEVER			= 55, // 성문 레버...	(9->55)	
-	NPC_ARTIFACT			= 60, // 결계석 (7->60)
-	NPC_DESTROYED_ARTIFACT	= 61, // 파괴되는 결계석
+	NPC_GATE_LEVER			= 55, // 성문 레버...	(9->55)	 [Korean comment]
+	NPC_ARTIFACT			= 60, // 결계석 (7->60) [Korean comment]
+	NPC_DESTROYED_ARTIFACT	= 61, // 파괴되는 결계석 [Korean comment]
 	NPC_DESTORY_ARTIFACT	= NPC_DESTROYED_ARTIFACT,
 
 	NPC_GUARD_TOWER_NEW		= 62,

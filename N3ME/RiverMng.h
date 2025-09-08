@@ -54,16 +54,16 @@ public:
 protected:
 	std::list<CRiverMesh*>			m_RiverMeshes;				// River Mesh list
 	CRiverMesh*						m_pSelRiver;				// 선택된 RiverMesh
-	CTypedPtrArray<CPtrArray, __VertexXyzT2*>	m_SelVtxArray;	// 선택된 점들
+	CTypedPtrArray<CPtrArray, __VertexXyzT2*>	m_SelVtxArray;	// 선택된 점들 Select
 	CVtxPosDummy					m_VtxPosDummy;				// 점을 움직일수 있는 dummy object
-	BOOL							m_bEditMode;				// 강물 편집모드인가?
-	int								m_RCursorMode;				// 강을 추가?하는 것인가 점을 선택하는 것인가?
+	BOOL							m_bEditMode;				// 강물 편집모드인가? Mode
+	int								m_RCursorMode;				// 강을 추가?하는 것인가 점을 선택하는 것인가? Add
 
 	CMainFrame*						m_pMainFrm;					// mainframe pointer
 	CDlgRiverProperty*				m_pDlgProperty;				// property dialog
 
-	RECT							m_rcSelDrag;				// 드래그 영역
-	__VertexXyzColor				m_CreateLine[2];			// 강 처음 생성할때 보이는 선
+	RECT							m_rcSelDrag;				// 드래그 영역 [Korean comment]
+	__VertexXyzColor				m_CreateLine[2];			// 강 처음 생성할때 보이는 선 Create
 
 // Operations
 public:
@@ -73,22 +73,22 @@ public:
 	virtual bool	Load(HANDLE hFile);
 	virtual bool	Save(HANDLE hFile);
 
-	void			MakeGameFiles(HANDLE hFile, float fSize);				// Game file로 저장
+	void			MakeGameFiles(HANDLE hFile, float fSize);				// Game file로 저장 Save
 	CRiverMesh*		CreateNewRiverMesh(__Vector3& vPos1, __Vector3& vPos2,
-		__Vector3& vPos3, __Vector3& vPos4);								// 새로운 강을 추가한다.
-	void			RemoveRiverMesh(int iRiverID);							// 선택된 강을 삭제한다.
-	BOOL			MouseMsgFilter(LPMSG pMsg);								// Mouse 메세지 처리
+		__Vector3& vPos3, __Vector3& vPos4);								// 새로운 강을 추가한다. Add
+	void			RemoveRiverMesh(int iRiverID);							// 선택된 강을 삭제한다. Delete
+	BOOL			MouseMsgFilter(LPMSG pMsg);								// Mouse 메세지 처리 Process
 	BOOL			SetRiverID(CRiverMesh* pRiverMesh, int iRiverID);		// 강의 ID를 설정
 	void			SetEditMode(BOOL bEditMode);							// 강 EditMode설정
 	void			ExtrudeRiverEdge();
-	CRiverMesh*		GetRiverMesh(int iRiverID);								// RiverMesh 얻기
-	void			DeleteSelectedVertex();									// 선택된 점들 지우기
+	CRiverMesh*		GetRiverMesh(int iRiverID);								// RiverMesh 얻기 [Korean comment]
+	void			DeleteSelectedVertex();									// 선택된 점들 지우기 Select
 	void			ReCalcUV();												// 선택된 강의 UV좌표 다시 계산.
 	void			ReCalcSelectedVertex();
 
-	void			GoRiver(int iRiverID);									// 선택된 강으로 갑니다.
+	void			GoRiver(int iRiverID);									// 선택된 강으로 갑니다. Select
 protected:
-	void			SetSelRiver(CRiverMesh* pRiverMesh);					// RiverMesh 선택하기
+	void			SetSelRiver(CRiverMesh* pRiverMesh);					// RiverMesh 선택하기 Select
 	void			SelectVtxByDragRect(RECT* pRect, BOOL bAdd);
 
 };

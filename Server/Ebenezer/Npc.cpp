@@ -35,9 +35,9 @@ void CNpc::Initialize()
 {
 	m_pMain = (CEbenezerDlg*) AfxGetApp()->GetMainWnd();
 
-	m_sNid = -1;				// NPC (서버상의)일련번호
+	m_sNid = -1;				// NPC (서버상의)일련번호 [Korean comment]
 	m_sSid = 0;
-	m_sZoneIndex = -1;			// Current Zone Index(배열)
+	m_sZoneIndex = -1;			// Current Zone Index(배열) [Korean comment]
 	m_sCurZone = -1;			// Current Zone number
 	m_fCurX = 0;				// Current X Pos;
 	m_fCurY = 0;				// Current Y Pos;
@@ -52,7 +52,7 @@ void CNpc::Initialize()
 								// 0 : Normal Monster
 								// 1 : NPC
 								// 2 : 각 입구,출구 NPC
-								// 3 : 경비병
+								// 3 : 경비병 [Korean comment]
 	m_byGroup = 0;
 	m_byLevel = 0;
 	m_iSellingGroup = 0;
@@ -66,7 +66,7 @@ void CNpc::Initialize()
 	m_byGateOpen = 1;
 	m_sHitRate = 0;
 	m_byObjectType = NORMAL_OBJECT;
-	m_byDirection = 0;			// npc의 방향,,
+	m_byDirection = 0;			// npc의 방향,, [Korean comment]
 
 	m_byEvent = -1;				//  This is for the event.
 }
@@ -152,8 +152,8 @@ void CNpc::RegisterRegion()
 		m_sRegion_Z = iRegZ;
 		pMap->RegionNpcAdd(m_sRegion_X, m_sRegion_Z, m_sNid);
 
-		RemoveRegion(old_region_x - m_sRegion_X, old_region_z - m_sRegion_Z);	// delete npc 는 계산 방향이 진행방향의 반대...
-		InsertRegion(m_sRegion_X - old_region_x, m_sRegion_Z - old_region_z);	// add npc 는 계산 방향이 진행방향...
+		RemoveRegion(old_region_x - m_sRegion_X, old_region_z - m_sRegion_Z);	// delete npc 는 계산 방향이 진행방향의 반대... Calculate
+		InsertRegion(m_sRegion_X - old_region_x, m_sRegion_Z - old_region_z);	// add npc 는 계산 방향이 진행방향... Calculate
 	}
 }
 
@@ -171,7 +171,7 @@ void CNpc::RemoveRegion(int del_x, int del_z)
 	SetByte(buff, NPC_OUT, send_index);
 	SetShort(buff, m_sNid, send_index);
 
-	// x 축으로 이동되었을때...
+	// x 축으로 이동되었을때... Move
 	if (del_x != 0)
 	{
 		m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x * 2, m_sRegion_Z + del_z - 1);
@@ -181,12 +181,12 @@ void CNpc::RemoveRegion(int del_x, int del_z)
 		// TRACE(_T("Remove : (%d %d), (%d %d), (%d %d)\n"), m_sRegion_X+del_x*2, m_sRegion_Z+del_z-1, m_sRegion_X+del_x*2, m_sRegion_Z+del_z, m_sRegion_X+del_x*2, m_sRegion_Z+del_z+1 );
 	}
 
-	// z 축으로 이동되었을때...
+	// z 축으로 이동되었을때... Move
 	if (del_z != 0)
 	{
 		m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x, m_sRegion_Z + del_z * 2);
 
-		// x, z 축 둘다 이동되었을때 겹치는 부분 한번만 보낸다..
+		// x, z 축 둘다 이동되었을때 겹치는 부분 한번만 보낸다.. Move
 		if (del_x < 0)
 		{
 			m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x + 1, m_sRegion_Z + del_z * 2);
@@ -220,7 +220,7 @@ void CNpc::InsertRegion(int del_x, int del_z)
 	SetShort(buff, m_sNid, send_index);
 	GetNpcInfo(buff, send_index);
 
-	// x 축으로 이동되었을때...
+	// x 축으로 이동되었을때... Move
 	if (del_x != 0)
 	{
 		m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x, m_sRegion_Z - 1);
@@ -230,12 +230,12 @@ void CNpc::InsertRegion(int del_x, int del_z)
 		// TRACE(_T("Insert : (%d %d), (%d %d), (%d %d)\n"), m_sRegion_X+del_x, m_sRegion_Z-1, m_sRegion_X+del_x, m_sRegion_Z, m_sRegion_X+del_x, m_sRegion_Z+1 );
 	}
 
-	// z 축으로 이동되었을때...
+	// z 축으로 이동되었을때... Move
 	if (del_z != 0)
 	{
 		m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X, m_sRegion_Z + del_z);
 
-		// x, z 축 둘다 이동되었을때 겹치는 부분 한번만 보낸다..
+		// x, z 축 둘다 이동되었을때 겹치는 부분 한번만 보낸다.. Move
 		if (del_x < 0)
 		{
 			m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + 1, m_sRegion_Z + del_z);
@@ -256,7 +256,7 @@ void CNpc::InsertRegion(int del_x, int del_z)
 
 int CNpc::GetRegionNpcList(int region_x, int region_z, char* buff, int& t_count)
 {
-	// 포인터 참조하면 안됨
+	// 포인터 참조하면 안됨 [Korean comment]
 	if (!m_pMain->m_bPointCheckFlag)
 		return 0;
 

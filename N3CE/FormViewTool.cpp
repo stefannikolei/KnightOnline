@@ -99,12 +99,12 @@ void CFormViewTool::OnBMakeSmooth()
 			CN3Skin* pSkin = pPart->Skin(j);
 			if(nullptr == pSkin) continue;
 
-			pSkin->ReGenerateSmoothNormal(); // 법선 벡터를 만들고.. // 부드럽게 게산..
+			pSkin->ReGenerateSmoothNormal(); // 법선 벡터를 만들고.. // 부드럽게 게산.. [Korean comment]
 		}
 	}
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE); // 렌더링..
+	pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE); // 렌더링.. Rendering
 }
 
 void CFormViewTool::OnInitialUpdate() 
@@ -137,7 +137,7 @@ void CFormViewTool::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
 void CFormViewTool::OnSelchangeCbLod() 
 {
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE); // 렌더링..
+	pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE); // 렌더링.. Rendering
 }
 
 void CFormViewTool::OnBAddTestSound0() 
@@ -255,9 +255,9 @@ void CFormViewTool::OnSize(UINT nType, int cx, int cy)
 	if(m_ListSound0.GetSafeHwnd() != nullptr)
 	{
 		CRect rcOrg, rcClient;
-		m_ListSound0.GetWindowRect(rcOrg); // 그래프 컨트롤의 원래 화면 좌표를 
+		m_ListSound0.GetWindowRect(rcOrg); // 그래프 컨트롤의 원래 화면 좌표를  [Korean comment]
 		this->GetClientRect(rcClient); // 
-		this->ClientToScreen(rcClient); // 화면 좌표로 바꾸고..
+		this->ClientToScreen(rcClient); // 화면 좌표로 바꾸고.. [Korean comment]
 
 		int cx2 = rcClient.right - rcOrg.left - 5;
 		int cy2 = rcOrg.Height();
@@ -268,9 +268,9 @@ void CFormViewTool::OnSize(UINT nType, int cx, int cy)
 	if(m_ListSound1.GetSafeHwnd() != nullptr)
 	{
 		CRect rcOrg, rcClient;
-		m_ListSound1.GetWindowRect(rcOrg); // 그래프 컨트롤의 원래 화면 좌표를 
+		m_ListSound1.GetWindowRect(rcOrg); // 그래프 컨트롤의 원래 화면 좌표를  [Korean comment]
 		this->GetClientRect(rcClient); // 
-		this->ClientToScreen(rcClient); // 화면 좌표로 바꾸고..
+		this->ClientToScreen(rcClient); // 화면 좌표로 바꾸고.. [Korean comment]
 
 		int cx2 = rcClient.right - rcOrg.left - 5;
 		int cy2 = rcOrg.Height();

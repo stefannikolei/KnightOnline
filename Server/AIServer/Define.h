@@ -36,7 +36,7 @@ constexpr int USER_DAMAGE_OVERRIDE_TEST_MODE	= 10'000;
 
 #define MAX_WEAPON_NAME_SIZE	40
 #define MAX_ITEM			28
-#define VIEW_DIST			48		// 가시거리
+#define VIEW_DIST			48		// 가시거리 [Korean comment]
 
 ///////////////// NATION ///////////////////////////////////
 //
@@ -54,8 +54,8 @@ constexpr int USER_DAMAGE_OVERRIDE_TEST_MODE	= 10'000;
 //
 //	User Authority
 //
-#define MANAGER_USER	0	// 운영자, 관리자
-#define GENERAL_USER	1	// 일반유저
+#define MANAGER_USER	0	// 운영자, 관리자 [Korean comment]
+#define GENERAL_USER	1	// 일반유저 [Korean comment]
 
 // Npc InOut
 #define NPC_IN					0X01
@@ -130,12 +130,12 @@ struct _NpcMovePosition
 
 struct _OBJECT_EVENT
 {
-	int sBelong;			// 소속
-	short sIndex;			// 100 번대 - 카루스 바인드 포인트 | 200 번대 엘모라드 바인드 포인트 | 1100 번대 - 카루스 성문들 1200 - 엘모라드 성문들
-	short sType;			// 0 - 바인드 포인트.. 1 - 좌우로 열리는 성문 2 - 상하로 열리는 성문 3 - 레버
+	int sBelong;			// 소속 [Korean comment]
+	short sIndex;			// 100 번대 - 카루스 바인드 포인트 | 200 번대 엘모라드 바인드 포인트 | 1100 번대 - 카루스 성문들 1200 - 엘모라드 성문들 [Korean comment]
+	short sType;			// 0 - 바인드 포인트.. 1 - 좌우로 열리는 성문 2 - 상하로 열리는 성문 3 - 레버 [Korean comment]
 	short sControlNpcID;	// 조종할 NPC ID (조종할 Object Index)
 	short sStatus;			// status
-	float fPosX;			// 위치값
+	float fPosX;			// 위치값 Position
 	float fPosY;
 	float fPosZ;
 };
@@ -189,7 +189,7 @@ struct _OBJECT_EVENT
 //
 //	About Map Object
 //
-#define USER_BAND				0			// Map 위에 유저가 있다.
+#define USER_BAND				0			// Map 위에 유저가 있다. [Korean comment]
 #define NPC_BAND				10000		// Map 위에 NPC(몹포함)가 있다.
 #define INVALID_BAND			20000		// 잘못된 ID BAND
 
@@ -231,7 +231,7 @@ struct _OBJECT_EVENT
 
 #define ITEM_NAME_LENGTH		20
 #define MAX_THROW_ITEM			30000
-#define ITEM_MAX_USE_WEAR		13		// 아이템중 쓸수있는 속성들만 모아넣기위해, 이벤트 아이템과 구분
+#define ITEM_MAX_USE_WEAR		13		// 아이템중 쓸수있는 속성들만 모아넣기위해, 이벤트 아이템과 구분 [Korean comment]
 
 ////////////////////////////////////////////////////////////
 // Durability Type
@@ -250,16 +250,16 @@ const BYTE	ATTACK_MAX		=	80;
 
 #define		DAMAGE_DELAY_C_TIME	2000
 
-// 타격비별 성공률 //
-#define GREAT_SUCCESS			0X01		// 대성공
-#define SUCCESS					0X02		// 성공
-#define NORMAL					0X03		// 보통
-#define	FAIL					0X04		// 실패
+// 타격비별 성공률 // [Korean comment]
+#define GREAT_SUCCESS			0X01		// 대성공 [Korean comment]
+#define SUCCESS					0X02		// 성공 [Korean comment]
+#define NORMAL					0X03		// 보통 [Korean comment]
+#define	FAIL					0X04		// 실패 [Korean comment]
 
 //
 //	User Status Value
 //
-#define USER_ABILITY_NUM		5		// 기본 상태 능력치 종류
+#define USER_ABILITY_NUM		5		// 기본 상태 능력치 종류 Status
 
 #define USER_STR				0
 #define USER_CON				1
@@ -267,7 +267,7 @@ const BYTE	ATTACK_MAX		=	80;
 #define USER_VOL				3
 #define USER_WIS				4
 
-#define DIR_DOWN			0			// 각 보고있는 방향을 정의한다.
+#define DIR_DOWN			0			// 각 보고있는 방향을 정의한다. [Korean comment]
 #define	DIR_DOWNLEFT		1
 #define DIR_LEFT			2
 #define	DIR_UPLEFT			3
@@ -276,35 +276,35 @@ const BYTE	ATTACK_MAX		=	80;
 #define DIR_RIGHT			6
 #define	DIR_DOWNRIGHT		7
 
-#define NPC_EVENT_MOP		1000		// 이벤트 몹 번호
-#define NPC_MAGIC_ITEM		100			// 1~10000번을 기준
+#define NPC_EVENT_MOP		1000		// 이벤트 몹 번호 [Korean comment]
+#define NPC_MAGIC_ITEM		100			// 1~10000번을 기준 [Korean comment]
 #define NPC_RARE_ITEM		120			// 
 #define NPC_EVENT_CHANCE	20			// 이벤트 몹일경우 매직확률과 레어 확률울 올려준다. X 20 
 
 ////////////////////////////////////////////////////////////
 // Npc Type
-// Monster는 0부터 시작 10까지의 타입
+// Monster는 0부터 시작 10까지의 타입 Type
 #define NPCTYPE_MONSTER				0	// monster
-#define NPC_BOSS_MONSTER			3	// 대장 몬스터
-#define NPC_DUNGEON_MONSTER			4	// 던젼 몬스터
-#define NPC_TRAP_MONSTER			5	// 함정 몬스터
-// NPC는 11부터 시작
-#define NPC_GUARD					11	// 붙박이형 경비병
-#define NPC_PATROL_GUARD			12	// 일반 필드에서 정찰을 담당하는 정찰병
-#define NPC_STORE_GUARD				13	// 일반 필드에서 상점주변을 보호하는 경비병
+#define NPC_BOSS_MONSTER			3	// 대장 몬스터 [Korean comment]
+#define NPC_DUNGEON_MONSTER			4	// 던젼 몬스터 [Korean comment]
+#define NPC_TRAP_MONSTER			5	// 함정 몬스터 [Korean comment]
+// NPC는 11부터 시작 [Korean comment]
+#define NPC_GUARD					11	// 붙박이형 경비병 [Korean comment]
+#define NPC_PATROL_GUARD			12	// 일반 필드에서 정찰을 담당하는 정찰병 [Korean comment]
+#define NPC_STORE_GUARD				13	// 일반 필드에서 상점주변을 보호하는 경비병 [Korean comment]
 #define NPC_MERCHANT				21	// 상점주인 NPC 
-#define NPC_TINKER					22	// 대장장이
-#define NPC_WAREHOUSE				23	// 창고지기
+#define NPC_TINKER					22	// 대장장이 [Korean comment]
+#define NPC_WAREHOUSE				23	// 창고지기 Window
 #define NPC_CAPTAIN_NPC				35	// 전직 시켜주는 NPC
 #define NPC_KNIGHTS_NPC				36	// 기사단 관리 NPC
 #define NPC_CLERIC					37	// 대사제 NPC
 #define NPC_HEALER					40	// Healer
-#define NPC_DOOR					50	// 성문 (6->50)
-#define NPC_PHOENIX_GATE			51	// 깨지지 않는 문 (8->51)
-#define NPC_SPECIAL_GATE			52	// 깨지지 않는 문이면서 2분마다 열렸다 닫혔다 하는 문
-#define NPC_GATE_LEVER				55	// 성문 레버...	(9->55)	
-#define NPC_ARTIFACT				60	// 결계석 (7->60)
-#define NPC_DESTORY_ARTIFACT		61	// 파괴되는 결계석
+#define NPC_DOOR					50	// 성문 (6->50) [Korean comment]
+#define NPC_PHOENIX_GATE			51	// 깨지지 않는 문 (8->51) [Korean comment]
+#define NPC_SPECIAL_GATE			52	// 깨지지 않는 문이면서 2분마다 열렸다 닫혔다 하는 문 [Korean comment]
+#define NPC_GATE_LEVER				55	// 성문 레버...	(9->55)	 [Korean comment]
+#define NPC_ARTIFACT				60	// 결계석 (7->60) [Korean comment]
+#define NPC_DESTORY_ARTIFACT		61	// 파괴되는 결계석 [Korean comment]
 #define NPC_DOMESTIC_ANIMAL			99	// 가축 NPC
 ////////////////////////////////////////////////////////////
 
@@ -314,18 +314,18 @@ const BYTE	ATTACK_MAX		=	80;
 #define CASTING				0x02
 ////////////////////////////////////////////////////////////
 
-#define MORAL_SELF				1		// 나 자신..
-#define MORAL_FRIEND_WITHME		2		// 나를 포함한 우리편(국가) 중 하나 ..
-#define MORAL_FRIEND_EXCEPTME	3		// 나를 뺀 우리편 중 하나 
-#define MORAL_PARTY				4		// 나를 포함한 우리파티 중 하나..
-#define MORAL_NPC				5		// NPC중 하나.
-#define MORAL_PARTY_ALL			6		// 나를 호함한 파티 모두..
+#define MORAL_SELF				1		// 나 자신.. [Korean comment]
+#define MORAL_FRIEND_WITHME		2		// 나를 포함한 우리편(국가) 중 하나 .. [Korean comment]
+#define MORAL_FRIEND_EXCEPTME	3		// 나를 뺀 우리편 중 하나  [Korean comment]
+#define MORAL_PARTY				4		// 나를 포함한 우리파티 중 하나.. [Korean comment]
+#define MORAL_NPC				5		// NPC중 하나. [Korean comment]
+#define MORAL_PARTY_ALL			6		// 나를 호함한 파티 모두.. [Korean comment]
 #define MORAL_ENEMY				7		// 울편을 제외한 모든 적중 하나(NPC포함)
-#define MORAL_ALL				8		// 겜상에 존재하는 모든 것중 하나.
-#define MORAL_AREA_ENEMY		10		// 지역에 포함된 적
-#define MORAL_AREA_FRIEND		11		// 지역에 포함된 우리편
-#define MORAL_AREA_ALL			12		// 지역에 포함된 모두
-#define MORAL_SELF_AREA			13		// 나를 중심으로 한 지역
+#define MORAL_ALL				8		// 겜상에 존재하는 모든 것중 하나. [Korean comment]
+#define MORAL_AREA_ENEMY		10		// 지역에 포함된 적 [Korean comment]
+#define MORAL_AREA_FRIEND		11		// 지역에 포함된 우리편 [Korean comment]
+#define MORAL_AREA_ALL			12		// 지역에 포함된 모두 [Korean comment]
+#define MORAL_SELF_AREA			13		// 나를 중심으로 한 지역 [Korean comment]
 
 ////////////////////////////////////////////////////////////////
 // Magic Packet sub define 

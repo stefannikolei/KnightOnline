@@ -95,15 +95,15 @@ bool CUILogIn_1298::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		}
 		else if (pSender == m_pBtn_Connect)
 		{
-			CGameProcedure::s_pProcLogIn->ConnectToGameServer(); // 고른 게임 서버에 접속
+			CGameProcedure::s_pProcLogIn->ConnectToGameServer(); // 고른 게임 서버에 접속 [Korean comment]
 			return true;
 		}
 		else if (pSender == m_pBtn_Cancel)
 		{
-			PostQuitMessage(0);	// 종료...
+			PostQuitMessage(0);	// 종료... [Korean comment]
 			return true;
 		}
-		else if (pSender == m_pBtn_Option) // 옵션..
+		else if (pSender == m_pBtn_Option) // 옵션.. [Korean comment]
 		{
 			std::string szMsg = fmt::format_text_resource(IDS_CONFIRM_EXECUTE_OPTION);
 			CGameProcedure::MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_EXECUTE_OPTION);
@@ -584,7 +584,7 @@ void CUILogIn_1298::OpenServerList()
 void CUILogIn_1298::SetVisibleLogInUIs(bool bEnable)
 {
 	if (m_pGroup_LogIn != nullptr)
-		m_pGroup_LogIn->SetVisible(bEnable); // 로그인을 숨긴다..
+		m_pGroup_LogIn->SetVisible(bEnable); // 로그인을 숨긴다.. [Korean comment]
 }
 
 bool CUILogIn_1298::OnKeyPress(int iKey)

@@ -14,9 +14,9 @@
 // sungyong 2002.05.22
 typedef struct _SEND_DATA
 {
-	short   sCurZone;		// 현재의 존
-	short	sLength;		// 패킷의 길이
-	char	pBuf[2048];		// 패킷의 내용..
+	short   sCurZone;		// 현재의 존 [Korean comment]
+	short	sLength;		// 패킷의 길이 [Korean comment]
+	char	pBuf[2048];		// 패킷의 내용.. [Korean comment]
 } SEND_DATA;
 // ~sungyong 2002.05.22
 
@@ -62,7 +62,7 @@ public:
 	CIOCPSocket2** m_SockArray;
 	CIOCPSocket2** m_SockArrayInActive;
 
-	CIOCPSocket2** m_ClientSockArray;		// Connect용 소켓
+	CIOCPSocket2** m_ClientSockArray;		// Connect용 소켓 [Korean comment]
 
 	CRITICAL_SECTION	m_critSendData;	// sungyong~ 2002.05.22
 

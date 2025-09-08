@@ -34,7 +34,7 @@ DWORD WINAPI RecvUDPThread(LPVOID lp)
 			spdlog::error("UdpSocket::RecvUDPThread: winsock error [err={} ip={}]",
 				err, inet_ntoa(pUdp->m_ReplyAddress.sin_addr));
 
-			// 재전송 루틴...
+			// 재전송 루틴... [Korean comment]
 
 			Sleep(10);
 			continue;
@@ -273,12 +273,12 @@ void CUdpSocket::RecvBattleEvent(char* pBuf)
 		if (nResult == KARUS)
 		{
 			//TRACE(_T("--> UDP RecvBattleEvent : 카루스 땅으로 넘어갈 수 있어\n"));
-			m_pMain->m_byKarusOpenFlag = 1;		// 카루스 땅으로 넘어갈 수 있어
+			m_pMain->m_byKarusOpenFlag = 1;		// 카루스 땅으로 넘어갈 수 있어 [Korean comment]
 		}
 		else if (nResult == ELMORAD)
 		{
 			//TRACE(_T("--> UDP  RecvBattleEvent : 엘모 땅으로 넘어갈 수 있어\n"));
-			m_pMain->m_byElmoradOpenFlag = 1;	// 엘모 땅으로 넘어갈 수 있어
+			m_pMain->m_byElmoradOpenFlag = 1;	// 엘모 땅으로 넘어갈 수 있어 [Korean comment]
 		}
 	}
 	else if (nType == BATTLE_EVENT_RESULT)
@@ -300,8 +300,8 @@ void CUdpSocket::RecvBattleEvent(char* pBuf)
 
 		m_pMain->m_bVictory = nResult;
 		m_pMain->m_byOldVictory = nResult;
-		m_pMain->m_byKarusOpenFlag = 0;		// 카루스 땅으로 넘어갈 수 없도록
-		m_pMain->m_byElmoradOpenFlag = 0;	// 엘모 땅으로 넘어갈 수 없도록
+		m_pMain->m_byKarusOpenFlag = 0;		// 카루스 땅으로 넘어갈 수 없도록 [Korean comment]
+		m_pMain->m_byElmoradOpenFlag = 0;	// 엘모 땅으로 넘어갈 수 없도록 [Korean comment]
 		m_pMain->m_byBanishFlag = 1;
 	}
 	else if (nType == BATTLE_EVENT_MAX_USER)
@@ -362,7 +362,7 @@ void CUdpSocket::RecvBattleEvent(char* pBuf)
 
 			SetByte(send_buff, UDP_BATTLE_EVENT_PACKET, send_index);
 			SetByte(send_buff, BATTLE_EVENT_KILL_USER, send_index);
-			SetByte(send_buff, 2, send_index);						// karus의 정보 전송
+			SetByte(send_buff, 2, send_index);						// karus의 정보 전송 Info
 			SetShort(send_buff, m_pMain->m_sKarusDead, send_index);
 			SetShort(send_buff, m_pMain->m_sElmoradDead, send_index);
 			m_pMain->Send_UDP_All(send_buff, send_index);
@@ -445,7 +445,7 @@ void CUdpSocket::RecvCreateKnights(char* pBuf)
 
 	m_pMain->m_KnightsMap.PutData(pKnights->m_sIndex, pKnights);
 
-	// 클랜정보에 추가
+	// 클랜정보에 추가 Info
 	m_pMain->m_KnightsManager.AddKnightsUser(knightsindex, chiefname);
 
 	//TRACE(_T("UDP - RecvCreateKnights - knname=%hs, name=%hs, index=%d\n"), knightsname, chiefname, knightsindex);
@@ -469,16 +469,16 @@ void CUdpSocket::RecvJoinKnights(char* pBuf, BYTE command)
 	{
 		finalstr = fmt::format_db_resource(IDS_KNIGHTS_JOIN, charId);
 
-		// 클랜정보에 추가
+		// 클랜정보에 추가 Info
 		m_pMain->m_KnightsManager.AddKnightsUser(knightsId, charId);
 		spdlog::debug("UdpSocket::RecvJoinKnights: charId={} joined knightsId={}",
 			charId, knightsId);
 		
 	}
-	// 탈퇴..
+	// 탈퇴.. [Korean comment]
 	else
 	{
-		// 클랜정보에 추가
+		// 클랜정보에 추가 Info
 		m_pMain->m_KnightsManager.RemoveKnightsUser(knightsId, charId);
 
 		finalstr = fmt::format_db_resource(IDS_KNIGHTS_WITHDRAW, charId);
@@ -642,7 +642,7 @@ void CUdpSocket::RecvDestroyKnights(char* pBuf)
 
 	flag = pKnights->m_byFlag;
 
-	// 클랜이나 기사단이 파괴된 메시지를 보내고 유저 데이타를 초기화
+	// 클랜이나 기사단이 파괴된 메시지를 보내고 유저 데이타를 초기화 Initialize
 	if (flag == CLAN_TYPE)
 		finalstr = fmt::format_db_resource(IDS_CLAN_DESTORY, pKnights->m_strName);
 	else if (flag == KNIGHTS_TYPE)

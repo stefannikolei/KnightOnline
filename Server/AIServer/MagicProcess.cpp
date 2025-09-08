@@ -212,15 +212,15 @@ BYTE CMagicProcess::ExecuteType1(int magicid, int tid, int data1, int data2, int
 
 	if (!pNpc->SetDamage(magicid, damage, m_pSrcUser->m_strUserID, m_pSrcUser->m_iUserId + USER_BAND, m_pSrcUser->m_pIocport))
 	{
-		// Npc가 죽은 경우,,
-		pNpc->SendExpToUserList(); // 경험치 분배!!
+		// Npc가 죽은 경우,, [Korean comment]
+		pNpc->SendExpToUserList(); // 경험치 분배!! [Korean comment]
 		pNpc->SendDead(m_pSrcUser->m_pIocport);
 		//m_pSrcUser->SendAttackSuccess(tid, MAGIC_ATTACK_TARGET_DEAD, 0, pNpc->m_iHP);
 		m_pSrcUser->SendAttackSuccess(tid, ATTACK_TARGET_DEAD, damage, pNpc->m_iHP);
 	}
 	else
 	{
-		// 공격 결과 전송
+		// 공격 결과 전송 [Korean comment]
 		m_pSrcUser->SendAttackSuccess(tid, ATTACK_SUCCESS, damage, pNpc->m_iHP);
 	}
 //	}
@@ -294,8 +294,8 @@ BYTE CMagicProcess::ExecuteType2(int magicid, int tid, int data1, int data2, int
 				SetShort(send_buff, 0, send_index);
 
 			m_pMain->Send(send_buff, send_index, m_pSrcUser->m_curZone);
-			// Npc가 죽은 경우,,
-			pNpc->SendExpToUserList(); // 경험치 분배!!
+			// Npc가 죽은 경우,, [Korean comment]
+			pNpc->SendExpToUserList(); // 경험치 분배!! [Korean comment]
 			pNpc->SendDead(m_pSrcUser->m_pIocport);
 			m_pSrcUser->SendAttackSuccess(tid, MAGIC_ATTACK_TARGET_DEAD, damage, pNpc->m_iHP);
 			//m_pSrcUser->SendAttackSuccess(tid, ATTACK_TARGET_DEAD, damage, pNpc->m_iHP);
@@ -304,7 +304,7 @@ BYTE CMagicProcess::ExecuteType2(int magicid, int tid, int data1, int data2, int
 		}
 		else
 		{
-			// 공격 결과 전송
+			// 공격 결과 전송 [Korean comment]
 			m_pSrcUser->SendAttackSuccess(tid, ATTACK_SUCCESS, damage, pNpc->m_iHP);
 		}
 	}
@@ -346,7 +346,7 @@ void CMagicProcess::ExecuteType3(int magicid, int tid, int data1, int data2, int
 	if (pMagic == nullptr)
 		return;
 
-	// 지역 공격
+	// 지역 공격 [Korean comment]
 	if (tid == -1)
 	{
 		result = AreaAttack(3, magicid, moral, data1, data2, data3, dexpoint, righthand_damage);
@@ -393,7 +393,7 @@ void CMagicProcess::ExecuteType3(int magicid, int tid, int data1, int data2, int
 			{
 				damage = abs(damage);
 
-				// 기절시키는 마법이라면.....
+				// 기절시키는 마법이라면..... [Korean comment]
 				if (pType->Attribute == 3)
 					attack_type = 3;
 				else
@@ -401,14 +401,14 @@ void CMagicProcess::ExecuteType3(int magicid, int tid, int data1, int data2, int
 
 				if (!pNpc->SetDamage(attack_type, damage, m_pSrcUser->m_strUserID, m_pSrcUser->m_iUserId + USER_BAND, m_pSrcUser->m_pIocport))
 				{
-					// Npc가 죽은 경우,,
-					pNpc->SendExpToUserList(); // 경험치 분배!!
+					// Npc가 죽은 경우,, [Korean comment]
+					pNpc->SendExpToUserList(); // 경험치 분배!! [Korean comment]
 					pNpc->SendDead(m_pSrcUser->m_pIocport);
 					m_pSrcUser->SendAttackSuccess(tid, MAGIC_ATTACK_TARGET_DEAD, damage, pNpc->m_iHP, MAGIC_ATTACK);
 				}
 				else
 				{
-					// 공격 결과 전송
+					// 공격 결과 전송 [Korean comment]
 					m_pSrcUser->SendAttackSuccess(tid, ATTACK_SUCCESS, damage, pNpc->m_iHP, MAGIC_ATTACK);
 				}
 			}
@@ -431,7 +431,7 @@ void CMagicProcess::ExecuteType3(int magicid, int tid, int data1, int data2, int
 		{
 			damage = abs(damage);
 
-			// 기절시키는 마법이라면.....
+			// 기절시키는 마법이라면..... [Korean comment]
 			if (pType->Attribute == 3)
 				attack_type = 3;
 			else
@@ -439,14 +439,14 @@ void CMagicProcess::ExecuteType3(int magicid, int tid, int data1, int data2, int
 
 			if (!pNpc->SetDamage(attack_type, damage, m_pSrcUser->m_strUserID, m_pSrcUser->m_iUserId + USER_BAND, m_pSrcUser->m_pIocport))
 			{
-				// Npc가 죽은 경우,,
-				pNpc->SendExpToUserList(); // 경험치 분배!!
+				// Npc가 죽은 경우,, [Korean comment]
+				pNpc->SendExpToUserList(); // 경험치 분배!! [Korean comment]
 				pNpc->SendDead(m_pSrcUser->m_pIocport);
 				m_pSrcUser->SendAttackSuccess(tid, MAGIC_ATTACK_TARGET_DEAD, damage, pNpc->m_iHP);
 			}
 			else
 			{
-				// 공격 결과 전송
+				// 공격 결과 전송 [Korean comment]
 				m_pSrcUser->SendAttackSuccess(tid, ATTACK_SUCCESS, damage, pNpc->m_iHP);
 			}
 		}
@@ -495,7 +495,7 @@ void CMagicProcess::ExecuteType4(int magicid, int sid, int tid, int data1, int d
 	model::MagicType4* pType = nullptr;
 	CNpc* pNpc = nullptr;      // Pointer initialization!
 
-	// 지역 공격
+	// 지역 공격 [Korean comment]
 	if (tid == -1)
 	{
 		result = AreaAttack(4, magicid, moral, data1, data2, data3, 0, 0);
@@ -523,19 +523,19 @@ void CMagicProcess::ExecuteType4(int magicid, int sid, int tid, int data1, int d
 	// Depending on which buff-type it is.....
 	switch (pType->BuffType)
 	{
-		case 1:				// HP 올리기..
+		case 1:				// HP 올리기.. [Korean comment]
 			break;
 
-		case 2:				// 방어력 올리기..
+		case 2:				// 방어력 올리기.. [Korean comment]
 			break;
 
-		case 4:				// 공격력 올리기..
+		case 4:				// 공격력 올리기.. [Korean comment]
 			break;
 
-		case 5:				// 공격 속도 올리기..
+		case 5:				// 공격 속도 올리기.. [Korean comment]
 			break;
 
-		case 6:				// 이동 속도 올리기..
+		case 6:				// 이동 속도 올리기.. Move
 //			if (pNpc->m_MagicType4[pType->bBuffType-1].sDurationTime > 0) {
 //				result = 0 ;
 //				goto fail_return ;					
@@ -550,13 +550,13 @@ void CMagicProcess::ExecuteType4(int magicid, int sid, int tid, int data1, int d
 //			}
 			break;
 
-		case 7:				// 능력치 올리기...
+		case 7:				// 능력치 올리기... [Korean comment]
 			break;
 
-		case 8:				// 저항력 올리기...
+		case 8:				// 저항력 올리기... [Korean comment]
 			break;
 
-		case 9:				// 공격 성공율 및 회피 성공율 올리기..
+		case 9:				// 공격 성공율 및 회피 성공율 올리기.. [Korean comment]
 			break;
 
 		default:
@@ -991,11 +991,11 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 			vEnd.Set(pNpc->m_fCurX, pNpc->m_fCurY, pNpc->m_fCurZ);
 			fDis = pNpc->GetDistance(vStart, vEnd);
 
-			// NPC가 반경안에 있을 경우...
+			// NPC가 반경안에 있을 경우... [Korean comment]
 			if (fDis > fRadius)
 				continue;
 
-			// 타잎 3일 경우...
+			// 타잎 3일 경우... [Korean comment]
 			if (magictype == 3)
 			{
 				damage = GetMagicDamage(pNpc->m_sNid + NPC_BAND, target_damage, attribute, dexpoint, righthand_damage);
@@ -1008,13 +1008,13 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 				else
 				{
 					damage = abs(damage);
-					if (pType3->Attribute == 3)   attack_type = 3; // 기절시키는 마법이라면.....
+					if (pType3->Attribute == 3)   attack_type = 3; // 기절시키는 마법이라면..... [Korean comment]
 					else attack_type = magicid;
 
 					if (!pNpc->SetDamage(attack_type, damage, m_pSrcUser->m_strUserID, m_pSrcUser->m_iUserId + USER_BAND, m_pSrcUser->m_pIocport))
 					{
-						// Npc가 죽은 경우,,
-						pNpc->SendExpToUserList(); // 경험치 분배!!
+						// Npc가 죽은 경우,, [Korean comment]
+						pNpc->SendExpToUserList(); // 경험치 분배!! [Korean comment]
 						pNpc->SendDead(m_pSrcUser->m_pIocport);
 						m_pSrcUser->SendAttackSuccess(pNpc->m_sNid + NPC_BAND, MAGIC_ATTACK_TARGET_DEAD, damage, pNpc->m_iHP);
 					}
@@ -1027,7 +1027,7 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 				memset(send_buff, 0, sizeof(send_buff));
 				send_index = 0;
 
-				// 패킷 전송.....
+				// 패킷 전송..... [Korean comment]
 				//if ( pMagic->bType2 == 0 || pMagic->bType2 == 3 ) 
 				{
 					SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
@@ -1045,7 +1045,7 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 					m_pMain->Send(send_buff, send_index, m_pSrcUser->m_curZone);
 				}
 			}
-			// 타잎 4일 경우...
+			// 타잎 4일 경우... [Korean comment]
 			else if (magictype == 4)
 			{
 				memset(send_buff, 0, sizeof(send_buff));
@@ -1055,19 +1055,19 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 				// Depending on which buff-type it is.....
 				switch (pType4->BuffType)
 				{
-					case 1:				// HP 올리기..
+					case 1:				// HP 올리기.. [Korean comment]
 						break;
 
-					case 2:				// 방어력 올리기..
+					case 2:				// 방어력 올리기.. [Korean comment]
 						break;
 
-					case 4:				// 공격력 올리기..
+					case 4:				// 공격력 올리기.. [Korean comment]
 						break;
 
-					case 5:				// 공격 속도 올리기..
+					case 5:				// 공격 속도 올리기.. [Korean comment]
 						break;
 
-					case 6:				// 이동 속도 올리기..
+					case 6:				// 이동 속도 올리기.. Move
 						//if (pNpc->m_MagicType4[pType4->bBuffType-1].sDurationTime > 0) {
 						//	result = 0 ;
 						//}
@@ -1080,13 +1080,13 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 					//}
 						break;
 
-					case 7:				// 능력치 올리기...
+					case 7:				// 능력치 올리기... [Korean comment]
 						break;
 
-					case 8:				// 저항력 올리기...
+					case 8:				// 저항력 올리기... [Korean comment]
 						break;
 
-					case 9:				// 공격 성공율 및 회피 성공율 올리기..
+					case 9:				// 공격 성공율 및 회피 성공율 올리기.. [Korean comment]
 						break;
 
 					default:

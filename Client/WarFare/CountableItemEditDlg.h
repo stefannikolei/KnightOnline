@@ -33,8 +33,8 @@ public:
 	bool Load(HANDLE hFile);
 	void				SetVisibleWithNoSound(bool bVisible, bool bWork = false, bool bReFocus = false);
 	void				SetVisible(bool bVisible);
-	int					GetQuantity(); // "edit_trade" Edit Control 에서 정수값을 얻오온다..
-	void				SetQuantity(int iQuantity); // "edit_trade" Edit Control 에서 정수값을 문자열로 세팅한다..
+	int					GetQuantity(); // "edit_trade" Edit Control 에서 정수값을 얻오온다.. [Korean comment]
+	void				SetQuantity(int iQuantity); // "edit_trade" Edit Control 에서 정수값을 문자열로 세팅한다.. [Korean comment]
 
 	CCountableItemEditDlg();
 	virtual ~CCountableItemEditDlg();

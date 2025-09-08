@@ -89,7 +89,7 @@ BOOL EVENT::LoadEvent(int zone)
 
 			t_index = 0;
 
-			// 주석에 대한 처리
+			// 주석에 대한 처리 Process
 			if (buf[t_index] == ';'
 				|| buf[t_index] == '/')
 			{

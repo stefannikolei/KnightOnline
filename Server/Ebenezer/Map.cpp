@@ -125,7 +125,7 @@ BOOL C3DMap::LoadMap(HANDLE hFile)
 
 	LoadObjectEvent(hFile);
 	LoadMapTile(hFile);
-	LoadRegeneEvent(hFile);		// 이건 내가 추가했슴
+	LoadRegeneEvent(hFile);		// 이건 내가 추가했슴 Add
 	LoadWarpList(hFile);
 
 	if (!LoadEvent())
@@ -152,7 +152,7 @@ void C3DMap::LoadObjectEvent(HANDLE hFile)
 	for (int i = 0; i < iEventObjectCount; i++)
 	{
 		pEvent = new _OBJECT_EVENT;
-		ReadFile(hFile, &pEvent->sBelong, 4, &dwNum, nullptr);				// 소속 : 0 -> 무소속
+		ReadFile(hFile, &pEvent->sBelong, 4, &dwNum, nullptr);				// 소속 : 0 -> 무소속 [Korean comment]
 		ReadFile(hFile, &pEvent->sIndex, 2, &dwNum, nullptr);				// Event Index
 		ReadFile(hFile, &pEvent->sType, 2, &dwNum, nullptr);				// 0 : bind point, 1,2 : gate, 3 : lever, 4 : flag lever, 5 : Warp point
 		ReadFile(hFile, &pEvent->sControlNpcID, 2, &dwNum, nullptr);
@@ -258,7 +258,7 @@ void C3DMap::LoadWarpList(HANDLE hFile)
 void C3DMap::LoadTerrain(HANDLE hFile)
 {
 	DWORD dwRWC;
-	ReadFile(hFile, &m_nMapSize, sizeof(int), &dwRWC, nullptr);	// 가로세로 정보가 몇개씩인가?
+	ReadFile(hFile, &m_nMapSize, sizeof(int), &dwRWC, nullptr);	// 가로세로 정보가 몇개씩인가? Info
 	ReadFile(hFile, &m_fUnitDist, sizeof(float), &dwRWC, nullptr);
 
 	m_fHeight = new float* [m_nMapSize];
@@ -268,7 +268,7 @@ void C3DMap::LoadTerrain(HANDLE hFile)
 	for (int z = 0; z < m_nMapSize; z++)
 	{
 		for (int x = 0; x < m_nMapSize; x++)
-			ReadFile(hFile, &m_fHeight[x][z], sizeof(float), &dwRWC, nullptr);	// 높이값 읽어오기
+			ReadFile(hFile, &m_fHeight[x][z], sizeof(float), &dwRWC, nullptr);	// 높이값 읽어오기 [Korean comment]
 	}
 }
 
@@ -277,7 +277,7 @@ float C3DMap::GetHeight(float x, float y, float z)
 	int iX, iZ;
 	iX = (int) (x / m_fUnitDist);
 	iZ = (int) (z / m_fUnitDist);
-	//_ASSERT( iX, iZ가 범위내에 있는 값인지 체크하기);
+	//_ASSERT( iX, iZ가 범위내에 있는 값인지 체크하기); Check
 
 	float fYTerrain;
 	float h1, h2, h3;
@@ -304,7 +304,7 @@ float C3DMap::GetHeight(float x, float y, float z)
 
 			float h12 = h1 + (h2 - h1) * dX;	// h1과 h2사이의 높이값
 			float h32 = h3 + (h2 - h3) * dX;	// h3과 h2사이의 높이값
-			fYTerrain = h32 + (h12 - h32) * ((dZ) / (1.0f - dX));	// 찾고자 하는 높이값
+			fYTerrain = h32 + (h12 - h32) * ((dZ) / (1.0f - dX));	// 찾고자 하는 높이값 [Korean comment]
 		}
 		else
 		{
@@ -317,7 +317,7 @@ float C3DMap::GetHeight(float x, float y, float z)
 
 			float h12 = h1 + (h2 - h1) * dX;	// h1과 h2사이의 높이값
 			float h13 = h1 + (h3 - h1) * dX;	// h1과 h3사이의 높이값
-			fYTerrain = h13 + (h12 - h13) * ((1.0f - dZ) / (dX));	// 찾고자 하는 높이값
+			fYTerrain = h13 + (h12 - h13) * ((1.0f - dZ) / (dX));	// 찾고자 하는 높이값 [Korean comment]
 		}
 	}
 	else
@@ -332,7 +332,7 @@ float C3DMap::GetHeight(float x, float y, float z)
 
 			float h12 = h1 + (h2 - h1) * dX;	// h1과 h2사이의 높이값
 			float h32 = h3 + (h2 - h3) * dX;	// h3과 h2사이의 높이값
-			fYTerrain = h12 + (h32 - h12) * ((1.0f - dZ) / (1.0f - dX));	// 찾고자 하는 높이값
+			fYTerrain = h12 + (h32 - h12) * ((1.0f - dZ) / (1.0f - dX));	// 찾고자 하는 높이값 [Korean comment]
 		}
 		else
 		{
@@ -345,12 +345,12 @@ float C3DMap::GetHeight(float x, float y, float z)
 
 			float h12 = h1 + (h2 - h1) * dX;	// h1과 h2사이의 높이값
 			float h13 = h1 + (h3 - h1) * dX;	// h1과 h3사이의 높이값
-			fYTerrain = h12 + (h13 - h12) * ((dZ) / (dX));	// 찾고자 하는 높이값
+			fYTerrain = h12 + (h13 - h12) * ((dZ) / (dX));	// 찾고자 하는 높이값 [Korean comment]
 		}
 	}
 
 	__Vector3 vPos(x, y, z);
-	float fHeight = m_N3ShapeMgr.GetHeightNearstPos(vPos); // 가장 가까운 높이값을 돌려준다..
+	float fHeight = m_N3ShapeMgr.GetHeightNearstPos(vPos); // 가장 가까운 높이값을 돌려준다.. [Korean comment]
 	if (-FLT_MAX != fHeight
 		&& fHeight > fYTerrain)
 		return fHeight;

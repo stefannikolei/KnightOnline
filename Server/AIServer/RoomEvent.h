@@ -17,9 +17,9 @@ typedef CSTLMap <int>			mapNpcArray;
 
 struct _RoomEvent
 {
-	short	sNumber;			// 명령어, 조건문 번호
-	short	sOption_1;			// option 1 (몬스터의 번호를 주로 가지고 있음)
-	short	sOption_2;			// option 2 (몬스터의 마리수)
+	short	sNumber;			// 명령어, 조건문 번호 [Korean comment]
+	short	sOption_1;			// option 1 (몬스터의 번호를 주로 가지고 있음) [Korean comment]
+	short	sOption_2;			// option 2 (몬스터의 마리수) [Korean comment]
 };
 
 class CNpc;
@@ -31,21 +31,21 @@ public:
 	int     m_iZoneNumber;		// zone number
 	short	m_sRoomNumber;		// room number (0:empty room)
 	BYTE	m_byStatus;			// room status (1:init, 2:progress, 3:clear)
-	BYTE	m_byCheck;			// 조건문의 갯수
-	BYTE	m_byRoomType;		// 방의 타입(0:일반, 1:함정방, 2:,,,,)
+	BYTE	m_byCheck;			// 조건문의 갯수 [Korean comment]
+	BYTE	m_byRoomType;		// 방의 타입(0:일반, 1:함정방, 2:,,,,) Type
 
 	int		m_iInitMinX;		// room region x
 	int		m_iInitMinZ;
 	int		m_iInitMaxX;
 	int		m_iInitMaxZ;
 
-	int		m_iEndMinX;			// room end region x 도착지점,,
+	int		m_iEndMinX;			// room end region x 도착지점,, [Korean comment]
 	int		m_iEndMinZ;
 	int		m_iEndMaxX;
 	int		m_iEndMaxZ;
 
-	_RoomEvent  m_Logic[MAX_CHECK_EVENT];		// 조건들
-	_RoomEvent  m_Exec[MAX_CHECK_EVENT];		// 실행문
+	_RoomEvent  m_Logic[MAX_CHECK_EVENT];		// 조건들 [Korean comment]
+	_RoomEvent  m_Exec[MAX_CHECK_EVENT];		// 실행문 [Korean comment]
 
 	float   m_fDelayTime;						// time
 

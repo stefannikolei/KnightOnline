@@ -62,9 +62,9 @@ protected:
 	
 	std::vector<__GameServerInfo> m_ListServerInfos;
 
-	bool	m_bOpenningNow; // 위에서 아래로 스르륵...열려야 한다면..
+	bool	m_bOpenningNow; // 위에서 아래로 스르륵...열려야 한다면.. [Korean comment]
 	float 	m_fMoveDelta;
-	bool	m_bLogIn; // 로그인 중복 방지..
+	bool	m_bLogIn; // 로그인 중복 방지.. [Korean comment]
 
 public:
 	void SetRequestedLogIn(bool bLogIn) { m_bLogIn = bLogIn; }

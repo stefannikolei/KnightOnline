@@ -55,32 +55,32 @@ void CLightMgr::Release()
 	/////////////////////////////////////////////
 		
 	///////////////////////////////////////////////////////////////
-	// 기본 라이트 세팅
+	// 기본 라이트 세팅 [Korean comment]
 	D3DCOLORVALUE crLgt;
 
 	crLgt.a = 0.0f, crLgt.r = crLgt.g = crLgt.b = 0.8f;
-	CN3Light* pLightGlobal = new CN3Light(); // 전체를 비출 라이트..
+	CN3Light* pLightGlobal = new CN3Light(); // 전체를 비출 라이트.. [Korean comment]
 	pLightGlobal->m_Data.InitDirection(LGT_DEFAULT0, __Vector3(0,-1,0), crLgt);
 	m_pActiveLight[LGT_DEFAULT0] = pLightGlobal;
 
 
 	crLgt.a = 0.0f, crLgt.r = crLgt.g = crLgt.b = 0.5f;
-	CN3Light* pLightGlobal2 = new CN3Light(); // 반대 편에서 전체를 비출 라이트..
+	CN3Light* pLightGlobal2 = new CN3Light(); // 반대 편에서 전체를 비출 라이트.. [Korean comment]
 	pLightGlobal2->m_Data.InitDirection(LGT_DEFAULT1, __Vector3(0,1,0), crLgt);
 	m_pActiveLight[LGT_DEFAULT1] = pLightGlobal2;
 
 	crLgt.a = 0.0f, crLgt.r = crLgt.g = crLgt.b = 0.3f;
-	CN3Light* pLight = new CN3Light(); // 카메라와 붙어 다닌다...
+	CN3Light* pLight = new CN3Light(); // 카메라와 붙어 다닌다... [Korean comment]
 	pLight->m_Data.InitPoint(LGT_DEFAULT2, __Vector3(0,0,0), crLgt, 32.0f);
 	m_pActiveLight[LGT_DEFAULT2] = pLight;
-	// 기본 라이트 세팅
+	// 기본 라이트 세팅 [Korean comment]
 	///////////////////////////////////////////////////////////////	
 }
 
 void CLightMgr::Tick()
 {
 	int i;
-	//거리에 따라 추려내고...
+	//거리에 따라 추려내고... [Korean comment]
 	int NumSlotEmpty = 0;
 	float LimitLeft, LimitRight, LimitUp, LimitDown;
 	LimitLeft = CN3Base::s_CameraData.vEye.x - LIGHT_VALIDRANGE;
@@ -134,7 +134,7 @@ void CLightMgr::Tick()
 		else it++;
 	}
 
-	//tick돌려라..
+	//tick돌려라.. [Korean comment]
 	for(i=0;i<LGT_MAX;i++)
 	{
 		if(m_pActiveLight[i])

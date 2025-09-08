@@ -53,9 +53,9 @@ BOOL CPosDummy::MouseMsgFilter(LPMSG pMsg)
 			DWORD nFlags = pMsg->wParam;
 			if (m_pSelectedCube && (nFlags & MK_LBUTTON))
 			{
-				__Vector3 vRayDir, vRayOrig;	// 화면 중앙(시점)과 마우스 포인터를 이은 직선의 방향과 원점
-				__Vector3 vPN, vPV;	// 평면의 법선과 포함된 점
-				__Vector3 vPos;	// 위의 평면과 직선의 만나는 점(구할 점)
+				__Vector3 vRayDir, vRayOrig;	// 화면 중앙(시점)과 마우스 포인터를 이은 직선의 방향과 원점 [Korean comment]
+				__Vector3 vPN, vPV;	// 평면의 법선과 포함된 점 [Korean comment]
+				__Vector3 vPos;	// 위의 평면과 직선의 만나는 점(구할 점) [Korean comment]
 				__Vector3 vTmp;
 				__Vector3 vCameraDir = s_CameraData.vAt - s_CameraData.vEye;	vCameraDir.Normalize();
 				GetPickRay(point, vRayDir, vRayOrig);

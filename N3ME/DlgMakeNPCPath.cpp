@@ -134,7 +134,7 @@ BOOL CDlgMakeNPCPath::OnInitDialog()
 	char szLine[512] = "", szID[80] = "", szBuff[4][80] = {"", "", "", ""};
 	char szName[512] = "";
 	
-	//NPC종류에 관한 정의...
+	//NPC종류에 관한 정의... Type
 	char szNpcFileName[MAX_PATH];
 	wsprintf(szNpcFileName, "npclist\\npclist.txt");
 	FILE* stream = fopen(szNpcFileName, "r");
@@ -167,7 +167,7 @@ BOOL CDlgMakeNPCPath::OnInitDialog()
 		fclose(stream);
 	}
 
-	//NPC움직임에 관한 정의..
+	//NPC움직임에 관한 정의.. [Korean comment]
 	wsprintf(szNpcFileName, "npclist\\npcacttypelist.txt");
 	stream = fopen(szNpcFileName, "r");
 	if(stream)
@@ -201,8 +201,8 @@ BOOL CDlgMakeNPCPath::OnInitDialog()
 	m_NPCList.GetLBText(0, m_strSelNPCName);
 	m_iSelNPCID = (int)m_NPCList.GetItemData(0);
 
-	//m_ActTypeList.AddString("움직이는");
-	//m_ActTypeList.AddString("안움직이는");
+	//m_ActTypeList.AddString("움직이는"); [Korean comment]
+	//m_ActTypeList.AddString("안움직이는"); [Korean comment]
 	m_ActTypeList.SetCurSel(0);
 	m_iSelActType = (int)m_ActTypeList.GetItemData(0);
 

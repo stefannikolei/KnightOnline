@@ -5,30 +5,30 @@
 #include <shared/_USER_DATA.h>
 
 //////////////////// 직업별 Define ////////////////////
-constexpr int KARUWARRRIOR		= 101;		// 카루전사
-constexpr int KARUROGUE			= 102;		// 카루로그
-constexpr int KARUWIZARD		= 103;		// 카루마법
-constexpr int KARUPRIEST		= 104;		// 카루사제
-constexpr int BERSERKER			= 105;		// 버서커
-constexpr int GUARDIAN			= 106;		// 가디언
-constexpr int HUNTER			= 107;		// 헌터
-constexpr int PENETRATOR		= 108;		// 페너트레이터
-constexpr int SORSERER			= 109;		// 소서러
-constexpr int NECROMANCER		= 110;		// 네크로맨서
-constexpr int SHAMAN			= 111;		// 샤만
-constexpr int DARKPRIEST		= 112;		// 다크프리스트
-constexpr int ELMORWARRRIOR		= 201;		// 엘모전사
-constexpr int ELMOROGUE			= 202;		// 엘모로그
-constexpr int ELMOWIZARD		= 203;		// 엘모마법
-constexpr int ELMOPRIEST		= 204;		// 엘모사제
-constexpr int BLADE				= 205;		// 블레이드
-constexpr int PROTECTOR			= 206;		// 프로텍터
-constexpr int RANGER			= 207;		// 레인져
-constexpr int ASSASSIN			= 208;		// 어쌔신
-constexpr int MAGE				= 209;		// 메이지
-constexpr int ENCHANTER			= 210;		// 엔첸터
-constexpr int CLERIC			= 211;		// 클레릭
-constexpr int DRUID				= 212;		// 드루이드
+constexpr int KARUWARRRIOR		= 101;		// 카루전사 [Korean comment]
+constexpr int KARUROGUE			= 102;		// 카루로그 [Korean comment]
+constexpr int KARUWIZARD		= 103;		// 카루마법 [Korean comment]
+constexpr int KARUPRIEST		= 104;		// 카루사제 [Korean comment]
+constexpr int BERSERKER			= 105;		// 버서커 [Korean comment]
+constexpr int GUARDIAN			= 106;		// 가디언 [Korean comment]
+constexpr int HUNTER			= 107;		// 헌터 [Korean comment]
+constexpr int PENETRATOR		= 108;		// 페너트레이터 [Korean comment]
+constexpr int SORSERER			= 109;		// 소서러 [Korean comment]
+constexpr int NECROMANCER		= 110;		// 네크로맨서 [Korean comment]
+constexpr int SHAMAN			= 111;		// 샤만 [Korean comment]
+constexpr int DARKPRIEST		= 112;		// 다크프리스트 [Korean comment]
+constexpr int ELMORWARRRIOR		= 201;		// 엘모전사 [Korean comment]
+constexpr int ELMOROGUE			= 202;		// 엘모로그 [Korean comment]
+constexpr int ELMOWIZARD		= 203;		// 엘모마법 [Korean comment]
+constexpr int ELMOPRIEST		= 204;		// 엘모사제 [Korean comment]
+constexpr int BLADE				= 205;		// 블레이드 [Korean comment]
+constexpr int PROTECTOR			= 206;		// 프로텍터 [Korean comment]
+constexpr int RANGER			= 207;		// 레인져 [Korean comment]
+constexpr int ASSASSIN			= 208;		// 어쌔신 [Korean comment]
+constexpr int MAGE				= 209;		// 메이지 [Korean comment]
+constexpr int ENCHANTER			= 210;		// 엔첸터 [Korean comment]
+constexpr int CLERIC			= 211;		// 클레릭 [Korean comment]
+constexpr int DRUID				= 212;		// 드루이드 [Korean comment]
 /////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////
@@ -42,11 +42,11 @@ constexpr int BABARIAN			= 11;
 constexpr int ELMORAD_MAN		= 12;
 constexpr int ELMORAD_WOMAN		= 13;
 
-// 타격비별 성공률 //
-constexpr int GREAT_SUCCESS		= 1;	// 대성공
-constexpr int SUCCESS			= 2;	// 성공
-constexpr int NORMAL			= 3;	// 보통
-constexpr int FAIL				= 4;	// 실패 
+// 타격비별 성공률 // [Korean comment]
+constexpr int GREAT_SUCCESS		= 1;	// 대성공 [Korean comment]
+constexpr int SUCCESS			= 2;	// 성공 [Korean comment]
+constexpr int NORMAL			= 3;	// 보통 [Korean comment]
+constexpr int FAIL				= 4;	// 실패  [Korean comment]
 
 // Item Move Direction Define 
 enum e_ItemMoveDirection
@@ -72,22 +72,22 @@ enum e_WeaponType
 	WEAPON_LONGBOW		= 8,
 	WEAPON_LAUNCHER		= 10,
 	WEAPON_STAFF		= 11,
-	WEAPON_ARROW		= 12,	// 스킬 없음
-	WEAPON_JAVELIN		= 13,	// 스킬 없음
-	WEAPON_WORRIOR_AC	= 21,	// 스킬 없음
-	WEAPON_LOG_AC		= 22,	// 스킬 없음
-	WEAPON_WIZARD_AC	= 23,	// 스킬 없음
-	WEAPON_PRIEST_AC	= 24,	// 스킬 없음
+	WEAPON_ARROW		= 12,	// 스킬 없음 [Korean comment]
+	WEAPON_JAVELIN		= 13,	// 스킬 없음 [Korean comment]
+	WEAPON_WORRIOR_AC	= 21,	// 스킬 없음 [Korean comment]
+	WEAPON_LOG_AC		= 22,	// 스킬 없음 [Korean comment]
+	WEAPON_WIZARD_AC	= 23,	// 스킬 없음 [Korean comment]
+	WEAPON_PRIEST_AC	= 24,	// 스킬 없음 [Korean comment]
 };
 
 ////////////////////////////////////////////////////////////
 // User Status //
 enum e_UserStatus
 {
-	USER_STANDING				= 1,	// 서 있다.
-	USER_SITDOWN				= 2,	// 앉아 있다.
-	USER_DEAD					= 3,	// 듀거떠
-	USER_BLINKING				= 4		// 방금 살아났어!!!
+	USER_STANDING				= 1,	// 서 있다. [Korean comment]
+	USER_SITDOWN				= 2,	// 앉아 있다. [Korean comment]
+	USER_DEAD					= 3,	// 듀거떠 [Korean comment]
+	USER_BLINKING				= 4		// 방금 살아났어!!! [Korean comment]
 };
 ////////////////////////////////////////////////////////////
 
@@ -119,10 +119,10 @@ enum e_DurabilityType
 //#define TRAINEE				0x02
 #define PUNISH				0x01	
 
-#define CHIEF				0x01	// 단장
-#define VICECHIEF			0x02	// 부단장
-#define TRAINEE				0x05	// 멤버
-#define COMMAND_CAPTAIN		100		// 지휘권자
+#define CHIEF				0x01	// 단장 [Korean comment]
+#define VICECHIEF			0x02	// 부단장 [Korean comment]
+#define TRAINEE				0x05	// 멤버 [Korean comment]
+#define COMMAND_CAPTAIN		100		// 지휘권자 [Korean comment]
 ////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////
@@ -134,8 +134,8 @@ enum e_DurabilityType
 constexpr int MAX_CLAN			= 36;
 constexpr int MAX_KNIGHTS_BANK	= 200;
 
-constexpr int ITEM_GOLD			= 900000000;	// 돈 아이템 번호...
-constexpr int ITEM_NO_TRADE		= 900000001;	// 거래 불가 아이템들.... 비러머글 크리스마스 이밴트 >.<		
+constexpr int ITEM_GOLD			= 900000000;	// 돈 아이템 번호... [Korean comment]
+constexpr int ITEM_NO_TRADE		= 900000001;	// 거래 불가 아이템들.... 비러머글 크리스마스 이밴트 >.<		 [Korean comment]
 
 ////////////////////////////////////////////////////////////
 // EVENT TYPE DEFINE
@@ -267,14 +267,14 @@ struct _EXCHANGE_ITEM
 	int itemid;
 	int count;
 	short duration;
-	BYTE pos;			//  교환후 들어갈 자리..
+	BYTE pos;			//  교환후 들어갈 자리.. [Korean comment]
 	int64_t	nSerialNum;	// item serial code
 };
 
 struct	_PARTY_GROUP
 {
 	WORD wIndex;
-	short uid[8];		// 하나의 파티에 8명까지 가입가능
+	short uid[8];		// 하나의 파티에 8명까지 가입가능 [Korean comment]
 	short sMaxHp[8];
 	short sHp[8];
 	BYTE bLevel[8];
@@ -297,20 +297,20 @@ struct	_PARTY_GROUP
 
 struct _OBJECT_EVENT
 {
-	BYTE byLife;			// 1:살아있다, 0:켁,, 죽음
-	int sBelong;			// 소속
-	short sIndex;			// 100 번대 - 카루스 바인드 포인트 | 200 번대 엘모라드 바인드 포인트 | 1100 번대 - 카루스 성문들 1200 - 엘모라드 성문들
-	short sType;			// 0 - 바인드 포인트, 1 - 좌우로 열리는 성문, 2 - 상하로 열리는 성문, 3 - 레버, 4 - 깃발레버, 6:철창, 7-깨지는 부활비석
+	BYTE byLife;			// 1:살아있다, 0:켁,, 죽음 [Korean comment]
+	int sBelong;			// 소속 [Korean comment]
+	short sIndex;			// 100 번대 - 카루스 바인드 포인트 | 200 번대 엘모라드 바인드 포인트 | 1100 번대 - 카루스 성문들 1200 - 엘모라드 성문들 [Korean comment]
+	short sType;			// 0 - 바인드 포인트, 1 - 좌우로 열리는 성문, 2 - 상하로 열리는 성문, 3 - 레버, 4 - 깃발레버, 6:철창, 7-깨지는 부활비석 Window
 	short sControlNpcID;	// 조종할 NPC ID (조종할 Object Index), Type-> 5 : Warp Group ID
 	short sStatus;			// status
-	float fPosX;			// 위치값
+	float fPosX;			// 위치값 Position
 	float fPosY;
 	float fPosZ;
 };
 
 struct _REGENE_EVENT
 {
-	int	  sRegenePoint;		// 캐릭터 나타나는 지역 번호
+	int	  sRegenePoint;		// 캐릭터 나타나는 지역 번호 Character
 	float fRegenePosX;		// 캐릭터 나타나는 지역의 왼아래쪽 구석 좌표 X
 	float fRegenePosY;		// 캐릭터 나타나는 지역의 왼아래쪽 구석 좌표 Y
 	float fRegenePosZ;		// 캐릭터 나타나는 지역의 왼아래쪽 구석 좌표 Z
@@ -320,8 +320,8 @@ struct _REGENE_EVENT
 
 struct _KNIGHTS_USER
 {
-	BYTE    byUsed;								// 사용중 : 1, 비사용중 : 0
-	char	strUserName[MAX_ID_SIZE + 1];		// 캐릭터의 이름
+	BYTE    byUsed;								// 사용중 : 1, 비사용중 : 0 [Korean comment]
+	char	strUserName[MAX_ID_SIZE + 1];		// 캐릭터의 이름 Character
 };
 
 struct _ZONE_SERVERINFO

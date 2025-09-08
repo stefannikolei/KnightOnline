@@ -181,13 +181,13 @@ void CViewProperty::UpdateInfo()
 			if(pC->m_bFogUse) pItem->m_curValue = "On";
 			else pItem->m_curValue = "Off";
 		}
-//		pItem = m_LPCamera.GetPropItem("안개 밀도");
+//		pItem = m_LPCamera.GetPropItem("안개 밀도"); [Korean comment]
 //		if(pItem) pItem->m_curValue.Format("%f", pC->m_fFogDensity);
 		pItem = m_LPCamera.GetPropItem("안개 색");
 		if(pItem) pItem->D3DColorSet(pC->m_FogColor);
-//		pItem = m_LPCamera.GetPropItem("안개 시작");
+//		pItem = m_LPCamera.GetPropItem("안개 시작"); [Korean comment]
 //		if(pItem) pItem->m_curValue.Format("%f", pC->m_fFogStart);
-//		pItem = m_LPCamera.GetPropItem("안개 끝");
+//		pItem = m_LPCamera.GetPropItem("안개 끝"); [Korean comment]
 //		if(pItem) pItem->m_curValue.Format("%f", pC->m_fFogEnd);
 
 		m_LPCamera.Invalidate();
@@ -434,7 +434,7 @@ void CViewProperty::UpdateInfo()
 			}
 		}
 
-		// 붙이는 오브젝트(무기, 장신구 등...) 정보 표시
+		// 붙이는 오브젝트(무기, 장신구 등...) 정보 표시 Object
 		int nPlug = m_CBChrPlug.GetCurSel();
 		int nPlugCount = pC->PlugCount();
 		m_CBChrPlug.ResetContent();
@@ -806,7 +806,7 @@ BOOL CViewProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 //				else if(pItem->m_propName == "Plug Type") pPlug->m_Type = (e_PlugType)pItem->m_crColor;
 				else if(pItem->m_propName == "Plug Joint")
 				{
-					int nJI = atoi(pItem->m_curValue); // Joint Index 가 영역을 벗어나지 못하도록...
+					int nJI = atoi(pItem->m_curValue); // Joint Index 가 영역을 벗어나지 못하도록... [Korean comment]
 					int nJC = 0;
 					CN3Joint* pJ = pC->Joint();
 					if(pJ) pJ->NodeCount(nJC); // Joint Node Count;
@@ -885,15 +885,15 @@ void CViewProperty::OnInitialUpdate()
 		int nH = 0;
 		
 		/////////////////////////////////////
-		// Transform 등록 정보
+		// Transform 등록 정보 Info
 		m_LPTransform.AddPropItem("Position", "", PIT_EDIT, "");
 		m_LPTransform.AddPropItem("Rotation", "", PIT_EDIT, "");
 		m_LPTransform.AddPropItem("Scale", "", PIT_EDIT, "");
-		// Transform 등록 정보
+		// Transform 등록 정보 Info
 		/////////////////////////////////////
 
 		/////////////////////////////////////
-		// Camera 등록 정보
+		// Camera 등록 정보 Info
 		m_LPCamera.AddPropItem("Eye", "", PIT_EDIT, "");
 		m_LPCamera.AddPropItem("At", "", PIT_EDIT, "");
 		m_LPCamera.AddPropItem("Up", "", PIT_EDIT, "");
@@ -905,11 +905,11 @@ void CViewProperty::OnInitialUpdate()
 		m_LPCamera.AddPropItem("안개 색", "", PIT_COLOR, "");
 //		m_LPCamera.AddPropItem("안개 시작", "", PIT_EDIT, "");
 //		m_LPCamera.AddPropItem("안개 끝", "", PIT_EDIT, "");
-		// Camera 등록 정보
+		// Camera 등록 정보 Info
 		/////////////////////////////////////
 
 		/////////////////////////////////////
-		// Light 등록 정보
+		// Light 등록 정보 Info
 		m_LPLight.AddPropItem("On", "", PIT_EDIT, "");
 		m_LPLight.AddPropItem("Number", "", PIT_EDIT, "");
 		m_LPLight.AddPropItem("Type", "", PIT_COMBO, "Null|Point|Spot|Directional|");
@@ -921,7 +921,7 @@ void CViewProperty::OnInitialUpdate()
 		m_LPLight.AddPropItem("Attenuation0", "", PIT_EDIT, "");
 		m_LPLight.AddPropItem("Attenuation1", "", PIT_EDIT, "");
 		m_LPLight.AddPropItem("Attenuation2", "", PIT_EDIT, "");
-		// Light 등록 정보
+		// Light 등록 정보 Info
 		/////////////////////////////////////
 
 
@@ -929,7 +929,7 @@ void CViewProperty::OnInitialUpdate()
 		CString str, strTmp;
 
 		/////////////////////////////////////
-		// Material 등록 정보
+		// Material 등록 정보 Info
 		m_LPMaterial.AddPropItem("Render Flags", "0", PIT_EDIT, "", 0);
 		strTmp = "Null|D3DBLEND_ZERO|D3DBLEND_ONE|D3DBLEND_SRCCOLOR|D3DBLEND_INVSRCCOLOR|D3DBLEND_SRCALPHA|D3DBLEND_INVSRCALPHA|D3DBLEND_DESTALPHA|\
 	D3DBLEND_INVDESTALPHA|D3DBLEND_DESTCOLOR|D3DBLEND_INVDESTCOLOR|D3DBLEND_SRCALPHASAT|D3DBLEND_BOTHSRCALPHA|D3DBLEND_BOTHINVSRCALPHA|";
@@ -950,7 +950,7 @@ void CViewProperty::OnInitialUpdate()
 		m_LPMaterial.AddPropItem("Diffuse Color", "", PIT_COLOR, "");
 		m_LPMaterial.AddPropItem("Specular Color", "", PIT_COLOR, "");
 		m_LPMaterial.AddPropItem("Emissive Color", "", PIT_COLOR, "");
-		// Material 등록 정보
+		// Material 등록 정보 Info
 		/////////////////////////////////////
 
 		
@@ -983,7 +983,7 @@ void CViewProperty::OnInitialUpdate()
 
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// 캐릭터
+		// 캐릭터 Character
 		m_LPChr.AddPropItem("Joint File", "", PIT_FILE, "N3 Joint File(*.N3Joint)|*.N3Joint||");
 		m_LPChr.AddPropItem("Collision Mesh File", "", PIT_FILE, "N3 Vector Mesh(*.N3VMesh)|*.N3VMesh||");
 		m_LPChr.AddPropItem("Collision Mesh Delete", "Collision Mesh 삭제", PIT_BUTTON, "");
@@ -1003,18 +1003,18 @@ void CViewProperty::OnInitialUpdate()
 		m_CBChrLOD.SetCurSel(0);
 
 		m_LPCPart.AddPropItem("Part File", "", PIT_FILE, "N3 Character part file(*.N3CPart)|*.N3CPart||");
-//		m_LPCPart.AddPropItem("Part Type", "", PIT_COMBO, "머리카락|얼굴|상체|하체|손|발|??|");
+//		m_LPCPart.AddPropItem("Part Type", "", PIT_COMBO, "머리카락|얼굴|상체|하체|손|발|??|"); [Korean comment]
 		m_LPCPart.AddPropItem("Texture File", "", PIT_FILE, "Texture 로 쓸수 있는 그림 파일(*.DXT; *.BMP; *.TGA)|*.DXT; *.BMP; *.TGA|");
 
 		m_LPCPlug.AddPropItem("Plug Name", "", PIT_EDIT, "");
-//		m_LPCPlug.AddPropItem("Plug Type", "", PIT_COMBO, "오른손장착|왼손장착|양손장착");
+//		m_LPCPlug.AddPropItem("Plug Type", "", PIT_COMBO, "오른손장착|왼손장착|양손장착"); [Korean comment]
 		m_LPCPlug.AddPropItem("Plug Joint", "", PIT_EDIT, "");
 		m_LPCPlug.AddPropItem("Plug Mesh File", "", PIT_FILE, "N3 Progressive Mesh File(*.N3PMesh)|*.N3PMesh||");
 		m_LPCPlug.AddPropItem("Plug Texture File", "", PIT_FILE, "Texture 로 쓸수 있는 그림 파일(*.DXT; *.BMP; *.TGA)|*.DXT; *.BMP; *.TGA|");
 		m_LPCPlug.AddPropItem("Plug Offset", "", PIT_EDIT, "");
 		m_LPCPlug.AddPropItem("Plug Rotation", "Reset", PIT_BUTTON, "");
 		m_LPCPlug.AddPropItem("Plug Scale", "", PIT_EDIT, "");
-		// 캐릭터
+		// 캐릭터 Character
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		int nW = 100;

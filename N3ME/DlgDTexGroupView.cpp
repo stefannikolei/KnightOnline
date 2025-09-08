@@ -137,7 +137,7 @@ void CDlgDTexGroupView::OnSelchangedTreeDtexGroup(NMHDR* pNMHDR, LRESULT* pResul
 	HTREEITEM hChild = m_Tree.GetChildItem(hTree);
 	HTREEITEM hParent = m_Tree.GetParentItem(hTree);
 
-	if(hParent==nullptr)// 그 그룹의 대표적인 썸네일만 보여주자..
+	if(hParent==nullptr)// 그 그룹의 대표적인 썸네일만 보여주자.. [Korean comment]
 	{
 		hTree = m_Tree.GetChildItem(hTree);
 		hTree = m_Tree.GetChildItem(hTree);

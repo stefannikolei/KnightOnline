@@ -18,7 +18,7 @@ static char THIS_FILE[]=__FILE__;
 
 CPlayerOtherMgr::CPlayerOtherMgr()
 {
-	m_iChrCountToRender = 0; // 렌더링되는 캐릭 카운트
+	m_iChrCountToRender = 0; // 렌더링되는 캐릭 카운트 Rendering
 }
 
 CPlayerOtherMgr::~CPlayerOtherMgr()
@@ -78,7 +78,7 @@ void CPlayerOtherMgr::Tick(const __Vector3& vPosPlayer)
 		if(iLOD >= 0 && iLOD < MAX_CHR_LOD) iLODTotal += MAX_CHR_LOD - iLOD; // 자동 LOD 계산할때 필요한 값..
 
 		float fDist = pNPC->Distance(vPosPlayer);
-		if(fDist < SOUND_RANGE_TO_SET) pNPC->SetSoundAndInitFont(); // SOUND_RANGE 안에 있으면.
+		if(fDist < SOUND_RANGE_TO_SET) pNPC->SetSoundAndInitFont(); // SOUND_RANGE 안에 있으면. [Korean comment]
 		else if(fDist > SOUND_RANGE_TO_RELEASE) pNPC->ReleaseSoundAndFont();
 		it++;
 	}
@@ -106,20 +106,20 @@ void CPlayerOtherMgr::Tick(const __Vector3& vPosPlayer)
 			// get displayed
 
 			float fDist = pNPC->Distance(vPosPlayer);
-			if (fDist < SOUND_RANGE_TO_SET) pNPC->SetSoundAndInitFont(D3DFONT_BOLD); // SOUND_RANGE 안에 있으면.
+			if (fDist < SOUND_RANGE_TO_SET) pNPC->SetSoundAndInitFont(D3DFONT_BOLD); // SOUND_RANGE 안에 있으면. [Korean comment]
 			else if (fDist > SOUND_RANGE_TO_RELEASE) pNPC->ReleaseSoundAndFont();
 			it2++;
 		}
 		else
 		{
 			float fDist = pNPC->Distance(vPosPlayer);
-			if(fDist < SOUND_RANGE_TO_SET) pNPC->SetSoundAndInitFont(D3DFONT_BOLD); // SOUND_RANGE 안에 있으면.
+			if(fDist < SOUND_RANGE_TO_SET) pNPC->SetSoundAndInitFont(D3DFONT_BOLD); // SOUND_RANGE 안에 있으면. [Korean comment]
 			else if(fDist > SOUND_RANGE_TO_RELEASE) pNPC->ReleaseSoundAndFont();
 			it2++;
 		}
 	}
 
-	// 죽은놈 처리..
+	// 죽은놈 처리.. Process
 	CPlayerBase* pCorpse = nullptr;
 	it_NPC it3 = m_Corpses.begin(), itEnd3 = m_Corpses.end();
 	for(; it3 != itEnd3; )
@@ -131,10 +131,10 @@ void CPlayerOtherMgr::Tick(const __Vector3& vPosPlayer)
 		iLOD = pCorpse->LODLevel();
 		if(iLOD >= 0 && iLOD < MAX_CHR_LOD) iLODTotal += MAX_CHR_LOD - iLOD; // 자동 LOD 계산할때 필요한 값..
 
-		if(pCorpse->m_fTimeAfterDeath >= TIME_CORPSE_REMAIN) // 죽은지 일정한 시간이 지나면..
+		if(pCorpse->m_fTimeAfterDeath >= TIME_CORPSE_REMAIN) // 죽은지 일정한 시간이 지나면.. Time
 		{
 			delete pCorpse;
-			it3 = m_Corpses.erase(it3); // 죽은놈 지우고..
+			it3 = m_Corpses.erase(it3); // 죽은놈 지우고.. [Korean comment]
 		}
 		else
 		{
@@ -167,7 +167,7 @@ void CPlayerOtherMgr::Render(float fSunAngle)
 //		pUPC->Render(true, fSunAngle);
 //	}
 
-	// 카메라 거리순으로 정렬
+	// 카메라 거리순으로 정렬 [Korean comment]
 	int iUPCSize = m_UPCs.size();
 	if(iUPCSize > 0)
 	{
@@ -197,7 +197,7 @@ void CPlayerOtherMgr::Render(float fSunAngle)
 //		
 //		pNPC->Render(true, fSunAngle);
 //	}
-	// 카메라 거리순으로 정렬
+	// 카메라 거리순으로 정렬 [Korean comment]
 	int iNPCSize = m_NPCs.size();
 	if(iNPCSize > 0)
 	{
@@ -212,7 +212,7 @@ void CPlayerOtherMgr::Render(float fSunAngle)
 	}
 
 
-	// 죽은놈도 렌더링..
+	// 죽은놈도 렌더링.. Rendering
 //	CPlayerBase* pCorpse = nullptr;
 //	it_NPC it3 = m_Corpses.begin(), itEnd3 = m_Corpses.end();
 //	for(; it3 != itEnd3; it3++)
@@ -220,7 +220,7 @@ void CPlayerOtherMgr::Render(float fSunAngle)
 //		pCorpse = it3->second;
 //		pCorpse->Render(false, fSunAngle);
 //	}
-	// 카메라 거리순으로 정렬
+	// 카메라 거리순으로 정렬 [Korean comment]
 	int iCorpseSize = m_Corpses.size();
 	if(iCorpseSize > 0)
 	{
@@ -276,7 +276,7 @@ CPlayerOther* CPlayerOtherMgr::PickUPC(int ixScreen, int iyScreen, int& iIDResul
 
 	if(!m_UPCs.empty())
 	{
-		// 카메라 거리순으로 정렬
+		// 카메라 거리순으로 정렬 [Korean comment]
 		std::vector<CPlayerOther*> UPCs;
 		UPCs.reserve(m_UPCs.size());
 		it_UPC it = m_UPCs.begin(), itEnd = m_UPCs.end();
@@ -286,7 +286,7 @@ CPlayerOther* CPlayerOtherMgr::PickUPC(int ixScreen, int iyScreen, int& iIDResul
 		for (auto itr = UPCs.begin(); itr != UPCs.end(); ++itr)
 		{
 			auto pUPC = *itr;
-			if(pUPC->LODLevel() < 0 || pUPC->LODLevel() >= MAX_CHR_LOD) continue; // Level Of Detail 이 없는건 지나간다.
+			if(pUPC->LODLevel() < 0 || pUPC->LODLevel() >= MAX_CHR_LOD) continue; // Level Of Detail 이 없는건 지나간다. [Korean comment]
 
 			CN3VMesh* pvMesh = pUPC->m_Chr.CollisionMesh();
 			if(nullptr != pvMesh && pvMesh->Pick(pUPC->m_Chr.m_Matrix, vPos, vDir, pvPick)) 
@@ -309,7 +309,7 @@ CPlayerNPC* CPlayerOtherMgr::PickNPC(int ixScreen, int iyScreen, int& iIDResult,
 	
 	if(!m_NPCs.empty())
 	{
-		// 카메라 거리순으로 정렬
+		// 카메라 거리순으로 정렬 [Korean comment]
 		std::vector<CPlayerNPC*> NPCs;
 		it_NPC it = m_NPCs.begin(), itEnd = m_NPCs.end();
 		NPCs.reserve(m_NPCs.size());
@@ -319,7 +319,7 @@ CPlayerNPC* CPlayerOtherMgr::PickNPC(int ixScreen, int iyScreen, int& iIDResult,
 		for (auto itr = NPCs.begin(); itr != NPCs.end(); ++itr)
 		{
 			auto pNPC = *itr;
-			if(pNPC->LODLevel() < 0 || pNPC->LODLevel() >= MAX_CHR_LOD) continue; // Level Of Detail 이 없는건 지나간다.
+			if(pNPC->LODLevel() < 0 || pNPC->LODLevel() >= MAX_CHR_LOD) continue; // Level Of Detail 이 없는건 지나간다. [Korean comment]
 
 			CN3VMesh* pvMesh = nullptr;
 			__Matrix44* pMtx = nullptr;
@@ -357,7 +357,7 @@ CPlayerNPC* CPlayerOtherMgr::PickCorpse(int ixScreen, int iyScreen, int& iIDResu
 	::_Convert2D_To_3DCoordinate(ixScreen, iyScreen, s_CameraData.mtxView, s_CameraData.mtxProjection, s_CameraData.vp, vPos, vDir);
 
 
-	// 카메라 거리순으로 정렬
+	// 카메라 거리순으로 정렬 [Korean comment]
 	std::vector<CPlayerNPC*> Corpses;
 	Corpses.reserve(m_Corpses.size());
 	it_NPC it = m_Corpses.begin(), itEnd = m_Corpses.end();
@@ -367,7 +367,7 @@ CPlayerNPC* CPlayerOtherMgr::PickCorpse(int ixScreen, int iyScreen, int& iIDResu
 	for (auto itr = Corpses.begin(); itr != Corpses.end(); ++itr)
 	{
 		auto pCorpse = *itr;
-		if(pCorpse->LODLevel() < 0 || pCorpse->LODLevel() >= MAX_CHR_LOD) continue; // Level Of Detail 이 없는건 지나간다.
+		if(pCorpse->LODLevel() < 0 || pCorpse->LODLevel() >= MAX_CHR_LOD) continue; // Level Of Detail 이 없는건 지나간다. [Korean comment]
 
 		CN3VMesh* pvMesh = pCorpse->m_Chr.CollisionMesh();
 		if(nullptr != pvMesh && pvMesh->Pick(pCorpse->m_Chr.m_Matrix, vPos, vDir)) 
@@ -416,7 +416,7 @@ void CPlayerOtherMgr::CorpseRemove(CPlayerNPC *pCorpse, bool bRemoveImmediately)
 	if(pCorpse->m_fTimeAfterDeath >= TIME_CORPSE_REMAIN - TIME_CORPSE_REMOVE) return;
 
 	if(bRemoveImmediately)
-		pCorpse->m_fTimeAfterDeath = TIME_CORPSE_REMAIN; // 죽은 시간을 늘려서 바로 없애준다..
+		pCorpse->m_fTimeAfterDeath = TIME_CORPSE_REMAIN; // 죽은 시간을 늘려서 바로 없애준다.. Time
 	else
 		pCorpse->m_fTimeAfterDeath = TIME_CORPSE_REMAIN - TIME_CORPSE_REMOVE; // 자 이제 없어질 시간이다.. 나머지는 Tick 에서 한다..
 }
@@ -425,14 +425,14 @@ void CPlayerOtherMgr::CorpseAdd(CPlayerNPC* pNPC)
 {
 	if(nullptr == pNPC) return;
 	std::pair<it_NPC, bool> result = m_Corpses.insert(val_NPC(pNPC->IDNumber(), pNPC));
-	if(false == result.second) // 중복되었으면..
+	if(false == result.second) // 중복되었으면.. [Korean comment]
 	{
-		delete result.first->second; // 전의걸 지워주고..
-		result.first->second = pNPC; // 새로 포인터 넣는다...
+		delete result.first->second; // 전의걸 지워주고.. [Korean comment]
+		result.first->second = pNPC; // 새로 포인터 넣는다... [Korean comment]
 	}
 }
 
-CPlayerNPC*	CPlayerOtherMgr::CorpseGetNearstNPC(bool bMustHaveItem, e_Nation eNation, const __Vector3& vPosPlayer) // 가장 가까운 적 시체 가져오기..
+CPlayerNPC*	CPlayerOtherMgr::CorpseGetNearstNPC(bool bMustHaveItem, e_Nation eNation, const __Vector3& vPosPlayer) // 가장 가까운 적 시체 가져오기.. [Korean comment]
 {
 	CPlayerNPC* pTarget = nullptr;
 	float fDistMin = FLT_MAX, fDistTmp = 0;
@@ -460,23 +460,23 @@ void CPlayerOtherMgr::MoveToCorpsesForcely(CPlayerNPC* pNPC, bool bErase)
 	if(nullptr == pNPC) return;
 
 	int iID = pNPC->IDNumber();
-	pNPC->Action(PSA_DEATH, false, nullptr, true); // 강제로 죽인다..
-	if(bErase) pNPC->m_fTimeAfterDeath = TIME_CORPSE_REMAIN - 10.0f; // 죽은 시간을 세팅...
+	pNPC->Action(PSA_DEATH, false, nullptr, true); // 강제로 죽인다.. [Korean comment]
+	if(bErase) pNPC->m_fTimeAfterDeath = TIME_CORPSE_REMAIN - 10.0f; // 죽은 시간을 세팅... Time
 	else pNPC->m_fTimeAfterDeath = 0.1f;
 
-	it_UPC it = m_UPCs.find(iID); // User를 찾아보고...
+	it_UPC it = m_UPCs.find(iID); // User를 찾아보고... [Korean comment]
 	if(it != m_UPCs.end())
 	{
-		if( bErase ) //삭제일때는 시체로 만든다
-		{//중복으로 인해서 캐릭터를 시체로 만든다.
+		if( bErase ) //삭제일때는 시체로 만든다 Delete
+		{//중복으로 인해서 캐릭터를 시체로 만든다. Character
 			CPlayerOther* pUPC = it->second;
-			this->CorpseAdd(pUPC); // 시체로 만들고..
-			m_UPCs.erase(it); // 맵에서 지운다.
+			this->CorpseAdd(pUPC); // 시체로 만들고.. [Korean comment]
+			m_UPCs.erase(it); // 맵에서 지운다. [Korean comment]
 		}
 
 //		CPlayerOther* pUPC = it->second;
-//		this->CorpseAdd(pUPC); // 시체로 만들고..
-//		m_UPCs.erase(it); // 맵에서 지운다.
+//		this->CorpseAdd(pUPC); // 시체로 만들고.. [Korean comment]
+//		m_UPCs.erase(it); // 맵에서 지운다. [Korean comment]
 	}
 	else
 	{
@@ -484,13 +484,13 @@ void CPlayerOtherMgr::MoveToCorpsesForcely(CPlayerNPC* pNPC, bool bErase)
 		if(it2 != m_NPCs.end())
 		{
 			CPlayerNPC* pNPC = it2->second; 
-			this->CorpseAdd(pNPC); // 시체로 만들고..
-			m_NPCs.erase(it2); // 맵에서 지운다.
+			this->CorpseAdd(pNPC); // 시체로 만들고.. [Korean comment]
+			m_NPCs.erase(it2); // 맵에서 지운다. [Korean comment]
 		}
 	}
 }
 
-CPlayerNPC*	CPlayerOtherMgr::CharacterGetByNearestEnemy(e_Nation eNation, const __Vector3& vPosPlayer) // 가장 가까운 적 가져오기..
+CPlayerNPC*	CPlayerOtherMgr::CharacterGetByNearestEnemy(e_Nation eNation, const __Vector3& vPosPlayer) // 가장 가까운 적 가져오기.. [Korean comment]
 {
 	CPlayerNPC* pTarget = nullptr;
 	float fDistMin = FLT_MAX, fDistTmp = 0;
@@ -553,14 +553,14 @@ CPlayerNPC*	CPlayerOtherMgr::CharacterGetByNearestEnemy(e_Nation eNation, const 
 	return pTarget;
 }
 
-bool CPlayerOtherMgr::CharacterDelete(int iID) // User, NPC 안 가리고 지운다..
+bool CPlayerOtherMgr::CharacterDelete(int iID) // User, NPC 안 가리고 지운다.. [Korean comment]
 {
-	it_UPC it = m_UPCs.find(iID); // User를 찾아보고...
+	it_UPC it = m_UPCs.find(iID); // User를 찾아보고... [Korean comment]
 	if(it != m_UPCs.end())
 	{
 		CPlayerOther* pUPC = it->second;
 		delete pUPC;
-		m_UPCs.erase(it); // 맵에서 지운다.
+		m_UPCs.erase(it); // 맵에서 지운다. [Korean comment]
 		return true;
 	}
 
@@ -569,7 +569,7 @@ bool CPlayerOtherMgr::CharacterDelete(int iID) // User, NPC 안 가리고 지운
 	{
 		CPlayerNPC* pNPC = it2->second; 
 		delete pNPC;
-		m_NPCs.erase(it2); // 맵에서 지운다.
+		m_NPCs.erase(it2); // 맵에서 지운다. [Korean comment]
 		return true;
 	}
 
@@ -618,16 +618,16 @@ int CPlayerOtherMgr::SortByCameraDistance(const void* pArg1, const void* pArg2)
 
 void CPlayerOtherMgr::CorpseAdd(int iID)
 {
-	it_UPC it = m_UPCs.find(iID); // User를 찾아보고...
+	it_UPC it = m_UPCs.find(iID); // User를 찾아보고... [Korean comment]
 	if(it != m_UPCs.end())
 	{
 		CPlayerOther* pUPC = it->second;
 
-		pUPC->Action(PSA_DEATH, false, nullptr, true); // 강제로 죽인다..
-		pUPC->m_fTimeAfterDeath = TIME_CORPSE_REMAIN - 10.0f; // 죽은 시간을 세팅...
+		pUPC->Action(PSA_DEATH, false, nullptr, true); // 강제로 죽인다.. [Korean comment]
+		pUPC->m_fTimeAfterDeath = TIME_CORPSE_REMAIN - 10.0f; // 죽은 시간을 세팅... Time
 
-		this->CorpseAdd(pUPC); // 시체로 만들고..
-		m_UPCs.erase(it); // 맵에서 지운다.
+		this->CorpseAdd(pUPC); // 시체로 만들고.. [Korean comment]
+		m_UPCs.erase(it); // 맵에서 지운다. [Korean comment]
 	}
 }
 
@@ -639,9 +639,9 @@ CPlayerNPC* CPlayerOtherMgr::PickAllPrecisely(int ixScreen, int iyScreen, int &i
 	::_Convert2D_To_3DCoordinate(ixScreen, iyScreen, s_CameraData.mtxView, s_CameraData.mtxProjection, s_CameraData.vp, vPos, vDir);
 
 
-	CPlayerNPC* pNPC = nullptr; // NPC라기 보다는 캐릭터 포인터
+	CPlayerNPC* pNPC = nullptr; // NPC라기 보다는 캐릭터 포인터 Character
 
-	// 카메라 거리순으로 정렬
+	// 카메라 거리순으로 정렬 [Korean comment]
 	std::vector<CPlayerNPC*> NPCs;
 	std::vector<CPlayerNPC*> NUPCBufs;
 	if(!m_NPCs.empty() || !m_UPCs.empty())
@@ -663,7 +663,7 @@ CPlayerNPC* CPlayerOtherMgr::PickAllPrecisely(int ixScreen, int iyScreen, int &i
 	{
 		pNPC = *itr;
 		if(pNPC == nullptr) continue;
-		if(pNPC->LODLevel() < 0 || pNPC->LODLevel() >= MAX_CHR_LOD) continue; // Level Of Detail 이 없는건 지나간다.
+		if(pNPC->LODLevel() < 0 || pNPC->LODLevel() >= MAX_CHR_LOD) continue; // Level Of Detail 이 없는건 지나간다. [Korean comment]
 
 		CN3VMesh* pvMesh = nullptr;
 		__Matrix44* pMtx = nullptr;
@@ -703,7 +703,7 @@ CPlayerNPC* CPlayerOtherMgr::PickAllPrecisely(int ixScreen, int iyScreen, int &i
 ////////////////////////////////////////////////////////////////////////////
 //	NPC와 UPC를 따로 충돌체크를 하게 되면 UPC가 나와 가까이 있어도 
 //	뒤에 있는 NPC를 먼저 찾아내기 때문에 UPC와 NPC를 동시에 카메라에 정렬하여
-//	충돌 체크를 해줘야 정확한 캐릭터를 찾아 낼수가 있다.
+//	충돌 체크를 해줘야 정확한 캐릭터를 찾아 낼수가 있다. Check
 ////////////////////////////////////////////////////////////////////////////
 
 	if(NUPCBufs.size() == 1)
@@ -719,7 +719,7 @@ CPlayerNPC* CPlayerOtherMgr::PickAllPrecisely(int ixScreen, int iyScreen, int &i
 	for (auto itr = NUPCBufs.begin(); itr != NUPCBufs.end(); ++itr)
 	{
 		pNPC = *itr;
-		if(pNPC->LODLevel() < 0 || pNPC->LODLevel() >= MAX_CHR_LOD) continue; // Level Of Detail 이 없는건 지나간다.
+		if(pNPC->LODLevel() < 0 || pNPC->LODLevel() >= MAX_CHR_LOD) continue; // Level Of Detail 이 없는건 지나간다. [Korean comment]
 
 		CN3VMesh* pvMesh = nullptr;
 		__Matrix44* pMtx = nullptr;
@@ -748,18 +748,18 @@ CPlayerNPC* CPlayerOtherMgr::PickNPCPrecisely(int ixScreen, int iyScreen, int &i
 	
 	if(!m_NPCs.empty())
 	{
-		// 카메라 거리순으로 정렬
+		// 카메라 거리순으로 정렬 [Korean comment]
 		std::vector<CPlayerNPC*> NPCs;
 		it_NPC it = m_NPCs.begin(), itEnd = m_NPCs.end();
 		NPCs.reserve(m_NPCs.size());
 		for(; it != itEnd; it++) NPCs.push_back(it->second);
 		qsort(&(NPCs[0]), NPCs.size(), 4, SortByCameraDistance);
 
-		CPlayerNPC* pNPC = nullptr; // NPC 를 먼저 찍어본다...
+		CPlayerNPC* pNPC = nullptr; // NPC 를 먼저 찍어본다... [Korean comment]
 		for (auto itr = NPCs.begin(); itr != NPCs.end(); ++itr)
 		{
 			pNPC = *itr;
-			if(pNPC->LODLevel() < 0 || pNPC->LODLevel() >= MAX_CHR_LOD) continue; // Level Of Detail 이 없는건 지나간다.
+			if(pNPC->LODLevel() < 0 || pNPC->LODLevel() >= MAX_CHR_LOD) continue; // Level Of Detail 이 없는건 지나간다. [Korean comment]
 
 			CN3VMesh* pvMesh = nullptr;
 			__Matrix44* pMtx = nullptr;
@@ -803,7 +803,7 @@ CPlayerOther* CPlayerOtherMgr::PickUPCPrecisely(int ixScreen, int iyScreen, int 
 
 	if(!m_UPCs.empty())
 	{
-		// 카메라 거리순으로 정렬
+		// 카메라 거리순으로 정렬 [Korean comment]
 		std::vector<CPlayerOther*> UPCs;
 		UPCs.reserve(m_UPCs.size());
 		it_UPC it = m_UPCs.begin(), itEnd = m_UPCs.end();
@@ -814,7 +814,7 @@ CPlayerOther* CPlayerOtherMgr::PickUPCPrecisely(int ixScreen, int iyScreen, int 
 		for (auto itr = UPCs.begin(); itr != UPCs.end(); ++itr)
 		{
 			pUPC = *itr;
-			if(pUPC->LODLevel() < 0 || pUPC->LODLevel() >= MAX_CHR_LOD) continue; // Level Of Detail 이 없는건 지나간다.
+			if(pUPC->LODLevel() < 0 || pUPC->LODLevel() >= MAX_CHR_LOD) continue; // Level Of Detail 이 없는건 지나간다. [Korean comment]
 
 			if(pUPC->m_Chr.CheckCollisionPrecisely(ixScreen ,iyScreen, pvPick) != -1)
 			{

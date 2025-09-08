@@ -24,7 +24,7 @@ static char THIS_FILE[]=__FILE__;
 
 CLightObjMgr::CLightObjMgr()
 {
-	m_pRefMapMng = nullptr;				// 지형 참조 포인터..
+	m_pRefMapMng = nullptr;				// 지형 참조 포인터.. [Korean comment]
 	m_bActive = false;
 
 	m_iVersion = 1;
@@ -232,7 +232,7 @@ void CLightObjMgr::Render()
 	D3DXMATRIX mtx;
 	D3DXMatrixIdentity(&mtx);
 		
-	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtx); // 월드 행렬 적용..
+	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtx); // 월드 행렬 적용.. [Korean comment]
 	
 	// set texture
 	hr = s_lpD3DDev->SetTexture(0, nullptr);
@@ -253,7 +253,7 @@ void CLightObjMgr::Render()
 
 	hr = s_lpD3DDev->SetFVF(FVF_XYZCOLOR);
 
-	//이미 만들어진 라이트오브젝트 그리기...
+	//이미 만들어진 라이트오브젝트 그리기... Object
 	std::list<LIGHTOBJ*>::iterator it;
 	LIGHTOBJ* pLO;	
 	for(it = m_ListObj.begin(); it != m_ListObj.end(); it++)
@@ -265,14 +265,14 @@ void CLightObjMgr::Render()
 		hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 12, &(m_CubeVB[0]), sizeof(__VertexXyzColor));
 	}
 
-	//현재 만들고 있는 라이트오브젝트 그리기.
+	//현재 만들고 있는 라이트오브젝트 그리기. Object
 	if(m_pCurrLO && m_pCurrLO->pRefLight)
 	{
 		MakeCube(m_pCurrLO->pRefLight->Pos(), 0xffff0000);
 		hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 12, &(m_CubeVB[0]), sizeof(__VertexXyzColor));		
 	}
 		
-	//다이얼로그 창에서 선택된 길 그리기..
+	//다이얼로그 창에서 선택된 길 그리기.. Window
 	pLO = m_pDlg->m_pSelLO;
 	if(pLO)
 	{

@@ -86,7 +86,7 @@ protected:
 	std::vector<__GameServerInfo> m_ListServerInfos;
 
 	bool	m_bIsNewsVisible;
-	bool	m_bLogIn; // 로그인 중복 방지..
+	bool	m_bLogIn; // 로그인 중복 방지.. [Korean comment]
 	int		m_iSelectedServerIndex;
 	std::string m_strNoticeText;
 public:

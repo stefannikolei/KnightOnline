@@ -32,7 +32,7 @@ public:
 
 	void	PutData(char* pData, int len);
 	void	GetData(char* pData, int len);
-	int		GetOutData(char* pData); //HeadPos, 변화
+	int		GetOutData(char* pData); //HeadPos, 변화 [Korean comment]
 	void	PutData(char& data);
 	char& GetHeadData() {
 		return m_pBuffer[m_iHeadPos];

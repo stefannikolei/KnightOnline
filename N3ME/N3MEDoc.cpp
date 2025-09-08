@@ -48,7 +48,7 @@ BOOL CN3MEDoc::OnNewDocument()
 	// (SDI documents will reuse this document)
 
 	// 맨 처음 실행할때 AfxGetMainWnd()함수가 CMainFrame* 을 넘겨주지 않고
-	// ActiveWindow()를 넘겨주기 때문에 아래 방식을 사용
+	// ActiveWindow()를 넘겨주기 때문에 아래 방식을 사용 [Korean comment]
 	CWinThread* pThread = AfxGetThread();
 	if (pThread)
 	{

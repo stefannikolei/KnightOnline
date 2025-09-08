@@ -94,7 +94,7 @@ BOOL CN3TexViewerDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	if (!CDocument::OnOpenDocument(lpszPathName))
 		return FALSE;
 
-	this->FindFiles(); // 파일을 찾고..
+	this->FindFiles(); // 파일을 찾고.. File
 	
 	// TODO: Add your specialized creation code here
 	m_pTexAlpha->Release();
@@ -102,7 +102,7 @@ BOOL CN3TexViewerDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		return FALSE;
 	
 	////////////////////////////////////////////////////////////////////////////////
-	// Alpha Texture 생성...
+	// Alpha Texture 생성... Create
 	m_pTexAlpha->Create(m_pTex->Width(), m_pTex->Height(), D3DFMT_A8R8G8B8, FALSE);
 	LPDIRECT3DSURFACE9 lpSurf, lpSurf2;
 	if(m_pTexAlpha->Get())
@@ -129,7 +129,7 @@ BOOL CN3TexViewerDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		lpSurf->UnlockRect();
 		lpSurf->Release(); lpSurf = nullptr;
 	}
-	// Alpha Texture 생성...
+	// Alpha Texture 생성... Create
 	////////////////////////////////////////////////////////////////////////////////
 
 	char szDrv[_MAX_DRIVE], szDir[_MAX_DIR], szFN[_MAX_FNAME], szExt[_MAX_EXT];

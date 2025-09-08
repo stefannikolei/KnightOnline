@@ -112,7 +112,7 @@ bool CTblEditorBase::LoadFile(
 	}
 
 	::WriteFile(hFile, pDatas, dwSizeLow, &dwRWC, nullptr); // write encrypted data into temporary file
-	CloseHandle(hFile); // 임시 파일 닫기
+	CloseHandle(hFile); // 임시 파일 닫기 File
 	delete[] pDatas;
 	pDatas = nullptr;
 

@@ -34,10 +34,10 @@ void CGameProcOption::Release()
 
 void CGameProcOption::Render()
 {
-	CGameProcedure::Render(); // UI 나 그밖의 기본적인 것들 렌더링..
+	CGameProcedure::Render(); // UI 나 그밖의 기본적인 것들 렌더링.. Rendering
 }
 
 void CGameProcOption::Tick()
 {
-	CGameProcedure::Tick();	// 키, 마우스 입력 등등..
+	CGameProcedure::Tick();	// 키, 마우스 입력 등등.. [Korean comment]
 }

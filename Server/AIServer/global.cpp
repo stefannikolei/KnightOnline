@@ -192,7 +192,7 @@ int myrand(int min, int max, BOOL bSame)
 }
 
 ///////////////////////////////////////////////////////////////////////////
-//	XdY 형식의 주사위 굴리기
+//	XdY 형식의 주사위 굴리기 [Korean comment]
 //
 int XdY(int x, int y)
 {

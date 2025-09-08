@@ -51,14 +51,14 @@ struct  _NpcSkillList
 struct  _NpcGiveItem
 {
 	int 	sSid;			// item serial number
-	short	count;			// item 갯수(돈은 단위)
+	short	count;			// item 갯수(돈은 단위) [Korean comment]
 };
 
 struct	_ExpUserList
 {
-	char	strUserID[MAX_ID_SIZE + 1];		// 아이디(캐릭터 이름)
+	char	strUserID[MAX_ID_SIZE + 1];		// 아이디(캐릭터 이름) Character
 	int		iUid;							// User uid
-	int		nDamage;						// 타격치 합
+	int		nDamage;						// 타격치 합 [Korean comment]
 	BOOL	bIs;							// 시야에 존재하는지를 판단(true:존재)
 	//BOOL	bSameParty;						// 같은 파티 소속이 있다면 TRUE, 그렇지 않으면 FALSE
 };
@@ -91,24 +91,24 @@ struct _PathList
 
 struct _MagicType3
 {
-	short		sHPAttackUserID;	// 지속 마법을 사용한 유저의 아이디 저장
+	short		sHPAttackUserID;	// 지속 마법을 사용한 유저의 아이디 저장 Save
 	short		sHPAmount;			// 지속 damage ( 지속총양 / (지속시간 / 2) )
-	BYTE		byHPDuration;		// 지속 시간
-	BYTE		byHPInterval;		// 지속 간격
-	float		fStartTime;			// 지속이 시작되는 시간..
+	BYTE		byHPDuration;		// 지속 시간 Time
+	BYTE		byHPInterval;		// 지속 간격 [Korean comment]
+	float		fStartTime;			// 지속이 시작되는 시간.. Time
 };
 
 struct _MagicType4
 {
-	BYTE	byAmount;			// 양
-	short	sDurationTime;		// 지속 시간
-	float   fStartTime;			// 지속이 시작되는 시간..
+	BYTE	byAmount;			// 양 [Korean comment]
+	short	sDurationTime;		// 지속 시간 Time
+	float   fStartTime;			// 지속이 시작되는 시간.. Time
 };
 
 struct _TargetHealer
 {
 	short	sNID;				// npc nid
-	short	sValue;				// 점수
+	short	sValue;				// 점수 [Korean comment]
 };
 
 class CServerDlg;
@@ -125,33 +125,33 @@ public:
 	CServerDlg* m_pMain;
 	CNpcMagicProcess m_MagicProcess;
 
-	_Target	m_Target;				// 공격할 유저 저장,,
-	short		m_ItemUserLevel;		// 죽을때 매직 이상 아이템를 떨구기위해 참조해야하는 유저의레벨
+	_Target	m_Target;				// 공격할 유저 저장,, Save
+	short		m_ItemUserLevel;		// 죽을때 매직 이상 아이템를 떨구기위해 참조해야하는 유저의레벨 [Korean comment]
 
-	int		m_TotalDamage;	// 총 누적된 대미지양
+	int		m_TotalDamage;	// 총 누적된 대미지양 [Korean comment]
 
 	/// \brief List of user information that has dealt damage to the npc.
 	/// Used for experience point distribution
 	_ExpUserList m_DamagedUserList[NPC_HAVE_USER_LIST];
 	
-	short   m_sMaxDamageUserid;		// 나에게 최고의 데미지를 준 유저의 아이디 저장..
+	short   m_sMaxDamageUserid;		// 나에게 최고의 데미지를 준 유저의 아이디 저장.. Save
 
-	_PathList m_PathList;			// Npc의 패스 리스트 
-	_PattenPos m_pPattenPos;		// Npc의 패턴,,
+	_PathList m_PathList;			// Npc의 패스 리스트  [Korean comment]
+	_PattenPos m_pPattenPos;		// Npc의 패턴,, [Korean comment]
 
-	//int m_iPattenNumber;		// 현재의 패턴번호
-	short m_iPattenFrame;			// 패턴의 현재 위치..
+	//int m_iPattenNumber;		// 현재의 패턴번호 [Korean comment]
+	short m_iPattenFrame;			// 패턴의 현재 위치.. Position
 
-	BYTE  m_byMoveType;			// NPC의 행동타입(이동관련)
-	BYTE  m_byInitMoveType;		// NPC의 초기 행동타입(이동관련)
+	BYTE  m_byMoveType;			// NPC의 행동타입(이동관련) Type
+	BYTE  m_byInitMoveType;		// NPC의 초기 행동타입(이동관련) Type
 	short m_sPathCount;			// NPC의 PathList Count
 	short m_sMaxPathCount;		// NPC의 PathList Max Count
 
-	BOOL	m_bFirstLive;		// NPC 가 처음 생성되는지 죽었다 살아나는지 판단.
-	BYTE	m_NpcState;			// NPC의 상태 - 살았다, 죽었다, 서있다 등등...
-	short	m_ZoneIndex;		// NPC 가 존재하고 있는 존의 인덱스
+	BOOL	m_bFirstLive;		// NPC 가 처음 생성되는지 죽었다 살아나는지 판단. Create
+	BYTE	m_NpcState;			// NPC의 상태 - 살았다, 죽었다, 서있다 등등... Status
+	short	m_ZoneIndex;		// NPC 가 존재하고 있는 존의 인덱스 Index
 
-	short	m_sNid;				// NPC (서버상의)일련번호
+	short	m_sNid;				// NPC (서버상의)일련번호 [Korean comment]
 
 	CMapInfo** m_pOrgMap;		// 원본 MapInfo 에 대한 포인터
 
@@ -188,75 +188,75 @@ public:
 	CPathFind m_vPathFind;
 	_PathNode* m_pPath;
 
-	int		m_nInitMinX;					// 초기위치
+	int		m_nInitMinX;					// 초기위치 Position
 	int		m_nInitMinY;
 	int		m_nInitMaxX;
 	int		m_nInitMaxY;
 
 	// NPC Class, Skill
-	//_NpcSkillList	m_NpcSkill[SKILL_NUM];	// NPC 가 가지고 있는 스킬
-	//BYTE			m_tWeaponClass;			// NPC 의 무기 클래스 
+	//_NpcSkillList	m_NpcSkill[SKILL_NUM];	// NPC 가 가지고 있는 스킬 [Korean comment]
+	//BYTE			m_tWeaponClass;			// NPC 의 무기 클래스  [Korean comment]
 
-	// 지속 마법 관련..
-	float		m_fHPChangeTime;			// Hp 회복율
-	float       m_fFaintingTime;			// 기절해 있는 시간..
-	_MagicType3  m_MagicType3[MAX_MAGIC_TYPE3];			// HP 관련된 마법..
-	_MagicType4  m_MagicType4[MAX_MAGIC_TYPE4];			// 능력치 관련된 마법..
+	// 지속 마법 관련.. [Korean comment]
+	float		m_fHPChangeTime;			// Hp 회복율 [Korean comment]
+	float       m_fFaintingTime;			// 기절해 있는 시간.. Time
+	_MagicType3  m_MagicType3[MAX_MAGIC_TYPE3];			// HP 관련된 마법.. [Korean comment]
+	_MagicType4  m_MagicType4[MAX_MAGIC_TYPE4];			// 능력치 관련된 마법.. [Korean comment]
 
 	//----------------------------------------------------------------
-	//	MONSTER DB 쪽에 있는 변수들
+	//	MONSTER DB 쪽에 있는 변수들 Variable
 	//----------------------------------------------------------------
 	short	m_sSid;				// MONSTER(NPC) Serial ID
 	std::string	m_strName;		// MONSTER(NPC) Name
 	short	m_sPid;							// MONSTER(NPC) Picture ID
-	short   m_sSize;						// 캐릭터의 비율(100 퍼센트 기준)
-	int     m_iWeapon_1;			// 착용 무기
-	int     m_iWeapon_2;			// 착용 무기
-	BYTE	m_byGroup;			// 소속집단(국가 개념)
-	BYTE	m_byActType;		// 행동패턴
-	BYTE	m_byRank;			// 작위
-	BYTE	m_byTitle;			// 지위
+	short   m_sSize;						// 캐릭터의 비율(100 퍼센트 기준) Character
+	int     m_iWeapon_1;			// 착용 무기 [Korean comment]
+	int     m_iWeapon_2;			// 착용 무기 [Korean comment]
+	BYTE	m_byGroup;			// 소속집단(국가 개념) [Korean comment]
+	BYTE	m_byActType;		// 행동패턴 [Korean comment]
+	BYTE	m_byRank;			// 작위 [Korean comment]
+	BYTE	m_byTitle;			// 지위 [Korean comment]
 	int 	m_iSellingGroup;	// 아이템 그룹(물건매매 담당 NPC의 경우만)
 	short	m_sLevel;			// level
-	int		m_iExp;				// 경험치
+	int		m_iExp;				// 경험치 [Korean comment]
 	int		m_iLoyalty;			// loyalty
 	int		m_iMaxHP;			// 최대 HP
 	short	m_sMaxMP;			// 최대 MP
-	short	m_sAttack;			// 공격값(지금 사용하지 않음..)
-	short	m_sDefense;			// 방어값
-	short	m_sHitRate;			// 공격민첩
-	short   m_sEvadeRate;		// 방어민첩
-	short	m_sDamage;			// 기본 데미지 - 공격값
-	short	m_sAttackDelay;		// 공격딜레이
-	short	m_sSpeed;			// 이동속도	
-	float   m_fSpeed_1;			// 기본 이동 타입		(1초에 갈 수 있는 거리)
-	float   m_fSpeed_2;			// 뛰는 이동 타입..		(1초에 갈 수 있는 거리)
-	short	m_sStandTime;		// 서있는 시간
-	int		m_iMagic1;			// 사용마법 1 (공격)
-	int		m_iMagic2;			// 사용마법 2 (지역)	
-	int		m_iMagic3;			// 사용마법 3 (능력치, 힐링)	
-	short	m_sFireR;			// 화염 저항력
-	short	m_sColdR;			// 냉기 저항력
-	short	m_sLightningR;		// 전기 저항력
-	short	m_sMagicR;			// 마법 저항력
-	short	m_sDiseaseR;		// 저주 저항력
-	short	m_sPoisonR;		// 독 저항력
-	short	m_sLightR;			// 빛 저항력
-	float	m_fBulk;			// 몬스터의 크기 (실제 비율)
-	BYTE	m_bySearchRange;	// 적 탐지 범위
-	BYTE	m_byAttackRange;	// 사정거리
-	BYTE	m_byTracingRange;	// 추격 거리
+	short	m_sAttack;			// 공격값(지금 사용하지 않음..) [Korean comment]
+	short	m_sDefense;			// 방어값 [Korean comment]
+	short	m_sHitRate;			// 공격민첩 [Korean comment]
+	short   m_sEvadeRate;		// 방어민첩 [Korean comment]
+	short	m_sDamage;			// 기본 데미지 - 공격값 [Korean comment]
+	short	m_sAttackDelay;		// 공격딜레이 [Korean comment]
+	short	m_sSpeed;			// 이동속도	 Move
+	float   m_fSpeed_1;			// 기본 이동 타입		(1초에 갈 수 있는 거리) Type
+	float   m_fSpeed_2;			// 뛰는 이동 타입..		(1초에 갈 수 있는 거리) Type
+	short	m_sStandTime;		// 서있는 시간 Time
+	int		m_iMagic1;			// 사용마법 1 (공격) [Korean comment]
+	int		m_iMagic2;			// 사용마법 2 (지역)	 [Korean comment]
+	int		m_iMagic3;			// 사용마법 3 (능력치, 힐링)	 [Korean comment]
+	short	m_sFireR;			// 화염 저항력 [Korean comment]
+	short	m_sColdR;			// 냉기 저항력 [Korean comment]
+	short	m_sLightningR;		// 전기 저항력 [Korean comment]
+	short	m_sMagicR;			// 마법 저항력 [Korean comment]
+	short	m_sDiseaseR;		// 저주 저항력 [Korean comment]
+	short	m_sPoisonR;		// 독 저항력 [Korean comment]
+	short	m_sLightR;			// 빛 저항력 [Korean comment]
+	float	m_fBulk;			// 몬스터의 크기 (실제 비율) Size
+	BYTE	m_bySearchRange;	// 적 탐지 범위 [Korean comment]
+	BYTE	m_byAttackRange;	// 사정거리 [Korean comment]
+	BYTE	m_byTracingRange;	// 추격 거리 [Korean comment]
 
 	BYTE	m_tNpcType;			// NPC Type
 								// 0 : Normal Monster
 								// 1 : NPC
 
-	short	m_byFamilyType;		// 몹들사이에서 가족관계를 결정한다.
-	BYTE    m_byMoneyType;		// Event몬스터일 경우 돈을 많이 주는 것, (0:루팅, 1:루팅을 하지 않고 바로 나눠갖는다)
+	short	m_byFamilyType;		// 몹들사이에서 가족관계를 결정한다. [Korean comment]
+	BYTE    m_byMoneyType;		// Event몬스터일 경우 돈을 많이 주는 것, (0:루팅, 1:루팅을 하지 않고 바로 나눠갖는다) [Korean comment]
 
-	int		m_iMoney;			// 떨어지는 돈
-	int		m_iItem;			// 떨어지는 아이템
-	//BYTE	m_byMemory;			// 공격 타입 
+	int		m_iMoney;			// 떨어지는 돈 [Korean comment]
+	int		m_iItem;			// 떨어지는 아이템 [Korean comment]
+	//BYTE	m_byMemory;			// 공격 타입  Type
 
 	int			m_iHP;				// 현재 HP
 	short		m_sMP;				// 현재 MP
@@ -265,29 +265,29 @@ public:
 	float   m_fSecForMetor;
 
 	//----------------------------------------------------------------
-	//	MONSTER AI에 관련된 변수들
+	//	MONSTER AI에 관련된 변수들 Variable
 	//----------------------------------------------------------------
-	BYTE	m_tNpcLongType;		// 공격 거리 : 원거리(1), 근거리(0), 직.간접(2)
-	BYTE	m_tNpcAttType;		// 공격 성향 : 선공(1), 후공(0)
-	BYTE	m_tNpcOldAttType;	// 공격 성향 : 선공(1), 후공(0) (활동영역 제어)
-	BYTE	m_tNpcGroupType;	// 군집을 형성하냐(1), 안하냐?(0)
-	BYTE	m_byNpcEndAttType;	// 마지막까지 싸우면(1), 그렇지 않으면(0)
-//	BYTE	m_tNpcTraceType;	// 끝까지 따라간다(1), 시야에서 없어지면 그만(0)
-	BYTE    m_byAttackPos;		// User의 어느 부분에서 공격하느지를 판단(8방향)
-	BYTE    m_byBattlePos;		// 어떤 진형을 선택할 것인지를 판단..
+	BYTE	m_tNpcLongType;		// 공격 거리 : 원거리(1), 근거리(0), 직.간접(2) [Korean comment]
+	BYTE	m_tNpcAttType;		// 공격 성향 : 선공(1), 후공(0) [Korean comment]
+	BYTE	m_tNpcOldAttType;	// 공격 성향 : 선공(1), 후공(0) (활동영역 제어) [Korean comment]
+	BYTE	m_tNpcGroupType;	// 군집을 형성하냐(1), 안하냐?(0) [Korean comment]
+	BYTE	m_byNpcEndAttType;	// 마지막까지 싸우면(1), 그렇지 않으면(0) [Korean comment]
+//	BYTE	m_tNpcTraceType;	// 끝까지 따라간다(1), 시야에서 없어지면 그만(0) [Korean comment]
+	BYTE    m_byAttackPos;		// User의 어느 부분에서 공격하느지를 판단(8방향) [Korean comment]
+	BYTE    m_byBattlePos;		// 어떤 진형을 선택할 것인지를 판단.. Select
 	BYTE	m_byWhatAttackType; // 공격 타입 : Normal(0), 근.장거리마법(1), 독(2), 힐링(3), 지역마법만(4), 1+4번 마법(5)
 	BYTE	m_byGateOpen;		// 성문일 경우에.. 사용... Gate Npc Status -> 1 : open 0 : close
-	BYTE    m_byMaxDamagedNation;	// 나를 죽인 유저의 국가를 저장.. (1:카루스, 2:엘모라드)
+	BYTE    m_byMaxDamagedNation;	// 나를 죽인 유저의 국가를 저장.. (1:카루스, 2:엘모라드) Save
 	BYTE    m_byObjectType;         // 보통은 0, object타입(성문, 레버)은 1
-	BYTE	m_byDungeonFamily;		// 던젼에서 같은 패밀리 묶음 (같은 방)
-	BYTE	m_bySpecialType;		// 몬스터의 형태가 변하는지를 판단(0:변하지 않음, 1:변하는 몬스터, 
-									// 2:죽는경우 조정하는 몬스터(대장몬스터 죽을경우 성문이 열림), 
-									// 3:대장몬스터의 죽음과 관련이 있는 몬스터(대장몬스터가 죽으면 관계되는 몬스터는 같이 죽도록)
+	BYTE	m_byDungeonFamily;		// 던젼에서 같은 패밀리 묶음 (같은 방) [Korean comment]
+	BYTE	m_bySpecialType;		// 몬스터의 형태가 변하는지를 판단(0:변하지 않음, 1:변하는 몬스터,  [Korean comment]
+									// 2:죽는경우 조정하는 몬스터(대장몬스터 죽을경우 성문이 열림),  [Korean comment]
+									// 3:대장몬스터의 죽음과 관련이 있는 몬스터(대장몬스터가 죽으면 관계되는 몬스터는 같이 죽도록) [Korean comment]
 									// 4:변하면서 죽는경우 조정하는 몬스터 (m_sControlSid)
-									// 5:처음에 죽었있다가 출현하는 몬스터,,
-									// 6:일정시간이 지난 후에 행동하는 몬스터,,
-									// 100:죽었을때 데미지를 많이 입힌 유저를 기록해 주세여
-	BYTE	m_byTrapNumber;			// 던젼에서 트랩의 번호,,
+									// 5:처음에 죽었있다가 출현하는 몬스터,, [Korean comment]
+									// 6:일정시간이 지난 후에 행동하는 몬스터,, Time
+									// 100:죽었을때 데미지를 많이 입힌 유저를 기록해 주세여 [Korean comment]
+	BYTE	m_byTrapNumber;			// 던젼에서 트랩의 번호,, [Korean comment]
 
 	/// \brief change state, one of:
 	/// 0: normal state
@@ -303,21 +303,21 @@ public:
 	/// 2: does not respawn
 	BYTE	m_byRegenType;
 	
-	BYTE    m_byDeadType;			// 0:살아 있는 경우, 100:전쟁이벤트중 죽은 경우
+	BYTE    m_byDeadType;			// 0:살아 있는 경우, 100:전쟁이벤트중 죽은 경우 [Korean comment]
 	short   m_sChangeSid;			// 변하는 몬스터의 Sid번호..
 	short   m_sControlSid;			// 조정하는 몬스터의 Sid번호..
 
 
 	//----------------------------------------------------------------
-	//	MONSTER_POS DB 쪽에 있는 변수들
+	//	MONSTER_POS DB 쪽에 있는 변수들 Variable
 	//----------------------------------------------------------------
-	int		m_Delay;			// 다음 상태로 전이되기 까지의 시간
-	float   m_fDelayTime;		// Npc Thread체크 타임...
+	int		m_Delay;			// 다음 상태로 전이되기 까지의 시간 Time
+	float   m_fDelayTime;		// Npc Thread체크 타임... Check
 
 	BYTE	m_byType;
-	int		m_sRegenTime;		// NPC 재생시간
+	int		m_sRegenTime;		// NPC 재생시간 Time
 
-	int		m_nLimitMinX;		// 활동 영역
+	int		m_nLimitMinX;		// 활동 영역 [Korean comment]
 	int		m_nLimitMinZ;
 	int		m_nLimitMaxX;
 	int		m_nLimitMaxZ;
@@ -333,31 +333,31 @@ public:
 	/// \brief Distance that can be traveled per second (actual distance sent to the client)
 	float m_fSecForRealMoveMetor;
 	
-	BYTE m_byDirection;					// NPC의 방향
+	BYTE m_byDirection;					// NPC의 방향 [Korean comment]
 
-	BOOL m_bPathFlag;					// 패스 파인드 실행여부 체크 변수..
+	BOOL m_bPathFlag;					// 패스 파인드 실행여부 체크 변수.. Variable
 
 	//----------------------------------------------------------------
-	//	NPC 이동 관련
+	//	NPC 이동 관련 Move
 	//----------------------------------------------------------------
-	_NpcPosition	m_pPoint[MAX_PATH_LINE];			// 이동시 참고 좌표
+	_NpcPosition	m_pPoint[MAX_PATH_LINE];			// 이동시 참고 좌표 Move
 
 	short m_iAniFrameIndex;
 	short m_iAniFrameCount;
-	BYTE m_byPathCount;					// 패스를 따라 이동하는 몬스터 끼리 겹치지 않도록,, 
-	BYTE m_byResetFlag;					// 추적공격시 패스파인딩을 다시 할것인지,, 말것인지를 판단..
-	BYTE m_byActionFlag;				// 행동변화 플래그 ( 0 : 행동변화 없음, 1 : 공격에서 추격)
+	BYTE m_byPathCount;					// 패스를 따라 이동하는 몬스터 끼리 겹치지 않도록,,  Move
+	BYTE m_byResetFlag;					// 추적공격시 패스파인딩을 다시 할것인지,, 말것인지를 판단.. [Korean comment]
+	BYTE m_byActionFlag;				// 행동변화 플래그 ( 0 : 행동변화 없음, 1 : 공격에서 추격) [Korean comment]
 
 	short m_iRegion_X;					// 현재의 region - x pos
 	short m_iRegion_Z;					// 현재의 region - z pos
 	short m_iFind_X[4];					// find enemy에서 찾을 Region검사영역
 	short m_iFind_Y[4];
 
-	float   m_fOldSpeed_1;			// 기본 이동 타입		(1초에 갈 수 있는 거리)
-	float   m_fOldSpeed_2;			// 뛰는 이동 타입..		(1초에 갈 수 있는 거리)
+	float   m_fOldSpeed_1;			// 기본 이동 타입		(1초에 갈 수 있는 거리) Type
+	float   m_fOldSpeed_2;			// 뛰는 이동 타입..		(1초에 갈 수 있는 거리) Type
 
 	// test
-	short m_sThreadNumber;				// 자신이 속한 스레드의 번호
+	short m_sThreadNumber;				// 자신이 속한 스레드의 번호 [Korean comment]
 
 
 public:
@@ -365,7 +365,7 @@ public:
 	virtual ~CNpc();
 
 	void Load(const model::Npc* pNpcTable, bool transformSpeeds);
-	void Init();	//	NPC 기본정보 초기화
+	void Init();	//	NPC 기본정보 초기화 Initialize
 	void InitTarget(void);
 	void InitUserList();
 	void InitPos();
@@ -384,10 +384,10 @@ public:
 	//void  FindFriendRegion(int x, int z, MAP* pMap, int type=0);
 	BOOL IsCloseTarget(CUser* pUser, int nRange);
 	int SendDead(CIOCPort* pIOCP, int type = 1);			// Npc Dead
-	void SendExpToUserList();								// User 경험치 분배..
-	BOOL SetDamage(int nAttackType, int nDamage, const char* sourceName, int uid, CIOCPort* pIOCP);	// Npc의 데미지 계산..
-	BOOL SetHMagicDamage(int nDamage, CIOCPort* pIOCP);	// Npc의 데미지 계산..
-	int GetDefense();										// Npc의 방어값..
+	void SendExpToUserList();								// User 경험치 분배.. [Korean comment]
+	BOOL SetDamage(int nAttackType, int nDamage, const char* sourceName, int uid, CIOCPort* pIOCP);	// Npc의 데미지 계산.. Calculate
+	BOOL SetHMagicDamage(int nDamage, CIOCPort* pIOCP);	// Npc의 데미지 계산.. Calculate
+	int GetDefense();										// Npc의 방어값.. [Korean comment]
 	void ChangeTarget(int nAttackType, CUser* pUser, CIOCPort* pIOCP);
 	void ChangeNTarget(CNpc* pNpc, CIOCPort* pIOCP);
 	int GetFinalDamage(CUser* pUser, int type = 1);
@@ -412,10 +412,10 @@ public:
 	BOOL IsLevelCheck(int iLevel);
 	BOOL IsHPCheck(int iHP);
 	BOOL IsCompStatus(CUser* pUser);
-	BOOL IsPathFindCheck(float fDistance);						// 패스 파인드를 할것인지를 체크하는 루틴..
-	void IsNoPathFind(float fDistance);						// 패스 파인드를 하지 않고 공격대상으로 가는 루틴..
+	BOOL IsPathFindCheck(float fDistance);						// 패스 파인드를 할것인지를 체크하는 루틴.. Check
+	void IsNoPathFind(float fDistance);						// 패스 파인드를 하지 않고 공격대상으로 가는 루틴.. [Korean comment]
 	BOOL IsInExpRange(CUser* pUser);
-	void GiveNpcHaveItem(CIOCPort* pIOCP);		// NPC 가 가진 아이템을 떨군다
+	void GiveNpcHaveItem(CIOCPort* pIOCP);		// NPC 가 가진 아이템을 떨군다 [Korean comment]
 
 	void NpcLive(CIOCPort* pIOCP);
 	void NpcFighting(CIOCPort* pIOCP);
@@ -435,7 +435,7 @@ public:
 	BOOL IsInPathRange();			//
 	int GetNearPathPoint();			//
 
-	// Packet Send부분..
+	// Packet Send부분.. [Korean comment]
 	void SendAll(CIOCPort* pIOCP, const char* pBuf, int nLength);
 	void SendAttackSuccess(CIOCPort* pIOCP, BYTE byResult, int tuid, short sDamage, int nHP = 0, BYTE byFlag = 0, short sAttack_type = 1);
 	void SendNpcInfoAll(char* temp_send, int& index, int count);	// game server에 npc정보를 전부 전송...

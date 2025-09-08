@@ -37,7 +37,7 @@ ZoneArray m_ZoneArray;
 CRITICAL_SECTION g_User_critical;
 CRITICAL_SECTION g_region_critical;
 
-#define CHECK_ALIVE 	100		//  게임서버와 통신이 끊김여부 판단, 타이머 변수
+#define CHECK_ALIVE 	100		//  게임서버와 통신이 끊김여부 판단, 타이머 변수 Variable
 #define REHP_TIME		200
 
 import AIServerBinder;
@@ -164,7 +164,7 @@ END_MESSAGE_MAP()
 // CServerDlg message handlers
 
 ///////////////////////////////////////////////////////////////////////////////
-//	각종 초기화
+//	각종 초기화 Initialize
 //
 BOOL CServerDlg::OnInitDialog()
 {
@@ -191,9 +191,9 @@ BOOL CServerDlg::OnInitDialog()
 		myrand(1, 10000);	// don't delete
 
 	// Compress Init
-	memset(m_CompBuf, 0, sizeof(m_CompBuf));	// 압축할 데이터를 모으는 버퍼
-	m_iCompIndex = 0;							// 압축할 데이터의 길이
-	m_CompCount = 0;							// 압축할 데이터의 개수
+	memset(m_CompBuf, 0, sizeof(m_CompBuf));	// 압축할 데이터를 모으는 버퍼 Data
+	m_iCompIndex = 0;							// 압축할 데이터의 길이 Data
+	m_CompCount = 0;							// 압축할 데이터의 개수 Data
 
 	InitializeCriticalSection(&g_User_critical);
 	InitializeCriticalSection(&g_region_critical);
@@ -514,7 +514,7 @@ void CServerDlg::ReportTableLoadError(const recordset_loader::Error& err, const 
 	spdlog::error(error);
 }
 
-//	Magic Table 을 읽는다.
+//	Magic Table 을 읽는다. [Korean comment]
 BOOL CServerDlg::GetMagicTableData()
 {
 	recordset_loader::STLMap loader(m_MagicTableMap);
@@ -582,7 +582,7 @@ BOOL CServerDlg::GetMakeRareItemTableData()
 }
 
 /////////////////////////////////////////////////////////////////////////
-//	NPC Item Table 을 읽는다.
+//	NPC Item Table 을 읽는다. [Korean comment]
 //
 BOOL CServerDlg::GetNpcItemTable()
 {
@@ -632,7 +632,7 @@ BOOL CServerDlg::GetNpcItemTable()
 	return TRUE;
 }
 
-//	Monster Table Data 를 읽는다.
+//	Monster Table Data 를 읽는다. [Korean comment]
 BOOL CServerDlg::GetMonsterTableData()
 {
 	NpcTableMap tableMap;
@@ -684,10 +684,10 @@ BOOL CServerDlg::GetNpcTableData()
 	return TRUE;
 }
 
-//	Npc Thread 를 만든다.
+//	Npc Thread 를 만든다. [Korean comment]
 BOOL CServerDlg::CreateNpcThread()
 {
-	m_TotalNPC = 0;			// DB에 있는 수
+	m_TotalNPC = 0;			// DB에 있는 수 [Korean comment]
 	m_CurrentNPC = 0;
 	m_CurrentNPCError = 0;
 
@@ -775,7 +775,7 @@ BOOL CServerDlg::LoadNpcPosTable(std::vector<model::NpcPos*>& rows)
 				for (int j = 0; j < nMonsterNumber; j++)
 				{
 					CNpc* pNpc = new CNpc();
-					pNpc->m_sNid = nSerial++;						// 서버 내에서의 고유 번호
+					pNpc->m_sNid = nSerial++;						// 서버 내에서의 고유 번호 [Korean comment]
 					pNpc->m_sSid = (short) row->NpcId;				// MONSTER(NPC) Serial ID
 
 					pNpc->m_byMoveType = row->ActType;
@@ -1014,7 +1014,7 @@ BOOL CServerDlg::LoadNpcPosTable(std::vector<model::NpcPos*>& rows)
 	return TRUE;
 }
 
-//	NPC Thread 들을 작동시킨다.
+//	NPC Thread 들을 작동시킨다. [Korean comment]
 void CServerDlg::ResumeAI()
 {
 	for (size_t i = 0; i < m_NpcThreadArray.size(); i++)
@@ -1043,7 +1043,7 @@ void CServerDlg::ResumeAI()
 	ResumeThread(m_pZoneEventThread->m_hThread);
 }
 
-//	메모리 정리
+//	메모리 정리 [Korean comment]
 BOOL CServerDlg::DestroyWindow()
 {
 	// TODO: Add your specialized code here and/or call the base class
@@ -1063,7 +1063,7 @@ BOOL CServerDlg::DestroyWindow()
 
 	WaitForSingleObject(m_pZoneEventThread, INFINITE);
 
-	// DB테이블 삭제 부분
+	// DB테이블 삭제 부분 Delete
 
 	// Map(Zone) Array Delete...
 	for (size_t i = 0; i < m_ZoneArray.size(); i++)
@@ -1485,7 +1485,7 @@ void CServerDlg::DeleteAllUserList(int zone)
 	if (zone < 0)
 		return;
 
-	// 모든 소켓이 끊어진 상태...
+	// 모든 소켓이 끊어진 상태... Status
 	if (zone == 9999
 		&& m_bFirstServerFlag)
 	{
@@ -1513,7 +1513,7 @@ void CServerDlg::DeleteAllUserList(int zone)
 			delete m_pUser[i];
 			m_pUser[i] = nullptr;
 		}
-		// 파티 정보 삭제..
+		// 파티 정보 삭제.. Delete
 		LeaveCriticalSection(&g_User_critical);
 
 		// Party Array Delete 
@@ -1771,7 +1771,7 @@ CNpc* CServerDlg::GetNpcPtr(const char* pNpcName)
 }
 
 
-//	추가할 소환몹의 메모리를 참조하기위해 플래그가 0인 상태것만 넘긴다.
+//	추가할 소환몹의 메모리를 참조하기위해 플래그가 0인 상태것만 넘긴다. Status
 CNpc* CServerDlg::GetEventNpcPtr()
 {
 	for (auto& [_, pNpc] : m_NpcMap)
@@ -1813,7 +1813,7 @@ int CServerDlg::MonsterSummon(const char* pNpcName, int zone_id, float fx, float
 	return 1;
 }
 
-//	소환할 몹의 데이타값을 셋팅한다.
+//	소환할 몹의 데이타값을 셋팅한다. [Korean comment]
 BOOL CServerDlg::SetSummonNpcData(CNpc* pNpc, int zone_id, float fx, float fz)
 {
 	int  iCount = 0;
@@ -1830,52 +1830,52 @@ BOOL CServerDlg::SetSummonNpcData(CNpc* pNpc, int zone_id, float fx, float fz)
 	pEventNpc->m_byBattlePos = 0;
 	pEventNpc->m_strName = pNpc->m_strName;					// MONSTER(NPC) Name
 	pEventNpc->m_sPid = pNpc->m_sPid;						// MONSTER(NPC) Picture ID
-	pEventNpc->m_sSize = pNpc->m_sSize;						// 캐릭터의 비율(100 퍼센트 기준)
-	pEventNpc->m_iWeapon_1 = pNpc->m_iWeapon_1;				// 착용무기
-	pEventNpc->m_iWeapon_2 = pNpc->m_iWeapon_2;				// 착용무기
-	pEventNpc->m_byGroup = pNpc->m_byGroup;					// 소속집단
-	pEventNpc->m_byActType = pNpc->m_byActType;				// 행동패턴
-	pEventNpc->m_byRank = pNpc->m_byRank;					// 작위
-	pEventNpc->m_byTitle = pNpc->m_byTitle;					// 지위
+	pEventNpc->m_sSize = pNpc->m_sSize;						// 캐릭터의 비율(100 퍼센트 기준) Character
+	pEventNpc->m_iWeapon_1 = pNpc->m_iWeapon_1;				// 착용무기 [Korean comment]
+	pEventNpc->m_iWeapon_2 = pNpc->m_iWeapon_2;				// 착용무기 [Korean comment]
+	pEventNpc->m_byGroup = pNpc->m_byGroup;					// 소속집단 [Korean comment]
+	pEventNpc->m_byActType = pNpc->m_byActType;				// 행동패턴 [Korean comment]
+	pEventNpc->m_byRank = pNpc->m_byRank;					// 작위 [Korean comment]
+	pEventNpc->m_byTitle = pNpc->m_byTitle;					// 지위 [Korean comment]
 	pEventNpc->m_iSellingGroup = pNpc->m_iSellingGroup;
 	pEventNpc->m_sLevel = pNpc->m_sLevel;					// level
-	pEventNpc->m_iExp = pNpc->m_iExp;						// 경험치
+	pEventNpc->m_iExp = pNpc->m_iExp;						// 경험치 [Korean comment]
 	pEventNpc->m_iLoyalty = pNpc->m_iLoyalty;				// loyalty
 	pEventNpc->m_iHP = pNpc->m_iMaxHP;						// 최대 HP
 	pEventNpc->m_iMaxHP = pNpc->m_iMaxHP;					// 현재 HP
 	pEventNpc->m_sMP = pNpc->m_sMaxMP;						// 최대 MP
 	pEventNpc->m_sMaxMP = pNpc->m_sMaxMP;					// 현재 MP
-	pEventNpc->m_sAttack = pNpc->m_sAttack;					// 공격값
-	pEventNpc->m_sDefense = pNpc->m_sDefense;				// 방어값
-	pEventNpc->m_sHitRate = pNpc->m_sHitRate;				// 타격성공률
-	pEventNpc->m_sEvadeRate = pNpc->m_sEvadeRate;			// 회피성공률
-	pEventNpc->m_sDamage = pNpc->m_sDamage;					// 기본 데미지
-	pEventNpc->m_sAttackDelay = pNpc->m_sAttackDelay;		// 공격딜레이
-	pEventNpc->m_sSpeed = pNpc->m_sSpeed;					// 이동속도
-	pEventNpc->m_fSpeed_1 = pNpc->m_fSpeed_1;				// 기본 이동 타입
-	pEventNpc->m_fSpeed_2 = pNpc->m_fSpeed_2;				// 뛰는 이동 타입..
-	pEventNpc->m_fOldSpeed_1 = pNpc->m_fOldSpeed_1;			// 기본 이동 타입
-	pEventNpc->m_fOldSpeed_2 = pNpc->m_fOldSpeed_2;			// 뛰는 이동 타입..
-	pEventNpc->m_fSecForMetor = 4.0f;						// 초당 갈 수 있는 거리..
-	pEventNpc->m_sStandTime = pNpc->m_sStandTime;			// 서있는 시간
-	pEventNpc->m_iMagic1 = pNpc->m_iMagic1;					// 사용마법 1
-	pEventNpc->m_iMagic2 = pNpc->m_iMagic2;					// 사용마법 2
-	pEventNpc->m_iMagic3 = pNpc->m_iMagic3;					// 사용마법 3
-	pEventNpc->m_sFireR = pNpc->m_sFireR;					// 화염 저항력
-	pEventNpc->m_sColdR = pNpc->m_sColdR;					// 냉기 저항력
-	pEventNpc->m_sLightningR = pNpc->m_sLightningR;			// 전기 저항력
-	pEventNpc->m_sMagicR = pNpc->m_sMagicR;					// 마법 저항력
-	pEventNpc->m_sDiseaseR = pNpc->m_sDiseaseR;				// 저주 저항력
-	pEventNpc->m_sPoisonR = pNpc->m_sPoisonR;				// 독 저항력
-	pEventNpc->m_sLightR = pNpc->m_sLightR;					// 빛 저항력
+	pEventNpc->m_sAttack = pNpc->m_sAttack;					// 공격값 [Korean comment]
+	pEventNpc->m_sDefense = pNpc->m_sDefense;				// 방어값 [Korean comment]
+	pEventNpc->m_sHitRate = pNpc->m_sHitRate;				// 타격성공률 [Korean comment]
+	pEventNpc->m_sEvadeRate = pNpc->m_sEvadeRate;			// 회피성공률 [Korean comment]
+	pEventNpc->m_sDamage = pNpc->m_sDamage;					// 기본 데미지 [Korean comment]
+	pEventNpc->m_sAttackDelay = pNpc->m_sAttackDelay;		// 공격딜레이 [Korean comment]
+	pEventNpc->m_sSpeed = pNpc->m_sSpeed;					// 이동속도 Move
+	pEventNpc->m_fSpeed_1 = pNpc->m_fSpeed_1;				// 기본 이동 타입 Type
+	pEventNpc->m_fSpeed_2 = pNpc->m_fSpeed_2;				// 뛰는 이동 타입.. Type
+	pEventNpc->m_fOldSpeed_1 = pNpc->m_fOldSpeed_1;			// 기본 이동 타입 Type
+	pEventNpc->m_fOldSpeed_2 = pNpc->m_fOldSpeed_2;			// 뛰는 이동 타입.. Type
+	pEventNpc->m_fSecForMetor = 4.0f;						// 초당 갈 수 있는 거리.. [Korean comment]
+	pEventNpc->m_sStandTime = pNpc->m_sStandTime;			// 서있는 시간 Time
+	pEventNpc->m_iMagic1 = pNpc->m_iMagic1;					// 사용마법 1 [Korean comment]
+	pEventNpc->m_iMagic2 = pNpc->m_iMagic2;					// 사용마법 2 [Korean comment]
+	pEventNpc->m_iMagic3 = pNpc->m_iMagic3;					// 사용마법 3 [Korean comment]
+	pEventNpc->m_sFireR = pNpc->m_sFireR;					// 화염 저항력 [Korean comment]
+	pEventNpc->m_sColdR = pNpc->m_sColdR;					// 냉기 저항력 [Korean comment]
+	pEventNpc->m_sLightningR = pNpc->m_sLightningR;			// 전기 저항력 [Korean comment]
+	pEventNpc->m_sMagicR = pNpc->m_sMagicR;					// 마법 저항력 [Korean comment]
+	pEventNpc->m_sDiseaseR = pNpc->m_sDiseaseR;				// 저주 저항력 [Korean comment]
+	pEventNpc->m_sPoisonR = pNpc->m_sPoisonR;				// 독 저항력 [Korean comment]
+	pEventNpc->m_sLightR = pNpc->m_sLightR;					// 빛 저항력 [Korean comment]
 	pEventNpc->m_fBulk = pNpc->m_fBulk;
-	pEventNpc->m_bySearchRange = pNpc->m_bySearchRange;		// 적 탐지 범위
-	pEventNpc->m_byAttackRange = pNpc->m_byAttackRange;		// 사정거리
-	pEventNpc->m_byTracingRange = pNpc->m_byTracingRange;	// 추격거리
+	pEventNpc->m_bySearchRange = pNpc->m_bySearchRange;		// 적 탐지 범위 [Korean comment]
+	pEventNpc->m_byAttackRange = pNpc->m_byAttackRange;		// 사정거리 [Korean comment]
+	pEventNpc->m_byTracingRange = pNpc->m_byTracingRange;	// 추격거리 [Korean comment]
 	pEventNpc->m_tNpcType = pNpc->m_tNpcType;				// NPC Type
-	pEventNpc->m_byFamilyType = pNpc->m_byFamilyType;		// 몹들사이에서 가족관계를 결정한다.
-	pEventNpc->m_iMoney = pNpc->m_iMoney;					// 떨어지는 돈
-	pEventNpc->m_iItem = pNpc->m_iItem;						// 떨어지는 아이템
+	pEventNpc->m_byFamilyType = pNpc->m_byFamilyType;		// 몹들사이에서 가족관계를 결정한다. [Korean comment]
+	pEventNpc->m_iMoney = pNpc->m_iMoney;					// 떨어지는 돈 [Korean comment]
+	pEventNpc->m_iItem = pNpc->m_iItem;						// 떨어지는 아이템 [Korean comment]
 	pEventNpc->m_tNpcLongType = pNpc->m_tNpcLongType;
 	pEventNpc->m_byWhatAttackType = pNpc->m_byWhatAttackType;
 
@@ -1892,8 +1892,8 @@ BOOL CServerDlg::SetSummonNpcData(CNpc* pNpc, int zone_id, float fx, float fz)
 
 	pEventNpc->m_ZoneIndex = -1;
 
-	pEventNpc->m_NpcState = NPC_DEAD;						// 상태는 죽은것으로 해야 한다.. 
-	pEventNpc->m_bFirstLive = 1;							// 처음 살아난 경우로 해줘야 한다..
+	pEventNpc->m_NpcState = NPC_DEAD;						// 상태는 죽은것으로 해야 한다..  Status
+	pEventNpc->m_bFirstLive = 1;							// 처음 살아난 경우로 해줘야 한다.. [Korean comment]
 
 	for (size_t i = 0; i < m_ZoneArray.size(); i++)
 	{
@@ -2079,7 +2079,7 @@ BOOL CServerDlg::AddObjectEventNpc(_OBJECT_EVENT* pEvent, int zone_number)
 
 	CNpc* pNpc = new CNpc();
 
-	pNpc->m_sNid = m_sMapEventNpc++;				// 서버 내에서의 고유 번호
+	pNpc->m_sNid = m_sMapEventNpc++;				// 서버 내에서의 고유 번호 [Korean comment]
 	pNpc->m_sSid = (short) pEvent->sIndex;			// MONSTER(NPC) Serial ID
 
 	pNpc->m_byMoveType = 100;
@@ -2091,7 +2091,7 @@ BOOL CServerDlg::AddObjectEventNpc(_OBJECT_EVENT* pEvent, int zone_number)
 
 	pNpc->m_byBattlePos = 0;
 
-	pNpc->m_fSecForMetor = 4.0f;					// 초당 갈 수 있는 거리..
+	pNpc->m_fSecForMetor = 4.0f;					// 초당 갈 수 있는 거리.. [Korean comment]
 
 	pNpc->Load(pNpcTable, false);
 
@@ -2115,7 +2115,7 @@ BOOL CServerDlg::AddObjectEventNpc(_OBJECT_EVENT* pEvent, int zone_number)
 
 	pNpc->m_ZoneIndex = -1;
 	pNpc->m_byObjectType = SPECIAL_OBJECT;
-	pNpc->m_bFirstLive = 1;		// 처음 살아난 경우로 해줘야 한다..
+	pNpc->m_bFirstLive = 1;		// 처음 살아난 경우로 해줘야 한다.. [Korean comment]
 	//pNpc->m_ZoneIndex = GetZoneIndex(pNpc->m_sCurZone);
 /*
 	if(pNpc->m_ZoneIndex == -1)	{
@@ -2225,8 +2225,8 @@ void CServerDlg::SendSystemMsg(const std::string_view msg, int zone, int type, i
 	char buff[256] = {};
 
 	SetByte(buff, AG_SYSTEM_MSG, send_index);
-	SetByte(buff, type, send_index);				// 채팅형식
-	SetShort(buff, who, send_index);				// 누구에게
+	SetByte(buff, type, send_index);				// 채팅형식 [Korean comment]
+	SetShort(buff, who, send_index);				// 누구에게 [Korean comment]
 	SetString2(buff, msg, send_index);
 
 	Send(buff, send_index, zone);
@@ -2243,11 +2243,11 @@ void CServerDlg::ResetBattleZone()
 		if (pMap== nullptr)
 			continue;
 
-		// 현재의 존이 던젼담당하는 존이 아니면 리턴..
+		// 현재의 존이 던젼담당하는 존이 아니면 리턴.. [Korean comment]
 		if (pMap->m_byRoomEvent == 0)
 			continue;
 
-		// 전체방이 클리어 되었다면
+		// 전체방이 클리어 되었다면 [Korean comment]
 		// if (pMap->IsRoomStatusCheck())
 		//	continue;
 

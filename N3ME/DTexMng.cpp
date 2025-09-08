@@ -126,7 +126,7 @@ void CDTexMng::DelDTexByID(int id)
 
 //
 //	Load..
-//	DTex정보들과 실제 텍스쳐 소스들을 읽어들인다. //	Read DTex information and actual texture sources.
+//	DTex정보들과 실제 텍스쳐 소스들을 읽어들인다. //	Read DTex information and actual texture sources. Info
 //
 void CDTexMng::LoadFromFile(CString RealFileName)
 {
@@ -162,13 +162,13 @@ void CDTexMng::LoadFromFile(CString RealFileName)
 
 			ProgressBar.StepIt();
 
-			//	실제 텍스쳐 소스를 읽고.. //	Read actual texture source..
+			//	실제 텍스쳐 소스를 읽고.. //	Read actual texture source.. [Korean comment]
 			CDTex* pDTex = new CDTex;
 			pDTex->Init();
 			pDTex->m_ID = i;
 			pDTex->m_pTex->LoadFromFile(szDTexFileName);
 			
-			//	그에 관한 타일 정보들을 읽고.. //	Read tile information about it..
+			//	그에 관한 타일 정보들을 읽고.. //	Read tile information about it.. Info
 			char szDir[_MAX_DIR], szFName[_MAX_FNAME];
 			_splitpath(szDTexFileName, nullptr, szDir, szFName, nullptr);
 			wsprintf(szDTexInfoFileName, "%s%s%s.dif", s_szPath.c_str(), szDir, szFName); // Texture Information file
@@ -224,7 +224,7 @@ void CDTexMng::LoadFromFile(CString RealFileName)
 
 			if(m_NextID <= id) m_NextID = id + 1;
 
-			//	실제 텍스쳐 소스를 읽고.. //	Read actual texture source..
+			//	실제 텍스쳐 소스를 읽고.. //	Read actual texture source.. [Korean comment]
 			CDTex* pDTex = new CDTex;
 			pDTex->Init();
 			pDTex->m_ID = id;
@@ -253,7 +253,7 @@ void CDTexMng::LoadFromFile(CString RealFileName)
 
 			if(version==1)
 			{
-				//	그에 관한 타일 정보들을 읽고.. //	Read tile information about it..
+				//	그에 관한 타일 정보들을 읽고.. //	Read tile information about it.. Info
 				char szDir[_MAX_DIR], szFName[_MAX_FNAME];
 				_splitpath(szDTexFileName, nullptr, szDir, szFName, nullptr);
 				wsprintf(szDTexInfoFileName, "%s%s%s.dif", s_szPath.c_str(), szDir, szFName); // Texture Information file
@@ -326,15 +326,15 @@ void CDTexMng::SaveToFile(CString RealFileName)
 
 		/*
 		//
-		//	version1 저장방식... //	Version1 save method...
-		//	dif파일만들기... //	Create dif file...
+		//	version1 저장방식... //	Version1 save method... Save
+		//	dif파일만들기... //	Create dif file... File
 		//
 		char szDir[_MAX_DIR], szFName[_MAX_FNAME];
 		
 		_splitpath(szDTexFileName, nullptr, szDir, szFName, nullptr);
 		wsprintf(szDTexInfoFileName, "%s%s%s.dif", s_szPath.c_str(), szDir, szFName); // Texture Information file
 
-		//	그에 관한 타일 정보들을 읽고.. //	Read tile information about it..
+		//	그에 관한 타일 정보들을 읽고.. //	Read tile information about it.. Info
 		HANDLE hFile = CreateFile(szDTexInfoFileName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 		if(hFile != INVALID_HANDLE_VALUE)
@@ -355,12 +355,12 @@ void CDTexMng::SaveToFile(CString RealFileName)
 
 
 //
-//	게임에서 쓸수 있는 타일 텍스쳐 포멧으로 변환후 저장..
+//	게임에서 쓸수 있는 타일 텍스쳐 포멧으로 변환후 저장.. Save
 //
 void CDTexMng::SaveGameTile()
 {
 	D3DFORMAT	Format;
-	int			Size = DTEX_SIZE / NUM_DTEXTILE;		//단위텍스쳐의 길이..
+	int			Size = DTEX_SIZE / NUM_DTEXTILE;		//단위텍스쳐의 길이.. [Korean comment]
 	D3DLOCKED_RECT d3dlr;
 
 	HANDLE hFile;
@@ -410,7 +410,7 @@ void CDTexMng::SaveGameTile()
 
 				for(ix=0; ix<NUM_DTEXTILE; ix++)
 				{
-					//텍스쳐 서페이스 만들고, 텍스쳐 채우고, 형식 변환하고, 저장.
+					//텍스쳐 서페이스 만들고, 텍스쳐 채우고, 형식 변환하고, 저장. Save
 					TileTex.Create(Size, Size, Format, TRUE);
 					TileTex.Get()->LockRect( 0, &d3dlrTarget, 0, 0 );
 					pSourceImg = (char*)((char*)d3dlr.pBits + (ix*Size*Bits) + (iz*Size*d3dlr.Pitch));

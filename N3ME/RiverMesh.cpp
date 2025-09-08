@@ -76,16 +76,16 @@ bool CRiverMesh::Load(HANDLE hFile)
 	DWORD dwNum;
 	int iLen; char szTextueFName[_MAX_PATH];
 
-	ReadFile(hFile, &m_iRiverID, sizeof(m_iRiverID), &dwNum, nullptr);		// 강 번호
-	ReadFile(hFile, &m_fSpeed1, sizeof(m_fSpeed1), &dwNum, nullptr);			// 유속
-	ReadFile(hFile, &m_fSpeed2, sizeof(m_fSpeed2), &dwNum, nullptr);			// 유속2
-	ReadFile(hFile, &m_fMeterPerV, sizeof(m_fMeterPerV), &dwNum, nullptr);	// U좌표 1.0에 해당하는 강의 길이
-	ReadFile(hFile, &m_fMeterPerU, sizeof(m_fMeterPerU), &dwNum, nullptr);	// V좌표 1.0에 해당하는 강의 길이
-	ReadFile(hFile, &m_fMeterPerV2, sizeof(m_fMeterPerV2), &dwNum, nullptr);// U2좌표 1.0에 해당하는 강의 길이
-	ReadFile(hFile, &m_fMeterPerU2, sizeof(m_fMeterPerU2), &dwNum, nullptr);// V2좌표 1.0에 해당하는 강의 길이
-	ReadFile(hFile, &m_dwAlphaFactor, sizeof(m_dwAlphaFactor), &dwNum, nullptr);	// 강을 투명하게 하기 위한 알파값
+	ReadFile(hFile, &m_iRiverID, sizeof(m_iRiverID), &dwNum, nullptr);		// 강 번호 [Korean comment]
+	ReadFile(hFile, &m_fSpeed1, sizeof(m_fSpeed1), &dwNum, nullptr);			// 유속 [Korean comment]
+	ReadFile(hFile, &m_fSpeed2, sizeof(m_fSpeed2), &dwNum, nullptr);			// 유속2 [Korean comment]
+	ReadFile(hFile, &m_fMeterPerV, sizeof(m_fMeterPerV), &dwNum, nullptr);	// U좌표 1.0에 해당하는 강의 길이 [Korean comment]
+	ReadFile(hFile, &m_fMeterPerU, sizeof(m_fMeterPerU), &dwNum, nullptr);	// V좌표 1.0에 해당하는 강의 길이 [Korean comment]
+	ReadFile(hFile, &m_fMeterPerV2, sizeof(m_fMeterPerV2), &dwNum, nullptr);// U2좌표 1.0에 해당하는 강의 길이 [Korean comment]
+	ReadFile(hFile, &m_fMeterPerU2, sizeof(m_fMeterPerU2), &dwNum, nullptr);// V2좌표 1.0에 해당하는 강의 길이 [Korean comment]
+	ReadFile(hFile, &m_dwAlphaFactor, sizeof(m_dwAlphaFactor), &dwNum, nullptr);	// 강을 투명하게 하기 위한 알파값 [Korean comment]
 
-	ReadFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, nullptr);			// 점 갯수
+	ReadFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, nullptr);			// 점 갯수 [Korean comment]
 	if (m_iVC>0) ReadFile(hFile, m_pVertices, m_iVC*sizeof(__VertexXyzT2), &dwNum, nullptr);	// vertex buffer
 	ReadFile(hFile, &m_iIC, sizeof(m_iIC), &dwNum, nullptr);			// IndexBufferCount.
 	ReadFile(hFile, &iLen, sizeof(iLen), &dwNum, nullptr);				// texture name length
@@ -120,16 +120,16 @@ bool CRiverMesh::Save(HANDLE hFile)
 {
 	DWORD dwNum;
 
-	WriteFile(hFile, &m_iRiverID, sizeof(m_iRiverID), &dwNum, nullptr);		// 강 번호
-	WriteFile(hFile, &m_fSpeed1, sizeof(m_fSpeed1), &dwNum, nullptr);			// 유속1
-	WriteFile(hFile, &m_fSpeed2, sizeof(m_fSpeed2), &dwNum, nullptr);			// 유속2
-	WriteFile(hFile, &m_fMeterPerV, sizeof(m_fMeterPerV), &dwNum, nullptr);	// U좌표 1.0에 해당하는 강의 길이
-	WriteFile(hFile, &m_fMeterPerU, sizeof(m_fMeterPerU), &dwNum, nullptr);	// V좌표 1.0에 해당하는 강의 길이
-	WriteFile(hFile, &m_fMeterPerV2, sizeof(m_fMeterPerV2), &dwNum, nullptr);	// U2좌표 1.0에 해당하는 강의 길이
-	WriteFile(hFile, &m_fMeterPerU2, sizeof(m_fMeterPerU2), &dwNum, nullptr);	// V2좌표 1.0에 해당하는 강의 길이
-	WriteFile(hFile, &m_dwAlphaFactor, sizeof(m_dwAlphaFactor), &dwNum, nullptr);	// 강을 투명하게 하기 위한 알파값
+	WriteFile(hFile, &m_iRiverID, sizeof(m_iRiverID), &dwNum, nullptr);		// 강 번호 [Korean comment]
+	WriteFile(hFile, &m_fSpeed1, sizeof(m_fSpeed1), &dwNum, nullptr);			// 유속1 [Korean comment]
+	WriteFile(hFile, &m_fSpeed2, sizeof(m_fSpeed2), &dwNum, nullptr);			// 유속2 [Korean comment]
+	WriteFile(hFile, &m_fMeterPerV, sizeof(m_fMeterPerV), &dwNum, nullptr);	// U좌표 1.0에 해당하는 강의 길이 [Korean comment]
+	WriteFile(hFile, &m_fMeterPerU, sizeof(m_fMeterPerU), &dwNum, nullptr);	// V좌표 1.0에 해당하는 강의 길이 [Korean comment]
+	WriteFile(hFile, &m_fMeterPerV2, sizeof(m_fMeterPerV2), &dwNum, nullptr);	// U2좌표 1.0에 해당하는 강의 길이 [Korean comment]
+	WriteFile(hFile, &m_fMeterPerU2, sizeof(m_fMeterPerU2), &dwNum, nullptr);	// V2좌표 1.0에 해당하는 강의 길이 [Korean comment]
+	WriteFile(hFile, &m_dwAlphaFactor, sizeof(m_dwAlphaFactor), &dwNum, nullptr);	// 강을 투명하게 하기 위한 알파값 [Korean comment]
 
-	WriteFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, nullptr);				// 점 갯수
+	WriteFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, nullptr);				// 점 갯수 [Korean comment]
 	if (m_iVC>0) WriteFile(hFile, m_pVertices, m_iVC*sizeof(__VertexXyzT2), &dwNum, nullptr);	// vertex buffer
 	WriteFile(hFile, &m_iIC, sizeof(m_iIC), &dwNum, nullptr);				// IndexBuffer Count.
 
@@ -180,13 +180,13 @@ void CRiverMesh::Render()
 		s_lpD3DDev->GetTextureStageState(0, D3DTSS_ALPHAOP, &dwAlphaOP);
 		s_lpD3DDev->GetTextureStageState(0, D3DTSS_ALPHAARG1, &dwAlphaArg1);
 
-		if ((m_dwAlphaFactor & 0xff000000) != 0xff000000)	// alpha factor 설정하기
+		if ((m_dwAlphaFactor & 0xff000000) != 0xff000000)	// alpha factor 설정하기 Set
 		{
-			// render state 세팅
+			// render state 세팅 [Korean comment]
 			s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 			s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 			s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-			s_lpD3DDev->SetRenderState(D3DRS_TEXTUREFACTOR, m_dwAlphaFactor);	// alpha factor 설정
+			s_lpD3DDev->SetRenderState(D3DRS_TEXTUREFACTOR, m_dwAlphaFactor);	// alpha factor 설정 Set
 			// texture state 세팅(alpha)
 			s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
 			s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TFACTOR);
@@ -249,7 +249,7 @@ void CRiverMesh::Render()
 
 }
 
-void CRiverMesh::RenderVertexPoint()	// 잘보이게 점만 다시 그리기
+void CRiverMesh::RenderVertexPoint()	// 잘보이게 점만 다시 그리기 Draw
 {
 	if (m_iVC == 0 || m_pVertices == nullptr) return;
 	HRESULT hr;
@@ -434,7 +434,7 @@ void CRiverMesh::ReCalcUV()
 	float fUPerMeter2 = 1.0f/m_fMeterPerU2;
 	float fVPerMeter2 = 1.0f/m_fMeterPerV2;
 
-	// 처음 두점 설정하기
+	// 처음 두점 설정하기 Set
 	__Vector3 vDiff; float fDiff;
 	vDiff = (__Vector3)m_pVertices[0].v - (__Vector3)m_pVertices[1].v;
 	fDiff = vDiff.Magnitude()*fUPerMeter/2;
@@ -444,7 +444,7 @@ void CRiverMesh::ReCalcUV()
 	m_pVertices[0].tu2 = 0.5f - fDiff;	m_pVertices[1].tu2 = 0.5f + fDiff;
 	m_pVertices[0].tv2 = 0.0f;			m_pVertices[1].tv2 = 0.0f;
 
-	// 나머지 점 계산하기
+	// 나머지 점 계산하기 Calculate
 	for (i=1; i<iCount; ++i)
 	{
 		// U

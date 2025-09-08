@@ -14,11 +14,11 @@
 class CN3FXBundleGame : public CN3FXBundle
 {
 public:
-	int					m_iID;			//겜에서 쓰는 아디..
+	int					m_iID;			//겜에서 쓰는 아디.. [Korean comment]
 	int					m_iIdx;
 	bool				m_bRegion;
 
-	//포물선 운동을 위한...싸인곡선 이용함다..
+	//포물선 운동을 위한...싸인곡선 이용함다.. [Korean comment]
 	float				m_fDistance;
 	float				m_fHeight;
 	

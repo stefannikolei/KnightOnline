@@ -122,7 +122,7 @@ int APIENTRY WinMain(
 
 	srand((uint32_t) time(nullptr));
 
-	// 메인 윈도우를 만들고..
+	// 메인 윈도우를 만들고.. Window
 	HWND hWndMain = CreateMainWindow(hInstance);
 	if (hWndMain == nullptr)
 	{
@@ -130,7 +130,7 @@ int APIENTRY WinMain(
 		exit(-1);
 	}
 
-	::ShowWindow(hWndMain, nCmdShow); // 보여준다..
+	::ShowWindow(hWndMain, nCmdShow); // 보여준다.. [Korean comment]
 	::SetActiveWindow(hWndMain);
 
 	CGameProcedure::s_bWindowed = true;

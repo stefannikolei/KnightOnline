@@ -40,14 +40,14 @@ bool CUIInn::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
 	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
-		if (pSender->m_szID == "btn_warehouse")	//창고이용..
+		if (pSender->m_szID == "btn_warehouse")	//창고이용.. Window
 		{
 			MsgSend_OpenWareHouse();
 			SetVisible(false);
 			return true;
 		}
 
-		if (pSender->m_szID == "btn_makeclan")	//clan 생성..
+		if (pSender->m_szID == "btn_makeclan")	//clan 생성.. Create
 		{
 			__InfoPlayerBase* pInfo = &CGameBase::s_pPlayer->m_InfoBase;
 			__InfoPlayerMySelf* pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
@@ -102,8 +102,8 @@ void CUIInn::Message(int iMessageID)
 
 void CUIInn::MsgSend_OpenWareHouse()
 {
-	uint8_t byBuff[2];		// 패킷 버퍼..
-	int iOffset=0;		// 패킷 오프셋..
+	uint8_t byBuff[2];		// 패킷 버퍼.. [Korean comment]
+	int iOffset=0;		// 패킷 오프셋.. [Korean comment]
 
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_WAREHOUSE);		
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_WARE_OPEN);

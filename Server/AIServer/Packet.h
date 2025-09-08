@@ -4,7 +4,7 @@
 const BYTE INFO_MODIFY			=	1;
 const BYTE INFO_DELETE			= 	2;
 
-// 상태이상 정보
+// 상태이상 정보 Info
 #define _ABNORMAL_DB			5
 
 const BYTE ABNORMAL_NONE		=	0;

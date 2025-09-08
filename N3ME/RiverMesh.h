@@ -55,16 +55,16 @@ protected:
 	int				m_iIC;					// Index Buffer Count.
 	int				m_iVC;					// Vertex Count.
 	CN3Texture*		m_pTexture;
-	int				m_iAnimTextureCount;	// Animation되는 텍스쳐 갯수
-	CN3Texture**	m_pAnimTextures;		// Animation되는 텍스쳐 포인터들..
+	int				m_iAnimTextureCount;	// Animation되는 텍스쳐 갯수 [Korean comment]
+	CN3Texture**	m_pAnimTextures;		// Animation되는 텍스쳐 포인터들.. [Korean comment]
 	float			m_fSpeed1;			// 유속 : 초당 v좌표의 변화량
 	float			m_fSpeed2;			// 유속 : 초당 v2좌표의 변화량
-	float			m_fMeterPerU;		// U좌표 1.0에 해당하는 강의 길이
-	float			m_fMeterPerV;		// V좌표 1.0에 해당하는 강의 길이
-	float			m_fMeterPerU2;		// U2좌표 1.0에 해당하는 강의 길이
-	float			m_fMeterPerV2;		// V2좌표 1.0에 해당하는 강의 길이
+	float			m_fMeterPerU;		// U좌표 1.0에 해당하는 강의 길이 [Korean comment]
+	float			m_fMeterPerV;		// V좌표 1.0에 해당하는 강의 길이 [Korean comment]
+	float			m_fMeterPerU2;		// U2좌표 1.0에 해당하는 강의 길이 [Korean comment]
+	float			m_fMeterPerV2;		// V2좌표 1.0에 해당하는 강의 길이 [Korean comment]
 	float			m_fAnimTexFPS;		// AnimTexture의 초당 frame 수;
-	DWORD			m_dwAlphaFactor;	// 강을 투명하게 하기 위한 알파값
+	DWORD			m_dwAlphaFactor;	// 강을 투명하게 하기 위한 알파값 [Korean comment]
 
 // Operations
 public:
@@ -72,11 +72,11 @@ public:
 	virtual bool	Load(HANDLE hFile);
 	virtual bool	Save(HANDLE hFile);
 	void			Render();
-	void			RenderVertexPoint();	// 잘보이게 점만 다시 그리기
+	void			RenderVertexPoint();	// 잘보이게 점만 다시 그리기 Draw
 
 	int				AddVertex(__Vector3& vPos1, __Vector3& vPos2, __Vector3& vPos3, __Vector3& vPos4);
 	int				AddVertex();
-	int				DeleteVertex(int iIndex);	// 쌍으로 지우고 뒤에 있는 것들을 앞으로 두개씩 이동
+	int				DeleteVertex(int iIndex);	// 쌍으로 지우고 뒤에 있는 것들을 앞으로 두개씩 이동 Move
 	__VertexXyzT2*	GetVertex(int iIndex) {if (iIndex<0 || iIndex>=m_iVC) return nullptr; return m_pVertices+iIndex;}
 	__Vector3		GetCenter();
 

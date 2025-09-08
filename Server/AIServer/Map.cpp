@@ -171,7 +171,7 @@ BOOL MAP::LoadMap(HANDLE hFile)
 void MAP::LoadTerrain(HANDLE hFile)
 {
 	DWORD dwRWC;
-	ReadFile(hFile, &m_nMapSize, sizeof(int), &dwRWC, nullptr);	// 가로세로 정보가 몇개씩인가?
+	ReadFile(hFile, &m_nMapSize, sizeof(int), &dwRWC, nullptr);	// 가로세로 정보가 몇개씩인가? Info
 	ReadFile(hFile, &m_fUnitDist, sizeof(float), &dwRWC, nullptr);
 
 	m_fHeight = new float* [m_nMapSize];
@@ -181,7 +181,7 @@ void MAP::LoadTerrain(HANDLE hFile)
 	for (int z = 0; z < m_nMapSize; z++)
 	{
 		for (int x = 0; x < m_nMapSize; x++)
-			ReadFile(hFile, &m_fHeight[x][z], sizeof(float), &dwRWC, nullptr);	// 높이값 읽어오기
+			ReadFile(hFile, &m_fHeight[x][z], sizeof(float), &dwRWC, nullptr);	// 높이값 읽어오기 [Korean comment]
 	}
 }
 
@@ -190,7 +190,7 @@ float MAP::GetHeight(float x, float z)
 	int iX, iZ;
 	iX = (int) (x / m_fUnitDist);
 	iZ = (int) (z / m_fUnitDist);
-	//_ASSERT( iX, iZ가 범위내에 있는 값인지 체크하기);
+	//_ASSERT( iX, iZ가 범위내에 있는 값인지 체크하기); Check
 
 	float y;
 	float h1, h2, h3;
@@ -217,7 +217,7 @@ float MAP::GetHeight(float x, float z)
 
 			float h12 = h1 + (h2 - h1) * dX;	// h1과 h2사이의 높이값
 			float h32 = h3 + (h2 - h3) * dX;	// h3과 h2사이의 높이값
-			y = h32 + (h12 - h32) * ((dZ) / (1.0f - dX));	// 찾고자 하는 높이값
+			y = h32 + (h12 - h32) * ((dZ) / (1.0f - dX));	// 찾고자 하는 높이값 [Korean comment]
 		}
 		else
 		{
@@ -230,7 +230,7 @@ float MAP::GetHeight(float x, float z)
 
 			float h12 = h1 + (h2 - h1) * dX;	// h1과 h2사이의 높이값
 			float h13 = h1 + (h3 - h1) * dX;	// h1과 h3사이의 높이값
-			y = h13 + (h12 - h13) * ((1.0f - dZ) / (dX));	// 찾고자 하는 높이값
+			y = h13 + (h12 - h13) * ((1.0f - dZ) / (dX));	// 찾고자 하는 높이값 [Korean comment]
 		}
 	}
 	else
@@ -245,7 +245,7 @@ float MAP::GetHeight(float x, float z)
 
 			float h12 = h1 + (h2 - h1) * dX;	// h1과 h2사이의 높이값
 			float h32 = h3 + (h2 - h3) * dX;	// h3과 h2사이의 높이값
-			y = h12 + (h32 - h12) * ((1.0f - dZ) / (1.0f - dX));	// 찾고자 하는 높이값
+			y = h12 + (h32 - h12) * ((1.0f - dZ) / (1.0f - dX));	// 찾고자 하는 높이값 [Korean comment]
 		}
 		else
 		{
@@ -258,7 +258,7 @@ float MAP::GetHeight(float x, float z)
 
 			float h12 = h1 + (h2 - h1) * dX;	// h1과 h2사이의 높이값
 			float h13 = h1 + (h3 - h1) * dX;	// h1과 h3사이의 높이값
-			y = h12 + (h13 - h12) * ((dZ) / (dX));	// 찾고자 하는 높이값
+			y = h12 + (h13 - h12) * ((dZ) / (dX));	// 찾고자 하는 높이값 [Korean comment]
 		}
 	}
 
@@ -359,9 +359,9 @@ void MAP::RegionNpcRemove(int rx, int rz, int nid)
 
 void MAP::LoadMapTile(HANDLE hFile)
 {
-	//MapTile속성 읽기..
-	//	속성이 0이면 못 가는 곳.
-	//	1이면 그냥 가는 곳...
+	//MapTile속성 읽기.. Load
+	//	속성이 0이면 못 가는 곳. [Korean comment]
+	//	1이면 그냥 가는 곳... [Korean comment]
 	//	그외는 이벤트 ID.
 	//
 	int x1 = m_sizeMap.cx;
@@ -369,7 +369,7 @@ void MAP::LoadMapTile(HANDLE hFile)
 	DWORD dwNum;
 	short** pEvent = new short* [m_sizeMap.cx];
 
-	// 잠시 막아놓고..
+	// 잠시 막아놓고.. [Korean comment]
 	for (int x = 0; x < m_sizeMap.cx; x++)
 	{
 		pEvent[x] = new short[m_sizeMap.cx];
@@ -473,7 +473,7 @@ void MAP::LoadObjectEvent(HANDLE hFile)
 	for (int i = 0; i < iEventObjectCount; i++)
 	{
 		pEvent = new _OBJECT_EVENT;
-		ReadFile(hFile, &pEvent->sBelong, 4, &dwNum, nullptr);					// 소속 
+		ReadFile(hFile, &pEvent->sBelong, 4, &dwNum, nullptr);					// 소속  [Korean comment]
 		ReadFile(hFile, &pEvent->sIndex, 2, &dwNum, nullptr);				// Event Index
 		ReadFile(hFile, &pEvent->sType, 2, &dwNum, nullptr);
 		ReadFile(hFile, &pEvent->sControlNpcID, 2, &dwNum, nullptr);
@@ -559,7 +559,7 @@ BOOL MAP::LoadRoomEvent(int zone_number)
 			buf[index] = (BYTE) 0;
 			t_index = 0;
 
-			// 주석에 대한 처리
+			// 주석에 대한 처리 Process
 			if (buf[t_index] == ';'
 				|| buf[t_index] == '/')
 			{
@@ -710,7 +710,7 @@ cancel_event_load:
 int MAP::IsRoomCheck(float fx, float fz)
 {
 	// dungeion work
-	// 현재의 존이 던젼인지를 판단, 아니면 리턴처리
+	// 현재의 존이 던젼인지를 판단, 아니면 리턴처리 Process
 
 	CRoomEvent* pRoom = nullptr;
 	char notify[100] = {};
@@ -734,7 +734,7 @@ int MAP::IsRoomCheck(float fx, float fz)
 		BOOL bFlag_1 = FALSE;
 		BOOL bFlag_2 = FALSE;
 
-		// 방이 초기화 상태
+		// 방이 초기화 상태 Initialize
 		if (pRoom->m_byStatus == 1)
 		{
 			minX = pRoom->m_iInitMinX;
@@ -742,10 +742,10 @@ int MAP::IsRoomCheck(float fx, float fz)
 			maxX = pRoom->m_iInitMaxX;
 			maxZ = pRoom->m_iInitMaxZ;
 		}
-		// 진행중인 상태
+		// 진행중인 상태 Status
 		else if (pRoom->m_byStatus == 2)
 		{
-			// 목표지점까지 이동하는게 아니라면,,
+			// 목표지점까지 이동하는게 아니라면,, Move
 			if (pRoom->m_Logic[0].sNumber != 4)
 				continue;
 
@@ -780,10 +780,10 @@ int MAP::IsRoomCheck(float fx, float fz)
 		if (bFlag_1
 			&& bFlag_2)
 		{
-			// 방이 초기화 상태
+			// 방이 초기화 상태 Initialize
 			if (pRoom->m_byStatus == 1)
 			{
-				pRoom->m_byStatus = 2;	// 진행중 상태로 방상태 변환
+				pRoom->m_byStatus = 2;	// 진행중 상태로 방상태 변환 Status
 				pRoom->m_fDelayTime = TimeGet();
 				room_number = i;
 				spdlog::trace("Map::IsRoomCheck: [roomEventId={} zoneId={} x={} z={}]",
@@ -791,10 +791,10 @@ int MAP::IsRoomCheck(float fx, float fz)
 				//wsprintf(notify, "** 알림 : [%d Zone][%d] 방에 들어오신것을 환영합니다 **", m_nZoneNumber, pRoom->m_sRoomNumber);
 				//m_pMain->SendSystemMsg( notify, m_nZoneNumber, PUBLIC_CHAT, SEND_ALL);
 			}
-			// 진행중인 상태
+			// 진행중인 상태 Status
 			else if (pRoom->m_byStatus == 2)
 			{
-				pRoom->m_byStatus = 3;					// 클리어 상태로
+				pRoom->m_byStatus = 3;					// 클리어 상태로 Status
 				//wsprintf(notify, "** 알림 : [%d Zone][%d] 목표지점까지 도착해서 클리어 됩니다ㅇ **", m_nZoneNumber, pRoom->m_sRoomNumber);
 				//m_pMain->SendSystemMsg( notify, m_nZoneNumber, PUBLIC_CHAT, SEND_ALL);
 			}
@@ -835,7 +835,7 @@ BOOL MAP::IsRoomStatusCheck()
 	int nTotalRoom = m_arRoomEventArray.GetSize() + 1;
 	int nClearRoom = 1;
 
-	// 방을 초기화중
+	// 방을 초기화중 Initialize
 	if (m_byRoomStatus == 2)
 		m_byInitRoomCount++;
 
@@ -850,7 +850,7 @@ BOOL MAP::IsRoomStatusCheck()
 			//return nullptr;
 		}
 
-		// 방 진행중
+		// 방 진행중 [Korean comment]
 		if (m_byRoomStatus == 1)
 		{
 			if (pRoom->m_byStatus == 3)
@@ -858,7 +858,7 @@ BOOL MAP::IsRoomStatusCheck()
 
 			if (m_byRoomType == 0)
 			{
-				// 방이 다 클리어 되었어여.. 초기화 해줘여,,
+				// 방이 다 클리어 되었어여.. 초기화 해줘여,, Initialize
 				if (nTotalRoom == nClearRoom)
 				{
 					m_byRoomStatus = 2;
@@ -868,15 +868,15 @@ BOOL MAP::IsRoomStatusCheck()
 				}
 			}
 		}
-		// 방을 초기화중
+		// 방을 초기화중 Initialize
 		else if (m_byRoomStatus == 2)
 		{
 			if (m_byInitRoomCount >= 10)
 			{
-				pRoom->InitializeRoom();		// 실제 방을 초기화
+				pRoom->InitializeRoom();		// 실제 방을 초기화 Initialize
 				nClearRoom += 1;
 
-				// 방이 초기화 되었어여.. 
+				// 방이 초기화 되었어여..  Initialize
 				if (nTotalRoom == nClearRoom)
 				{
 					m_byRoomStatus = 3;
@@ -886,7 +886,7 @@ BOOL MAP::IsRoomStatusCheck()
 				}
 			}
 		}
-		// 방 초기화 완료
+		// 방 초기화 완료 Initialize
 		else if (m_byRoomStatus == 3)
 		{
 			m_byRoomStatus = 1;
@@ -915,7 +915,7 @@ void MAP::InitializeRoom()
 			continue;
 		}
 
-		pRoom->InitializeRoom();		// 실제 방을 초기화
+		pRoom->InitializeRoom();		// 실제 방을 초기화 Initialize
 		m_byRoomStatus = 1;
 		m_byInitRoomCount = 0;
 	}

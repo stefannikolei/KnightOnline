@@ -22,14 +22,14 @@ protected:
 	CN3UIProgress*	m_pProgress_HPSlow[MAX_PARTY_OR_FORCE];		// HP Slow
 	CN3UIProgress*	m_pProgress_HPLasting[MAX_PARTY_OR_FORCE];	// HP Lasting
 	CN3UIProgress*	m_pProgress_MP[MAX_PARTY_OR_FORCE];			// MP Bar
-	CN3UIStatic*	m_pStatic_IDs[MAX_PARTY_OR_FORCE];			// 부대원갯수 만큼... 이름들..
-	CN3UIArea*		m_pAreas[MAX_PARTY_OR_FORCE];				// 부대원갯수 만큼... 이름들..
+	CN3UIStatic*	m_pStatic_IDs[MAX_PARTY_OR_FORCE];			// 부대원갯수 만큼... 이름들.. Name
+	CN3UIArea*		m_pAreas[MAX_PARTY_OR_FORCE];				// 부대원갯수 만큼... 이름들.. Name
 
-	std::list<__InfoPartyOrForce>	m_Members; // 파티 멤버
-	int			m_iIndexSelected; // 현재 선택된 멤버인덱스..
+	std::list<__InfoPartyOrForce>	m_Members; // 파티 멤버 [Korean comment]
+	int			m_iIndexSelected; // 현재 선택된 멤버인덱스.. Index
 
 public:
-	int			m_iPartyOrForce; // 파티냐? 부대냐?? 1 이면 파티 2 이면 부대..
+	int			m_iPartyOrForce; // 파티냐? 부대냐?? 1 이면 파티 2 이면 부대.. [Korean comment]
 
 public:
 	bool OnKeyPress(int iKey);
@@ -39,8 +39,8 @@ public:
 	void		MemberHPChange(int iID, int iHP, int iHPMax, int iMP, int iMPMax);
 	void		MemberStatusChange(int iID, e_PartyStatus ePS, bool bSuffer);
 
-	void		MemberInfoReInit(); // 파티원 구성이 변경될때.. 순서 및 각종 정보 업데이트..
-	bool		TargetByIndex(int iIndex); // 순서대로 타겟 잡기..
+	void		MemberInfoReInit(); // 파티원 구성이 변경될때.. 순서 및 각종 정보 업데이트.. Update
+	bool		TargetByIndex(int iIndex); // 순서대로 타겟 잡기.. [Korean comment]
 
 	int MemberCount() const
 	{
@@ -49,7 +49,7 @@ public:
 
 	const __InfoPartyOrForce*	MemberInfoGetByID(int iID, int& iIndexResult);
 	const __InfoPartyOrForce*	MemberInfoGetByIndex(int iIndex);
-	const __InfoPartyOrForce*	MemberInfoGetSelected(); // 현재 선택된 멤버인덱스..
+	const __InfoPartyOrForce*	MemberInfoGetSelected(); // 현재 선택된 멤버인덱스.. Index
 	const __InfoPartyOrForce*	MemberAdd(int iID, const std::string& szID, int iLevel, e_Class eClass, int iHP, int iHPMax, int iMP, int iMPMax);
 	class CPlayerOther*			MemberGetByNearst(const __Vector3& vPosPlayer);
 	bool						MemberRemove(int iID);

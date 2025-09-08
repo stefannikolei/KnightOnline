@@ -18,14 +18,14 @@ class CNpc
 public:
 	CEbenezerDlg* m_pMain;
 
-	/// \brief Serial number of NPC (server-side) || NPC (서버상의)일련번호
+	/// \brief Serial number of NPC (server-side) || NPC (서버상의)일련번호 [Korean comment]
 	short	m_sNid;
 
-	/// \brief Reference number for the NPC table || NPC 테이블 참조번호
+	/// \brief Reference number for the NPC table || NPC 테이블 참조번호 [Korean comment]
 	short	m_sSid;
 	
 	short	m_sCurZone;			// Current Zone;
-	short	m_sZoneIndex;		// NPC 가 존재하고 있는 존의 인덱스
+	short	m_sZoneIndex;		// NPC 가 존재하고 있는 존의 인덱스 Index
 	float	m_fCurX;			// Current X Pos;
 	float	m_fCurY;			// Current Y Pos;
 	float	m_fCurZ;			// Current Z Pos;
@@ -37,23 +37,23 @@ public:
 	int		m_iMaxHP;			// 최대 HP
 	int		m_iHP;				// 현재 HP
 	BYTE	m_byState;			// 몬스터 (NPC) 상태
-	BYTE	m_byGroup;			// 소속 집단
-	BYTE	m_byLevel;			// 레벨
+	BYTE	m_byGroup;			// 소속 집단 [Korean comment]
+	BYTE	m_byLevel;			// 레벨 [Korean comment]
 	BYTE	m_tNpcType;			// NPC Type
 								// 0 : Normal Monster
 								// 1 : NPC
 								// 2 : 각 입구,출구 NPC
-								// 3 : 경비병
+								// 3 : 경비병 [Korean comment]
 	int		m_iSellingGroup;		// ItemGroup
 //	DWORD	m_dwStepDelay;		
 
 	short	m_sRegion_X;			// region x position
 	short	m_sRegion_Z;			// region z position
-	BYTE	m_NpcState;			// NPC의 상태 - 살았다, 죽었다, 서있다 등등...
+	BYTE	m_NpcState;			// NPC의 상태 - 살았다, 죽었다, 서있다 등등... Status
 	BYTE	m_byGateOpen;		// Gate Npc Status -> 1 : open 0 : close
-	short   m_sHitRate;			// 공격 성공률
+	short   m_sHitRate;			// 공격 성공률 [Korean comment]
 	BYTE    m_byObjectType;     // 보통은 0, object타입(성문, 레버)은 1
-	BYTE	m_byDirection;		// NPC가 보고 있는 방향
+	BYTE	m_byDirection;		// NPC가 보고 있는 방향 [Korean comment]
 
 	short   m_byEvent;		    // This is for the quest. 
 

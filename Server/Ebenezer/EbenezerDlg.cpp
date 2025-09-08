@@ -94,20 +94,20 @@ DWORD WINAPI ReadQueueThread(LPVOID lp)
 				if (result == 0xFF)
 					memset(pUser->m_strAccountID, 0, sizeof(pUser->m_strAccountID));
 				SetByte(send_buff, WIZ_LOGIN, send_index);
-				SetByte(send_buff, result, send_index);					// 성공시 국가 정보
+				SetByte(send_buff, result, send_index);					// 성공시 국가 정보 Info
 				pUser->Send(send_buff, send_index);
 				break;
 
 			case WIZ_SEL_NATION:
 				SetByte(send_buff, WIZ_SEL_NATION, send_index);
-				SetByte(send_buff, GetByte(pBuf, index), send_index);	// 국가 정보
+				SetByte(send_buff, GetByte(pBuf, index), send_index);	// 국가 정보 Info
 				pUser->Send(send_buff, send_index);
 				break;
 
 			case WIZ_NEW_CHAR:
 				result = GetByte(pBuf, index);
 				SetByte(send_buff, WIZ_NEW_CHAR, send_index);
-				SetByte(send_buff, result, send_index);					// 성공시 국가 정보
+				SetByte(send_buff, result, send_index);					// 성공시 국가 정보 Info
 				pUser->Send(send_buff, send_index);
 				break;
 
@@ -115,7 +115,7 @@ DWORD WINAPI ReadQueueThread(LPVOID lp)
 				pUser->RecvDeleteChar(pBuf + index);
 			/*	result = GetByte( pBuf, index );
 				SetByte( send_buff, WIZ_DEL_CHAR, send_index );
-				SetByte( send_buff, result, send_index );					// 성공시 국가 정보
+				SetByte( send_buff, result, send_index );					// 성공시 국가 정보 Info
 				SetByte( send_buff, GetByte( pBuf, index ), send_index );
 				pUser->Send( send_buff, send_index );	*/
 				break;
@@ -258,14 +258,14 @@ CEbenezerDlg::CEbenezerDlg(CWnd* pParent /*=nullptr*/)
 	memset(m_ppNotice, 0, sizeof(m_ppNotice));
 	memset(m_AIServerIP, 0, sizeof(m_AIServerIP));
 
-	m_bPermanentChatMode = FALSE;			// 비러머글 남는 공지 --;
+	m_bPermanentChatMode = FALSE;			// 비러머글 남는 공지 --; [Korean comment]
 	m_bPermanentChatFlag = FALSE;
 	memset(m_strPermanentChat, 0, sizeof(m_strPermanentChat));
 
 	memset(m_strKarusCaptain, 0, sizeof(m_strKarusCaptain));
 	memset(m_strElmoradCaptain, 0, sizeof(m_strElmoradCaptain));
 
-	m_bSanta = FALSE;		// 갓댐 산타!!! >.<
+	m_bSanta = FALSE;		// 갓댐 산타!!! >.< [Korean comment]
 
 	ConnectionManager::Create();
 }
@@ -310,9 +310,9 @@ BOOL CEbenezerDlg::OnInitDialog()
 	srand(static_cast<uint32_t>(time(nullptr)));
 
 	// Compress Init
-	memset(m_CompBuf, 0, sizeof(m_CompBuf));	// 압축할 데이터를 모으는 버퍼
-	m_iCompIndex = 0;							// 압축할 데이터의 길이
-	m_CompCount = 0;							// 압축할 데이터의 개수
+	memset(m_CompBuf, 0, sizeof(m_CompBuf));	// 압축할 데이터를 모으는 버퍼 Data
+	m_iCompIndex = 0;							// 압축할 데이터의 길이 Data
+	m_CompCount = 0;							// 압축할 데이터의 개수 Data
 
 	m_sZoneCount = 0;
 	m_sSocketCount = 0;
@@ -907,16 +907,16 @@ BOOL CEbenezerDlg::AISocketConnect(int zone, bool flag, std::string* errorReason
 	SetByte(pBuf, AI_SERVER_CONNECT, send_index);
 	SetByte(pBuf, zone, send_index);
 
-	// 재접속
+	// 재접속 [Korean comment]
 	if (flag)
 		SetByte(pBuf, 1, send_index);
-	// 처음 접속..
+	// 처음 접속.. [Korean comment]
 	else
 		SetByte(pBuf, 0, send_index);
 
 	pAISock->Send(pBuf, send_index);
 
-	// 해야할일 :이 부분 처리.....
+	// 해야할일 :이 부분 처리..... Process
 	//SendAllUserInfo();
 	//m_sSocketCount = zone;
 	m_AISocketMap.PutData(zone, pAISock);
@@ -1285,7 +1285,7 @@ BOOL CEbenezerDlg::MapFileLoad()
 
 			m_ZoneArray.push_back(pMap);
 
-			// 스트립트를 읽어 들인다.
+			// 스트립트를 읽어 들인다. [Korean comment]
 			EVENT* pEvent = new EVENT;
 			if (!pEvent->LoadEvent(row.ZoneId))
 			{
@@ -1574,7 +1574,7 @@ void CEbenezerDlg::UpdateGameTime()
 		UpdateWeather();
 		SetGameTime();
 
-		//  갓댐 산타!! >.<
+		//  갓댐 산타!! >.< [Korean comment]
 		if (m_bSanta)
 			FlySanta();
 		//
@@ -1607,7 +1607,7 @@ void CEbenezerDlg::UpdateGameTime()
 	//SetByte(pSendBuf, AG_CHECK_ALIVE_REQ, send_index);
 	//Send_AIServer(1000, pSendBuf, send_index);
 
-	// 시간과 날씨 정보를 보낸다..
+	// 시간과 날씨 정보를 보낸다.. Info
 	memset(pSendBuf, 0, sizeof(pSendBuf));
 	send_index = 0;
 	SetByte(pSendBuf, AG_TIME_WEATHER, send_index);
@@ -2010,7 +2010,7 @@ void CEbenezerDlg::NpcInOutForMe(CUser* pSendUser)
 
 int CEbenezerDlg::GetRegionNpcIn(C3DMap* pMap, int region_x, int region_z, char* buff, int& t_count)
 {
-	// 포인터 참조하면 안됨
+	// 포인터 참조하면 안됨 [Korean comment]
 	if (!m_bPointCheckFlag)
 		return 0;
 
@@ -2157,7 +2157,7 @@ void CEbenezerDlg::RegionNpcInfoForMe(CUser* pSendUser, int nType)
 
 int CEbenezerDlg::GetRegionNpcList(C3DMap* pMap, int region_x, int region_z, char* nid_buff, int& t_count, int nType)
 {
-	// 포인터 참조하면 안됨
+	// 포인터 참조하면 안됨 [Korean comment]
 	if (!m_bPointCheckFlag)
 		return 0;
 
@@ -2187,7 +2187,7 @@ int CEbenezerDlg::GetRegionNpcList(C3DMap* pMap, int region_x, int region_z, cha
 			continue;
 
 		CNpc* pNpc = m_NpcMap.GetData(npcId);
-		//if( pNpc && (pNpc->m_NpcState == NPC_LIVE ) ) {  // 수정할 것,,
+		//if( pNpc && (pNpc->m_NpcState == NPC_LIVE ) ) {  // 수정할 것,, [Korean comment]
 		if (pNpc != nullptr)
 		{
 			SetShort(nid_buff, pNpc->m_sNid, buff_index);
@@ -2299,7 +2299,7 @@ BOOL CEbenezerDlg::PreTranslateMessage(MSG* pMsg)
 				return TRUE;
 			}
 
-			// 비러머글 남는 공지 --;
+			// 비러머글 남는 공지 --; [Korean comment]
 			if (_strnicmp("/permanent", chatstr, 10) == 0)
 			{
 				m_bPermanentChatMode = TRUE;
@@ -2322,7 +2322,7 @@ BOOL CEbenezerDlg::PreTranslateMessage(MSG* pMsg)
 			}
 //
 
-			// 갓댐 산타!!! >.<
+			// 갓댐 산타!!! >.< [Korean comment]
 			if (_strnicmp("/santa", chatstr, 6) == 0)
 			{
 				m_bSanta = TRUE;			// Make Motherfucking Santa Claus FLY!!!
@@ -2337,7 +2337,7 @@ BOOL CEbenezerDlg::PreTranslateMessage(MSG* pMsg)
 
 			std::string finalstr;
 
-			// 비러머글 남는 공지		
+			// 비러머글 남는 공지		 [Korean comment]
 			if (m_bPermanentChatFlag)
 				finalstr = fmt::format("- {} -", chatstr);
 			else
@@ -2347,7 +2347,7 @@ BOOL CEbenezerDlg::PreTranslateMessage(MSG* pMsg)
 			SetByte(buff, WIZ_CHAT, buffindex);
 			// SetByte( buff, PUBLIC_CHAT, buffindex );
 
-			// 비러머글 남는 공지
+			// 비러머글 남는 공지 [Korean comment]
 			if (permanent_off)
 			{
 				SetByte(buff, END_PERMANENT_CHAT, buffindex);
@@ -2466,7 +2466,7 @@ void CEbenezerDlg::SyncTest(int nType)
 
 	for (C3DMap* pMap : m_ZoneArray)
 	{
-		//if (k != 2) continue;		// 201 존만 체크..
+		//if (k != 2) continue;		// 201 존만 체크.. Check
 		if (pMap == nullptr)
 			continue;
 
@@ -2601,7 +2601,7 @@ void CEbenezerDlg::SendAllUserInfo()
 		//Sleep(1);
 	}
 
-	// 파티에 대한 정보도 보내도록 한다....
+	// 파티에 대한 정보도 보내도록 한다.... Info
 	EnterCriticalSection(&g_region_critical);
 
 	for (int i = 0; i < m_PartyMap.GetSize(); i++)
@@ -2613,11 +2613,11 @@ void CEbenezerDlg::SendAllUserInfo()
 		send_index = 0;
 		ZeroMemory(send_buff, sizeof(send_buff));
 		SetByte(send_buff, AG_PARTY_INFO_ALL, send_index);
-		SetShort(send_buff, i, send_index);					// 파티 번호
+		SetShort(send_buff, i, send_index);					// 파티 번호 [Korean comment]
 		//if( i == pParty->wIndex )
 		for (int j = 0; j < 8; j++)
 		{
-			SetShort(send_buff, pParty->uid[j], send_index);				// 유저 번호
+			SetShort(send_buff, pParty->uid[j], send_index);				// 유저 번호 [Korean comment]
 			//SetShort(send_buff, pParty->sHp[j], send_index );				// HP
 			//SetByte(send_buff, pParty->bLevel[j], send_index );				// Level
 			//SetShort(send_buff, pParty->sClass[j], send_index );			// Class
@@ -2736,7 +2736,7 @@ void CEbenezerDlg::KillUser(const char* strbuff)
 
 CNpc* CEbenezerDlg::GetNpcPtr(int sid, int cur_zone)
 {
-	// 포인터 참조하면 안됨
+	// 포인터 참조하면 안됨 [Korean comment]
 	if (!m_bPointCheckFlag)
 		return nullptr;
 
@@ -2833,13 +2833,13 @@ void CEbenezerDlg::BattleZoneOpenTimer()
 		if (m_sBanishDelay == 0)
 		{
 			m_byBattleOpen = NO_BATTLE;
-			m_byKarusOpenFlag = 0;		// 카루스 땅으로 넘어갈 수 없도록
-			m_byElmoradOpenFlag = 0;	// 엘모 땅으로 넘어갈 수 없도록
+			m_byKarusOpenFlag = 0;		// 카루스 땅으로 넘어갈 수 없도록 [Korean comment]
+			m_byElmoradOpenFlag = 0;	// 엘모 땅으로 넘어갈 수 없도록 [Korean comment]
 
 			memset(m_strKarusCaptain, 0, sizeof(m_strKarusCaptain));
 			memset(m_strElmoradCaptain, 0, sizeof(m_strElmoradCaptain));
 
-			// original: 전쟁 종료 0단계
+			// original: 전쟁 종료 0단계 [Korean comment]
 			spdlog::debug("EbenezerDlg::BattleZoneOpenTimer: war ended, stage 0");
 
 			if (m_nServerNo == KARUS)
@@ -2848,7 +2848,7 @@ void CEbenezerDlg::BattleZoneOpenTimer()
 				send_index = 0;
 				SetByte(send_buff, UDP_BATTLE_EVENT_PACKET, send_index);
 				SetByte(send_buff, BATTLE_EVENT_KILL_USER, send_index);
-				SetByte(send_buff, 1, send_index);						// karus의 정보 전송
+				SetByte(send_buff, 1, send_index);						// karus의 정보 전송 Info
 				SetShort(send_buff, m_sKarusDead, send_index);
 				SetShort(send_buff, m_sElmoradDead, send_index);
 				Send_UDP_All(send_buff, send_index);
@@ -2859,7 +2859,7 @@ void CEbenezerDlg::BattleZoneOpenTimer()
 
 		if (m_sBanishDelay == 3)
 		{
-			// 눈싸움 전쟁
+			// 눈싸움 전쟁 [Korean comment]
 			if (m_byOldBattleOpen == SNOW_BATTLE)
 			{
 				if (m_sKarusDead > m_sElmoradDead)
@@ -2906,7 +2906,7 @@ void CEbenezerDlg::BattleZoneOpenTimer()
 		}
 		else if (m_sBanishDelay == 20)
 		{
-			// original: 전쟁 종료 3단계 - 초기화 해주세여
+			// original: 전쟁 종료 3단계 - 초기화 해주세여 Initialize
 			spdlog::debug("EbenezerDlg::BattleZoneOpenTimer: War ended, stage 3: resetting battlezone");
 			SetByte(send_buff, AG_BATTLE_EVENT, send_index);
 			SetByte(send_buff, BATTLE_EVENT_OPEN, send_index);
@@ -3288,7 +3288,7 @@ int CEbenezerDlg::GetKnightsAllMembers(int knightsindex, char* temp_buff, int& b
 			if (pUser == nullptr)
 				continue;
 
-			// 같은 소속의 클랜..
+			// 같은 소속의 클랜.. [Korean comment]
 			if (pUser->m_pUserData->m_bKnights == knightsindex)
 			{
 				SetShort(temp_buff, strlen(pUser->m_pUserData->m_id), buff_index);
@@ -3311,7 +3311,7 @@ int CEbenezerDlg::GetKnightsAllMembers(int knightsindex, char* temp_buff, int& b
 		{
 			if (pKnights->m_arKnightsUser[i].byUsed == 1)
 			{
-				// 접속중인 회원
+				// 접속중인 회원 [Korean comment]
 				CUser* pUser = GetUserPtr(pKnights->m_arKnightsUser[i].strUserName, NameType::Character);
 				if (pUser != nullptr)
 				{
@@ -3325,13 +3325,13 @@ int CEbenezerDlg::GetKnightsAllMembers(int knightsindex, char* temp_buff, int& b
 						SetByte(temp_buff, 1, buff_index);
 						count++;
 					}
-					// 다른존에서 탈퇴나 추방된 유저이므로 메모리에서 삭제
+					// 다른존에서 탈퇴나 추방된 유저이므로 메모리에서 삭제 Delete
 					else
 					{
 						m_KnightsManager.RemoveKnightsUser(knightsindex, pUser->m_pUserData->m_id);
 					}
 				}
-				// 비접속중인 회원
+				// 비접속중인 회원 [Korean comment]
 				else
 				{
 					SetShort(temp_buff, strlen(pKnights->m_arKnightsUser[i].strUserName), buff_index);
@@ -3448,7 +3448,7 @@ void CEbenezerDlg::WritePacketLog()
 
 int CEbenezerDlg::GetKnightsGrade(int nPoints)
 {
-	// 클랜등급 = 클랜원 국가 기여도의 총합 / 24
+	// 클랜등급 = 클랜원 국가 기여도의 총합 / 24 [Korean comment]
 	int nClanPoints = nPoints / 24;
 
 	int nGrade = 5;
@@ -3655,7 +3655,7 @@ BOOL CEbenezerDlg::LoadKnightsRankTable()
 			{
 				//if (nKarusRank == 5 || nFindKarus == 1)
 				if (nKarusRank == 5)
-					continue;			// 5위까지 클랜장이 없으면 대장은 없음			
+					continue;			// 5위까지 클랜장이 없으면 대장은 없음			 [Korean comment]
 
 				//nKarusRank++;
 
@@ -3691,7 +3691,7 @@ BOOL CEbenezerDlg::LoadKnightsRankTable()
 			{
 				//if (nElmoRank == 5 || nFindElmo == 1)
 				if (nElmoRank == 5)
-					continue;			// 5위까지 클랜장이 없으면 대장은 없음			
+					continue;			// 5위까지 클랜장이 없으면 대장은 없음			 [Korean comment]
 
 				//nElmoRank++;
 
@@ -3783,7 +3783,7 @@ void CEbenezerDlg::BattleZoneCurrentUsers()
 	if (pMap == nullptr)
 		return;
 
-	// 현재의 서버가 배틀존 서버가 아니라면 리턴
+	// 현재의 서버가 배틀존 서버가 아니라면 리턴 [Korean comment]
 	if (m_nServerNo != pMap->m_nServerNo)
 		return;
 

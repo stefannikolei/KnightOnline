@@ -33,7 +33,7 @@ CN3CEDoc::CN3CEDoc()
 
 	m_bLoadingNow = FALSE;
 
-	// Character 초기화..
+	// Character 초기화.. Initialize
 	CN3Chr* pChr = new CN3Chr();
 	m_Scene.ChrAdd(pChr);
 }
@@ -50,7 +50,7 @@ BOOL CN3CEDoc::OnNewDocument()
 	if(m_Scene.ChrGet(0))
 	{
 		m_Scene.ChrGet(0)->Release();
-		m_Scene.ChrGet(0)->AniDefaultSet(); // 기본 에니메이션 세팅..
+		m_Scene.ChrGet(0)->AniDefaultSet(); // 기본 에니메이션 세팅.. [Korean comment]
 	}
 	this->UpdateAllViews(nullptr);
 
@@ -98,7 +98,7 @@ BOOL CN3CEDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		return FALSE;
 	
 	// TODO: Add your specialized creation code here
-	char szPath[512]; // 경로를 잘 가려야 한다..
+	char szPath[512]; // 경로를 잘 가려야 한다.. [Korean comment]
 	lstrcpy(szPath, lpszPathName);
 	int nFind = 0;
 	for(int i = lstrlen(szPath) - 1; i >= 0; i--)
@@ -113,7 +113,7 @@ BOOL CN3CEDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	
 	m_bLoadingNow = TRUE;
 
-	m_Scene.PathSet(szPath); // 경로를 정해주고..
+	m_Scene.PathSet(szPath); // 경로를 정해주고.. [Korean comment]
 	m_Scene.ChrGet(0)->Release();
 	m_Scene.ChrGet(0)->LoadFromFile(lpszPathName);
 	CN3Joint* pJoint = m_Scene.ChrGet(0)->Joint();
@@ -128,7 +128,7 @@ BOOL CN3CEDoc::OnOpenDocument(LPCTSTR lpszPathName)
 
 	if(m_Scene.ChrGet(0)->AniCtrl() == nullptr)
 	{
-		m_Scene.ChrGet(0)->AniDefaultSet(); // 기본 에니메이션 세팅..
+		m_Scene.ChrGet(0)->AniDefaultSet(); // 기본 에니메이션 세팅.. [Korean comment]
 	}
 
 	m_bLoadingNow = FALSE;
@@ -143,7 +143,7 @@ BOOL CN3CEDoc::OnSaveDocument(LPCTSTR lpszPathName)
 	CDocument::OnSaveDocument(lpszPathName);
 	
 	// TODO: Add your specialized creation code here
-	char szPath[512]; // 경로를 잘 가려야 한다..
+	char szPath[512]; // 경로를 잘 가려야 한다.. [Korean comment]
 	lstrcpy(szPath, lpszPathName);
 	int nFind = 0;
 	for(int i = lstrlen(szPath) - 1; i >= 0; i--)
@@ -159,14 +159,14 @@ BOOL CN3CEDoc::OnSaveDocument(LPCTSTR lpszPathName)
 	char szDrive[_MAX_DRIVE], szDir[_MAX_DIR], szFName[_MAX_FNAME];
 	_splitpath(lpszPathName, szDrive, szDir, szFName, nullptr);
 
-	m_Scene.PathSet(szPath); // 경로를 정해주고..
+	m_Scene.PathSet(szPath); // 경로를 정해주고.. [Korean comment]
 	CN3Chr* pChr = m_Scene.ChrGet(0);
-	pChr->m_szName = szFName; // 이름을 정하고..
+	pChr->m_szName = szFName; // 이름을 정하고.. Name
 
 //	CN3Joint* pJoint = pChr->Joint();
 //	if(pJoint)
 //	{
-//		pJoint->SaveToFile(); // 관절도 저장해준다..
+//		pJoint->SaveToFile(); // 관절도 저장해준다.. Save
 //	}
 
 	CN3CPlugBase* pPlug = nullptr;
@@ -194,7 +194,7 @@ void CN3CEDoc::OnFileSaveAsOneFolder()
 	if(dlg.DoModal() == IDCANCEL) return;
 	CString szFullFileName = dlg.GetPathName();
 
-	char szPath[512]; // 경로를 잘 가려야 한다..
+	char szPath[512]; // 경로를 잘 가려야 한다.. [Korean comment]
 	lstrcpy(szPath, szFullFileName);
 	int nFind = 0;
 	for(int i = lstrlen(szPath) - 1; i >= 0; i--)
@@ -210,7 +210,7 @@ void CN3CEDoc::OnFileSaveAsOneFolder()
 	char szDrive[_MAX_DRIVE], szDir[_MAX_DIR];
 	_splitpath(szFullFileName, szDrive, szDir, nullptr, nullptr);
 
-	m_Scene.PathSet(szPath); // 경로를 정해주고..
+	m_Scene.PathSet(szPath); // 경로를 정해주고.. [Korean comment]
 	CN3Chr* pChr = m_Scene.ChrGet(0);
 
 	CN3Joint* pJoint = pChr->Joint();
@@ -218,7 +218,7 @@ void CN3CEDoc::OnFileSaveAsOneFolder()
 	{
 		char szFN[256];
 		_makepath(szFN, szDrive, szDir, pChr->m_szName.c_str(), ".N3Joint");
-		pJoint->SaveToFile(szFN); // 관절도 저장해준다..
+		pJoint->SaveToFile(szFN); // 관절도 저장해준다.. Save
 	}
 
 	CN3CPlugBase* pPlug = nullptr;
@@ -270,7 +270,7 @@ void CN3CEDoc::OnFileSaveAsOneFolder()
 	}
 
 	CN3AnimControl* pAni = pChr->AniCtrl();
-	if(pAni && pAni->Count() > 0) // 에니메이션은 같은 이름으로 저장해준다..
+	if(pAni && pAni->Count() > 0) // 에니메이션은 같은 이름으로 저장해준다.. Save
 	{
 		pAni->m_szName = pChr->m_szName;
 
@@ -282,12 +282,12 @@ void CN3CEDoc::OnFileSaveAsOneFolder()
 	
 	m_Scene.ChrGet(0)->SaveToFile(std::string(szFullFileName));
 	this->SetPathName(szFullFileName);
-	this->UpdateAllViews(nullptr); // 모두 업데이트..
+	this->UpdateAllViews(nullptr); // 모두 업데이트.. Update
 }
 
 void CN3CEDoc::OnCloseDocument() 
 {
-	if(m_Scene.ChrGet(0)) m_Scene.ChrGet(0)->Release(); // 이렇게 해야.. 엔진이 없어지기 전에 깔끔하게 없어진다..
+	if(m_Scene.ChrGet(0)) m_Scene.ChrGet(0)->Release(); // 이렇게 해야.. 엔진이 없어지기 전에 깔끔하게 없어진다.. [Korean comment]
 
 	CDocument::OnCloseDocument();
 }
@@ -321,7 +321,7 @@ void CN3CEDoc::OnToolOptimizeAnimationData()
 	
 	std::string szFN(FileName);
 	std::string szFNPrev = pAniCtrl->FileName();
-	pAniCtrl->SaveToFile(szFN); // 저장..
+	pAniCtrl->SaveToFile(szFN); // 저장.. Save
 	pAniCtrl->FileNameSet(szFNPrev);
 
 	CFileDialog dlg2(FALSE, "N3Joint", nullptr, dwFlags, "Joint File(*.N3Joint)|*.N3Joint||", nullptr);
@@ -331,36 +331,36 @@ void CN3CEDoc::OnToolOptimizeAnimationData()
 	szFNPrev = pJointSrc->FileName();
 	pChr->Tick(0.0f); // 초기위치로 Tick
 	szFN = FileName;
-	pJointSrc->SaveToFile(szFN); // 원래걸 다른 이름으로 저장..
+	pJointSrc->SaveToFile(szFN); // 원래걸 다른 이름으로 저장.. Save
 	pJointSrc->FileNameSet(szFNPrev);
 
 	int nK = pAniCtrl->Count();
 	CN3Joint JointDest;
 	
 	pChr->Tick(0.0f); // 초기위치로 Tick
-	JointDest.CopyExceptAnimationKey(pJointSrc); // 뼈대 구조 및 값들만 복사한다음..
-	JointDest.AddKey(pJointSrc, 0, 0); // 바인딩 포즈 키를 추가하고 복사한다..
+	JointDest.CopyExceptAnimationKey(pJointSrc); // 뼈대 구조 및 값들만 복사한다음.. [Korean comment]
+	JointDest.AddKey(pJointSrc, 0, 0); // 바인딩 포즈 키를 추가하고 복사한다.. Add
 	
 	int iAniCount = pAniCtrl->Count();
 	std::vector<float> fFrmOffsets(iAniCount, 0);
 	std::vector<float> fFrmStarts(iAniCount, 0);
-	for(int i = 0; i < iAniCount; i++) // Animation Key 추가.
+	for(int i = 0; i < iAniCount; i++) // Animation Key 추가. Add
 	{
 		__AnimData* pAD = pAniCtrl->DataGet(i);
-		if(pAD->fFrmEnd < pAD->fFrmStart) pAD->fFrmEnd = pAD->fFrmStart; // 같은 프레임으로 만든다..
+		if(pAD->fFrmEnd < pAD->fFrmStart) pAD->fFrmEnd = pAD->fFrmStart; // 같은 프레임으로 만든다.. [Korean comment]
 		
 		int iS = (int)(pAD->fFrmStart / fSamplingRate);
 		int iE = (int)(pAD->fFrmEnd / fSamplingRate); // 반올림하려고 0.5f 넣었다..
 
 		if(iE < iS) continue;
 
-		JointDest.AddKey(pJointSrc, iS, iE); // 키를 추가하고 복사한다..
+		JointDest.AddKey(pJointSrc, iS, iE); // 키를 추가하고 복사한다.. Add
 		fFrmOffsets[i] = (iE - iS + 1) * fSamplingRate; // 각 데이터의 Offset 계산..
 		fFrmStarts[i] = pAD->fFrmStart - (iS * fSamplingRate);
 	}
 
 	float fOffsetCur = fSamplingRate;
-	for(int i = 0; i < iAniCount; i++) // Animation Key Frame 다시 계산..
+	for(int i = 0; i < iAniCount; i++) // Animation Key Frame 다시 계산.. Calculate
 	{
 		__AnimData* pAD = pAniCtrl->DataGet(i);
 
@@ -376,5 +376,5 @@ void CN3CEDoc::OnToolOptimizeAnimationData()
 	pChr->JointSet("");
 	pChr->JointSet(JointDest.FileName());
 
-	UpdateAllViews(nullptr); // 모든 뷰 초기화..
+	UpdateAllViews(nullptr); // 모든 뷰 초기화.. Initialize
 }

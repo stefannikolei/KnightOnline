@@ -16,8 +16,8 @@
 
 struct __ChatInfo
 {
-	std::string szChat; // 문자열
-	D3DCOLOR	color; // 문자열 색깔
+	std::string szChat; // 문자열 [Korean comment]
+	D3DCOLOR	color; // 문자열 색깔 Color
 
 	__ChatInfo() {};
 	__ChatInfo(const std::string& szChat_Arg, D3DCOLOR color_Arg) { szChat = szChat_Arg; color = color_Arg; }
@@ -38,11 +38,11 @@ protected:
 	ChatList		m_ContinueMsg;		// 지속적으로 공지해주는 메시지 buffer
 	int				m_iCurContinueMsg;
 
-	CN3UIString*	m_pNoticeTitle;		// 채팅창 맨윗줄에 표시될 공지...
+	CN3UIString*	m_pNoticeTitle;		// 채팅창 맨윗줄에 표시될 공지... Window
 	CN3UIString*	m_pChatOut;			// 채팅이 출력되는 UIString 참조포인터(실제 m_Child로 관리), 글씨체와 초기 영역만 참조한다.
 	CN3UIScrollBar* m_pScrollbar;		// scrollbar 참조포인터(실제 m_Child로 관리)
 	int				m_iChatLineCount;	// 채팅창에 출력되는 line의 수(채팅창 사이즈가 변했을때 다시 계산해주자.)
-	RECT			m_rcChatOutRegion;	// 채팅이 출력되는 영역
+	RECT			m_rcChatOutRegion;	// 채팅이 출력되는 영역 [Korean comment]
 	CN3UIString**	m_ppUILines;		// 채팅이 출력되는 UIString 배열포인터(채팅창 사이즈가 변하므로 배열도 변한다.
 
 	CN3UIEdit*		m_pEdit;			//son, chat_in
@@ -65,7 +65,7 @@ protected:
 	bool			m_bChatParty;
 
 	bool			m_bKillFocus;
-//	e_ChatBuffer	m_eChatBuffer; // 채팅 표시 모드 .. 버퍼가 나누어져있다..
+//	e_ChatBuffer	m_eChatBuffer; // 채팅 표시 모드 .. 버퍼가 나누어져있다.. Mode
 	
 /*
 	ChatList		m_MsgBuffer;		// 채팅 packet기준으로 된 buffer
@@ -77,9 +77,9 @@ protected:
 */
 
 protected:
-	void			SetTopLine(int iTopLine);		// 맨 윗줄을 지정해준다.
-//	void			AddLineBuffer(e_ChatBuffer eCB, const std::string& szString, D3DCOLOR color);	// line 버퍼를 만들어준다.(너무 길면 알아서 2줄로 만들어준다.)
-	void			AddLineBuffer(const std::string& szString, D3DCOLOR color);	// line 버퍼를 만들어준다.(너무 길면 알아서 2줄로 만들어준다.)
+	void			SetTopLine(int iTopLine);		// 맨 윗줄을 지정해준다. [Korean comment]
+//	void			AddLineBuffer(e_ChatBuffer eCB, const std::string& szString, D3DCOLOR color);	// line 버퍼를 만들어준다.(너무 길면 알아서 2줄로 만들어준다.) [Korean comment]
+	void			AddLineBuffer(const std::string& szString, D3DCOLOR color);	// line 버퍼를 만들어준다.(너무 길면 알아서 2줄로 만들어준다.) [Korean comment]
 	void			RecalcLineBuffers();		// 채팅창 사이즈가 변했을때 호출해주면 line buffer를 다시 계산해서 넣어준다.
 	void			CreateLines();
 
@@ -102,9 +102,9 @@ public:
 	void				SetString(const std::string& szChat);
 	void				SetCaretPos(int iPos);
 	const std::string&	GetString() const {return m_szString;}				//son, chat_in
-	void				AddChatMsg(e_ChatMode eCM, const std::string& szString, D3DCOLOR color = 0xffffffff);		// 채팅 메세지를 저장하고 알맞은 형태로 화면에 출력해준다.
+	void				AddChatMsg(e_ChatMode eCM, const std::string& szString, D3DCOLOR color = 0xffffffff);		// 채팅 메세지를 저장하고 알맞은 형태로 화면에 출력해준다. Save
 	void				AddContinueMsg(e_ChatMode eCM, const std::string& szString, D3DCOLOR color = 0xffffffff);
-	void				AdjustScroll(); // 스크롤 위치등 조정..
+	void				AdjustScroll(); // 스크롤 위치등 조정.. Position
 
 	BOOL			IsChatMode();
 	void			SetFocus();

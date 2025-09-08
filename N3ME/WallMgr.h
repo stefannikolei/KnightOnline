@@ -26,10 +26,10 @@ protected:
 	__VertexXyzColor	m_BoardVB[4];
 
 public:
-	CMapMng*				m_pRefMapMng;				// 지형 참조 포인터..
-	std::list<CWall*>		m_pWalls;					// 벽들...
+	CMapMng*				m_pRefMapMng;				// 지형 참조 포인터.. [Korean comment]
+	std::list<CWall*>		m_pWalls;					// 벽들... [Korean comment]
 	CDlgMakeWall*			m_pDlg;						// path make dialog..
-	bool					m_bActive;					// 이기능이 활성화 되어 있는지...1:활성화, 0:비활성화..
+	bool					m_bActive;					// 이기능이 활성화 되어 있는지...1:활성화, 0:비활성화.. [Korean comment]
 	CWall*					m_pCurrWall;				// 현재 만들고 있는 벽..or 만들려고 준비한 버퍼..
 
 protected:

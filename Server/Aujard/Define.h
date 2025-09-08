@@ -115,23 +115,23 @@ typedef union {
 ////////////////////////////////////////////////////////////////
 // Knights Packet sub define 
 ////////////////////////////////////////////////////////////////
-#define KNIGHTS_CREATE			0x11		// 생성
-#define KNIGHTS_JOIN			0x12		// 가입
-#define KNIGHTS_WITHDRAW		0x13		// 탈퇴
-#define KNIGHTS_REMOVE			0x14		// 멤버 삭제
-#define KNIGHTS_DESTROY			0x15		// 뽀개기
-#define KNIGHTS_ADMIT			0x16		// 멤버 가입 허가
-#define KNIGHTS_REJECT			0x17		// 멤버 가입 거절
-#define KNIGHTS_PUNISH			0x18		// 멤버 징계
-#define KNIGHTS_CHIEF			0x19		// 단장 임명
-#define KNIGHTS_VICECHIEF		0x1A		// 부단장 임명
-#define KNIGHTS_OFFICER			0x1B		// 장교임명
+#define KNIGHTS_CREATE			0x11		// 생성 Create
+#define KNIGHTS_JOIN			0x12		// 가입 [Korean comment]
+#define KNIGHTS_WITHDRAW		0x13		// 탈퇴 [Korean comment]
+#define KNIGHTS_REMOVE			0x14		// 멤버 삭제 Delete
+#define KNIGHTS_DESTROY			0x15		// 뽀개기 [Korean comment]
+#define KNIGHTS_ADMIT			0x16		// 멤버 가입 허가 [Korean comment]
+#define KNIGHTS_REJECT			0x17		// 멤버 가입 거절 [Korean comment]
+#define KNIGHTS_PUNISH			0x18		// 멤버 징계 [Korean comment]
+#define KNIGHTS_CHIEF			0x19		// 단장 임명 [Korean comment]
+#define KNIGHTS_VICECHIEF		0x1A		// 부단장 임명 [Korean comment]
+#define KNIGHTS_OFFICER			0x1B		// 장교임명 [Korean comment]
 #define KNIGHTS_ALLLIST_REQ		0x1C		// 리스트를 10개 단위로 Page 요청
-#define KNIGHTS_MEMBER_REQ		0x1D		// 모든 멤버 요청
-#define KNIGHTS_CURRENT_REQ		0x1E		// 현재 접속 리스트
-#define KNIGHTS_STASH			0x1F		// 기사단 창고
-#define KNIGHTS_MODIFY_FAME		0x20		// 멤버의 직위 변경.. 해당 멤버에게 간다
-#define KNIGHTS_JOIN_REQ		0x21		// 해당멤버에게 가입요청을 한다
+#define KNIGHTS_MEMBER_REQ		0x1D		// 모든 멤버 요청 [Korean comment]
+#define KNIGHTS_CURRENT_REQ		0x1E		// 현재 접속 리스트 [Korean comment]
+#define KNIGHTS_STASH			0x1F		// 기사단 창고 Window
+#define KNIGHTS_MODIFY_FAME		0x20		// 멤버의 직위 변경.. 해당 멤버에게 간다 Change
+#define KNIGHTS_JOIN_REQ		0x21		// 해당멤버에게 가입요청을 한다 [Korean comment]
 #define KNIGHTS_LIST_REQ		0x22		// 기사단 리스트를  요청 ( index 검색 )
 
 ////////////////////////////////////////////////////////////////
@@ -164,7 +164,7 @@ typedef union {
 #define SEND_REGION				0x02
 #define SEND_ALL				0x03
 
-#define ITEMCOUNT_MAX		9999	// 소모 아이템 소유 한계값
+#define ITEMCOUNT_MAX		9999	// 소모 아이템 소유 한계값 [Korean comment]
 
 /////////////////////////////////////////////////////////////////////////////////
 // Structure Define
