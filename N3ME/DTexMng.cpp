@@ -127,6 +127,7 @@ void CDTexMng::DelDTexByID(int id)
 //
 //	Load..
 //	DTex정보들과 실제 텍스쳐 소스들을 읽어들인다.
+//	Read DTex information and actual texture sources.
 //
 void CDTexMng::LoadFromFile(CString RealFileName)
 {
@@ -163,12 +164,14 @@ void CDTexMng::LoadFromFile(CString RealFileName)
 			ProgressBar.StepIt();
 
 			//	실제 텍스쳐 소스를 읽고..
+			//	Read actual texture source..
 			CDTex* pDTex = new CDTex;
 			pDTex->Init();
 			pDTex->m_ID = i;
 			pDTex->m_pTex->LoadFromFile(szDTexFileName);
 			
 			//	그에 관한 타일 정보들을 읽고..
+			//	Read tile information about it..
 			char szDir[_MAX_DIR], szFName[_MAX_FNAME];
 			_splitpath(szDTexFileName, nullptr, szDir, szFName, nullptr);
 			wsprintf(szDTexInfoFileName, "%s%s%s.dif", s_szPath.c_str(), szDir, szFName); // Texture Information file
@@ -225,6 +228,7 @@ void CDTexMng::LoadFromFile(CString RealFileName)
 			if(m_NextID <= id) m_NextID = id + 1;
 
 			//	실제 텍스쳐 소스를 읽고..
+			//	Read actual texture source..
 			CDTex* pDTex = new CDTex;
 			pDTex->Init();
 			pDTex->m_ID = id;
@@ -254,6 +258,7 @@ void CDTexMng::LoadFromFile(CString RealFileName)
 			if(version==1)
 			{
 				//	그에 관한 타일 정보들을 읽고..
+				//	Read tile information about it..
 				char szDir[_MAX_DIR], szFName[_MAX_FNAME];
 				_splitpath(szDTexFileName, nullptr, szDir, szFName, nullptr);
 				wsprintf(szDTexInfoFileName, "%s%s%s.dif", s_szPath.c_str(), szDir, szFName); // Texture Information file
@@ -292,6 +297,7 @@ void CDTexMng::SaveToFile(CString RealFileName)
 	char szDTexDir[_MAX_PATH];
 	wsprintf(szDTexDir, "%sDTex", s_szPath.c_str());
 	CreateDirectory("dtex", nullptr); // 경로 만들고..
+	// Create path..
 
 	char szDTexInfoFileName[_MAX_PATH];
 	wsprintf(szDTexInfoFileName, "%sDTEX\\%s.dtx", s_szPath.c_str(), (LPCTSTR)RealFileName);
@@ -327,7 +333,9 @@ void CDTexMng::SaveToFile(CString RealFileName)
 		/*
 		//
 		//	version1 저장방식...
+		//	Version1 save method...
 		//	dif파일만들기...
+		//	Create dif file...
 		//
 		char szDir[_MAX_DIR], szFName[_MAX_FNAME];
 		
