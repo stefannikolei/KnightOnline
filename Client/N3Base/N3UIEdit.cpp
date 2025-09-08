@@ -568,18 +568,25 @@ void CN3UIEdit::SetMaxString(uint32_t nMax)		// 최대 글씨 수를 정해준�
 		return;
 
 	// 여기까지 오는 경우는 현재 글씨길이가 iMax보다 큰 경우이므로 제한글자에 맞춰 잘라주게 다시 설정한다.
+	// If we get here, the current text length is greater than iMax, so we reset it to cut according to the character limit.
 	SetString(szBuff);
 }
 
 /////////////////////////////////////////////////////////////////////
 //
 // 특정 위치가 한글의 2byte중에 두번째 바이트인지 검사하는 부분이다.
+// This part checks whether a specific position is the second byte among the 2 bytes of Hangul.
 // IsDBCSLeadByte라는 함수가 있지만 조합형일 경우는
+// There is a function called IsDBCSLeadByte, but for combination type
 // 시작Byte와 끝byte의 범위가 같으로 이 함수로 검사 할 수 없다.
+// the range of start byte and end byte is the same, so this function cannot be used for testing.
 // 따라서 처음부터 검사를 하는 방법 외에는 다른 방법이 없다.
+// Therefore, there is no other way than to check from the beginning.
 //
 // NT의 Unicode에서는 어떻게 작용하는지 검사해 보지 않았지만
+// I haven't tested how it works in NT's Unicode, but
 // 별 다른 문제 없이 사용할 수 있다고 생각한다.
+// I think it can be used without any other problems.
 //
 /////////////////////////////////////////////////////////////////////
 BOOL CN3UIEdit::IsHangulMiddleByte( const char* lpszStr, int iPos )
@@ -616,6 +623,7 @@ void CN3UIEdit::SetString(const std::string& szString)
 		if (IsHangulMiddleByte(szString.c_str(), m_iMaxStrLen))
 		{
 			szNewBuff = szString.substr(0, m_iMaxStrLen-1);	// -1은 한글이므로 하나 덜 카피하기 위해 +1은 맨 마지막에 nullptr 넣기 위해
+			// -1 because it's Hangul, so copy one less; +1 to put nullptr at the very end
 			if (UISTYLE_EDIT_PASSWORD & m_dwStyle)
 			{
 				int iNewBuffLen = szNewBuff.size();
@@ -623,12 +631,14 @@ void CN3UIEdit::SetString(const std::string& szString)
 
 				szNewBuff.assign(m_iMaxStrLen-1, '*');
 				__ASSERT('\0' == szNewBuff[m_iMaxStrLen - 1], "글자수가 다르다.");
+				// The number of characters is different.
 			}
 			m_pBuffOutRef->SetString(szNewBuff);
 		}
 		else
 		{
 			szNewBuff = szString.substr(0, m_iMaxStrLen);	// +1은 맨 마지막에 nullptr 넣기 위해
+			// +1 to put nullptr at the very end
 			if (UISTYLE_EDIT_PASSWORD & m_dwStyle)
 			{
 				int iNewBuffLen = szNewBuff.size();
