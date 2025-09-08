@@ -1563,6 +1563,7 @@ void CUser::Attack(char* pBuf)
 					GoldChange(tid, 0);
 
 					// 기범이의 완벽한 보호 코딩!!!
+					// Ki-beom's perfect protection coding!!!
 					pTUser->InitType3();	// Init Type 3.....
 					pTUser->InitType4();	// Init Type 4.....
 
@@ -2074,7 +2075,8 @@ void CUser::SetMaxMp()
 	}
 }
 
-// 너무 개판이라 나중에 반드시 수정해야 할 함수.... 
+// 너무 개판이라 나중에 반드시 수정해야 할 함수....
+// This function is too messy and must be fixed later.... 
 void CUser::Regene(char* pBuf, int magicid)
 {
 //	Corpse();		// Get rid of the corpse ~ 또 사고칠뻔 했자나 이 바보야!!!
@@ -2122,6 +2124,7 @@ void CUser::Regene(char* pBuf, int magicid)
 		return;
 
 	UserInOut(USER_OUT);	// 원래는 이 한줄밖에 없었음 --;
+	// Originally there was only this one line --;
 
 	float x = (float) (myrand(0, 400) / 100.0f);
 	float z = (float) (myrand(0, 400) / 100.0f);
@@ -2261,6 +2264,7 @@ void CUser::Regene(char* pBuf, int magicid)
 	}
 
 //	비러머글 클랜 소환!!!
+//	Bilge clan summon!!!
 	m_fLastRegeneTime = TimeGet();
 //
 	m_sWhoKilledMe = -1;
@@ -2288,6 +2292,7 @@ void CUser::Regene(char* pBuf, int magicid)
 #endif
 
 	// 이거 확인사살로 추가했어요!!!!
+	// I added this as a confirmation kill!!!!
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
 
@@ -7631,6 +7636,7 @@ void CUser::HPTimeChangeType3(float currenttime)
 				}
 			}
 			// 기범이의 완벽한 보호 코딩!!!
+			// Ki-beom's perfect protection coding!!!
 			InitType3();	// Init Type 3.....
 			InitType4();	// Init Type 4.....
 
