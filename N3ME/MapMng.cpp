@@ -52,7 +52,7 @@ CMapMng::CMapMng(CMainFrame* pMainFrm)
 	m_pMainFrm = pMainFrm;
 	m_pTerrain = nullptr;
 
-	// Path 지정하기
+	// Path 지정하기 Set path
 	m_pSceneSource = new CN3Scene;
 	m_pSceneSource->m_szName = "SourceList";
 	m_pSceneSource->FileNameSet("SourceList.N3Scene");
@@ -111,7 +111,7 @@ CMapMng::CMapMng(CMainFrame* pMainFrm)
 
 	m_bLoadingComplete = false;
 
-	// 윈도 배치
+	// 윈도 배치 Window layout
 	CRect rc(0,0,980,1000);
 	pMainFrm->MoveWindow(&rc);
 	m_pDlgSourceList->MoveWindow(rc.right, rc.top, 300, 500);
@@ -120,7 +120,7 @@ CMapMng::CMapMng(CMainFrame* pMainFrm)
 	Release();
 }
 
-// 파괴자
+// 파괴자 Destructor
 CMapMng::~CMapMng()
 {
 	Release();
@@ -139,7 +139,7 @@ CMapMng::~CMapMng()
 	if (m_pLightObjMgr) {delete m_pLightObjMgr; m_pLightObjMgr = nullptr;}
 }
 
-// 초기화
+// 초기화 Initialize
 void CMapMng::Release()
 {
 	if(m_pTerrain) { delete m_pTerrain; m_pTerrain = nullptr;}
@@ -180,14 +180,14 @@ void CMapMng::Release()
 	m_PondMng.Release();
 }
 
-//FarPlane 갱신...
+//FarPlane 갱신... Update FarPlane...
 void CMapMng::UpDateFP()
 {
 	m_pSceneOutput->CameraGetActive()->m_Data.fFP = m_pMainFrm->GetFP();
 	Invalidate();
 }
 
-// m_pSceneSource 캐릭터와 오브젝트를 추가하는 함수
+// m_pSceneSource 캐릭터와 오브젝트를 추가하는 함수 Function to add characters and objects to m_pSceneSource
 void CMapMng::LoadSourceObjects()
 {
 	ASSERT(m_pSceneSource && m_pDlgSourceList);
