@@ -1,10 +1,10 @@
 ﻿//////////////////////////////////////////////////
 //	Commented By : Lynus
-//	Commented On 2001-04-12 오후 8:42:02
+//	Commented On 2001-04-12 오후 8:42:02 [Korean comment]
 //
 //	CN3SndObjStream class (N3SndObjStream.h)
 //
-//	End Of Comment (By Lynus On 2001-04-12 오후 8:42:02 )
+//	End Of Comment (By Lynus On 2001-04-12 오후 8:42:02 ) [Korean comment]
 //////////////////////////////////////////////////
 #include "StdAfxBase.h"
 #include "N3SndObjStream.h"
@@ -189,14 +189,14 @@ void CN3SndObjStream::RealPlay()
 			{
 				if(m_bIsLoop==false)
 				{
-					//tick에 어케 적용할 것인가..
+					//tick에 어케 적용할 것인가.. [Korean comment]
 					m_PastTime = m_PlayTime;
 					Stop();
 					return;
 				}
 				else if(m_bIsLoop==true)
 				{
-					//tick에 어케 적용할 것인가..
+					//tick에 어케 적용할 것인가.. [Korean comment]
 					//Stop();
 					//m_lpDSBuff->Stop();
 					Play();
@@ -290,7 +290,7 @@ void CN3SndObjStream::Tick()
 		}
 		else
 		{
-			//볼륨 점점 작게....
+			//볼륨 점점 작게.... [Korean comment]
 			int vol = 0;
 			if(m_fFadeOutTime>0.0f)  vol = (int)(((m_fFadeOutTime - m_fTmpSecPerFrm)/m_fFadeOutTime)*(float)m_iMaxVolume);
 			SetVolume(vol);
@@ -301,7 +301,7 @@ void CN3SndObjStream::Tick()
 
 /*
 //
-// 똑같다.
+// 똑같다. [Korean comment]
 //
 void CN3SndObjStream::Play(float delay, float fFadeInTime)
 {
@@ -314,7 +314,7 @@ void CN3SndObjStream::Play(float delay, float fFadeInTime)
 
 
 //
-// 똑같다.
+// 똑같다. [Korean comment]
 //
 void CN3SndObjStream::Stop(float fFadeOutTime)
 {

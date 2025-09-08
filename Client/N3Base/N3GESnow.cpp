@@ -42,9 +42,9 @@ void CN3GESnow::Tick()
 
 	int iCount = m_iVC/3;
 	int iActiveCount = iCount;
-	if(m_iFadeMode > 0) // 차차 많아지게 한다..
+	if(m_iFadeMode > 0) // 차차 많아지게 한다.. [Korean comment]
 	{
-		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정..
+		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정.. Time
 		{
 			iActiveCount = (int)(iCount * m_fFadeTimeCur / m_fFadeTime);
 			if(iActiveCount > iCount) iActiveCount = iCount;
@@ -53,7 +53,7 @@ void CN3GESnow::Tick()
 	}
 	else if(m_iFadeMode < 0)
 	{
-		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정..
+		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정.. Time
 		{
 			iActiveCount = (int)(iCount * (1.0f - m_fFadeTimeCur / m_fFadeTime));
 			if(iActiveCount > iCount) iActiveCount = iCount;
@@ -80,7 +80,7 @@ void CN3GESnow::Tick()
 
 	for (i=0; i<iActiveCount; ++i)
 	{
-		// 위치 결정하기
+		// 위치 결정하기 Position
 		__VertexXyzT1* pV1 = pVertices+i*3+0;
 		__VertexXyzT1* pV2 = pVertices+i*3+1;
 		__VertexXyzT1* pV3 = pVertices+i*3+2;
@@ -92,7 +92,7 @@ void CN3GESnow::Tick()
 //		pV1->x += vAdd.x;	pV1->y += vAdd.y;	pV1->z += vAdd.z;
 
 		float fDiff = pParticle->vPos.y - (fCurY-fHalfHeight);
-		if (fDiff < 0)	// 높이 범위를 벗어났을 경우
+		if (fDiff < 0)	// 높이 범위를 벗어났을 경우 [Korean comment]
 		{
 			pParticle->vPos.y -= (((int)(fDiff/m_fHeight)-1)*m_fHeight);
 			pParticle->vPos.x = m_fWidth*(rand()%10000-5000)/10000.f;
@@ -109,25 +109,25 @@ void CN3GESnow::Tick()
 		else
 		{
 			fDiff = pParticle->vPos.y - (fCurY+fHalfHeight);
-			if (fDiff > 0)	// 높이 범위를 반대로 벗어났을경우
+			if (fDiff > 0)	// 높이 범위를 반대로 벗어났을경우 [Korean comment]
 				pParticle->vPos.y -= ((int)(fDiff/m_fHeight)+1)*m_fHeight;
-			// x 너비 범위를 벗어났을 경우
+			// x 너비 범위를 벗어났을 경우 [Korean comment]
 			fDiff = pParticle->vPos.x - fHalfWidth;
 			if (fDiff > 0) pParticle->vPos.x -= ((int)(fDiff/m_fWidth)+1)*m_fWidth;
 			fDiff = pParticle->vPos.x + fHalfWidth;
 			if (fDiff < 0) pParticle->vPos.x -= ((int)(fDiff/m_fWidth)-1)*m_fWidth;
-			// z 너비 범위를 벗어났을 경우
+			// z 너비 범위를 벗어났을 경우 [Korean comment]
 			fDiff = pParticle->vPos.z - fHalfWidth;
 			if (fDiff >  0) pParticle->vPos.z -= ((int)(fDiff/m_fWidth)+1)*m_fWidth;
 			fDiff = pParticle->vPos.z + fHalfWidth;
 			if (fDiff < 0) pParticle->vPos.z -= ((int)(fDiff/m_fWidth)-1)*m_fWidth;
 		}
-		// 중심축을 주위로 회전한 위치 계산
+		// 중심축을 주위로 회전한 위치 계산 Calculate
 		pParticle->fRadian += fAddRadian;
 		__Vector3 vPos;	vPos.Set(cosf(pParticle->fRadian), 0, sinf(pParticle->fRadian));
 		vPos += pParticle->vPos;
 		
-		// 버텍스 버퍼의 점 다시 세팅하기
+		// 버텍스 버퍼의 점 다시 세팅하기 [Korean comment]
 		pV1->x = vPos.x + pParticle->vOffset1.x;	pV1->y = vPos.y + pParticle->vOffset1.y;	pV1->z = vPos.z + pParticle->vOffset1.z;
 		pV2->x = vPos.x + pParticle->vOffset2.x;	pV2->y = vPos.y + pParticle->vOffset2.y;	pV2->z = vPos.z + pParticle->vOffset2.z;
 		pV3->x = vPos.x + pParticle->vOffset3.x;	pV3->y = vPos.y + pParticle->vOffset3.y;	pV3->z = vPos.z + pParticle->vOffset3.z;
@@ -143,9 +143,9 @@ void CN3GESnow::Render(__Vector3& vPos)
 
 	int iCount = m_iVC / 3;
 	int iActiveCount = iCount;
-	if(m_iFadeMode > 0) // 차차 많아지게 한다..
+	if(m_iFadeMode > 0) // 차차 많아지게 한다.. [Korean comment]
 	{
-		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정..
+		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정.. Time
 		{
 			iActiveCount = (int)(iCount * m_fFadeTimeCur / m_fFadeTime);
 			if(iActiveCount > iCount) iActiveCount = iCount;
@@ -154,7 +154,7 @@ void CN3GESnow::Render(__Vector3& vPos)
 	}
 	else if(m_iFadeMode < 0)
 	{
-		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정..
+		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정.. Time
 		{
 			iActiveCount = (int)(iCount * (1.0f - m_fFadeTimeCur / m_fFadeTime));
 			if(iActiveCount > iCount) iActiveCount = iCount;
@@ -194,7 +194,7 @@ void CN3GESnow::Render(__Vector3& vPos)
 
 	// render
 	s_lpD3DDev->SetFVF(FVF_XYZT1);
-	s_lpD3DDev->SetStreamSource(0, m_pVB, 0, sizeof(__VertexXyzT1)); // 버텍스 버퍼 지정
+	s_lpD3DDev->SetStreamSource(0, m_pVB, 0, sizeof(__VertexXyzT1)); // 버텍스 버퍼 지정 [Korean comment]
 	s_lpD3DDev->DrawPrimitive(D3DPT_TRIANGLELIST, 0, iActiveCount);
 
 	// restore
@@ -221,7 +221,7 @@ void CN3GESnow::Create(float fDensity, float fWidth, float fHeight, float fSnowS
 	__ASSERT(fVolume>0, "Snow volume is less than 0");
 	int iSnowCount = (int)(fVolume*fDensity);
 
-	// m_pVB, m_pIB 만들기
+	// m_pVB, m_pIB 만들기 [Korean comment]
 	__ASSERT(s_lpD3DDev, "D3D Device pointer is NULL!");
 	m_iVC = iSnowCount*3;
 	HRESULT hr = s_lpD3DDev->CreateVertexBuffer(m_iVC*sizeof(__VertexXyzT1), D3DUSAGE_DYNAMIC, FVF_XYZT1, D3DPOOL_DEFAULT, &m_pVB, nullptr);
@@ -230,7 +230,7 @@ void CN3GESnow::Create(float fDensity, float fWidth, float fHeight, float fSnowS
 	hr = m_pVB->Lock(0, iSnowCount*3*sizeof(__VertexXyzT1), (void**)&pVertices, D3DLOCK_NOSYSLOCK);
 	if (FAILED(hr)) return;
 
-	// __SnowParticle 정보 채워 넣기
+	// __SnowParticle 정보 채워 넣기 Info
 	m_pSnowParticle = new __SnowParticle[iSnowCount];
 
 	const float sqrt3 = sqrtf(3.0f);
@@ -254,7 +254,7 @@ void CN3GESnow::Create(float fDensity, float fWidth, float fHeight, float fSnowS
 		m_pSnowParticle[i].vOffset2.Set(cosf(fRadian)*fSnowSize/2.f, -fSnowSize/2.f, sinf(fRadian)*fSnowSize/2.f);
 		m_pSnowParticle[i].vOffset3.Set(-cosf(fRadian)*fSnowSize/2.f, -fSnowSize/2.f, -sinf(fRadian)*fSnowSize/2.f);
 
-		// uv좌표 넣기
+		// uv좌표 넣기 [Korean comment]
 		__VertexXyzT1* pV1 = pVertices + i*3,	*pV2 = pVertices + i*3+1,	*pV3 = pVertices + i*3+2;
 // 정삼각형에 눈 동그라미가 삼각형에 꽉 차게 UV좌표 배치 (geforce2카드에서 border color가 제대로 되지 않아서..)
 //		pV1->tu = 0.5f;	pV1->tv = 0.5f - sqrt3/2.f;
@@ -266,7 +266,7 @@ void CN3GESnow::Create(float fDensity, float fWidth, float fHeight, float fSnowS
 		pV2->tu = 1.0f;	pV2->tv = 1.0f;
 		pV3->tu = 0.0f;	pV3->tv = 1.0f;
 
-		// 이 방식은 눈텍스쳐 사각형에 삼각형을 넣는 방식(따라서 눈 텍스쳐를 삼각형에 맞게 그려주자)
+		// 이 방식은 눈텍스쳐 사각형에 삼각형을 넣는 방식(따라서 눈 텍스쳐를 삼각형에 맞게 그려주자) [Korean comment]
 
 	}
 

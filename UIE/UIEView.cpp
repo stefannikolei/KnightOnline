@@ -95,7 +95,7 @@ void CUIEView::OnDraw(CDC* pDC)
 	CUIEDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	if (UIEMODE_PREVIEW == m_eMode) return;	// preview일때는 그냥 리턴
+	if (UIEMODE_PREVIEW == m_eMode) return;	// preview일때는 그냥 리턴 [Korean comment]
 
 	int iUIC = pDoc->GetSelectedUICount();
 	for(int i = 0 ; i < iUIC; i++)
@@ -161,7 +161,7 @@ void CUIEView::OnDraw(CDC* pDC)
 		pDC->SelectObject(pOldPen);
 	}
 
-	if(m_bViewGrid) // 그리드 보기..
+	if(m_bViewGrid) // 그리드 보기.. [Korean comment]
 	{
 		CRect rc;
 		CPen pen, penThick;
@@ -251,7 +251,7 @@ BOOL CUIEView::OnEraseBkgnd(CDC* pDC)
 
 	pEng->s_lpD3DDev->BeginScene();
 
-	//	그리기...
+	//	그리기... Draw
 	switch(m_eMode)
 	{
 	case UIEMODE_PREVIEW:
@@ -290,14 +290,14 @@ void CUIEView::OnLButtonDown(UINT nFlags, CPoint point)
 	{
 		CN3UIBase* pSelectedUI = pDoc->GetSelectedUI();
 		if (RT_NONE != m_eSelectedRectType && pSelectedUI)
-		{	// 지정된 사각형 변형일때
+		{	// 지정된 사각형 변형일때 [Korean comment]
 			if (-1000 != m_rcSelectedRect.left) m_eDragType = CheckDragType(m_rcSelectedRect, point);
 			else m_eDragType = DRAGTYPE_NONE;
 		}
 
 		if (DRAGTYPE_NONE == m_eDragType)
 		{	// m_RootUI의 자식중에서 point에 위치한 ui 선택하기
-			if(!(nFlags & MK_CONTROL)) pDoc->SetSelectedUI(nullptr); // 컨트롤 키를 누르지 않으면 멀티 셀렉트 해제후..
+			if(!(nFlags & MK_CONTROL)) pDoc->SetSelectedUI(nullptr); // 컨트롤 키를 누르지 않으면 멀티 셀렉트 해제후.. [Korean comment]
 			
 			CN3UIBase* pRootUI = GetDocument()->GetRootUI();
 			CN3UIBase* pUISelected = nullptr;
@@ -444,7 +444,7 @@ BOOL CUIEView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	return CView::OnSetCursor(pWnd, nHitTest, message);
 }
 
-// mode 바꾸기
+// mode 바꾸기 [Korean comment]
 void CUIEView::SetMode(eUIE_MODE eMode)
 {
 	m_eMode = eMode;
@@ -720,7 +720,7 @@ void CUIEView::UpdateUIInfo_SelectedRect()
 
 					if(pSelectedUI->GetParent()) // 부모 UI 가 있으면..
 					{
-						pSelectedUI->GetParent()->ResizeAutomaticalyByChild(); // 자동으로 영역 다시 계산..
+						pSelectedUI->GetParent()->ResizeAutomaticalyByChild(); // 자동으로 영역 다시 계산.. Calculate
 					}
 				}
 
@@ -817,7 +817,7 @@ BOOL CUIEView::PreTranslateMessage(MSG* pMsg)
 
 void CUIEView::OnViewGrid() 
 {
-	m_bViewGrid = !m_bViewGrid; // 그리드 보기..
+	m_bViewGrid = !m_bViewGrid; // 그리드 보기.. [Korean comment]
 	this->InvalidateRect(nullptr, FALSE);
 }
 

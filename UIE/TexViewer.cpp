@@ -82,10 +82,10 @@ void CTexViewer::OnPaint()
 	CPaintDC dc(this); // device context for painting
 
 	dc.SetViewportOrg(-m_ptLeftTopInImage.x * m_fScale, -m_ptLeftTopInImage.y * m_fScale);
-	// 현재 선택된 영역 그리기
+	// 현재 선택된 영역 그리기 Draw
 	if (m_rcSelectedRect.top != -1)
 	{
-		// 선택 영역을 좌우상하를 를 크기에 따라 다시 배치 후 화면 좌표로 변환
+		// 선택 영역을 좌우상하를 를 크기에 따라 다시 배치 후 화면 좌표로 변환 Size
 		CRect rcSelected;
 		if (m_rcSelectedRect.left<m_rcSelectedRect.right)
 		{
@@ -115,16 +115,16 @@ void CTexViewer::OnPaint()
 		dc.SetBkColor(RGB(0,0,0));
 		dc.SelectStockObject(NULL_BRUSH);
 		CPen* pOldPen = dc.SelectObject(&m_WhiteDashPen);
-		dc.Rectangle(&rcSelected);	// 흰 점선 펜으로 칠하고
+		dc.Rectangle(&rcSelected);	// 흰 점선 펜으로 칠하고 [Korean comment]
 		dc.SelectObject(pOldPen);
 	}
-	// ImageType별 영역이 있으면 그리기
+	// ImageType별 영역이 있으면 그리기 Draw
 	int i;
 	int iOldMode = dc.SetROP2(R2_NOTXORPEN);
 	dc.SelectStockObject(NULL_BRUSH);
 	for (i=0; i<m_iImageTypeCount; ++i)
 	{
-		if (m_iCurSelectedImage == i) continue;	// 현재 선택된 것은 건너뛰기
+		if (m_iCurSelectedImage == i) continue;	// 현재 선택된 것은 건너뛰기 Select
 		CRect rcTmp = m_ImageRects[i];
 		rcTmp.left *= m_fScale;		rcTmp.right *= m_fScale;
 		rcTmp.top *= m_fScale;		rcTmp.bottom *= m_fScale;
@@ -143,7 +143,7 @@ void CTexViewer::OnLButtonDown(UINT nFlags, CPoint point)
 
 	if (EDITMODE_SELECT == m_eEditMode)
 	{
-		// 지정된 사각형이 있으면 그 사각형을 변형하는지 체크하자
+		// 지정된 사각형이 있으면 그 사각형을 변형하는지 체크하자 Check
 		if (-1 != m_rcSelectedRect.left)
 		{
 			CRect rcReal = m_rcSelectedRect;
@@ -155,7 +155,7 @@ void CTexViewer::OnLButtonDown(UINT nFlags, CPoint point)
 		if (DRAGTYPE_NONE == m_eDragType)
 		{
 			CPoint pt = point;
-			ScreenToImage(&pt);				// image 좌표로 변환
+			ScreenToImage(&pt);				// image 좌표로 변환 [Korean comment]
 			m_rcSelectedRect.SetRect(pt, pt);
 			m_eDragType = DRAGTYPE_SELECT;
 			m_bDeselect = TRUE;
@@ -187,7 +187,7 @@ void CTexViewer::OnLButtonUp(UINT nFlags, CPoint point)
 				else
 				{
 					CPoint pt = point;
-					ScreenToImage(&pt);				// image 좌표로 변환
+					ScreenToImage(&pt);				// image 좌표로 변환 [Korean comment]
 					
 					// 사각형의 left,top은 작은 좌표 right, bottom은 큰 좌표로 정리하기
 					if (m_rcSelectedRect.left > pt.x)
@@ -223,9 +223,9 @@ void CTexViewer::OnLButtonUp(UINT nFlags, CPoint point)
 				Zoom((GetAsyncKeyState(VK_MENU) & 0xff00) ? FALSE : TRUE);
 				CPoint ptNext = ptPrev;
 				ImageToScreen(&ptNext);	// zoom 한 후의 image좌표를 screen좌표로 전환
-				ptNext.x = int((ptNext.x-rc.CenterPoint().x)/m_fScale);		//화면 가운데로 오게끔 설정
+				ptNext.x = int((ptNext.x-rc.CenterPoint().x)/m_fScale);		//화면 가운데로 오게끔 설정 Set
 				ptNext.y = int((ptNext.y-rc.CenterPoint().y)/m_fScale);
-				SetLeftTopInImage( m_ptLeftTopInImage + ptNext);	//차이만큼 옮기기
+				SetLeftTopInImage( m_ptLeftTopInImage + ptNext);	//차이만큼 옮기기 [Korean comment]
 			}
 			else
 			{
@@ -251,21 +251,21 @@ void CTexViewer::OnMouseMove(UINT nFlags, CPoint point)
 	{
 		if (EDITMODE_SELECT == m_eEditMode)
 		{
-			// 화면 스크롤 체크
+			// 화면 스크롤 체크 Check
 			CRect rcClient;
 			GetClientRect(&rcClient);
 			CPoint ptOffset(0,0);
-			int iBorder = 20;	// 화면 가장자리 20 이내있으면 1씩 증감
+			int iBorder = 20;	// 화면 가장자리 20 이내있으면 1씩 증감 [Korean comment]
 			if (point.x < rcClient.left+iBorder) ptOffset.x = -1;
 			else if (point.x > rcClient.right-iBorder) ptOffset.x = 1;
 			if (point.y < rcClient.top+iBorder) ptOffset.y = -1;
 			else if (point.y > rcClient.bottom-iBorder) ptOffset.y = 1;
-			iBorder = 10;		// 10 이내있으면 5씩 증감
+			iBorder = 10;		// 10 이내있으면 5씩 증감 [Korean comment]
 			if (point.x < rcClient.left+iBorder) ptOffset.x = -5;
 			else if (point.x > rcClient.right-iBorder) ptOffset.x = 5;
 			if (point.y < rcClient.top+iBorder) ptOffset.y = -5;
 			else if (point.y > rcClient.bottom-iBorder) ptOffset.y = 5;
-			iBorder = 5;		// 5 이내있으면 20씩 증감
+			iBorder = 5;		// 5 이내있으면 20씩 증감 [Korean comment]
 			if (point.x < rcClient.left+iBorder) ptOffset.x = -20;
 			else if (point.x > rcClient.right-iBorder) ptOffset.x = 20;
 			if (point.y < rcClient.top+iBorder) ptOffset.y = -20;
@@ -274,15 +274,15 @@ void CTexViewer::OnMouseMove(UINT nFlags, CPoint point)
 
 			if (DRAGTYPE_SELECT == m_eDragType)
 			{
-				// 선택 영역 갱신
+				// 선택 영역 갱신 Select
 				CPoint pt = point;
-				ScreenToImage(&pt);				// image 좌표로 변환
+				ScreenToImage(&pt);				// image 좌표로 변환 [Korean comment]
 				m_rcSelectedRect.right = pt.x;
 				m_rcSelectedRect.bottom = pt.y;
-				m_bDeselect = FALSE;		// deselect 해제
+				m_bDeselect = FALSE;		// deselect 해제 [Korean comment]
 			}
 			else
-			{	// 영역 변형일 경우 다음과 같이 처리
+			{	// 영역 변형일 경우 다음과 같이 처리 Process
 				ProcessDrag(point);
 			}
 			Invalidate();
@@ -303,7 +303,7 @@ void CTexViewer::OnMouseMove(UINT nFlags, CPoint point)
 void CTexViewer::OnSize(UINT nType, int cx, int cy) 
 {
 	CWnd::OnSize(nType, cx, cy);
-	SetLeftTopInImage(m_ptLeftTopInImage);	// 사이즈가 달라졌으므로 다시 설정하여 왼쪽 위를 다시 계산하게 하기
+	SetLeftTopInImage(m_ptLeftTopInImage);	// 사이즈가 달라졌으므로 다시 설정하여 왼쪽 위를 다시 계산하게 하기 Set
 	
 }
 
@@ -377,7 +377,7 @@ void CTexViewer::Release()
 	m_eDragType = DRAGTYPE_NONE;
 	m_ptClickOffset = CPoint(-1,-1);
 
-	// image type관련
+	// image type관련 [Korean comment]
 	int i;
 	for (i=0; i<MAX_IMAGETYPE; ++i)
 	{
@@ -419,7 +419,7 @@ void CTexViewer::Render()
 	lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1,  D3DTA_TEXTURE);
 	lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP,  D3DTOP_DISABLE);
 
-	//  그림 위치와 배율등을 고려해서 계산
+	//  그림 위치와 배율등을 고려해서 계산 Calculate
 	CRect rcRender(0,0, m_TexSize.cx*m_fScale, m_TexSize.cy*m_fScale);
 	rcRender.OffsetRect(-m_ptLeftTopInImage.x*m_fScale, -m_ptLeftTopInImage.y*m_fScale);
 	static __VertexTransformed		Vertices[4];
@@ -429,7 +429,7 @@ void CTexViewer::Render()
 	Vertices[2].Set((float)rcRender.right, (float)rcRender.bottom, z, rhw, color, 1.0f, 1.0f);
 	Vertices[3].Set((float)rcRender.left, (float)rcRender.bottom, z, rhw, color, 0.0f, 1.0f);
 
-	// 그리기
+	// 그리기 Draw
 	lpD3DDev->SetFVF(FVF_TRANSFORMED);//lpD3DDev->SetVertexShader(FVF_TRANSFORMED);
 	HRESULT hr = lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, Vertices, sizeof(Vertices[0]));
 
@@ -447,7 +447,7 @@ void CTexViewer::SetTexture(LPCTSTR pszFName)
 	CN3Base::s_MngTex.Delete(&m_pTex);
 	m_pTex = CN3Base::s_MngTex.Get(pszFName);
 
-	// texture size 지정
+	// texture size 지정 [Korean comment]
 	if (m_pTex)	{m_TexSize.cx = m_pTex->Width();	m_TexSize.cy = m_pTex->Height();}
 	else m_TexSize.cx = m_TexSize.cy = 0;
 }
@@ -510,23 +510,23 @@ BOOL CTexViewer::ImageToScreen(RECT* pRect)
 CTexViewer::eEDITMODE CTexViewer::SetEditMode(eEDITMODE eMode)
 {
 	if (m_eEditMode == eMode) return m_eEditMode;
-	if (m_bDrag) return m_eEditMode;		// 드래그 중이면 바꾸지 말자 이상동장 가능성이 많다.
+	if (m_bDrag) return m_eEditMode;		// 드래그 중이면 바꾸지 말자 이상동장 가능성이 많다. [Korean comment]
 	m_eEditMode = eMode;
 	return m_eEditMode;
 }
 
 void CTexViewer::SetLeftTopInImage(CPoint ptLeftTop)
 {
-	// 한계 영역 계산하기
-	//  그림 위치와 배율등을 고려해서 계산
-	CRect rcClient;				// Client영역
+	// 한계 영역 계산하기 Calculate
+	//  그림 위치와 배율등을 고려해서 계산 Calculate
+	CRect rcClient;				// Client영역 [Korean comment]
 	GetClientRect(&rcClient);
 	CPoint ptLimit;
 	ptLimit.x = int(m_TexSize.cx - rcClient.Width()/m_fScale);
 	ptLimit.y = int(m_TexSize.cy - rcClient.Height()/m_fScale);
 	if (ptLimit.x < 0) ptLimit.x = 0;	if (ptLimit.y < 0) ptLimit.y = 0;
 
-	//한계 영역에 맞추어 계산하기
+	//한계 영역에 맞추어 계산하기 Calculate
 	if (ptLeftTop.x < 0) ptLeftTop.x = 0;	if (ptLeftTop.y < 0) ptLeftTop.y = 0;
 	if (ptLeftTop.x > ptLimit.x) ptLeftTop.x = ptLimit.x;
 	if (ptLeftTop.y > ptLimit.y) ptLeftTop.y = ptLimit.y;
@@ -562,7 +562,7 @@ void CTexViewer::SetSelectedUVRect(const __FLOAT_RECT* pFRect)
 	if (nullptr == pFRect) return;
 	ASSERT(m_TexSize.cx > 2 && m_TexSize.cy > 2);
 
-	m_rcSelectedRect.left = int(pFRect->left*m_TexSize.cx + 0.5f);		// 0.5f를 더하는 이유는 반올림..
+	m_rcSelectedRect.left = int(pFRect->left*m_TexSize.cx + 0.5f);		// 0.5f를 더하는 이유는 반올림.. [Korean comment]
 	m_rcSelectedRect.right = int(pFRect->right*m_TexSize.cx + 0.5f);
 	m_rcSelectedRect.top = int(pFRect->top*m_TexSize.cy + 0.5f);
 	m_rcSelectedRect.bottom = int(pFRect->bottom*m_TexSize.cy + 0.5f);
@@ -599,7 +599,7 @@ CTexViewer::eDRAGTYPE CTexViewer::CheckDragType(CRect rcSel, CPoint point)
 	return DRAGTYPE_NONE;
 }
 
-// 영역 변형일 경우 처리하는 루틴
+// 영역 변형일 경우 처리하는 루틴 Process
 void CTexViewer::ProcessDrag(CPoint point)
 {
 	ScreenToImage(&point);
@@ -706,7 +706,7 @@ BOOL CTexViewer::AutoMultiRectSelect(BOOL bHorizon, CString& strErrMsg)	// 가�
 	int iCol = 0;
 	CPoint ptLeftTop = m_rcSelectedRect.TopLeft();
 	if (bHorizon)
-	{	// 수평으로 이동하며 나누기
+	{	// 수평으로 이동하며 나누기 Move
 		for(i=0; i<m_iImageTypeCount; ++i)
 		{
 			if ( (ptLeftTop.x + m_rcSelectedRect.Width()*(iRow+1)) > m_TexSize.cx) {++iCol; iRow = 0;}
@@ -723,7 +723,7 @@ BOOL CTexViewer::AutoMultiRectSelect(BOOL bHorizon, CString& strErrMsg)	// 가�
 		}
 	}
 	else
-	{	// 수직으로 이동하며 나누기
+	{	// 수직으로 이동하며 나누기 Move
 		for(i=0; i<m_iImageTypeCount; ++i)
 		{
 			if ( (ptLeftTop.y + m_rcSelectedRect.Height()*(iCol+1)) > m_TexSize.cy) {++iRow; iCol = 0;}

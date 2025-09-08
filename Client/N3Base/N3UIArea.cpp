@@ -44,10 +44,10 @@ bool CN3UIArea::Load(HANDLE hFile)
 	if (false == CN3UIBase::Load(hFile)) return false;
 
 #ifndef _REPENT
-	// 추가사항이 있으면 이곳에 추가하기
+	// 추가사항이 있으면 이곳에 추가하기 Add
 	DWORD dwNum;
 	int iAreaType;
-	ReadFile(hFile, &iAreaType, sizeof(int), &dwNum, nullptr);	// click 영역
+	ReadFile(hFile, &iAreaType, sizeof(int), &dwNum, nullptr);	// click 영역 [Korean comment]
 	m_eAreaType = (eUI_AREA_TYPE)iAreaType;
 #endif
 	return true;
@@ -65,10 +65,10 @@ uint32_t CN3UIArea::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 #endif
 #endif
 
-	// 특정 이벤트에 대해 메시지 전송..
+	// 특정 이벤트에 대해 메시지 전송.. Mesh
 	if(IsIn(ptCur.x, ptCur.y) && (dwFlags & UI_MOUSE_LBCLICK) )	
 	{
-		m_pParent->ReceiveMessage(this, UIMSG_BUTTON_CLICK); // 부모에게 버튼 클릭 통지..
+		m_pParent->ReceiveMessage(this, UIMSG_BUTTON_CLICK); // 부모에게 버튼 클릭 통지.. Button
 		dwRet |= UI_MOUSEPROC_DONESOMETHING;
 	}
 
@@ -95,7 +95,7 @@ bool CN3UIArea::Save(HANDLE hFile)
 #ifndef _REPENT
 	DWORD dwNum;
 	int iAreaType = (int)m_eAreaType;
-	WriteFile(hFile, &iAreaType, sizeof(int), &dwNum, nullptr);	// click 영역
+	WriteFile(hFile, &iAreaType, sizeof(int), &dwNum, nullptr);	// click 영역 [Korean comment]
 #endif
 	return true;
 }

@@ -120,7 +120,7 @@ void CDlgTexture::OnOK()
 {
 	ASSERT(m_pTexViewer);
 	if (m_iImageTypeCount>0)
-	{	// 모두 영역 선택이 되었나 체크
+	{	// 모두 영역 선택이 되었나 체크 Check
 		int i;
 		for (i=0; i<m_iImageTypeCount; ++i)
 		{
@@ -152,7 +152,7 @@ void CDlgTexture::OnRadioSelect()
 	if (nullptr == m_pTexViewer) return;
 	CTexViewer::eEDITMODE eEditMode = m_pTexViewer->SetEditMode(CTexViewer::EDITMODE_SELECT);
 	if (CTexViewer::EDITMODE_SELECT != eEditMode)
-	{	// 모드 바꾸기 실패
+	{	// 모드 바꾸기 실패 Mode
 		UpdateData(TRUE);
 		m_RadioEditMode = eEditMode;
 		UpdateData(FALSE);
@@ -164,7 +164,7 @@ void CDlgTexture::OnRadioZoom()
 	if (nullptr == m_pTexViewer) return;
 	CTexViewer::eEDITMODE eEditMode = m_pTexViewer->SetEditMode(CTexViewer::EDITMODE_ZOOM);
 	if (CTexViewer::EDITMODE_ZOOM != eEditMode)
-	{	// 모드 바꾸기 실패
+	{	// 모드 바꾸기 실패 Mode
 		UpdateData(TRUE);
 		m_RadioEditMode = eEditMode;
 		UpdateData(FALSE);
@@ -182,7 +182,7 @@ void CDlgTexture::OnRadioHand()
 	if (nullptr == m_pTexViewer) return;
 	CTexViewer::eEDITMODE eEditMode = m_pTexViewer->SetEditMode(CTexViewer::EDITMODE_HAND);
 	if (CTexViewer::EDITMODE_HAND != eEditMode)
-	{	// 모드 바꾸기 실패
+	{	// 모드 바꾸기 실패 Mode
 		UpdateData(TRUE);
 		m_RadioEditMode = eEditMode;
 		UpdateData(FALSE);
@@ -213,7 +213,7 @@ LRESULT	CDlgTexture::OnUpdateInfo(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-// control들 다시 배치
+// control들 다시 배치 Layout
 void CDlgTexture::Resize()
 {
 	CWnd* pOKBtn = GetDlgItem(IDOK);
@@ -228,7 +228,7 @@ void CDlgTexture::Resize()
 		pWnd = GetDlgItem(IDC_STATIC_INFO);
 		pWnd->GetWindowRect(&rc);
 
-		// texture window 배치
+		// texture window 배치 Layout
 		int iTexViewerWidth = rcClient.Width() - rc.Width() - iOffset;
 		int iTexViewerHeight = rcClient.Height();
 		if (iTexViewerWidth < 0)
@@ -243,7 +243,7 @@ void CDlgTexture::Resize()
 
 		m_pTexViewer->MoveWindow(0, 0, iTexViewerWidth, iTexViewerHeight);
 
-		// 버튼들 배치
+		// 버튼들 배치 Button
 		pWnd = GetDlgItem(IDC_STATIC_INFO);
 		pWnd->GetWindowRect(&rc);
 		CPoint ptCtrl(rcClient.Width()-rc.Width(), 0);

@@ -108,16 +108,16 @@ void CFormViewProperty::OnInitialUpdate()
 	CSkyViewerDoc* pDoc = GetDocument();
 	m_SldTime.SetRange(0, 24 * 60);
 	
-//enum		eSKY_DAYCHANGE {	SDC_SKYCOLOR=0,		// 하늘색
-//								SDC_FOGCOLOR,		// 안개색
-//								SDC_STARCOUNT,		// 별 수
-//								SDC_MOONPHASE,		// 달 모양
-//								SDC_SUNCOLOR,		// 해 색
+//enum		eSKY_DAYCHANGE {	SDC_SKYCOLOR=0,		// 하늘색 Color
+//								SDC_FOGCOLOR,		// 안개색 Color
+//								SDC_STARCOUNT,		// 별 수 [Korean comment]
+//								SDC_MOONPHASE,		// 달 모양 [Korean comment]
+//								SDC_SUNCOLOR,		// 해 색 Color
 //								SDC_GLOWCOLOR,		// 해의 glow색
 //								SDC_FLARECOLOR,		// 해의 flare색
-//								SDC_CLOUD1COLOR,	// 구름층 1의 색
-//								SDC_CLOUD2COLOR,	// 구름층 2의 색
-//								SDC_CLOUDTEX,		// 구름 텍스쳐 바꾸기
+//								SDC_CLOUD1COLOR,	// 구름층 1의 색 Color
+//								SDC_CLOUD2COLOR,	// 구름층 2의 색 Color
+//								SDC_CLOUDTEX,		// 구름 텍스쳐 바꾸기 [Korean comment]
 //								NUM_SKYDAYCHANGE,
 //								
 //								SDC_UNKNOWN = 0xffffffff
@@ -133,7 +133,7 @@ void CFormViewProperty::OnInitialUpdate()
 	m_LPProperty.AddPropItem("시간", "", PIT_EDIT, "0시0분");
 	m_LPProperty.AddPropItem("지연시간", "", PIT_EDIT, "0초");
 
-	// 시간을 가져와 세팅..
+	// 시간을 가져와 세팅.. Time
 	SYSTEMTIME Time;
 	::GetLocalTime(&Time);
 	pDoc->m_Sky.SetGameTime(Time.wYear, Time.wMonth, Time.wDay, Time.wHour, Time.wMinute);
@@ -194,7 +194,7 @@ void CFormViewProperty::UpdateTime()
 	CSkyViewerDoc* pDoc = GetDocument();
 	pDoc->m_Sky.GetGameTime(&iYear, &iMonth, &iDay, &iHour, &iMin);
 	
-	// 시간 업데이트..
+	// 시간 업데이트.. Update
 	SetDlgItemInt(IDC_E_YEAR, iYear);
 	SetDlgItemInt(IDC_E_MONTH, iMonth);
 	SetDlgItemInt(IDC_E_DAY, iDay);

@@ -23,8 +23,8 @@ CN3Scene::CN3Scene()
 	m_nCameraActive = 0;
 
 	m_fFrmCur = 0.0f; // Animation Frame;
-	m_fFrmStart = 0.0f; // 전체 프레임.
-	m_fFrmEnd = 1000.0f; // 기본값 프레임.
+	m_fFrmStart = 0.0f; // 전체 프레임. [Korean comment]
+	m_fFrmEnd = 1000.0f; // 기본값 프레임. [Korean comment]
 
 	m_nCameraCount = 0; 
 	m_nLightCount = 0;
@@ -49,8 +49,8 @@ void CN3Scene::Release()
 	m_nCameraActive = 0;
 
 	m_fFrmCur = 0.0f; // Animation Frame;
-	m_fFrmStart = 0.0f; // 전체 프레임.
-	m_fFrmEnd = 1000.0f; // 기본값 프레임.
+	m_fFrmStart = 0.0f; // 전체 프레임. [Korean comment]
+	m_fFrmEnd = 1000.0f; // 기본값 프레임. [Korean comment]
 
 	int i = 0;
 	for(i = 0; i < MAX_SCENE_CAMERA; i++) { if(m_pCameras[i]) { delete m_pCameras[i]; m_pCameras[i] = nullptr; } }
@@ -70,14 +70,14 @@ bool CN3Scene::Load(HANDLE hFile)
 	
 	ReadFile(hFile, &m_nCameraActive, 4, &dwRWC, nullptr);
 	ReadFile(hFile, &m_fFrmCur, 4, &dwRWC, nullptr); // Animation Frame;
-	ReadFile(hFile, &m_fFrmStart, 4, &dwRWC, nullptr); // 전체 프레임.
-	ReadFile(hFile, &m_fFrmEnd, 4, &dwRWC, nullptr); // 전체 프레임.
+	ReadFile(hFile, &m_fFrmStart, 4, &dwRWC, nullptr); // 전체 프레임. [Korean comment]
+	ReadFile(hFile, &m_fFrmEnd, 4, &dwRWC, nullptr); // 전체 프레임. [Korean comment]
 
 	int i = 0, nL = 0;
 	char szName[512] = "";
 
 	int nCC = 0;
-	ReadFile(hFile, &nCC, 4, &dwRWC, nullptr); // 카메라..
+	ReadFile(hFile, &nCC, 4, &dwRWC, nullptr); // 카메라.. [Korean comment]
 	for(i = 0; i < nCC; i++)
 	{
 		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
@@ -97,7 +97,7 @@ bool CN3Scene::Load(HANDLE hFile)
 	}
 
 	int nLC = 0;
-	ReadFile(hFile, &nLC, 4, &dwRWC, nullptr); // 카메라..
+	ReadFile(hFile, &nLC, 4, &dwRWC, nullptr); // 카메라.. [Korean comment]
 	for(i = 0; i < nLC; i++) 
 	{
 		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
@@ -137,7 +137,7 @@ bool CN3Scene::Load(HANDLE hFile)
 	}
 
 	int nChrC = 0;
-	ReadFile(hFile, &nChrC, 4, &dwRWC, nullptr); // 캐릭터
+	ReadFile(hFile, &nChrC, 4, &dwRWC, nullptr); // 캐릭터 Character
 	for(i = 0; i < nChrC; i++)
 	{
 		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
@@ -173,10 +173,10 @@ bool CN3Scene::Save(HANDLE hFile)
 	
 	WriteFile(hFile, &m_nCameraActive, 4, &dwRWC, nullptr);
 	WriteFile(hFile, &m_fFrmCur, 4, &dwRWC, nullptr); // Animation Frame;
-	WriteFile(hFile, &m_fFrmStart, 4, &dwRWC, nullptr); // 전체 프레임.
-	WriteFile(hFile, &m_fFrmEnd, 4, &dwRWC, nullptr); // 전체 프레임.
+	WriteFile(hFile, &m_fFrmStart, 4, &dwRWC, nullptr); // 전체 프레임. [Korean comment]
+	WriteFile(hFile, &m_fFrmEnd, 4, &dwRWC, nullptr); // 전체 프레임. [Korean comment]
 	
-	WriteFile(hFile, &m_nCameraCount, 4, &dwRWC, nullptr); // 카메라..
+	WriteFile(hFile, &m_nCameraCount, 4, &dwRWC, nullptr); // 카메라.. [Korean comment]
 	for (CN3Camera* camera : m_pCameras)
 	{
 		int nL = static_cast<int>(camera->FileName().size());
@@ -185,7 +185,7 @@ bool CN3Scene::Save(HANDLE hFile)
 		camera->SaveToFile();
 	}
 
-	WriteFile(hFile, &m_nLightCount, 4, &dwRWC, nullptr); // 카메라..
+	WriteFile(hFile, &m_nLightCount, 4, &dwRWC, nullptr); // 카메라.. [Korean comment]
 	for (CN3Light* light : m_pLights)
 	{
 		int nL = static_cast<int>(light->FileName().size());
@@ -208,7 +208,7 @@ bool CN3Scene::Save(HANDLE hFile)
 	}
 
 	int iCC = static_cast<int>(m_Chrs.size());
-	WriteFile(hFile, &iCC, 4, &dwRWC, nullptr); // 캐릭터
+	WriteFile(hFile, &iCC, 4, &dwRWC, nullptr); // 캐릭터 Character
 	for (CN3Chr* chr : m_Chrs)
 	{
 		int nL = chr->FileName().size();
@@ -220,7 +220,7 @@ bool CN3Scene::Save(HANDLE hFile)
 		chr->SaveToFile();
 	}
 
-	CN3Base::SaveResrc(); // Resource 를 파일로 저장한다..
+	CN3Base::SaveResrc(); // Resource 를 파일로 저장한다.. Save
 	return true;
 }
 
@@ -253,7 +253,7 @@ void CN3Scene::Tick(float fFrm)
 		|| fFrm < m_fFrmStart
 		|| fFrm > m_fFrmEnd)
 	{
-		m_fFrmCur += 30.0f / CN3Base::s_fFrmPerSec; // 일정하게 움직이도록 시간에 따라 움직이는 양을 조절..
+		m_fFrmCur += 30.0f / CN3Base::s_fFrmPerSec; // 일정하게 움직이도록 시간에 따라 움직이는 양을 조절.. Time
 		if (m_fFrmCur > m_fFrmEnd)
 			m_fFrmCur = m_fFrmStart;
 	}
@@ -274,22 +274,22 @@ void CN3Scene::TickCameras(float fFrm)
 	{
 		m_pCameras[i]->Tick(m_fFrmCur);
 		if (m_nCameraActive == i)
-			m_pCameras[i]->Apply(); // 카메라 데이터 값을 적용한다..
+			m_pCameras[i]->Apply(); // 카메라 데이터 값을 적용한다.. Data
 	}
 }
 
 void CN3Scene::TickLights(float fFrm)
 {
 	for (int i = 0; i < 8; i++)
-		s_lpD3DDev->LightEnable(i, FALSE); // 일단 라이트 다 끄고..
+		s_lpD3DDev->LightEnable(i, FALSE); // 일단 라이트 다 끄고.. [Korean comment]
 
 	for (int i = 0; i < m_nLightCount; i++)
 	{
 		m_pLights[i]->Tick(m_fFrmCur);
-		m_pLights[i]->Apply(); // 라이트 적용
+		m_pLights[i]->Apply(); // 라이트 적용 [Korean comment]
 	}
 
-	// 라이트가 항상 카메라를 따라오게 만든다..
+	// 라이트가 항상 카메라를 따라오게 만든다.. [Korean comment]
 	if (!m_bDisableDefaultLight)
 	{
 		__Vector3 vDir = s_CameraData.vAt - s_CameraData.vEye;
@@ -304,7 +304,7 @@ void CN3Scene::TickLights(float fFrm)
 		s_lpD3DDev->SetLight(7, &lgt);
 	}
 
-	// Ambient Light 바꾸기..
+	// Ambient Light 바꾸기.. [Korean comment]
 //	uint32_t dwAmbient =	0xff000000 | 
 //						(((uint32_t)(m_pLights[i]->m_Data.Diffuse.r * 255 * 0.5f)) << 16) | 
 //						(((uint32_t)(m_pLights[i]->m_Data.Diffuse.g * 255 * 0.5f)) << 8) | 
@@ -537,7 +537,7 @@ void CN3Scene::DefaultCameraAdd()
 }
 void CN3Scene::DefaultLightAdd()
 {
-	// Light 초기화..
+	// Light 초기화.. Initialize
 	CN3Light* pLight = new CN3Light();
 	pLight->m_szName = "DefaultLight";
 	pLight->FileNameSet("Data\\DefaultLight.N3Light");

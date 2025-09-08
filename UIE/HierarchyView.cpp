@@ -113,7 +113,7 @@ void CHierarchyView::OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult)
 
 	CN3UIBase* pUI = (CN3UIBase*)GetTreeCtrl().GetItemData(hItem);
 	if(0 == ::_IsKeyDown(VK_CONTROL))
-		GetDocument()->SetSelectedUI(nullptr); // 컨트롤 키를 안눌렀으면.. 단독 셀렉트..
+		GetDocument()->SetSelectedUI(nullptr); // 컨트롤 키를 안눌렀으면.. 단독 셀렉트.. [Korean comment]
 	GetDocument()->SetSelectedUI(pUI);
 	
 	*pResult = 0;
@@ -139,7 +139,7 @@ void CHierarchyView::UpdateAllInfo()
 	this->SelectObject(TVI_ROOT, GetDocument()->GetSelectedUI());
 }
 
-// tree item 정보 갱신하기
+// tree item 정보 갱신하기 Info
 void CHierarchyView::UpdateTreeItem(HTREEITEM hParent, CN3UIBase *pUIBase)
 {
 	if(pUIBase == nullptr) return;
@@ -154,7 +154,7 @@ void CHierarchyView::UpdateTreeItem(HTREEITEM hParent, CN3UIBase *pUIBase)
 		{
 			str = _T("Button");
 			if (pParentUI && UI_TYPE_SCROLLBAR == pParentUI->UIType())
-			{	// 부모가 스크롤의 버튼일 경우
+			{	// 부모가 스크롤의 버튼일 경우 Button
 				if (CN3UIScrollBar::BTN_LEFTUP == pUIBase->GetReserved())
 					str = _T("Left/Up Button");
 				else if(CN3UIScrollBar::BTN_RIGHTDOWN == pUIBase->GetReserved())
@@ -210,10 +210,10 @@ void CHierarchyView::UpdateTreeItem(HTREEITEM hParent, CN3UIBase *pUIBase)
 	}
 	
 	str += " - ";
-	str += pUIBase->m_szID.c_str(); // 이름을 붙여준다... !!
+	str += pUIBase->m_szID.c_str(); // 이름을 붙여준다... !! Name
 
 	HTREEITEM hItem = GetTreeCtrl().InsertItem(str, hParent);	// insert
-	GetTreeCtrl().SetItemData(hItem, (DWORD)pUIBase);	// pointer 저장
+	GetTreeCtrl().SetItemData(hItem, (DWORD)pUIBase);	// pointer 저장 Save
 	GetTreeCtrl().Expand(hItem, TVE_EXPAND);			// expand
 
 	// update child

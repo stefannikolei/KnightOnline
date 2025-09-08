@@ -84,10 +84,10 @@ void CN3FXPlugPart::Tick(const __Matrix44& mtxParent)
 {
 	if (m_pFXB)
 	{
-		// 위치
+		// 위치 Position
 		m_pFXB->m_vPos = m_vOffsetPos*mtxParent;
 
-		// 회전
+		// 회전 Rotate
 		static __Matrix44 mtxRot;
 		mtxRot = mtxParent; mtxRot.PosSet(0,0,0);
 		m_pFXB->m_vDir = m_vOffsetDir*mtxRot;
@@ -101,7 +101,7 @@ void CN3FXPlugPart::Tick(const CN3Chr* pChr)
 	__ASSERT(pChr, "no chr");
 	if (m_pFXB)
 	{
-		// 위치
+		// 위치 Position
 		const __Matrix44* pMtxJoint = pChr->MatrixGet(m_nRefIndex);
 		if (nullptr == pMtxJoint) return;
 
@@ -110,7 +110,7 @@ void CN3FXPlugPart::Tick(const CN3Chr* pChr)
 		mtx *= pChr->m_Matrix;
 		m_pFXB->m_vPos = m_vOffsetPos*mtx;
 		
-		// 회전
+		// 회전 Rotate
 		mtx.PosSet(0,0,0);
 		m_pFXB->m_vDir = m_vOffsetDir*mtx;
 
@@ -132,7 +132,7 @@ void CN3FXPlugPart::SetFXB(const std::string& strFN)
 	m_vOffsetPos = m_pFXB->m_vPos;	//일단 FXB에 설정되어 있는 vPos와 vDir값을 가져와서 적용.
 	m_vOffsetDir = m_pFXB->m_vDir;
 
-	m_pFXB->Init();					// FX 나오게 하기
+	m_pFXB->Init();					// FX 나오게 하기 [Korean comment]
 	m_pFXB->Trigger();
 }
 
@@ -175,7 +175,7 @@ bool CN3FXPlug::Load(HANDLE hFile)
 	__ASSERT(0 == m_FXPParts.size(), "must 0");
 	DWORD dwNum;
 	int i, nCount;
-	ReadFile(hFile, &nCount, sizeof(nCount), &dwNum, nullptr);		// Part의 갯수
+	ReadFile(hFile, &nCount, sizeof(nCount), &dwNum, nullptr);		// Part의 갯수 [Korean comment]
 
 	if (nCount > 0) m_FXPParts.assign(nCount, nullptr);
 	for(i=0; i<nCount; ++i)
@@ -222,11 +222,11 @@ bool CN3FXPlug::Save(HANDLE hFile)
 {
 	if (false == CN3BaseFileAccess::Save(hFile)) return false;
 
-	RemoveFXPParts_HaveNoBundle();	// 번들 없는 파트들 지우기
+	RemoveFXPParts_HaveNoBundle();	// 번들 없는 파트들 지우기 [Korean comment]
 
 	DWORD dwNum;
 	int i, nCount = m_FXPParts.size();
-	WriteFile(hFile, &nCount, sizeof(nCount), &dwNum, nullptr);		// Part의 갯수
+	WriteFile(hFile, &nCount, sizeof(nCount), &dwNum, nullptr);		// Part의 갯수 [Korean comment]
 	for(i=0; i<nCount; ++i)	m_FXPParts[i]->Save(hFile);
 
 	return true;
@@ -239,12 +239,12 @@ void CN3FXPlug::RemoveFXPParts_HaveNoBundle()	// 번들 없는 Part들 제거하
 	{
 		if (m_FXPParts[i] && nullptr == m_FXPParts[i]->GetFXB())
 		{
-			delete m_FXPParts[i];								// FXB가 없으면 이 파트는 지운다.
+			delete m_FXPParts[i];								// FXB가 없으면 이 파트는 지운다. [Korean comment]
 			m_FXPParts[i] = nullptr;
 		}
 	}
 
-	// nullptr인 포인터들을 없앤다.
+	// nullptr인 포인터들을 없앤다. [Korean comment]
 	std::vector<CN3FXPlugPart*>::iterator itor;
 	for (itor = m_FXPParts.begin(); itor != m_FXPParts.end();)
 	{

@@ -30,33 +30,33 @@ protected:
 //	int			m_iZoom;
 	HACCEL		m_hAccelTable;
 	eUIE_MODE	m_eMode;					// 현재 Mode
-	eRECTTYPE	m_eSelectedRectType;		// 수정하는 사각형 종류 (영역, 움직이는 영역, 클릭 영역)
-	CPoint		m_ptOldMouse;				// 이전 마우스 좌표
-	CPoint		m_ptOldLBPos;				// 이전에 왼쪽 버튼으로 찍은 마우스..
+	eRECTTYPE	m_eSelectedRectType;		// 수정하는 사각형 종류 (영역, 움직이는 영역, 클릭 영역) Type
+	CPoint		m_ptOldMouse;				// 이전 마우스 좌표 [Korean comment]
+	CPoint		m_ptOldLBPos;				// 이전에 왼쪽 버튼으로 찍은 마우스.. Button
 
-	COLORREF	m_RegionRectColor;			// 영역 사각형을 표시하는 선 색
-	COLORREF	m_MoveRectColor;			// 움직이는 영역 사각형을 표시하는 선 색
-	COLORREF	m_ClickRectColor;			// click 사각형을 표시하는 선 색
+	COLORREF	m_RegionRectColor;			// 영역 사각형을 표시하는 선 색 Color
+	COLORREF	m_MoveRectColor;			// 움직이는 영역 사각형을 표시하는 선 색 Color
+	COLORREF	m_ClickRectColor;			// click 사각형을 표시하는 선 색 Color
 
 	enum	eDRAGTYPE {DRAGTYPE_NONE=0, DRAGTYPE_MOVE, DRAGTYPE_LEFT, DRAGTYPE_RIGHT,
 					DRAGTYPE_TOP, DRAGTYPE_BOTTOM, DRAGTYPE_LEFTTOP, DRAGTYPE_RIGHTTOP,
 					DRAGTYPE_LEFTBOTTOM, DRAGTYPE_RIGHTBOTTOM};
-	eDRAGTYPE		m_eDragType;			// Drag 상태
-	CRect			m_rcSelectedRect;		// 선택된 사각형 영역
+	eDRAGTYPE		m_eDragType;			// Drag 상태 Status
+	CRect			m_rcSelectedRect;		// 선택된 사각형 영역 Select
 
-	BOOL		m_bViewGrid; // 그리드 보기..
+	BOOL		m_bViewGrid; // 그리드 보기.. [Korean comment]
 
 // Operations
 public:
 	CN3UIBase*	Pick(const POINT& point, CN3UIBase* pUI);
 	void		SetMode(eUIE_MODE eMode);					// 모드를 변경하는 함수(Edit, Preview)
-	void		SelectRectType(eRECTTYPE eRectType);		// 수정하는 사각형 종류(영역, 움직이는 영역, 클릭 영역)를 정하는 함수
-	void		ChangeBkgndColor();							// 배경색을 바꿈
+	void		SelectRectType(eRECTTYPE eRectType);		// 수정하는 사각형 종류(영역, 움직이는 영역, 클릭 영역)를 정하는 함수 Function
+	void		ChangeBkgndColor();							// 배경색을 바꿈 Color
 protected:
-	void	RenderPreview();							// Preview 화면을 렌더하는 함수
-	void	RenderEditview();							// Editview 화면을 렌더하는 함수
-	eDRAGTYPE CheckDragType(CRect rcSel, CPoint point);	// 마우스 위치에 따라 드래그 상태를 구별하는 함수
-	void	UpdateStatusBarText();						// Status Bar text를 현재 상태에 받게 갱신하는 함수
+	void	RenderPreview();							// Preview 화면을 렌더하는 함수 Function
+	void	RenderEditview();							// Editview 화면을 렌더하는 함수 Function
+	eDRAGTYPE CheckDragType(CRect rcSel, CPoint point);	// 마우스 위치에 따라 드래그 상태를 구별하는 함수 Function
+	void	UpdateStatusBarText();						// Status Bar text를 현재 상태에 받게 갱신하는 함수 Function
 	void	UpdateUIInfo_SelectedRect();				// selected rect정보를 토대로 UI 정보를 갱신하기
 public:
 // Overrides

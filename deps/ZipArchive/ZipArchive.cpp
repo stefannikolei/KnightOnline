@@ -980,7 +980,7 @@ CString CZipArchive::GetDrive(LPCTSTR lpszFilePath)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	특정 디렉토리를 제거한체 압축한다. 2001.5.30
+//	특정 디렉토리를 제거한체 압축한다. 2001.5.30 Remove
 //
 BOOL CZipArchive::AddNewFile(LPCTSTR lpszFilePath, LPCTSTR strPath, int iLevel, unsigned long nBufSize)
 {

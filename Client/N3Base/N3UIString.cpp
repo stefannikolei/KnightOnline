@@ -60,7 +60,7 @@ void CN3UIString::Init(CN3UIBase* pParent)
 	CN3UIBase::Init(pParent);
 
 	if(m_pDFont) delete m_pDFont; m_pDFont = nullptr;
-	m_pDFont = new CDFont("굴림", 16);	// default 로 굴림 16으로 설정
+	m_pDFont = new CDFont("굴림", 16);	// default 로 굴림 16으로 설정 Set
 	m_pDFont->InitDeviceObjects( CN3Base::s_lpD3DDev );
 	m_pDFont->RestoreDeviceObjects();
 }
@@ -81,7 +81,7 @@ void CN3UIString::SetStringAsInt(int iVal)
 
 void CN3UIString::SetString_NoWordWrap(const std::string& szString)
 {
-	// 왼쪽위 정렬해서 그린다.
+	// 왼쪽위 정렬해서 그린다. [Korean comment]
 	m_ptDrawPos.x = m_rcRegion.left;
 	m_ptDrawPos.y = m_rcRegion.top;
 
@@ -112,7 +112,7 @@ void CN3UIString::SetStyle(uint32_t dwStyle)
 	WordWrap();
 }
 
-// 글씨찍는 위치도 바뀌어 준다.
+// 글씨찍는 위치도 바뀌어 준다. Position
 BOOL CN3UIString::MoveOffset(int iOffsetX, int iOffsetY)
 {
 	if (FALSE == CN3UIBase::MoveOffset(iOffsetX, iOffsetY)) return FALSE;
@@ -171,10 +171,10 @@ void CN3UIString::WordWrap()
 
 	if (m_dwStyle & UISTYLE_STRING_SINGLELINE)
 	{
-		// 임시 변수 잡기
+		// 임시 변수 잡기 Variable
 		std::string szNewBuff;
 
-		/*if (size.cy>iRegionHeight)	// 글자 높이가 해당 영역보다 큰 경우
+		/*if (size.cy>iRegionHeight)	// 글자 높이가 해당 영역보다 큰 경우 [Korean comment]
 		{	
 			// NOTE: need to look into putting this back!!!
 
@@ -183,30 +183,30 @@ void CN3UIString::WordWrap()
 			m_pDFont->SetText("Temp1");
 			return;
 		}
-		else*/ if (size.cx <= iRegionWidth)	// 글자 가로 길이가 영역 길이보다 작을경우
+		else*/ if (size.cx <= iRegionWidth)	// 글자 가로 길이가 영역 길이보다 작을경우 [Korean comment]
 		{
 			szNewBuff = m_szString;
 
-			// 가로 정렬 
+			// 가로 정렬  [Korean comment]
 			if (m_dwStyle & UISTYLE_STRING_ALIGNRIGHT) m_ptDrawPos.x = m_rcRegion.right - size.cx;
 			else if (m_dwStyle & UISTYLE_STRING_ALIGNCENTER) m_ptDrawPos.x = m_rcRegion.left + ((iRegionWidth-size.cx)/2);
 			else m_ptDrawPos.x = m_rcRegion.left;
-			// 세로 정렬
+			// 세로 정렬 [Korean comment]
 			if (m_dwStyle & UISTYLE_STRING_ALIGNBOTTOM) m_ptDrawPos.y = m_rcRegion.bottom-size.cy;
 			else if (m_dwStyle & UISTYLE_STRING_ALIGNVCENTER) m_ptDrawPos.y = m_rcRegion.top + ((iRegionHeight-size.cy)/2);
 			else m_ptDrawPos.y = m_rcRegion.top;
 			m_iLineCount = 1;
 		}
-		else	// 글자 가로 길이가 영역 길이보다 클경우 영역안에 들어가는 글자만 표시하자.
+		else	// 글자 가로 길이가 영역 길이보다 클경우 영역안에 들어가는 글자만 표시하자. [Korean comment]
 		{
-			// 가로 정렬은 왼쪽 정렬로.
+			// 가로 정렬은 왼쪽 정렬로. [Korean comment]
 			m_ptDrawPos.x = m_rcRegion.left;
-			// 세로 정렬
+			// 세로 정렬 [Korean comment]
 			if (m_dwStyle & UISTYLE_STRING_ALIGNBOTTOM) m_ptDrawPos.y = m_rcRegion.bottom-size.cy;
 			else if (m_dwStyle & UISTYLE_STRING_ALIGNVCENTER) m_ptDrawPos.y = m_rcRegion.top + ((iRegionHeight-size.cy)/2);
 			else m_ptDrawPos.y = m_rcRegion.top;
 
-			// 글자 자르는 코드
+			// 글자 자르는 코드 [Korean comment]
 			int iCount = 0;
 			while(iCount<iStrLen)
 			{
@@ -214,14 +214,14 @@ void CN3UIString::WordWrap()
 				{
 					break;
 				}
-				else if (0x80 & szString[iCount])	// 2BYTE 문자
+				else if (0x80 & szString[iCount])	// 2BYTE 문자 [Korean comment]
 				{
 					BOOL bFlag = m_pDFont->GetTextExtent(szString.c_str(), iCount+2, &size);
 					__ASSERT(bFlag, "cannot get size of dfont");
 					if (size.cx>iRegionWidth) break;
 					iCount += 2;
 				}
-				else								// 1BYTE 문자
+				else								// 1BYTE 문자 [Korean comment]
 				{
 					BOOL bFlag = m_pDFont->GetTextExtent(szString.c_str(), iCount+1, &size);
 					__ASSERT(bFlag, "cannot get size of dfont");
@@ -237,17 +237,17 @@ void CN3UIString::WordWrap()
 
 	}
 	else
-	{	// mutiline일때는 항상 왼쪽 정렬해서 그린다.
+	{	// mutiline일때는 항상 왼쪽 정렬해서 그린다. [Korean comment]
 		m_ptDrawPos.x = m_rcRegion.left;
 		m_ptDrawPos.y = m_rcRegion.top;
 
-		m_NewLineIndices.clear();	// 새로운 라인 인덱스 클리어
+		m_NewLineIndices.clear();	// 새로운 라인 인덱스 클리어 Index
 
-		// 글자 자르는 코드, 영역 밖으로 벗어나는 글자는 찍지 않는다.
+		// 글자 자르는 코드, 영역 밖으로 벗어나는 글자는 찍지 않는다. [Korean comment]
 		int iCX=0;//, iCY=0;
 		int iCount = 0;
 
-		// 우선 맨 처음 한줄이 들어갈 수 있는 크기인지 체크하기
+		// 우선 맨 처음 한줄이 들어갈 수 있는 크기인지 체크하기 Check
 		BOOL bFlag = m_pDFont->GetTextExtent("최", 2, &size);
 		__ASSERT(bFlag, "cannot get size of dfont");
 //		iCY += size.cy;
@@ -261,8 +261,8 @@ void CN3UIString::WordWrap()
 			//return;
 		}
 
-		m_iLineCount = 1;	// 여기까지 오면 1줄은 찍힌다.
-		m_NewLineIndices.push_back(0);	// 맨 첨 시작은 0
+		m_iLineCount = 1;	// 여기까지 오면 1줄은 찍힌다. [Korean comment]
+		m_NewLineIndices.push_back(0);	// 맨 첨 시작은 0 [Korean comment]
 
 		while(iCount<iStrLen)
 		{
@@ -270,36 +270,36 @@ void CN3UIString::WordWrap()
 			{
 //				szNewBuff += '\n';
 //				iCY += size.cy;
-//				if (iCY > iRegionHeight) break;	// 세로 범위가 넘으면 더이상 글자를 찍지 않는다.
+//				if (iCY > iRegionHeight) break;	// 세로 범위가 넘으면 더이상 글자를 찍지 않는다. [Korean comment]
 				++iCount;
 				iCX = 0;
 				if (iCount<iStrLen-1)
 				{
-					++m_iLineCount;	// 마지막 글자가 아닐경우 한줄 더하기 
+					++m_iLineCount;	// 마지막 글자가 아닐경우 한줄 더하기  [Korean comment]
 					m_NewLineIndices.push_back(iCount);
 				}
 			}
 			else
 			{
 				int iCC=0;
-				if (0x80 & szString[iCount])	iCC = 2;	// 2BYTE 문자
-				else iCC = 1;	// 1BYTE 문자
+				if (0x80 & szString[iCount])	iCC = 2;	// 2BYTE 문자 [Korean comment]
+				else iCC = 1;	// 1BYTE 문자 [Korean comment]
 
 				BOOL bFlag = m_pDFont->GetTextExtent(&(szString[iCount]), iCC, &size);
 				__ASSERT(bFlag, "cannot get size of dfont");
-				if ((iCX+size.cx) > iRegionWidth)	// 가로 길이가 넘었으면
+				if ((iCX+size.cx) > iRegionWidth)	// 가로 길이가 넘었으면 [Korean comment]
 				{
-//					szNewBuff += '\n';	// 다음줄로 내린다.
+//					szNewBuff += '\n';	// 다음줄로 내린다. [Korean comment]
 					iCX = 0;
 //					iCY += size.cy;
-//					if (iCY > iRegionHeight) break;	// 세로 범위가 넘으면 더이상 글자를 찍지 않는다.
+//					if (iCY > iRegionHeight) break;	// 세로 범위가 넘으면 더이상 글자를 찍지 않는다. [Korean comment]
 					if (iCount<iStrLen-1)
 					{
-						++m_iLineCount;	// 마지막 글자가 아닐경우 한줄 더하기 
+						++m_iLineCount;	// 마지막 글자가 아닐경우 한줄 더하기  [Korean comment]
 						m_NewLineIndices.push_back(iCount);
 					}
 				}
-				// 글자 카피
+				// 글자 카피 [Korean comment]
 //				szNewBuff += szString.substr(iCount, iCC);
 				
 				iCount += iCC;
@@ -340,7 +340,7 @@ void CN3UIString::SetStartLine(int iLine)
 			if ((iSize>0) && ('\n' != strNew[iSize-1])) strNew += "\n";
 		}
 	}
-	// 마지막줄 처리
+	// 마지막줄 처리 Process
 	if (bMoreLine)
 	{
 		if (iEndLine > 0) {
@@ -362,9 +362,9 @@ bool CN3UIString::Load(HANDLE hFile)
 {
 	if (false == CN3UIBase::Load(hFile)) return false;
 	DWORD dwNum;
-	// font 정보
+	// font 정보 Info
 	int iStrLen = 0;
-	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이 
+	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이  Name
 	if (iStrLen>0)
 	{
 		std::string szFontName(iStrLen, '?');
@@ -374,12 +374,12 @@ bool CN3UIString::Load(HANDLE hFile)
 		ReadFile(hFile, &dwFontHeight, sizeof(dwFontHeight), &dwNum, nullptr);	// font height
 		ReadFile(hFile, &dwFontFlags, sizeof(dwFontFlags), &dwNum, nullptr);	// font flag (bold, italic)
 
-		SetFont(szFontName, dwFontHeight, dwFontFlags & D3DFONT_BOLD, dwFontFlags & D3DFONT_ITALIC);	// 글꼴 지정
+		SetFont(szFontName, dwFontHeight, dwFontFlags & D3DFONT_BOLD, dwFontFlags & D3DFONT_ITALIC);	// 글꼴 지정 [Korean comment]
 	}
 #ifdef _N3TOOL
 	else
 	{
-		SetFont("굴림", 10, FALSE, FALSE);	// 임시로 글꼴 지정
+		SetFont("굴림", 10, FALSE, FALSE);	// 임시로 글꼴 지정 [Korean comment]
 		MessageBox(s_hWndBase, "폰트가 지정되지 않은 UIString이 있어서 굴림(10)으로 설정하였습니다.", "No font", MB_OK);
 	}
 #else
@@ -387,8 +387,8 @@ bool CN3UIString::Load(HANDLE hFile)
 #endif
 
 	// string
-	ReadFile(hFile, &m_Color, sizeof(m_Color), &dwNum, nullptr);			// 글자 색
-	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// string 길이 
+	ReadFile(hFile, &m_Color, sizeof(m_Color), &dwNum, nullptr);			// 글자 색 Color
+	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// string 길이  [Korean comment]
 	if (iStrLen>0)
 	{
 		std::string szString(iStrLen, '?');
@@ -407,14 +407,14 @@ void CN3UIString::operator = (const CN3UIString& other)
 {
 	CN3UIBase::operator = (other);
 
-	m_ptDrawPos = other.m_ptDrawPos;		// 실제 화면에 표시될 글자의 제일 왼쪽 상단 좌표
-	m_Color = other.m_Color;			// 글자 색
+	m_ptDrawPos = other.m_ptDrawPos;		// 실제 화면에 표시될 글자의 제일 왼쪽 상단 좌표 [Korean comment]
+	m_Color = other.m_Color;			// 글자 색 Color
 
-	// 폰트 설정
+	// 폰트 설정 Set
 	uint32_t dwFontFlags = other.GetFontFlags();
 	SetFont(other.GetFontName(), other.GetFontHeight(), dwFontFlags & D3DFONT_BOLD, dwFontFlags & D3DFONT_ITALIC);
 
-	// 글씨 설정
+	// 글씨 설정 Set
 	this->SetString(other.m_szString); // m_szString = other.m_szString;			// string buffer
 }
 
@@ -423,13 +423,13 @@ bool CN3UIString::Save(HANDLE hFile)
 {
 	if (false == CN3UIBase::Save(hFile)) return false;
 	DWORD dwNum;
-	// font 정보
+	// font 정보 Info
 	char* pszFontName = nullptr;
 	__ASSERT(m_pDFont, "no font");
 	const std::string strFontName(m_pDFont->GetFontName());
 	int iStrLen = strFontName.size();
 	__ASSERT(iStrLen>0, "No font name");
-	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이 
+	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이  Name
 	if (iStrLen>0)
 	{
 		WriteFile(hFile, strFontName.c_str(), iStrLen, &dwNum, nullptr);				// string
@@ -444,10 +444,10 @@ bool CN3UIString::Save(HANDLE hFile)
 	}
 
 	// string
-	WriteFile(hFile, &m_Color, sizeof(m_Color), &dwNum, nullptr);			// 글자 색
+	WriteFile(hFile, &m_Color, sizeof(m_Color), &dwNum, nullptr);			// 글자 색 Color
 	iStrLen = 0;
 	iStrLen = m_szString.size();
-	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// string 길이 
+	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// string 길이  [Korean comment]
 	if (iStrLen>0)
 	{
 		WriteFile(hFile, m_szString.c_str(), iStrLen, &dwNum, nullptr);				// string
@@ -557,16 +557,16 @@ uint32_t CN3UIString::MouseProc(uint32_t dwFlags, const POINT &ptCur, const POIN
 #endif
 #endif
 
-	// 특정 이벤트에 대해 메시지 전송..
+	// 특정 이벤트에 대해 메시지 전송.. Mesh
 	if(IsIn(ptCur.x, ptCur.y) && (dwFlags & UI_MOUSE_LBCLICKED) )	
 	{
-		m_pParent->ReceiveMessage(this, UIMSG_STRING_LCLICK); // 부모에게 버튼 클릭 통지..
+		m_pParent->ReceiveMessage(this, UIMSG_STRING_LCLICK); // 부모에게 버튼 클릭 통지.. Button
 //		dwRet |= UI_MOUSEPROC_DONESOMETHING;
 	}
 
 	if(IsIn(ptCur.x, ptCur.y) && (dwFlags & UI_MOUSE_LBDBLCLK) )	
 	{
-		m_pParent->ReceiveMessage(this, UIMSG_STRING_LDCLICK); // 부모에게 버튼 클릭 통지..
+		m_pParent->ReceiveMessage(this, UIMSG_STRING_LDCLICK); // 부모에게 버튼 클릭 통지.. Button
 //		dwRet |= UI_MOUSEPROC_DONESOMETHING;
 	}
 

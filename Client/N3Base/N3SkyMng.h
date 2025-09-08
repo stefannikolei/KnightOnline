@@ -13,20 +13,20 @@
 #include <vector>
 
 const float TIME_REAL_PER_GAME = 10.0f;						// 실제 시간과 game시간의 비율(현재 게임은 실제 시간보다 열배 빨리 돌아간다..)
-const float TIME_GAME_PER_REAL = 1.0f/TIME_REAL_PER_GAME;	// game시간과 실제 시간의 비율
+const float TIME_GAME_PER_REAL = 1.0f/TIME_REAL_PER_GAME;	// game시간과 실제 시간의 비율 Time
 #define CONVERT_SEC(h, m, s) ((h)*3600 + (m)*60 + (s))
 
-// 시간 관리
-enum		eSKY_DAYCHANGE {	SDC_SKYCOLOR=0,		// 하늘색
-								SDC_FOGCOLOR,		// 안개색
-								SDC_STARCOUNT,		// 별 수
-								SDC_MOONPHASE,		// 달 모양
-								SDC_SUNCOLOR,		// 해 색, 크기 - 1000 이 뷰포트에서 꽉차는 크기.
+// 시간 관리 Time
+enum		eSKY_DAYCHANGE {	SDC_SKYCOLOR=0,		// 하늘색 Color
+								SDC_FOGCOLOR,		// 안개색 Color
+								SDC_STARCOUNT,		// 별 수 [Korean comment]
+								SDC_MOONPHASE,		// 달 모양 [Korean comment]
+								SDC_SUNCOLOR,		// 해 색, 크기 - 1000 이 뷰포트에서 꽉차는 크기. Size
 								SDC_GLOWCOLOR,		// 해의 glow색, 크기 - 1000 이 뷰포트에서 꽉차는 크기.
 								SDC_FLARECOLOR,		// 해의 flare색, 크기 - 1000 이 뷰포트에서 꽉차는 크기.
-								SDC_CLOUD1COLOR,	// 구름층 1의 색
-								SDC_CLOUD2COLOR,	// 구름층 2의 색
-								SDC_CLOUDTEX,		// 구름 텍스쳐 바꾸기
+								SDC_CLOUD1COLOR,	// 구름층 1의 색 Color
+								SDC_CLOUD2COLOR,	// 구름층 2의 색 Color
+								SDC_CLOUDTEX,		// 구름 텍스쳐 바꾸기 [Korean comment]
 								
 								SDC_LIGHT0COLOR,	// Direction Light 0
 								SDC_LIGHT1COLOR,	// Direction Light 1
@@ -39,12 +39,12 @@ enum		eSKY_DAYCHANGE {	SDC_SKYCOLOR=0,		// 하늘색
 
 struct		__SKY_DAYCHANGE
 {
-	std::string		szName;			// 이름 붙이기..
-	eSKY_DAYCHANGE	eSkyDayChange;	// 어떤 변화인가?
-	uint32_t			dwWhen;			// 언제 변화시작인가?(0시부터 초단위로 나타낸 시간)
+	std::string		szName;			// 이름 붙이기.. Name
+	eSKY_DAYCHANGE	eSkyDayChange;	// 어떤 변화인가? [Korean comment]
+	uint32_t			dwWhen;			// 언제 변화시작인가?(0시부터 초단위로 나타낸 시간) Time
 	uint32_t			dwParam1;		// parameter 1
 	uint32_t			dwParam2;		// parameter 2
-	float			fHowLong;		// 얼마나 걸릴것인가?(실시간 초)
+	float			fHowLong;		// 얼마나 걸릴것인가?(실시간 초) Time
 
 	void Init()
 	{
@@ -116,9 +116,9 @@ public:
 	virtual ~CN3SkyMng();
 // Attributes
 public:
-	enum		eSKY_WEATHER {  SW_CLEAR=1,	// 맑음
-								SW_RAINY,	// 비
-								SW_SNOW};	// 눈
+	enum		eSKY_WEATHER {  SW_CLEAR=1,	// 맑음 [Korean comment]
+								SW_RAINY,	// 비 [Korean comment]
+								SW_SNOW};	// 눈 [Korean comment]
 protected:
 	class CN3Sky*			m_pSky;
 	class CN3Moon*			m_pMoon;
@@ -135,24 +135,24 @@ protected:
 	int						m_iWeatherChangeCurPos;
 
 	uint32_t		m_dwCheckTick;	// 서버에서 시간을 받을때의 윈도우TickCount(실시간) (게임시간으로 24시에 다시 설정하기도 한다.)
-	uint32_t		m_dwCheckGameTime;	// 서버에서 내려받은 시간(게임 시간 초단위) 0 ~ (24*60*60)
+	uint32_t		m_dwCheckGameTime;	// 서버에서 내려받은 시간(게임 시간 초단위) 0 ~ (24*60*60) Time
 	eSKY_WEATHER	m_eWeather;
 
 	int			m_iYear;
 	int			m_iMonth;
 	int			m_iDay;
 
-	int			m_iHourFix;		// 해,달 방향 고정시 시간으로 나타내는 방향.
+	int			m_iHourFix;		// 해,달 방향 고정시 시간으로 나타내는 방향. Time
 
 
-	float			m_fCellSize;	// 내부 셀 크기
-	POINT			m_CurCellPos;	// 현재 내부셀 좌표
-	__Vector3		m_vPos[9];		// 주변 셀 9칸의 중심좌표들
+	float			m_fCellSize;	// 내부 셀 크기 Size
+	POINT			m_CurCellPos;	// 현재 내부셀 좌표 [Korean comment]
+	__Vector3		m_vPos[9];		// 주변 셀 9칸의 중심좌표들 [Korean comment]
 
-	// 효과들..
-	class CN3GERain*		m_pGERain;		// 비
-	class CN3GESnow*		m_pGESnow;		// 눈
-#ifdef _N3GAME // 게임이 아닌 툴에서는 필요없다...
+	// 효과들.. [Korean comment]
+	class CN3GERain*		m_pGERain;		// 비 [Korean comment]
+	class CN3GESnow*		m_pGESnow;		// 눈 [Korean comment]
+#ifdef _N3GAME // 게임이 아닌 툴에서는 필요없다... [Korean comment]
 	class CN3SndObj*		m_pSnd_Weather_Rain;
 	class CN3SndObj*		m_pSnd_Weather_Snow;
 #endif // #ifdef _N3GAME
@@ -184,7 +184,7 @@ public:
 
 	bool Load(HANDLE hFile) override;
 
-#ifdef _N3GAME // 게임이 아닌 툴에서는 필요없다...
+#ifdef _N3GAME // 게임이 아닌 툴에서는 필요없다... [Korean comment]
 	void ReleaseSound();
 #endif // #ifdef _N3GAME
 
@@ -210,24 +210,24 @@ public:
 	D3DCOLOR	GetLightAmbientColor(int iIndex);
 
 	void	Release() override;
-	void	Render(); // 하늘만 렌더링..
-	void	RenderWeather(); // 비나 눈등의 날씨 렌더링..
+	void	Render(); // 하늘만 렌더링.. Rendering
+	void	RenderWeather(); // 비나 눈등의 날씨 렌더링.. Rendering
 	void	Tick();
 
-	// 시간 관리
+	// 시간 관리 Time
 	void	GetGameTime(int* piYear, int* piMonth, int* piDay, int* piHour, int*piMin);
 	void	SetGameTime(int iYear, int iMonth, int iDay, int iHour, int iMin);
-	void	SetWeather(eSKY_WEATHER eWeather, int iPercentage);	//	날씨 세팅
+	void	SetWeather(eSKY_WEATHER eWeather, int iPercentage);	//	날씨 세팅 [Korean comment]
 	
-	void	SunAndMoonDirectionFixByHour(int iHour); // 해와 달 각도 관리
+	void	SunAndMoonDirectionFixByHour(int iHour); // 해와 달 각도 관리 [Korean comment]
 
-//	By : Ecli666 ( On 2002-04-04 오전 10:53:58 )
+//	By : Ecli666 ( On 2002-04-04 오전 10:53:58 ) [Korean comment]
 //
 	CN3Sun*	GetSunPointer()	{	return m_pSun;	}
-//	~(By Ecli666 On 2002-04-04 오전 10:53:58 )
+//	~(By Ecli666 On 2002-04-04 오전 10:53:58 ) [Korean comment]
 	
 protected:
-	void		SetCheckGameTime(uint32_t dwCheckGameTime);//	CheckGameTime을 정해주고 현재시간을 다시 세팅한다.(특정 시간으로 강제적으로 만들때 호출한다.)
+	void		SetCheckGameTime(uint32_t dwCheckGameTime);//	CheckGameTime을 정해주고 현재시간을 다시 세팅한다.(특정 시간으로 강제적으로 만들때 호출한다.) Time
 	int			GetLatestChange(eSKY_DAYCHANGE eSDC, int iPos);// m_pDayChangeQueues에서 지정된 위치(iPos) 이전의 가장 최근에 변화하는 위치 얻어오기
 	void		ChangeSky(__SKY_DAYCHANGE* pSDC, float fTakeTime);
 	int			GetDayChangePos_AfterNSec(uint32_t dwCurGameTime, float fSec);		// 실시간 N초 후에 DayChangeQueue의 위치 구하기

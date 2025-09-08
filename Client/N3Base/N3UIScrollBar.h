@@ -46,7 +46,7 @@ public:
 	int				GetMaxPos() const {if (m_pTrackBarRef) return m_pTrackBarRef->GetMaxPos(); return 0;}
 
 #ifdef _N3TOOL
-// tool에서 사용하는 함수들
+// tool에서 사용하는 함수들 Function
 public:
 	virtual void	operator = (const CN3UIScrollBar& other);
 	void			CreateTrackBarAndBtns();			// trackbar와 button 생성

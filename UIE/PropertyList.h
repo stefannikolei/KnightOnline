@@ -21,7 +21,7 @@
 #define PIT_COLOR	2
 #define PIT_FONT	3
 #define PIT_FILE	4
-#define PIT_FILE_MULTI	5 // FileName1'\n'FileName2'\n'....FileName'\n' 이렇게 문자열이 된다..
+#define PIT_FILE_MULTI	5 // FileName1'\n'FileName2'\n'....FileName'\n' 이렇게 문자열이 된다.. [Korean comment]
 #define PIT_CHECK	6
 #define PIT_BUTTON	7
 
@@ -39,7 +39,7 @@ public:
 	CString			m_curValue; // Color 값의 Alpha 값으로도 쓰인다..
 	int				m_nItemType;
 	CStringArray	m_szCBItemsOrFilter;
-	COLORREF		m_crColor; // ColorReference | Combo Box Index 로 쓰인다..
+	COLORREF		m_crColor; // ColorReference | Combo Box Index 로 쓰인다.. [Korean comment]
 
 public:
 	void D3DColorSet(D3DCOLOR color);

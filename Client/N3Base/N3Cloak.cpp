@@ -418,7 +418,7 @@ void CN3Cloak::ApplyOffset(D3DXVECTOR3	&vDif)
 		m_fOffsetRecoveryTime = 1.4f;
 	}
 	else
-	{	// offset 이 적용되어 있는 상태.
+	{	// offset 이 적용되어 있는 상태. Status
 		m_fOffsetRecoveryTime -= s_fSecPerFrm;
 		if (m_fOffsetRecoveryTime < 0.0f)
 		{	// Recovery process
@@ -439,7 +439,7 @@ void CN3Cloak::ApplyOffset(D3DXVECTOR3	&vDif)
 
 void CN3Cloak::TickYaw(float fYaw)
 {
-	// 회전이 있었다.
+	// 회전이 있었다. Rotate
 	if (fYaw != m_fPrevYaw)
 	{
 		if (fYaw - m_fPrevYaw > 0.0f)

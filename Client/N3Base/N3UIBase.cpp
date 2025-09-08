@@ -35,7 +35,7 @@ bool CN3UIBase::s_bWaitFromServer = false;
 
 CN3UIEdit* CN3UIBase::s_pFocusedEdit = nullptr;
 CN3UITooltip* CN3UIBase::s_pTooltipCtrl = nullptr;
-std::string CN3UIBase::s_szStringTmp; // 임시변수..
+std::string CN3UIBase::s_szStringTmp; // 임시변수.. Variable
 
 CN3UIBase::CN3UIBase()
 {
@@ -61,7 +61,7 @@ CN3UIBase::CN3UIBase()
 
 CN3UIBase::~CN3UIBase()
 {
-	if(m_pParent) m_pParent->RemoveChild(this);	// 부모의 자식에서 나를 지우기
+	if(m_pParent) m_pParent->RemoveChild(this);	// 부모의 자식에서 나를 지우기 [Korean comment]
 
 	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_OpenUI);
 	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_CloseUI);
@@ -70,7 +70,7 @@ CN3UIBase::~CN3UIBase()
 	{
 		CN3UIBase* pChild = m_Children.front();
 		if (pChild) delete pChild;	// 자식이 delete되면서 부모의 list에서는 자동으로 제거된다.
-									// 따라서 리스트에서 따로 지우는 부분이 없어도 된다.
+									// 따라서 리스트에서 따로 지우는 부분이 없어도 된다. [Korean comment]
 	}
 }
 
@@ -96,7 +96,7 @@ void CN3UIBase::Release()
 	while (!m_Children.empty())
 	{
 		// 자식이 delete되면서 부모의 list에서는 자동으로 제거된다.
-		// 따라서 리스트에서 따로 지우는 부분이 없어도 된다.
+		// 따라서 리스트에서 따로 지우는 부분이 없어도 된다. [Korean comment]
 		delete m_Children.front();
 	}
 
@@ -183,7 +183,7 @@ BOOL CN3UIBase::MoveOffset(int iOffsetX, int iOffsetY)
 	m_rcRegion.right += iOffsetX;
 	m_rcRegion.bottom += iOffsetY;
 
-	// movable 영역
+	// movable 영역 [Korean comment]
 	if(	m_rcMovable.right - m_rcMovable.left != 0 &&
 		m_rcMovable.bottom - m_rcMovable.top != 0 )
 	{
@@ -218,7 +218,7 @@ void CN3UIBase::SetSize(int iWidth, int iHeight)
 
 bool CN3UIBase::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) // 메시지를 받는다.. 보낸놈, msg
 {
-	if(m_pParent && pSender) m_pParent->ReceiveMessage(pSender, dwMsg); // 부모가 있으면 그넘에게도 보낸다..
+	if(m_pParent && pSender) m_pParent->ReceiveMessage(pSender, dwMsg); // 부모가 있으면 그넘에게도 보낸다.. [Korean comment]
 	return true;
 }
 
@@ -242,7 +242,7 @@ bool CN3UIBase::Load(HANDLE hFile)
 	CN3BaseFileAccess::Load(hFile);
 	DWORD dwRWC = 0;
 
-	// children 정보
+	// children 정보 Info
 	int iCC = 0;
 	if (m_iFileFormatVersion >= N3FORMAT_VER_1264)
 	{
@@ -284,7 +284,7 @@ bool CN3UIBase::Load(HANDLE hFile)
 		pChild->Load(hFile);
 	}
 
-	// base 정보
+	// base 정보 Info
 	int iIDLen = 0;
 	ReadFile(hFile, &iIDLen, sizeof(iIDLen), &dwRWC, nullptr);				// ui id length
 	if (iIDLen > 0)
@@ -303,7 +303,7 @@ bool CN3UIBase::Load(HANDLE hFile)
 	ReadFile(hFile, &m_dwReserved, sizeof(m_dwReserved), &dwRWC, nullptr);	// m_dwReserved
 
 	int iTooltipLen;
-	ReadFile(hFile, &iTooltipLen, sizeof(iTooltipLen), &dwRWC, nullptr);	//	tooltip문자열 길이
+	ReadFile(hFile, &iTooltipLen, sizeof(iTooltipLen), &dwRWC, nullptr);	//	tooltip문자열 길이 [Korean comment]
 	if (iTooltipLen > 0)
 	{
 		m_szToolTip.assign(iTooltipLen, '\0');
@@ -313,7 +313,7 @@ bool CN3UIBase::Load(HANDLE hFile)
 	std::string szSoundFN;
 	// 이전 uif파일을 컨버팅 하려면 사운드 로드 하는 부분 막기
 	int iSndFNLen = 0;
-	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwRWC, nullptr);		//	사운드 파일 문자열 길이
+	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwRWC, nullptr);		//	사운드 파일 문자열 길이 File
 	if (iSndFNLen > 0)
 	{
 		szSoundFN.assign(iSndFNLen, '\0');
@@ -323,7 +323,7 @@ bool CN3UIBase::Load(HANDLE hFile)
 		m_pSnd_OpenUI = s_SndMgr.CreateObj(szSoundFN, SNDTYPE_2D);
 	}
 
-	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwRWC, nullptr);		//	사운드 파일 문자열 길이
+	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwRWC, nullptr);		//	사운드 파일 문자열 길이 File
 	if (iSndFNLen > 0)
 	{
 		szSoundFN.assign(iSndFNLen, '\0');
@@ -371,7 +371,7 @@ uint32_t CN3UIBase::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
 	if (!m_bVisible) return dwRet;
 
-	// UI 움직이는 코드
+	// UI 움직이는 코드 [Korean comment]
 	if (UI_STATE_COMMON_MOVE == m_eState)
 	{
 		if (dwFlags&UI_MOUSE_LBCLICKED)
@@ -386,45 +386,45 @@ uint32_t CN3UIBase::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 		return dwRet;
 	}
 
-	if(false == IsIn(ptCur.x, ptCur.y))	// 영역 밖이면
+	if(false == IsIn(ptCur.x, ptCur.y))	// 영역 밖이면 [Korean comment]
 	{
 		if(false == IsIn(ptOld.x, ptOld.y))
 		{
-			return dwRet;// 이전 좌표도 영역 밖이면 
+			return dwRet;// 이전 좌표도 영역 밖이면  [Korean comment]
 		}
-		dwRet |= UI_MOUSEPROC_PREVINREGION;	// 이전 좌표는 영역 안이었다.
+		dwRet |= UI_MOUSEPROC_PREVINREGION;	// 이전 좌표는 영역 안이었다. [Korean comment]
 	}
 	else
 	{
-		// tool tip 관련
+		// tool tip 관련 [Korean comment]
 		if (s_pTooltipCtrl != nullptr)
 			s_pTooltipCtrl->SetText(m_szToolTip, m_crToolTip);
 	}
 
-	dwRet |= UI_MOUSEPROC_INREGION;	// 이번 좌표는 영역 안이다.
+	dwRet |= UI_MOUSEPROC_INREGION;	// 이번 좌표는 영역 안이다. [Korean comment]
 
 
 	//this_ui
 	if(m_pChildUI && m_pChildUI->IsVisible())
 		return dwRet;
 
-	// child에게 메세지 전달
+	// child에게 메세지 전달 [Korean comment]
 	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
 		uint32_t dwChildRet = pChild->MouseProc(dwFlags, ptCur, ptOld);
 		if (UI_MOUSEPROC_DONESOMETHING & dwChildRet)
-		{	// 이경우에는 먼가 포커스를 받은 경우이다.
+		{	// 이경우에는 먼가 포커스를 받은 경우이다. [Korean comment]
 			// (아래 코드는 dialog를 관리하는 곳에서 해야 한다. 따라서 막아놓음)
-//			m_Children.erase(itor);			// 우선 리스트에서 지우고
-//			m_Children.push_front(pChild);	// 맨앞에 넣는다. 그리는 순서를 맨 나중에 그리도록 하려고
+//			m_Children.erase(itor);			// 우선 리스트에서 지우고 [Korean comment]
+//			m_Children.push_front(pChild);	// 맨앞에 넣는다. 그리는 순서를 맨 나중에 그리도록 하려고 [Korean comment]
 
 			dwRet |= (UI_MOUSEPROC_CHILDDONESOMETHING|UI_MOUSEPROC_DONESOMETHING);
 			return dwRet;
 		}
 	}
 
-	// UI 움직이는 코드
+	// UI 움직이는 코드 [Korean comment]
 	if (UI_STATE_COMMON_MOVE != m_eState && 
 			PtInRect(&m_rcMovable, ptCur) && (dwFlags&UI_MOUSE_LBCLICK) )
 	{
@@ -608,7 +608,7 @@ void CN3UIBase::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFocus)
 #ifndef _N3TOOL
 void CN3UIBase::operator = (const CN3UIBase& other)
 {
-	Init(nullptr);	// 일단 부모는 없게 초기화
+	Init(nullptr);	// 일단 부모는 없게 초기화 Initialize
 
 	UIListItorConst it = other.m_Children.begin();
 	UIListItorConst itEnd = other.m_Children.end();
@@ -642,7 +642,7 @@ void CN3UIBase::operator = (const CN3UIBase& other)
 				*pUINew = *((CN3UIStatic*)pOtherChild); 
 				pChild = pUINew;
 			} 
-			break;	// static (배경그림과 글자가 나오는 클래스)
+			break;	// static (배경그림과 글자가 나오는 클래스) [Korean comment]
 		case UI_TYPE_PROGRESS:	
 			{ 
 				CN3UIProgress* pUINew = new CN3UIProgress();	
@@ -718,7 +718,7 @@ void CN3UIBase::operator = (const CN3UIBase& other)
 			break;	// icon slot
 #endif
 		}
-		if(pChild) pChild->SetParent(this);	// 부모 지정
+		if(pChild) pChild->SetParent(this);	// 부모 지정 [Korean comment]
 	}
 
 	m_bVisible = other.m_bVisible;
@@ -752,7 +752,7 @@ bool CN3UIBase::Save(HANDLE hFile)
 	CN3BaseFileAccess::Save(hFile);
 	DWORD dwRWC = 0;
 
-	// child 정보
+	// child 정보 Info
 	int iCC = m_Children.size();
 
 	if (m_iFileFormatVersion >= N3FORMAT_VER_1264)
@@ -770,7 +770,7 @@ bool CN3UIBase::Save(HANDLE hFile)
 		WriteFile(hFile, &iCC, sizeof(iCC), &dwRWC, nullptr);
 	}
 
-	//WriteFile(hFile, &iCC, sizeof(iCC), &dwRWC, nullptr); // Child 갯수 ㅆ고..고..
+	//WriteFile(hFile, &iCC, sizeof(iCC), &dwRWC, nullptr); // Child 갯수 ㅆ고..고.. [Korean comment]
 
 	for(UIListReverseItor itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
 	// childadd할때 push_front이므로 저장할 때 거꾸로 저장해야 한다.
@@ -778,11 +778,11 @@ bool CN3UIBase::Save(HANDLE hFile)
 		CN3UIBase* pChild = (*itor);
 		eUI_TYPE eUIType = pChild->UIType();
 
-		WriteFile(hFile, &eUIType, sizeof(eUIType), &dwRWC, nullptr); // UI Type 쓰고..
+		WriteFile(hFile, &eUIType, sizeof(eUIType), &dwRWC, nullptr); // UI Type 쓰고.. [Korean comment]
 		pChild->Save(hFile);
 	}
 
-	// base 정보
+	// base 정보 Info
 	int iIDLen = 0;
 	iIDLen = m_szID.size();
 	WriteFile(hFile, &iIDLen, sizeof(iIDLen), &dwRWC, nullptr);				// id length
@@ -793,17 +793,17 @@ bool CN3UIBase::Save(HANDLE hFile)
 	WriteFile(hFile, &m_dwReserved, sizeof(m_dwReserved), &dwRWC, nullptr);	//	m_dwReserved
 
 	int iTooltipLen = m_szToolTip.size();
-	WriteFile(hFile, &iTooltipLen, sizeof(iTooltipLen), &dwRWC, nullptr);		//	tooltip문자열 길이
+	WriteFile(hFile, &iTooltipLen, sizeof(iTooltipLen), &dwRWC, nullptr);		//	tooltip문자열 길이 [Korean comment]
 	if (iTooltipLen>0) WriteFile(hFile, m_szToolTip.c_str(), iTooltipLen, &dwRWC, nullptr);
 
 	int iSndFNLen = 0;
 	if (m_pSnd_OpenUI) iSndFNLen = m_pSnd_OpenUI->m_szFileName.size();
-	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwRWC, nullptr);		//	사운드 파일 문자열 길이
+	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwRWC, nullptr);		//	사운드 파일 문자열 길이 File
 	if (iSndFNLen>0) WriteFile(hFile, m_pSnd_OpenUI->m_szFileName.c_str(), iSndFNLen, &dwRWC, nullptr);
 
 	iSndFNLen = 0;
 	if (m_pSnd_CloseUI) iSndFNLen = m_pSnd_CloseUI->m_szFileName.size();
-	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwRWC, nullptr);		//	사운드 파일 문자열 길이
+	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwRWC, nullptr);		//	사운드 파일 문자열 길이 File
 	if (iSndFNLen>0) WriteFile(hFile, m_pSnd_CloseUI->m_szFileName.c_str(), iSndFNLen, &dwRWC, nullptr);
 	
 	return true;
@@ -811,7 +811,7 @@ bool CN3UIBase::Save(HANDLE hFile)
 
 void CN3UIBase::ChangeImagePath(const std::string& szPathOld, const std::string& szPathNew)
 {
-	// child 정보
+	// child 정보 Info
 	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
@@ -821,7 +821,7 @@ void CN3UIBase::ChangeImagePath(const std::string& szPathOld, const std::string&
 
 void CN3UIBase::ChangeFont(const std::string& szFont)
 {
-	// child 정보
+	// child 정보 Info
 	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
@@ -831,7 +831,7 @@ void CN3UIBase::ChangeFont(const std::string& szFont)
 
 void CN3UIBase::GatherImageFileName(std::set<std::string>& setImgFile)
 {
-	// child 정보
+	// child 정보 Info
 	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
@@ -975,7 +975,7 @@ bool CN3UIBase::MoveToUpper(CN3UIBase* pChild)
 void CN3UIBase::ArrangeZOrder()
 {
 	// 보통 image가 배경그림이 되므로 child list에서 맨 뒤로 보낸다.
-	// 왜냐하면 맨 뒤에 있는것이 맨 먼저 그려지므로
+	// 왜냐하면 맨 뒤에 있는것이 맨 먼저 그려지므로 [Korean comment]
 	UIList tempList;
 	UIListItor itor;
 	for(itor = m_Children.begin(); m_Children.end() != itor;)
@@ -983,8 +983,8 @@ void CN3UIBase::ArrangeZOrder()
 		CN3UIBase* pChild = (*itor);
 		if(UI_TYPE_IMAGE == pChild->UIType())
 		{
-			itor = m_Children.erase(itor);	// 현재 위치에서 지우고
-			tempList.push_back(pChild);		// 임시 버퍼에 저장
+			itor = m_Children.erase(itor);	// 현재 위치에서 지우고 Position
+			tempList.push_back(pChild);		// 임시 버퍼에 저장 Save
 		}
 		else ++itor;
 	}
@@ -992,14 +992,14 @@ void CN3UIBase::ArrangeZOrder()
 	for(itor = tempList.begin(); tempList.end() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
-		m_Children.push_back(pChild);		// child list맨 뒤에 넣기
+		m_Children.push_back(pChild);		// child list맨 뒤에 넣기 [Korean comment]
 	}
 	tempList.clear();
 }
 
 void CN3UIBase::operator = (const CN3UIBase& other)
 {
-	Init(nullptr);	// 일단 부모는 없게 초기화
+	Init(nullptr);	// 일단 부모는 없게 초기화 Initialize
 
 	UIListItorConst it = other.m_Children.begin();
 	UIListItorConst itEnd = other.m_Children.end();
@@ -1033,7 +1033,7 @@ void CN3UIBase::operator = (const CN3UIBase& other)
 				*pUINew = *((CN3UIStatic*)pOtherChild); 
 				pChild = pUINew;
 			} 
-			break;	// static (배경그림과 글자가 나오는 클래스)
+			break;	// static (배경그림과 글자가 나오는 클래스) [Korean comment]
 		case UI_TYPE_PROGRESS:	
 			{ 
 				CN3UIProgress* pUINew = new CN3UIProgress();	
@@ -1109,7 +1109,7 @@ void CN3UIBase::operator = (const CN3UIBase& other)
 			break;	// icon slot
 #endif
 		}
-		if(pChild) pChild->SetParent(this);	// 부모 지정
+		if(pChild) pChild->SetParent(this);	// 부모 지정 [Korean comment]
 	}
 
 	m_bVisible = other.m_bVisible;
@@ -1133,7 +1133,7 @@ void CN3UIBase::SetSndOpen(const std::string& strFileName)
 	if (0 == strFileName.size()) return;
 
 	CN3BaseFileAccess tmpBase;
-	tmpBase.FileNameSet(strFileName);	// Base경로에 대해서 상대적 경로를 넘겨준다.
+	tmpBase.FileNameSet(strFileName);	// Base경로에 대해서 상대적 경로를 넘겨준다. [Korean comment]
 
 	SetCurrentDirectory(tmpBase.PathGet().c_str());
 	m_pSnd_OpenUI = s_SndMgr.CreateObj(tmpBase.FileName(), SNDTYPE_2D);
@@ -1145,7 +1145,7 @@ void CN3UIBase::SetSndClose(const std::string& strFileName)
 	if (0 == strFileName.size()) return;
 
 	CN3BaseFileAccess tmpBase;
-	tmpBase.FileNameSet(strFileName);	// Base경로에 대해서 상대적 경로를 넘겨준다.
+	tmpBase.FileNameSet(strFileName);	// Base경로에 대해서 상대적 경로를 넘겨준다. [Korean comment]
 
 	SetCurrentDirectory(tmpBase.PathGet().c_str());
 	m_pSnd_CloseUI = s_SndMgr.CreateObj(tmpBase.FileName(), SNDTYPE_2D);

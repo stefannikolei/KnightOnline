@@ -25,10 +25,10 @@ public:
 	RECT			GetClickRect() const {return m_rcClick;}
 protected:
 	CN3UIImage*		m_ImageRef[NUM_BTN_STATE];	// 버튼의 각 상태별 image의 참조 포인터(참조인 이유는  children list로 관리하므로 참조만 한다.)
-	RECT			m_rcClick;					// click되는 영역
+	RECT			m_rcClick;					// click되는 영역 [Korean comment]
 
-	CN3SndObj*		m_pSnd_On;		// 버튼 위에 마우스가 올라가는 순간 내는 소리
-	CN3SndObj*		m_pSnd_Click;	// 버튼이 눌리는 순간 내는 소리
+	CN3SndObj*		m_pSnd_On;		// 버튼 위에 마우스가 올라가는 순간 내는 소리 Button
+	CN3SndObj*		m_pSnd_Click;	// 버튼이 눌리는 순간 내는 소리 Button
 
 // Operations
 public:
@@ -40,7 +40,7 @@ public:
 	virtual uint32_t	MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld);
 	virtual void	Render();
 
-// 툴에서 사용하기 위한 함수
+// 툴에서 사용하기 위한 함수 Function
 public:
 	virtual void	operator = (const CN3UIButton& other);
 	void			SetSndOn(const std::string& strFileName);

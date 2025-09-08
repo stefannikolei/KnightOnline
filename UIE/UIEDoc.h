@@ -40,8 +40,8 @@ public:
 	void		SetSelectedUI(CN3UIBase* pUI);
 
 protected:
-	void		Release();		// Document 변수 초기화
-	BOOL		SetImageInfos(CN3UIImage* pUI);	// image정보 넣는 루틴
+	void		Release();		// Document 변수 초기화 Initialize
+	BOOL		SetImageInfos(CN3UIImage* pUI);	// image정보 넣는 루틴 Info
 	BOOL		SetStringInfos(CN3UIString* pUI);	// string
 	BOOL		SetTrackBarInfos(CN3UITrackBar* pUI);	// track bar
 	BOOL		SetButtonInfos(CN3UIButton* pUI);		// button

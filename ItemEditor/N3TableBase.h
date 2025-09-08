@@ -23,8 +23,8 @@ protected:
 	typedef typename std::map<uint32_t, Type>::value_type	val_Table;
 	typedef typename std::pair<typename std::map<uint32_t, Type>::iterator, bool> pair_Table;
 
-	typename std::vector<DATA_TYPE> m_DataTypes;	// 실제 사용되는 정보의 데이타 타입
-	typename std::map<uint32_t, Type> m_Datas; // 실제 사용되는 정보
+	typename std::vector<DATA_TYPE> m_DataTypes;	// 실제 사용되는 정보의 데이타 타입 Info
+	typename std::map<uint32_t, Type> m_Datas; // 실제 사용되는 정보 Info
 
 // Operations
 public:
@@ -34,7 +34,7 @@ public:
 	{
 		auto it = m_Datas.find(dwID);
 		if (it == m_Datas.end())
-			return nullptr; // 찾기에 실패 했다!~!!
+			return nullptr; // 찾기에 실패 했다!~!! [Korean comment]
 		
 		return &it->second;
 	}
@@ -44,7 +44,7 @@ public:
 		return static_cast<int>(m_Datas.size());
 	}
 
-	Type* GetIndexedData(int index)	//index로 찾기..
+	Type* GetIndexedData(int index)	//index로 찾기.. [Korean comment]
 	{
 		if (index < 0
 			|| index >= static_cast<int>(m_Datas.size()))
@@ -59,7 +59,7 @@ public:
 	{
 		auto it = m_Datas.find(dwID);
 		if (it == m_Datas.end())
-			return false; // 찾기에 실패 했다!~!!
+			return false; // 찾기에 실패 했다!~!! [Korean comment]
 
 		auto itSkill = m_Datas.begin();
 		int iSize = static_cast<int>(m_Datas.size());
@@ -103,11 +103,11 @@ CN3TableBase<Type>::~CN3TableBase()
 template <class Type>
 void CN3TableBase<Type>::Release()
 {
-	m_DataTypes.clear(); // data type 저장한것 지우기
-	m_Datas.clear(); // row 데이타 지우기
+	m_DataTypes.clear(); // data type 저장한것 지우기 Save
+	m_Datas.clear(); // row 데이타 지우기 [Korean comment]
 }
 
-// 파일에 데이타 타입별로 쓰기..
+// 파일에 데이타 타입별로 쓰기.. File
 template <class Type>
 BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char* lpszData)
 {
@@ -120,10 +120,10 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 			if (isdigit(lpszData[0]))
 			{
 				int iTemp = atoi(lpszData);
-				if (iTemp < -127 || iTemp > 128) return FALSE; // 범위가 벗어났어~
+				if (iTemp < -127 || iTemp > 128) return FALSE; // 범위가 벗어났어~ [Korean comment]
 				cWrite = (char)iTemp;
 			}
-			else return FALSE;		// 문자는 안되~!
+			else return FALSE;		// 문자는 안되~! [Korean comment]
 
 			WriteFile(hFile, &cWrite, sizeof(cWrite), &dwNum, nullptr);
 		}
@@ -134,10 +134,10 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 			if (isdigit(lpszData[0]))
 			{
 				int iTemp = atoi(lpszData);
-				if (iTemp < 0 || iTemp > 255) return FALSE; // 범위가 벗어났어~
+				if (iTemp < 0 || iTemp > 255) return FALSE; // 범위가 벗어났어~ [Korean comment]
 				byteWrite = (uint8_t)iTemp;
 			}
-			else return FALSE;		// 문자는 안되~!
+			else return FALSE;		// 문자는 안되~! [Korean comment]
 
 			WriteFile(hFile, &byteWrite, sizeof(byteWrite), &dwNum, nullptr);
 		}
@@ -148,10 +148,10 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 			if (isdigit(lpszData[0]) || '-' == lpszData[0] )
 			{
 				int iTemp = atoi(lpszData);
-				if (iTemp < -32767 || iTemp > 32768) return FALSE; // 범위가 벗어났어~
+				if (iTemp < -32767 || iTemp > 32768) return FALSE; // 범위가 벗어났어~ [Korean comment]
 				iWrite = (int16_t)iTemp;
 			}
-			else return FALSE;		// 문자는 안되~!
+			else return FALSE;		// 문자는 안되~! [Korean comment]
 
 			WriteFile(hFile, &iWrite, sizeof(iWrite), &dwNum, nullptr);
 		}
@@ -162,10 +162,10 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 			if (isdigit(lpszData[0]) )
 			{
 				int iTemp = atoi(lpszData);
-				if (iTemp < 0 || iTemp > 65535) return FALSE; // 범위가 벗어났어~
+				if (iTemp < 0 || iTemp > 65535) return FALSE; // 범위가 벗어났어~ [Korean comment]
 				iWrite = (int16_t)iTemp;
 			}
-			else return FALSE;		// 문자는 안되~!
+			else return FALSE;		// 문자는 안되~! [Korean comment]
 
 			WriteFile(hFile, &iWrite, sizeof(iWrite), &dwNum, nullptr);
 		}
@@ -174,7 +174,7 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 		{
 			int iWrite;
 			if (isdigit(lpszData[0]) || '-' == lpszData[0] )	iWrite = atoi(lpszData);
-			else return FALSE;		// 문자는 안되~!
+			else return FALSE;		// 문자는 안되~! [Korean comment]
 
 			WriteFile(hFile, &iWrite, sizeof(iWrite), &dwNum, nullptr);
 		}
@@ -183,7 +183,7 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 		{
 			uint32_t iWrite;
 			if (isdigit(lpszData[0]) )	iWrite = strtoul(lpszData, nullptr, 10);
-			else return FALSE;		// 문자는 안되~!
+			else return FALSE;		// 문자는 안되~! [Korean comment]
 
 			WriteFile(hFile, &iWrite, sizeof(iWrite), &dwNum, nullptr);
 		}
@@ -201,7 +201,7 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 			float fWrite;
 			if (isdigit(lpszData[0]) || '-' == lpszData[0] ||
 				'.' == lpszData[0] )	fWrite = (float)atof(lpszData);
-			else return FALSE;	// 문자는 안되~!
+			else return FALSE;	// 문자는 안되~! [Korean comment]
 			WriteFile(hFile, &fWrite, sizeof(fWrite), &dwNum, nullptr);
 		}
 		break;
@@ -315,24 +315,24 @@ BOOL CN3TableBase<Type>::LoadFromFile(const std::string& szFN)
 	
 	
 	
-	// 파일 암호화 풀기.. .. 임시 파일에다 쓴다음 ..
+	// 파일 암호화 풀기.. .. 임시 파일에다 쓴다음 .. File
 	std::string szFNTmp = szFN + ".tmp";
 	DWORD dwSizeHigh = 0;
 	DWORD dwSizeLow = ::GetFileSize(hFile, &dwSizeHigh);
 	if(dwSizeLow <= 0)
 	{
 		CloseHandle(hFile);
-		::remove(szFNTmp.c_str()); // 임시 파일 지우기..
+		::remove(szFNTmp.c_str()); // 임시 파일 지우기.. File
 		return FALSE;
 	}
 
-	// 원래 파일을 읽고..
+	// 원래 파일을 읽고.. File
 	uint8_t* pDatas = new uint8_t[dwSizeLow];
 	DWORD dwRWC = 0;
-	::ReadFile(hFile, pDatas, dwSizeLow, &dwRWC, nullptr); // 암호화된 데이터 읽고..
-	CloseHandle(hFile); // 원래 파일 닫고
+	::ReadFile(hFile, pDatas, dwSizeLow, &dwRWC, nullptr); // 암호화된 데이터 읽고.. Data
+	CloseHandle(hFile); // 원래 파일 닫고 File
 
-// 테이블 만드는 툴에서 쓰는 키와 같은 키..
+// 테이블 만드는 툴에서 쓰는 키와 같은 키.. [Korean comment]
 	uint16_t key_r = 0x0816;
 	uint16_t key_c1 = 0x6081;
 	uint16_t key_c2 = 0x1608;
@@ -353,7 +353,7 @@ BOOL CN3TableBase<Type>::LoadFromFile(const std::string& szFN)
 //	return plain;
 //}
 
-	// 암호화 풀고..
+	// 암호화 풀고.. [Korean comment]
 	for (uint32_t i = 0; i < dwSizeLow; i++)
 	{
 		uint8_t byData = (pDatas[i] ^ (key_r>>8));
@@ -361,14 +361,14 @@ BOOL CN3TableBase<Type>::LoadFromFile(const std::string& szFN)
 		pDatas[i] = byData;
 	}
 
-	// 임시 파일에 쓴다음.. 다시 연다..
+	// 임시 파일에 쓴다음.. 다시 연다.. File
 	std::wstring wStr2 = s2ws(szFNTmp);
 	hFile = ::CreateFile(wStr2.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-	::WriteFile(hFile, pDatas, dwSizeLow, &dwRWC, nullptr); // 임시파일에 암호화 풀린 데이터 쓰기
-	CloseHandle(hFile); // 임시 파일 닫기
+	::WriteFile(hFile, pDatas, dwSizeLow, &dwRWC, nullptr); // 임시파일에 암호화 풀린 데이터 쓰기 Data
+	CloseHandle(hFile); // 임시 파일 닫기 File
 	delete [] pDatas; pDatas = nullptr;
 
-	hFile = ::CreateFile(wStr2.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr); // 임시 파일 읽기 모드로 열기.
+	hFile = ::CreateFile(wStr2.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr); // 임시 파일 읽기 모드로 열기. Load
 
 	
 
@@ -391,7 +391,7 @@ BOOL CN3TableBase<Type>::LoadFromFile(const std::string& szFN)
 	}
 
 
-	// 임시 파일 지우기..
+	// 임시 파일 지우기.. File
 	::remove(szFNTmp.c_str());
 
 	return bResult;
@@ -402,7 +402,7 @@ BOOL CN3TableBase<Type>::Load(HANDLE hFile)
 {
 	Release();
 
-	// data(column) 의 구조가 어떻게 되어 있는지 읽기
+	// data(column) 의 구조가 어떻게 되어 있는지 읽기 Load
 	DWORD dwNum;
 	int i, j, iDataTypeCount = 0;
 	ReadFile(hFile, &iDataTypeCount, 4, &dwNum, nullptr);			// (엑셀에서 column 수)
@@ -427,7 +427,7 @@ BOOL CN3TableBase<Type>::Load(HANDLE hFile)
 		}
 	}
 
-	// row 가 몇줄인지 읽기
+	// row 가 몇줄인지 읽기 Load
 	int iRC;
 	ReadFile(hFile, &iRC, sizeof(iRC), &dwNum, nullptr);
 	Type Data;
@@ -472,7 +472,7 @@ int CN3TableBase<Type>::SizeOf(DATA_TYPE DataType) const
 	return 0;
 }
 
-// structure는 4바이트 정렬하여서 메모리를 잡는다. 따라서 아래 함수가 필요하다.
+// structure는 4바이트 정렬하여서 메모리를 잡는다. 따라서 아래 함수가 필요하다. Function
 // 아래 함수로 OffsetTable을 만들어 쓴 후에는 만드시 리턴값을 delete [] 를 해주어야 한다.
 template <class Type>
 BOOL CN3TableBase<Type>::MakeOffsetTable(std::vector<int>& offsets)
@@ -487,29 +487,29 @@ BOOL CN3TableBase<Type>::MakeOffsetTable(std::vector<int>& offsets)
 	for (i=1; i<iDataTypeCount; ++i)
 	{
 		int iCurDataSize = SizeOf(m_DataTypes[i]);
-		if (1 == iCurDataSize%4)	// 현재 데이터가 1바이트면 그냥 이전 데이터가 몇바이트든 상관 없다.
+		if (1 == iCurDataSize%4)	// 현재 데이터가 1바이트면 그냥 이전 데이터가 몇바이트든 상관 없다. Data
 		{
 			offsets[i] = offsets[i-1] + iPrevDataSize;
 		}
-		else if (2 == iCurDataSize%4) // 현재 데이터가 2바이트면 짝수번지에 위치해야 한다.
+		else if (2 == iCurDataSize%4) // 현재 데이터가 2바이트면 짝수번지에 위치해야 한다. Data
 		{
 			if (0 == ((offsets[i-1]+iPrevDataSize) % 2))
 				offsets[i] = offsets[i-1] + iPrevDataSize;
 			else
 				offsets[i] = offsets[i-1] + iPrevDataSize+1;
 		}
-		else if (0 == iCurDataSize%4) // 현재 데이터가 4바이트면 4의 배수번지에 위치해야 한다.
+		else if (0 == iCurDataSize%4) // 현재 데이터가 4바이트면 4의 배수번지에 위치해야 한다. Data
 		{
 			if (0 == ((offsets[i-1]+iPrevDataSize) % 4))
 				offsets[i] = offsets[i-1] + iPrevDataSize;
 			else
-				offsets[i] = ((int)(offsets[i-1] + iPrevDataSize + 3)/4)*4;	// 4의 배수로 만들기
+				offsets[i] = ((int)(offsets[i-1] + iPrevDataSize + 3)/4)*4;	// 4의 배수로 만들기 [Korean comment]
 		}
 		iPrevDataSize = iCurDataSize;
 	}
 
 	// 맨 마지막 값에 Type의 실제 사이즈를 넣자.
-	offsets[iDataTypeCount] = ((int)(offsets[iDataTypeCount-1] + iPrevDataSize + 3)/4)*4;	// 4의 배수로 만들기
+	offsets[iDataTypeCount] = ((int)(offsets[iDataTypeCount-1] + iPrevDataSize + 3)/4)*4;	// 4의 배수로 만들기 [Korean comment]
 
 	return true;
 }

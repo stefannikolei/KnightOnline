@@ -66,7 +66,7 @@ public:
 	int		GetMaxVolume() { return m_iMaxVolume; }
 
 	void	Init();
-	void	Release(); // 참조 카운트를 리턴 해준다.. 사운드 매니저에서는 이 참조 카운트를 보고 맵에서 지운다..
+	void	Release(); // 참조 카운트를 리턴 해준다.. 사운드 매니저에서는 이 참조 카운트를 보고 맵에서 지운다.. Count
 	virtual bool Create(const std::string& szFN, e_SndType eType);
 	bool	Duplicate(CN3SndObj* pSrc, e_SndType eType, D3DVECTOR* pPos = nullptr);
 

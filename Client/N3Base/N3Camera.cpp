@@ -21,7 +21,7 @@ CN3Camera::CN3Camera()
 	m_Data.vAt = m_vAt = __Vector3(0,0,0);
 	m_Data.vUp = m_vScale = __Vector3(0,1,0);
 
-	m_Data.fFOV = D3DXToRadian(55.0f); // 기본값 55 도
+	m_Data.fFOV = D3DXToRadian(55.0f); // 기본값 55 도 [Korean comment]
 	m_Data.fNP = 0.7f;
 	m_Data.fFP = 512.0f;
 
@@ -46,7 +46,7 @@ void CN3Camera::Release()
 	m_Data.vAt = m_vAt = __Vector3(0,0,0);
 	m_Data.vUp = m_vScale = __Vector3(0,1,0);
 
-	m_Data.fFOV = D3DXToRadian(55.0f); // 기본값 55 도
+	m_Data.fFOV = D3DXToRadian(55.0f); // 기본값 55 도 [Korean comment]
 	m_Data.fNP = 0.7f;
 	m_Data.fFP = 512.0f;
 
@@ -224,7 +224,7 @@ BOOL CN3Camera::MoveByWindowMessage(MSG* pMsg)
 					return TRUE;
 				}
 			}
-		default:	// 마우스 메세지가 아닐경우 카메라 움직임이 아니다.
+		default:	// 마우스 메세지가 아닐경우 카메라 움직임이 아니다. [Korean comment]
 			return FALSE;
 		}
 	}
@@ -244,8 +244,8 @@ void CN3Camera::Zoom(float fDelta)
 	__Vector3 vPos = m_vPos + vD * fDelta;
 	float fDist = (vPos - m_Data.vAt).Magnitude();
 #ifndef _N3INDOOR
-	if(fDist < 0.3f) return; // 너무 가까우면 적용하지 않는다..
-	else if(fDist > m_Data.fFP * 2.0f) return; // 너무 멀면 적용하지 않는다.
+	if(fDist < 0.3f) return; // 너무 가까우면 적용하지 않는다.. [Korean comment]
+	else if(fDist > m_Data.fFP * 2.0f) return; // 너무 멀면 적용하지 않는다. [Korean comment]
 #endif
 
 	m_vPos = vPos;
@@ -282,7 +282,7 @@ void CN3Camera::Rotate(float fRadianX, float fRadianY)
 }
 
 #ifdef _N3TOOL
-void CN3Camera::LookAround(float fRadianX, float fRadianY)		//At Postion을 중심으로 카메라가 돈다..고로 위치가 바뀐다..
+void CN3Camera::LookAround(float fRadianX, float fRadianY)		//At Postion을 중심으로 카메라가 돈다..고로 위치가 바뀐다.. Position
 {
 	//static __Matrix44 mtx;
 	//static __Vector3 v1, v2;
@@ -379,7 +379,7 @@ void CN3Camera::Apply()
 	s_lpD3DDev->SetTransform(D3DTS_PROJECTION, &m_Data.mtxProjection); // Projection Matrix Setting
 	memcpy(&(CN3Base::s_CameraData), &m_Data, sizeof(__CameraData)); // Static Data Update...
 
-	// 안개 색깔 맞추기..
+	// 안개 색깔 맞추기.. Color
 	s_lpD3DDev->SetRenderState( D3DRS_FOGENABLE, m_bFogUse);
 	s_lpD3DDev->SetRenderState( D3DRS_FOGCOLOR,  m_FogColor);
 
@@ -427,19 +427,19 @@ void CN3Camera::Tick(float fFrm)
 	// View Matrix 및 Projection Matrix Setting
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 	__Vector3 m_vEye, m_vUp ->> m_vPos, m_vScale 로 대신한다.. 중요!!
+	// 	__Vector3 m_vEye, m_vUp ->> m_vPos, m_vScale 로 대신한다.. 중요!! [Korean comment]
 	m_Data.vEye = m_vPos;
 	m_Data.vAt  = m_vAt;
-	m_Data.vUp  = m_vScale; // Up Vector 처럼 쓴다.
+	m_Data.vUp  = m_vScale; // Up Vector 처럼 쓴다. [Korean comment]
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //	m_Data.fInverse_SineHalfOfFOV = 1.0f/sinf(m_Data.fFOV*0.5f);
 
-	::D3DXMatrixLookAtLH(&m_Data.mtxView, &m_Data.vEye, &m_Data.vAt, &m_Data.vUp); // Look At 적용
-	::D3DXMatrixInverse(&m_Data.mtxViewInverse, nullptr, &m_Data.mtxView); // View Inverse 행렬 구하기..
-	CN3Base::s_lpD3DDev->GetViewport(&m_Data.vp); // View port 가져오기...
+	::D3DXMatrixLookAtLH(&m_Data.mtxView, &m_Data.vEye, &m_Data.vAt, &m_Data.vUp); // Look At 적용 [Korean comment]
+	::D3DXMatrixInverse(&m_Data.mtxViewInverse, nullptr, &m_Data.mtxView); // View Inverse 행렬 구하기.. [Korean comment]
+	CN3Base::s_lpD3DDev->GetViewport(&m_Data.vp); // View port 가져오기... [Korean comment]
 	
-	m_Data.fAspect = (float)m_Data.vp.Width / (float)m_Data.vp.Height; // 종횡비
+	m_Data.fAspect = (float)m_Data.vp.Width / (float)m_Data.vp.Height; // 종횡비 [Korean comment]
 	if(m_bOrtho)
 	{
 		float fL = (m_Data.vAt - m_Data.vEye).Magnitude() / 2.0f;

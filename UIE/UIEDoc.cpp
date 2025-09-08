@@ -181,13 +181,13 @@ void CUIEDoc::SetSelectedUI(CN3UIBase* pUI)
 		{
 			if(pUI == *it)
 			{
-				it = m_SelectedUIs.erase(it); // 같은 거면 선택에서 제외.
+				it = m_SelectedUIs.erase(it); // 같은 거면 선택에서 제외. Select
 				bOverLapped = true;
 			}
 			else it++;
 		}
 
-		if(false == bOverLapped) m_SelectedUIs.push_front(pUI); // 겹치지 않으면.. 추가..
+		if(false == bOverLapped) m_SelectedUIs.push_front(pUI); // 겹치지 않으면.. 추가.. Add
 	}
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
@@ -206,7 +206,7 @@ void CUIEDoc::OnInsertImage()
 	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
 
-	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
+	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음. [Korean comment]
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	if (FALSE == SetImageInfos(pUI))
 	{
@@ -231,7 +231,7 @@ void CUIEDoc::OnInsertString()
 	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
 
-	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
+	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음. [Korean comment]
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	if(FALSE == SetStringInfos(pUI))
 	{
@@ -239,7 +239,7 @@ void CUIEDoc::OnInsertString()
 		else pFrm->MessageBox("Font 지정 및 기타 설정을 해야 UIString이 보일 것입니다.");
 		return;
 	}
-	// 영역 지정
+	// 영역 지정 [Korean comment]
 	SIZE size;
 	CRect rcRegion(0,0,20,30);
 	if (pUI->GetTextExtent("진", lstrlen("진"), &size)) rcRegion.SetRect(0,0,size.cx, size.cy);
@@ -261,7 +261,7 @@ void CUIEDoc::OnInsertButton()
 	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
 
-	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
+	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음. [Korean comment]
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	if (FALSE == SetButtonInfos(pUI))
 	{
@@ -271,15 +271,15 @@ void CUIEDoc::OnInsertButton()
 	}
 	// 버튼 위치 설정, size(width,height)는 image영역 설정에 따른다.
 	CRect rcRegion = pUI->GetRegion();
-	rcRegion.OffsetRect(-rcRegion.TopLeft());	// 0,0인점으로 마추기
+	rcRegion.OffsetRect(-rcRegion.TopLeft());	// 0,0인점으로 마추기 [Korean comment]
 	pUI->SetRegion(rcRegion);
 
 	pFrm->MessageBox("1. 버튼의 위치와 영역을 지정해주세요.\n2. 네모 버튼이 아닐경우 click되는 영역을 지정해주세요.\n3. 체크버튼으로 만들고 싶으면 style을 지정해주세요.");
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
 	UpdateAllViews(nullptr);
-	// click 영역을 따로 지정할 필요가 있으면 지정한다.
-	// style 지정
+	// click 영역을 따로 지정할 필요가 있으면 지정한다. [Korean comment]
+	// style 지정 [Korean comment]
 }
 
 void CUIEDoc::OnInsertStatic() 
@@ -293,7 +293,7 @@ void CUIEDoc::OnInsertStatic()
 	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);	
 
-	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
+	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음. [Korean comment]
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	// image에 관련된 세팅을 해주고 image영역을 가져와 static의 영역을 세팅후
 	CN3UIImage* pBkImage = pUI->GetImageBkGnd();
@@ -321,14 +321,14 @@ void CUIEDoc::OnInsertEdit()
 	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);		
 
-	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
+	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음. [Korean comment]
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	// image에 관련된 세팅을 해주고 image영역을 가져와 edit의 영역을 세팅후
 	CN3UIImage* pBkImage = pUI->GetImageBkGnd();
 	SetImageInfos(pBkImage);
 	RECT rcRegion = pBkImage->GetRegion();
 	pUI->SetRegion(rcRegion);
-	// string 관련 세팅
+	// string 관련 세팅 [Korean comment]
 	CN3UIString* pUIString = pUI->GetUIString();
 	if (FALSE == SetStringInfos(pUIString))	pFrm->MessageBox("text의 정보를 넣어야 글씨가 제대로 보일 것입니다.");
 
@@ -348,12 +348,12 @@ void CUIEDoc::OnInsertProgress()
 	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
 
-	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
+	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음. [Korean comment]
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	// background이미지와 foreground이미지를 설정하고
 	CN3UIImage* pUIImage = pUI->GetBkGndImgRef();
 	ASSERT(pUIImage);
-	// texture 설정
+	// texture 설정 Set
 	char szTexture[_MAX_PATH];
 	while(1)
 	{
@@ -402,7 +402,7 @@ void CUIEDoc::OnInsertProgress()
 	rcRegion = dlg.GetImageRect(0);
 	pUI->SetFrGndUVFromFrGndImage();
 	pUI->SetRegion(rcRegion);
-	// style 지정
+	// style 지정 [Korean comment]
 	pFrm->MessageBox("왼쪽창에서 스타일(가로/세로)을 지정해주세요.");
 
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
@@ -421,7 +421,7 @@ void CUIEDoc::OnInsertTrackbar()
 	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
 
-	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
+	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음. [Korean comment]
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	if (FALSE == SetTrackBarInfos(pUI))
 	{
@@ -429,7 +429,7 @@ void CUIEDoc::OnInsertTrackbar()
 		else pFrm->MessageBox("텍스쳐지정 및 기타 설정을 해야 Trackbar가 보일 것입니다.");
 		return;
 	}
-	// style 지정
+	// style 지정 [Korean comment]
 	pFrm->MessageBox("왼쪽창에서 스타일(가로/세로)을 지정해주세요.");
 
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
@@ -447,7 +447,7 @@ void CUIEDoc::OnInsertScrollbar()
 	pUI->CreateTrackBarAndBtns();
 	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);	
-	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
+	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음. [Korean comment]
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	pFrm->MessageBox("(스크롤바 만들기)위/왼쪽 버튼 지정입니다.");
 	// 2개의 button을 설정하고
@@ -461,9 +461,9 @@ void CUIEDoc::OnInsertScrollbar()
 	}
 	// 버튼 위치 설정, size(width,height)는 image영역 설정에 따른다.
 	CRect rcRegion = pUIBtn->GetRegion();
-	rcRegion.OffsetRect(-rcRegion.TopLeft());	// 0,0인점으로 마추기
+	rcRegion.OffsetRect(-rcRegion.TopLeft());	// 0,0인점으로 마추기 [Korean comment]
 	pUIBtn->SetRegion(rcRegion);
-	// 2번째 버튼 
+	// 2번째 버튼  Button
 	pFrm->MessageBox("(스크롤바 만들기)아래/오른쪽 버튼 지정입니다.");
 	pUIBtn = pUI->GetBtnRef(CN3UIScrollBar::BTN_RIGHTDOWN);
 	ASSERT(pUIBtn);
@@ -475,10 +475,10 @@ void CUIEDoc::OnInsertScrollbar()
 	}
 	// 버튼 위치 설정, size(width,height)는 image영역 설정에 따른다.
 	rcRegion = pUIBtn->GetRegion();
-	rcRegion.OffsetRect(CPoint(20,20)-rcRegion.TopLeft());	// 20,20인점으로 맞추기
+	rcRegion.OffsetRect(CPoint(20,20)-rcRegion.TopLeft());	// 20,20인점으로 맞추기 [Korean comment]
 	pUIBtn->SetRegion(rcRegion);
 	pFrm->MessageBox("(스크롤바 만들기)가운데 Track bar지정입니다.");
-	// trackbar를 설정하고
+	// trackbar를 설정하고 Set
 
 	CN3UITrackBar* pUITrackBar = pUI->GetTrackBarRef();
 	if (FALSE == SetTrackBarInfos(pUITrackBar))
@@ -488,12 +488,12 @@ void CUIEDoc::OnInsertScrollbar()
 		return;
 	}
 	rcRegion = pUITrackBar->GetRegion();
-	rcRegion.OffsetRect(CPoint(40,40)-rcRegion.TopLeft());	// 40,40인점으로 맞추기
+	rcRegion.OffsetRect(CPoint(40,40)-rcRegion.TopLeft());	// 40,40인점으로 맞추기 [Korean comment]
 	pUITrackBar->SetRegion(rcRegion);
 	pUI->SetRegion(rcRegion);
 
 	// 버튼과 trackbar영역을 더해서 scrollbar영역을 설정
-	// style을 정하고
+	// style을 정하고 [Korean comment]
 	pFrm->MessageBox("1. 왼쪽창에서 스타일(가로/세로)을 지정해주세요.\n스크롤의 영역을 반드시 양 버튼과 가운데 트랙바가 들어가게 정해주세요");
 
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
@@ -512,7 +512,7 @@ void CUIEDoc::OnInsertArea()
 
 	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
-	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
+	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음. [Korean comment]
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
@@ -528,7 +528,7 @@ void CUIEDoc::OnInsertIconslot()
 	if(this->GetSelectedUI()) pUI->Init(this->GetSelectedUI());
 	else pUI->Init(&m_RootUI);
 	SetSelectedUI(pUI);
-	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
+	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음. [Korean comment]
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	pFrm->MessageBox("영역을 지정해 주세요.");
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
@@ -550,7 +550,7 @@ void CUIEDoc::OnInsertList()
 
 	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
-	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
+	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음. [Korean comment]
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
@@ -567,7 +567,7 @@ void CUIEDoc::OnEditDelete()	// 선택된 ui 지우기
 		pUI = *it;
 //		if (pUI && (&m_RootUI) == pUI->GetParent())
 //		{	// 선택된 ui가 m_RootUI의 child이면 지운다.
-		if (pUI && (&m_RootUI) != pUI) // Root UI 가 아니면 지운다..
+		if (pUI && (&m_RootUI) != pUI) // Root UI 가 아니면 지운다.. [Korean comment]
 		{
 			delete pUI;
 			it = m_SelectedUIs.erase(it);
@@ -601,7 +601,7 @@ BOOL CUIEDoc::SetImageInfos(CN3UIImage* pUI)
 {
 	if (nullptr == pUI) return FALSE;
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	// texture 지정
+	// texture 지정 [Korean comment]
 	char szTexture[_MAX_PATH];
 	while(1)
 	{
@@ -622,10 +622,10 @@ BOOL CUIEDoc::SetImageInfos(CN3UIImage* pUI)
 	CRect rcRegion;
 	if (FALSE == dlg.GetSelectedUVRect(&frcUV)) return FALSE;
 	rcRegion = dlg.GetSelectedRect();
-	// UV좌표 지정
+	// UV좌표 지정 [Korean comment]
 	pUI->SetUVRect(frcUV.left, frcUV.top, frcUV.right, frcUV.bottom);
 	// 영역 지정(texture의 크기에 따라 width와 height는 자동으로 지정하고 위치는 물어보자)
-	rcRegion.OffsetRect(-rcRegion.TopLeft());	// 0,0인점으로 마추기
+	rcRegion.OffsetRect(-rcRegion.TopLeft());	// 0,0인점으로 마추기 [Korean comment]
 	pUI->SetRegion(rcRegion);
 	return TRUE;
 }
@@ -633,7 +633,7 @@ BOOL CUIEDoc::SetImageInfos(CN3UIImage* pUI)
 BOOL CUIEDoc::SetStringInfos(CN3UIString* pUI)
 {
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	// font 지정, 글자 색 지정
+	// font 지정, 글자 색 지정 Color
 	CFontDialog dlg;
 	if (IDCANCEL == dlg.DoModal())		return FALSE;
 	__ASSERT(dlg.GetSize()>0, "font height가 0보다 작습니다.");
@@ -646,7 +646,7 @@ BOOL CUIEDoc::SetStringInfos(CN3UIString* pUI)
 	COLORREF color = dlg.GetColor();
 	D3DCOLOR d3dColor = 0xff000000| ((color&0x00ff0000)>>16) | (color&0x0000ff00) | ((color&0x000000ff)<<16);
 	pUI->SetColor(d3dColor);
-	// style 지정
+	// style 지정 [Korean comment]
 	pFrm->MessageBox("1. 왼쪽 창에서 ☆★☆★[[[Style]]]☆★☆★을 지정해주시고(중요),\n2. 위치와 크기를 정해주세요.\n3. 표시될 글자가 있으면 왼쪽 아래창에 써주세요.");
 	return TRUE;
 }
@@ -657,7 +657,7 @@ BOOL CUIEDoc::SetTrackBarInfos(CN3UITrackBar* pUI)
 	// background이미지와 thumb이미지를 설정하고
 	CN3UIImage* pUIImage = pUI->GetBkGndImgRef();
 	ASSERT(pUIImage);
-	// texture 설정
+	// texture 설정 Set
 	char szTexture[_MAX_PATH];
 	while(1)
 	{
@@ -700,7 +700,7 @@ BOOL CUIEDoc::SetButtonInfos(CN3UIButton* pUI)
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3UIImage* pUIImage = pUI->GetImageRef(CN3UIButton::BS_NORMAL);
 	ASSERT(pUIImage);
-	// texture 설정
+	// texture 설정 Set
 	char szTexture[_MAX_PATH];
 	while(1)
 	{
@@ -802,7 +802,7 @@ void CUIEDoc::OnEditDuplicate()
 				*pUINew = *((CN3UIStatic*)pUISrc); 
 				pUIDest = pUINew;
 			} 
-			break;	// static (배경그림과 글자가 나오는 클래스)
+			break;	// static (배경그림과 글자가 나오는 클래스) [Korean comment]
 		case UI_TYPE_PROGRESS:	
 			{ 
 				CN3UIProgress* pUINew = new CN3UIProgress();	
@@ -887,7 +887,7 @@ void CUIEDoc::OnEditDuplicate()
 		pUIDest->MoveOffset(10, 10);
 	}
 
-	// region 갱신하는 함수 만들어서 처리하기
+	// region 갱신하는 함수 만들어서 처리하기 Function
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
 
@@ -906,7 +906,7 @@ void CUIEDoc::OnEditMakeGroup()
 	{
 		pUI = *it;
 		if(iUIC == iUIC) pUIFirst = pUI;
-		else // 모두 같은 패어런트인지 확인..
+		else // 모두 같은 패어런트인지 확인.. [Korean comment]
 		{
 			if(pUIFirst->GetParent() != pUI->GetParent())
 			{
@@ -924,7 +924,7 @@ void CUIEDoc::OnEditMakeGroup()
 
 	CN3UIBase* pUIParentOld = pUIFirst->GetParent();
 	CN3UIBase* pUIParentNew = new CN3UIBase();
-	pUIParentNew->Init(pUIParentOld); // 그룹을 예전 패어런트 밑에 넣고..
+	pUIParentNew->Init(pUIParentOld); // 그룹을 예전 패어런트 밑에 넣고.. [Korean comment]
 	
 	it = m_SelectedUIs.begin();
 	itEnd = m_SelectedUIs.end();
@@ -1088,7 +1088,7 @@ void CUIEDoc::OnBatchToolChangeImagePath()
 	if(dlg.DoModal() == IDCANCEL) return;
 
 
-	CDlgChangeImage dlg2; // 이미지 파일 이름 가져오기..
+	CDlgChangeImage dlg2; // 이미지 파일 이름 가져오기.. File
 	if(dlg2.DoModal() == IDCANCEL) return;
 
 	CN3Texture Tex;
@@ -1120,7 +1120,7 @@ void CUIEDoc::OnBatchToolChangeFont()
 
 	if(dlg.DoModal() == IDCANCEL) return;
 
-	CFontDialog dlg2; // 이미지 파일 이름 가져오기..
+	CFontDialog dlg2; // 이미지 파일 이름 가져오기.. File
 	if(dlg2.DoModal() == IDCANCEL) return;
 
 	CN3Texture Tex;
@@ -1160,7 +1160,7 @@ void CUIEDoc::OnBatchToolGatherImageFileName()
 		base.GatherImageFileName(setImgFNs);
 	}
  
-	// 폴더 선택하기..
+	// 폴더 선택하기.. Select
 	char szFolder[_MAX_PATH] = "";
 	BROWSEINFO bi;
 	LPCITEMIDLIST lpidl;

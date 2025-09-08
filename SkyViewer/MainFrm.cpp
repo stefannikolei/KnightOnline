@@ -71,7 +71,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	DockControlBar(&m_wndToolBar);
 
 	if(!m_Eng.Init(TRUE, m_hWnd, 64, 64, 0, TRUE)) return -1;
-	m_Eng.GridCreate(1000, 1000); // 그리드 만들기..
+	m_Eng.GridCreate(1000, 1000); // 그리드 만들기.. [Korean comment]
 
 	m_Camera.m_bFogUse = true;
 
@@ -80,7 +80,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_Lights[1].m_Data.InitDirection(1, __Vector3(0,0,-1), crLgt);
 	m_Lights[2].m_Data.InitPoint(2, __Vector3(0,0,0), crLgt, 32.0f);
 
-	m_ObjectBundle.LoadFromFile("Object\\Field.N3Shape"); // 배경으로 쓸 오브젝트 부르기..
+	m_ObjectBundle.LoadFromFile("Object\\Field.N3Shape"); // 배경으로 쓸 오브젝트 부르기.. Object
 
 	return 0;
 }
@@ -147,7 +147,7 @@ void CMainFrame::OnImportObject()
 
 	std::string szObjPrev = m_ObjectBundle.FileName();
 	m_ObjectBundle.Release();
-	if(m_ObjectBundle.LoadFromFile((const char*)szFullPath)) // 배경으로 쓸 오브젝트 부르기..
+	if(m_ObjectBundle.LoadFromFile((const char*)szFullPath)) // 배경으로 쓸 오브젝트 부르기.. Object
 	{
 		CSkyViewerView* pView = (CSkyViewerView*)(m_wndSplitter.GetPane(0,1));
 		pView->InvalidateRect(nullptr, FALSE);

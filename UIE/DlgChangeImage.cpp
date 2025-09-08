@@ -51,7 +51,7 @@ void CDlgChangeImage::OnBBrowseOldFile()
 
 	if (IDCANCEL == dlg.DoModal()) return;
 	CString szFN_Old = dlg.GetPathName();
-	szFN_Old.MakeLower(); // 소문자로 만들고..
+	szFN_Old.MakeLower(); // 소문자로 만들고.. [Korean comment]
 
 	CString szPath = CN3Base::PathGet().c_str();
 	szPath.MakeLower();
@@ -68,10 +68,10 @@ void CDlgChangeImage::OnBBrowseNewFile()
 
 	if (IDCANCEL == dlg.DoModal()) return;
 	CString szFN_New = dlg.GetPathName();
-	szFN_New.MakeLower(); // 소문자로 만들고..
+	szFN_New.MakeLower(); // 소문자로 만들고.. [Korean comment]
 
 	CString szPath = CN3Base::PathGet().c_str();
-	szPath.MakeLower(); // 소문자로 만든다
+	szPath.MakeLower(); // 소문자로 만든다 [Korean comment]
 	int i = szFN_New.Find(szPath);
 	if(i >= 0) szFN_New = szFN_New.Mid(i + szPath.GetLength());
 

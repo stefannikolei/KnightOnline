@@ -22,8 +22,8 @@ CN3IMesh::CN3IMesh()
 
 	m_nFC = 0;
 
-	m_pwVtxIndices = nullptr; // 점 인덱스 리스트. 
-	m_pwUVsIndices = nullptr; // 텍스처 좌표 인덱스 리스트.
+	m_pwVtxIndices = nullptr; // 점 인덱스 리스트.  Index
+	m_pwUVsIndices = nullptr; // 텍스처 좌표 인덱스 리스트. Index
 
 	m_nVC = m_nUVC = 0;
 	m_pVertices = nullptr;
@@ -36,8 +36,8 @@ CN3IMesh::~CN3IMesh()
 	delete [] m_pVertices; m_pVertices = nullptr;
 	delete [] m_pfUVs; m_pfUVs = nullptr;
 
-	delete [] m_pwVtxIndices; m_pwVtxIndices = nullptr; // 점 인덱스 리스트. 
-	delete [] m_pwUVsIndices; m_pwUVsIndices = nullptr; // 텍스처 좌표 인덱스 리스트.
+	delete [] m_pwVtxIndices; m_pwVtxIndices = nullptr; // 점 인덱스 리스트.  Index
+	delete [] m_pwUVsIndices; m_pwUVsIndices = nullptr; // 텍스처 좌표 인덱스 리스트. Index
 
 //	if(m_lpVB) m_lpVB->Release();
 }
@@ -53,8 +53,8 @@ void CN3IMesh::Release()
 	delete [] m_pVertices; m_pVertices = nullptr;
 	delete [] m_pfUVs; m_pfUVs = nullptr;
 
-	delete [] m_pwVtxIndices; m_pwVtxIndices = nullptr; // 점 인덱스 리스트. 
-	delete [] m_pwUVsIndices; m_pwUVsIndices = nullptr; // 텍스처 좌표 인덱스 리스트.
+	delete [] m_pwVtxIndices; m_pwVtxIndices = nullptr; // 점 인덱스 리스트.  Index
+	delete [] m_pwUVsIndices; m_pwUVsIndices = nullptr; // 텍스처 좌표 인덱스 리스트. Index
 
 //	if(m_lpVB) m_lpVB->Release(); m_lpVB = nullptr;
 
@@ -288,7 +288,7 @@ void CN3IMesh::RenderSelected()
 		vFace[1] = pVs[i*3+1];
 		vFace[2] = pVs[i*3+2];
 		vFace[3] = vFace[0];
-		CN3Base::RenderLines(vFace, 3, 0xff00ff00); // 녹색으로 렌더링..
+		CN3Base::RenderLines(vFace, 3, 0xff00ff00); // 녹색으로 렌더링.. Rendering
 	}
 }
 #endif // end of _N3TOOL
@@ -321,7 +321,7 @@ bool CN3IMesh::Load(HANDLE hFile)
 		ReadFile(hFile, m_pwUVsIndices, 2 * nFC * 3, (DWORD *)&dwRWC, nullptr); // uint16_t
 	}
 
-	this->FindMinMax(); // 최소 최대값을 찾는다..
+	this->FindMinMax(); // 최소 최대값을 찾는다.. [Korean comment]
 
 	return true;
 }
@@ -360,7 +360,7 @@ void CN3IMesh::FindMinMax()
 
 	if(m_pVertices == nullptr || m_nVC < 0) return;
 
-	// 최소, 최대 점을 찾는다.
+	// 최소, 최대 점을 찾는다. [Korean comment]
 	m_vMin.Set(FLT_MAX, FLT_MAX, FLT_MAX);
 	m_vMax.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 	for(int i = 0; i < m_nVC; i++)

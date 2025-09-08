@@ -438,7 +438,7 @@ bool CN3FXPartMesh::Tick()
 	return true;
 
 /*	
-	//회전과 이동..
+	//회전과 이동.. Move
 	__Matrix44 mtx;
 	mtx.Identity();]
 	mtx.Rotation(m_fCurrLife*m_vRotVelocity);
@@ -489,7 +489,7 @@ bool CN3FXPartMesh::Tick()
 	//m_pShape->ScaleSet(m_vUnitScale.x+vScale.x, m_vUnitScale.y+vScale.y, m_vUnitScale.z+vScale.z);
 	m_pShape->ScaleSet(vScale.x, vScale.y, vScale.z);
 
-	//텍스쳐 이동..
+	//텍스쳐 이동.. Move
 	if(m_cTextureMoveDir>0)
 	{
 		int cnt = m_pShape->PartCount();
@@ -682,12 +682,12 @@ bool CN3FXPartMesh::IsDead()
 
 //
 //	render...
-//	일단은 파티클 하나씩 그리고....
-//	나중에는 같은 텍스쳐 쓰는 것들끼리 묶어서 그리자...
+//	일단은 파티클 하나씩 그리고.... [Korean comment]
+//	나중에는 같은 텍스쳐 쓰는 것들끼리 묶어서 그리자... [Korean comment]
 //
 void CN3FXPartMesh::Render()
 {
-	// render state 세팅
+	// render state 세팅 [Korean comment]
 	if(!m_pShape) return;
 
 	DWORD dwAlpha;

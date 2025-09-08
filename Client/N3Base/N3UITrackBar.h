@@ -27,10 +27,10 @@ protected:
 	CN3UIImage*		m_pBkGndImageRef;		// 배경 이미지 reference (메모리 할당은 children list로 관리)
 	CN3UIImage*		m_pThumbImageRef;		// 가운데 드레그 하여 옮길 수 있는 이미지 reference
 
-	int				m_iMaxPos;									// 최대
-	int				m_iMinPos;									// 최소
-	int 			m_iCurPos;									// 현재 값
-	int				m_iPageSize;								// page단위 이동할때 이동값
+	int				m_iMaxPos;									// 최대 [Korean comment]
+	int				m_iMinPos;									// 최소 [Korean comment]
+	int 			m_iCurPos;									// 현재 값 [Korean comment]
+	int				m_iPageSize;								// page단위 이동할때 이동값 Move
 // Operations
 public:
 	void		Release() override;
@@ -81,11 +81,11 @@ protected:
 	void			UpDownThumbPos(int iDiff);					// Thumb위치를 아래 위로 iDiff pixel만큼 움직인 후 m_iCurPos 갱신하기
 
 #ifdef _N3TOOL
-// tool에서 쓰이는 함수
+// tool에서 쓰이는 함수 Function
 public:
 	virtual void	operator = (const CN3UITrackBar& other);
-	void			CreateImages();			// 이미지 생성
-	void			DeleteBkImage();		// 배경이미지 삭제
+	void			CreateImages();			// 이미지 생성 Create
+	void			DeleteBkImage();		// 배경이미지 삭제 Delete
 
 	CN3UIImage* GetBkGndImgRef() const
 	{

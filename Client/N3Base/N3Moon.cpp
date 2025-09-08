@@ -73,7 +73,7 @@ void CN3Moon::Render(__Matrix44& matView, __Matrix44& matProj)
 	int Y = s_CameraData.vp.Y;
 	float fRHW = 1.0f/vOut.w;
 	vMoon.z = vOut.z*fRHW;
-	if (vMoon.z < 0.0f || vMoon.z > 1.0f) return;		// 화면 뒤에 그려진다.
+	if (vMoon.z < 0.0f || vMoon.z > 1.0f) return;		// 화면 뒤에 그려진다. [Korean comment]
 	// Mapping Screen Coordinate.
 	vMoon.x = (float)X + ((vOut.x*fRHW + 1.0f)*Width*0.5f);
 	vMoon.y = (float)Y + ((-vOut.y*fRHW + 1.0f)*Height*0.5f);
@@ -82,9 +82,9 @@ void CN3Moon::Render(__Matrix44& matView, __Matrix44& matProj)
 	int iMoonSize = (int)(Width * m_fMoonRatio) / 2;
 	SetRect(&rcMoon, (int)(vMoon.x-iMoonSize), (int)(vMoon.y-iMoonSize), (int)(vMoon.x+iMoonSize), (int)(vMoon.y+iMoonSize));
 	// clipping with screen.
-	if ( rcMoon.right < X|| rcMoon.bottom < Y || rcMoon.left > X+Width || rcMoon.top > Y+Height) return;	// 화면 밖에 그려진다.
+	if ( rcMoon.right < X|| rcMoon.bottom < Y || rcMoon.left > X+Width || rcMoon.top > Y+Height) return;	// 화면 밖에 그려진다. [Korean comment]
 
-	// 2D로 그리기
+	// 2D로 그리기 Draw
 	m_pVertices[0].x = (float)rcMoon.left;		m_pVertices[0].y = (float)rcMoon.top;
 	m_pVertices[1].x = (float)rcMoon.right;		m_pVertices[1].y = (float)rcMoon.top;
 	m_pVertices[2].x = (float)rcMoon.right;		m_pVertices[2].y = (float)rcMoon.bottom;

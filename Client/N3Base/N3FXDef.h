@@ -1,7 +1,7 @@
 ﻿//////////////////////////////////////////////////////////////////////////////////////
 //
 //	N3FXDef.h
-//	Effect에서 쓰이는 상수들이나 자료형들 정의...
+//	Effect에서 쓰이는 상수들이나 자료형들 정의... [Korean comment]
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -18,14 +18,14 @@ constexpr int MAX_FX_PART_V1		= 26;	// V1(+) after it was changed - no version c
 // TODO: Fix this. The UI is just hardcoded for 16 (which got later updated to 26 without a version change).
 constexpr int MAX_FX_PART_TOOL		= MAX_FX_PART_V1_ORIG;
 
-// 한 인스턴스가 동시에 표현할수 있는 갯수..
+// 한 인스턴스가 동시에 표현할수 있는 갯수.. [Korean comment]
 constexpr int MAX_FX_PART			= MAX_FX_PART_V1;
 
-constexpr int NUM_VERTEX_PARTICLE = 4;	// 파티클 하나에 들어가는 점수..
+constexpr int NUM_VERTEX_PARTICLE = 4;	// 파티클 하나에 들어가는 점수.. [Korean comment]
 constexpr int NUM_VERTEX_BOTTOM = 10;	//
 constexpr int NUM_KEY_COLOR = 100;
 
-enum e_FXPartType	// 이펙트 스타일...매쉬를 이용한 건지, 파티클을 이용한 건지..등등..
+enum e_FXPartType	// 이펙트 스타일...매쉬를 이용한 건지, 파티클을 이용한 건지..등등.. [Korean comment]
 {
 	FX_PART_TYPE_NONE = 0,
 	FX_PART_TYPE_PARTICLE = 1,		//'particle'
@@ -34,7 +34,7 @@ enum e_FXPartType	// 이펙트 스타일...매쉬를 이용한 건지, 파티클
 	FX_PART_TYPE_BOTTOMBOARD = 4	//'bottomboard'
 };
 
-enum e_FXPartState	//파트의 상태..
+enum e_FXPartState	//파트의 상태.. Status
 {
 	FX_PART_STATE_DEAD = 0,
 	FX_PART_STATE_DYING = 1,
@@ -42,14 +42,14 @@ enum e_FXPartState	//파트의 상태..
 	FX_PART_STATE_READY = 3
 };
 
-enum e_FXBundleState	//번들의 상태..
+enum e_FXBundleState	//번들의 상태.. Status
 {
 	FX_BUNDLE_STATE_DEAD = 0,
 	FX_BUNDLE_STATE_DYING = 1,
 	FX_BUNDLE_STATE_LIVE = 2	
 };
 
-enum e_FXBundleAct	//번들이 어케 동작하는지..
+enum e_FXBundleAct	//번들이 어케 동작하는지.. [Korean comment]
 {
 	FX_BUNDLE_MOVE_DIR_FIXEDTARGET = 0,
 	FX_BUNDLE_MOVE_DIR_FLEXABLETARGET = 1,
@@ -61,7 +61,7 @@ enum e_FXBundleAct	//번들이 어케 동작하는지..
 };
 
 //
-enum e_FXPartParticleEmitType	// 이펙트 파트가 어떤 모양으로 전개되는지...
+enum e_FXPartParticleEmitType	// 이펙트 파트가 어떤 모양으로 전개되는지... [Korean comment]
 {
 	FX_PART_PARTICLE_EMIT_TYPE_NORMAL = 0,	//'normal'
 	FX_PART_PARTICLE_EMIT_TYPE_SPREAD = 1,	//'spread'
@@ -73,11 +73,11 @@ enum e_FXPartParticleEmitType	// 이펙트 파트가 어떤 모양으로 전개�
 //structures.....
 
 /*
-typedef struct __TABLE_FX	// FX 리소스 레코드...
+typedef struct __TABLE_FX	// FX 리소스 레코드... [Korean comment]
 {
 	uint32_t		dwID;		// 고유 ID
 	std::string	szFN;		// file name
-	uint32_t		dwSoundID;	// 효과에 쓰는 사운드 아디.
+	uint32_t		dwSoundID;	// 효과에 쓰는 사운드 아디. [Korean comment]
 } TABLE_FX;
 */
 
@@ -88,13 +88,13 @@ typedef struct Point3D
 	float z;
 } POINT3D;
 
-typedef union __ParticleEmitCondition	//파티클 분사시 필요정보..
+typedef union __ParticleEmitCondition	//파티클 분사시 필요정보.. Info
 {
 	POINT3D	vGatherPoint;	//EmitType이 gather일때 모아지는 점..
 	float	fEmitAngle;		//EmitType이 spread일때 뿌려지는 각..
 } PARTICLEEMITCONDITION;
 
-typedef struct __FXPartWithStartTime	// 번들에서 파트들 관리할때..
+typedef struct __FXPartWithStartTime	// 번들에서 파트들 관리할때.. [Korean comment]
 {
 	class CN3FXPartBase*	pPart;
 	float					fStartTime;

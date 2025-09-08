@@ -42,7 +42,7 @@ void CLogWriter::Open(const std::string& szFN)
 
 	DWORD dwSizeHigh = 0;
 	DWORD dwSizeLow = ::GetFileSize(hFile, &dwSizeHigh);
-	if (dwSizeLow > 256000)  // 파일 사이즈가 너무 크면 지운다..
+	if (dwSizeLow > 256000)  // 파일 사이즈가 너무 크면 지운다.. File
 	{
 		CloseHandle(hFile);
 		::DeleteFile(s_szFileName.c_str());
@@ -51,7 +51,7 @@ void CLogWriter::Open(const std::string& szFN)
 			return;
 	}
 
-	::SetFilePointer(hFile, 0, nullptr, FILE_END); // 추가 하기 위해서 파일의 끝으로 옮기고..
+	::SetFilePointer(hFile, 0, nullptr, FILE_END); // 추가 하기 위해서 파일의 끝으로 옮기고.. File
 
 	std::string buff;
 	SYSTEMTIME time;
@@ -78,7 +78,7 @@ void CLogWriter::Close()
 			return;
 	}
 
-	::SetFilePointer(hFile, 0, nullptr, FILE_END); // 추가 하기 위해서 파일의 끝으로 옮기고..
+	::SetFilePointer(hFile, 0, nullptr, FILE_END); // 추가 하기 위해서 파일의 끝으로 옮기고.. File
 
 	std::string buff;
 	SYSTEMTIME time;
@@ -115,7 +115,7 @@ void CLogWriter::Write(const std::string_view message)
 	std::string outputMessage = fmt::format("    [{:02}:{:02}:{:02}] {}\r\n",
 		time.wHour, time.wMinute, time.wSecond, message);
 
-	::SetFilePointer(hFile, 0, nullptr, FILE_END); // 추가 하기 위해서 파일의 끝으로 옮기고..
+	::SetFilePointer(hFile, 0, nullptr, FILE_END); // 추가 하기 위해서 파일의 끝으로 옮기고.. File
 
 	DWORD dwRWC = 0;
 	WriteFile(hFile, outputMessage.data(), static_cast<DWORD>(outputMessage.length()), &dwRWC, nullptr);
