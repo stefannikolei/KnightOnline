@@ -30,38 +30,38 @@ CPlayerBase::CPlayerBase()
 {
 	m_ePlayerType = PLAYER_BASE; // Player Type ... Base, NPC, OTher, MySelf
 
-	m_Chr.PartAlloc(PART_POS_COUNT); // 기본적으로 파트와 플러그 세팅..
+	m_Chr.PartAlloc(PART_POS_COUNT); // 기본적으로 파트와 플러그 세팅.. Basically part and plug setting
 	m_Chr.PlugAlloc(PLUG_POS_COUNT);
 
 	m_Chr.PosSet(__Vector3(0.0f, 0.0f, 0.0f));
 
-	m_pLooksRef = nullptr;				// 기본적인 모습과 기본 정보 참조 테이블
-	memset(m_pItemPlugBasics, 0, sizeof(m_pItemPlugBasics)); // 캐릭터에 붙은 무기들..
+	m_pLooksRef = nullptr;				// 기본적인 모습과 기본 정보 참조 테이블 Basic appearance and basic information reference table
+	memset(m_pItemPlugBasics, 0, sizeof(m_pItemPlugBasics)); // 캐릭터에 붙은 무기들.. Weapons attached to character
 	memset(m_pItemPlugExts, 0, sizeof(m_pItemPlugExts));
-	memset(m_pItemPartBasics, 0, sizeof(m_pItemPartBasics)); // 캐릭터에 붙은 갑옷들..
-	memset(m_pItemPartExts, 0, sizeof(m_pItemPartExts)); // 캐릭터에 붙은 갑옷들..
+	memset(m_pItemPartBasics, 0, sizeof(m_pItemPartBasics)); // 캐릭터에 붙은 갑옷들.. Armor attached to character
+	memset(m_pItemPartExts, 0, sizeof(m_pItemPartExts)); // 캐릭터에 붙은 갑옷들.. Armor attached to character
 
 	m_iIDTarget	= -1;
 	m_iMagicAni = 0;
-	m_bGuardSuccess	= false;	// 방어에 성공했는지에 대한 플래그..
-	m_bVisible = true;			// 보이는지??
+	m_bGuardSuccess	= false;	// 방어에 성공했는지에 대한 플래그.. Flag for successful defense
+	m_bVisible = true;			// 보이는지?? Is it visible??
 
-	m_iDroppedItemID				= 0;	// 죽은후 떨어트린 아이템
+	m_iDroppedItemID				= 0;	// 죽은후 떨어트린 아이템 Item dropped after death
 
-	m_Chr.m_nJointPartStarts[0]		= 1;	// 상체 - 에니메이션을 분리해 처리하는데... 조인트 인덱스이다.
-	m_Chr.m_nJointPartEnds[0]		= 15;	// 상체
+	m_Chr.m_nJointPartStarts[0]		= 1;	// 상체 - 에니메이션을 분리해 처리하는데... 조인트 인덱스이다. Upper body - joint index for processing animations separately
+	m_Chr.m_nJointPartEnds[0]		= 15;	// 상체 Upper body
 
-	m_Chr.m_nJointPartStarts[1]		= 16;	// 하체
-	m_Chr.m_nJointPartEnds[1]		= 23;	// 하체
+	m_Chr.m_nJointPartStarts[1]		= 16;	// 하체 Lower body
+	m_Chr.m_nJointPartEnds[1]		= 23;	// 하체 Lower body
 
-	m_cvDuration.a = m_cvDuration.r = m_cvDuration.g = m_cvDuration.b = 1.0f; // 지속 컬러 값
-	m_fDurationColorTimeCur = 0; // 현재 시간..
-	m_fDurationColorTime = 0; // 지속시간..
+	m_cvDuration.a = m_cvDuration.r = m_cvDuration.g = m_cvDuration.b = 1.0f; // 지속 컬러 값 Duration color value
+	m_fDurationColorTimeCur = 0; // 현재 시간.. Current time
+	m_fDurationColorTime = 0; // 지속시간.. Duration time
 
-	m_fFlickeringFactor = 1.0f; // 깜박거림 알파 값 1.0 이면 깜박이지 않는다....
-	m_fFlickeringTime = 0; // 깜박거림 시간..
+	m_fFlickeringFactor = 1.0f; // 깜박거림 알파 값 1.0 이면 깜박이지 않는다.... Flickering alpha value - if 1.0, it doesn't flicker
+	m_fFlickeringTime = 0; // 깜박거림 시간.. Flickering time
 
-	m_fTimeAfterDeath = 0; // 죽는 모션을 취하는 타이머 - 5초정도면 적당한가?? 그전에 공격을 받으면 바로 죽는다.
+	m_fTimeAfterDeath = 0; // 죽는 모션을 취하는 타이머 - 5초정도면 적당한가?? 그전에 공격을 받으면 바로 죽는다. Timer for death animation - is about 5 seconds appropriate? Dies immediately if attacked before then
 
 	m_eStateNext = m_eState = PSA_BASIC;
 	m_eStateMove = PSM_STOP; // 첨에 정지..
