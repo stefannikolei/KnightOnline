@@ -70,8 +70,7 @@ BOOL CDlgBase::OnInitDialog()
 	int nH = 0;
 	
 	/////////////////////////////////////
-	// Transform 등록 정보
-	// Transform registration information
+	// Transform 등록 정보 // Transform registration information
 	m_LPTransform.AddPropItem("Position", "", PIT_EDIT, "");
 	m_LPTransform.AddPropItem("Rotation", "", PIT_EDIT, "");
 	m_LPTransform.AddPropItem("Scale", "", PIT_EDIT, "");
@@ -79,13 +78,11 @@ BOOL CDlgBase::OnInitDialog()
 	m_LPTransform.GetWindowRect(&rc);
 	nH = m_LPTransform.GetItemHeight(0) * m_LPTransform.GetCount() + 4;
 	m_LPTransform.SetWindowPos(nullptr, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
-	// Transform 등록 정보
-	// Transform registration information
+	// Transform 등록 정보 // Transform registration information
 	/////////////////////////////////////
 
 	/////////////////////////////////////
-	// Camera 등록 정보
-	// Camera registration information
+	// Camera 등록 정보 // Camera registration information
 	m_LPCamera.AddPropItem("Eye", "", PIT_EDIT, "");
 	m_LPCamera.AddPropItem("At", "", PIT_EDIT, "");
 	m_LPCamera.AddPropItem("Up", "", PIT_EDIT, "");
@@ -101,13 +98,11 @@ BOOL CDlgBase::OnInitDialog()
 	m_LPCamera.GetWindowRect(&rc);
 	nH = m_LPCamera.GetItemHeight(0) * m_LPCamera.GetCount() + 4;
 	m_LPCamera.SetWindowPos(nullptr, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
-	// Camera 등록 정보
-	// Camera registration information
+	// Camera 등록 정보 // Camera registration information
 	/////////////////////////////////////
 
 	/////////////////////////////////////
-	// Light 등록 정보
-	// Light registration information
+	// Light 등록 정보 // Light registration information
 	m_LPLight.AddPropItem("On", "", PIT_EDIT, "");
 	m_LPLight.AddPropItem("Number", "", PIT_EDIT, "");
 	m_LPLight.AddPropItem("Type", "", PIT_COMBO, "Null|Point|Spot|Directional|");
@@ -123,8 +118,7 @@ BOOL CDlgBase::OnInitDialog()
 	m_LPLight.GetWindowRect(&rc);
 	nH = m_LPLight.GetItemHeight(0) * m_LPLight.GetCount() + 4;
 	m_LPLight.SetWindowPos(nullptr, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
-	// Light 등록 정보
-	// Light registration information
+	// Light 등록 정보 // Light registration information
 	/////////////////////////////////////
 
 
@@ -132,8 +126,7 @@ BOOL CDlgBase::OnInitDialog()
 	CString str, strTmp;
 
 	/////////////////////////////////////
-	// Material 등록 정보
-	// Material registration information
+	// Material 등록 정보 // Material registration information
 	m_LPMaterial.AddPropItem("Render Flags", "0", PIT_EDIT, "", 0);
 	strTmp = "Null|D3DBLEND_ZERO|D3DBLEND_ONE|D3DBLEND_SRCCOLOR|D3DBLEND_INVSRCCOLOR|D3DBLEND_SRCALPHA|D3DBLEND_INVSRCALPHA|D3DBLEND_DESTALPHA|\
 D3DBLEND_INVDESTALPHA|D3DBLEND_DESTCOLOR|D3DBLEND_INVDESTCOLOR|D3DBLEND_SRCALPHASAT|D3DBLEND_BOTHSRCALPHA|D3DBLEND_BOTHINVSRCALPHA|";
@@ -158,8 +151,7 @@ D3DTOP_BUMPENVMAP|D3DTOP_BUMPENVMAPLUMINANCE|D3DTOP_DOTPRODUCT|D3DTOP_MULTIPLYAD
 	m_LPMaterial.GetWindowRect(&rc);
 	nH = m_LPMaterial.GetItemHeight(0) * m_LPMaterial.GetCount() + 4;
 	m_LPMaterial.SetWindowPos(nullptr, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
-	// Material 등록 정보
-	// Material registration information
+	// Material 등록 정보 // Material registration information
 	/////////////////////////////////////
 
 	
@@ -192,8 +184,7 @@ D3DTOP_BUMPENVMAP|D3DTOP_BUMPENVMAPLUMINANCE|D3DTOP_DOTPRODUCT|D3DTOP_MULTIPLYAD
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 캐릭터
-	// Character
+	// 캐릭터 // Character
 	m_LPChr.AddPropItem("Joint File", "", PIT_FILE, "N3 Joint File(*.N3Joint)|*.N3Joint||");
 	m_LPChr.AddPropItem("Collision Mesh File", "", PIT_FILE, "N3 Vector Mesh(*.N3VMesh)|*.N3VMesh||");
 	m_LPChr.AddPropItem("Collision Mesh Delete", "Collision Mesh 삭제", PIT_BUTTON, "");
@@ -236,8 +227,7 @@ D3DTOP_BUMPENVMAP|D3DTOP_BUMPENVMAPLUMINANCE|D3DTOP_DOTPRODUCT|D3DTOP_MULTIPLYAD
 	m_LPCPlug.GetWindowRect(&rc);
 	nH = m_LPCPlug.GetItemHeight(0) * m_LPCPlug.GetCount() + 4;
 	m_LPCPlug.SetWindowPos(nullptr, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
-	// 캐릭터
-	// Character
+	// 캐릭터 // Character
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	int nW = 100;
@@ -430,7 +420,6 @@ void CDlgBase::UpdateInfo()
 		pItem = m_LPShape.GetPropItem("Event Type");	if(pItem) pItem->m_curValue.Format("%d", pS->m_iEventType);
 		pItem = m_LPShape.GetPropItem("NPC ID");		if(pItem) pItem->m_curValue.Format("%d", pS->m_iNPC_ID);
 		pItem = m_LPShape.GetPropItem("NPC Status");		if(pItem) pItem->m_curValue.Format("%d", pS->m_iNPC_Status); // NPC 로 쓰는 오브젝트일 경우 NPC Type
-		// NPC Type for objects used as NPCs
 
 		int nPartCount = pS->PartCount();
 
@@ -614,7 +603,6 @@ void CDlgBase::UpdateInfo()
 		}
 
 		// 붙이는 오브젝트(무기, 장신구 등...) 정보 표시
-		// Display information for attached objects (weapons, accessories, etc...)
 		int nPlug = m_CBChrPlug.GetCurSel();
 		int nPlugCount = pC->PlugCount();
 		m_CBChrPlug.ResetContent();
@@ -805,7 +793,6 @@ BOOL CDlgBase::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 			else if(pItem->m_propName == "Event Type" && pItem->m_curValue.GetLength() > 0) pS->m_iEventType = atoi(pItem->m_curValue);
 			else if(pItem->m_propName == "NPC ID" && pItem->m_curValue.GetLength() > 0)		pS->m_iNPC_ID = atoi(pItem->m_curValue);
 			else if(pItem->m_propName == "NPC Status" && pItem->m_curValue.GetLength() > 0) pS->m_iNPC_Status = atoi(pItem->m_curValue); // NPC 로 쓰는 오브젝트일 경우 NPC Type
-			// NPC Type for objects used as NPCs
 
 			else if(pItem->m_propName == "Collision Mesh File" && pItem->m_curValue.GetLength() > 0)
 				pS->CollisionMeshSet(std::string(pItem->m_curValue));
@@ -990,7 +977,6 @@ BOOL CDlgBase::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 				if(pItem->m_propName == "Plug Joint")
 				{
 					int nJI = atoi(pItem->m_curValue); // Joint Index 가 영역을 벗어나지 못하도록...
-					// To prevent Joint Index from going out of range...
 					int nJC = 0;
 					CN3Joint* pJ = pC->Joint();
 					if(pJ) pJ->NodeCount(nJC); // Joint Node Count;
@@ -1064,7 +1050,6 @@ void CDlgBase::OnChangeEName()
 	{
 		CString str;
 		GetDlgItemText(IDC_E_NAME, str); // 이름 바꾸기..
-		// Change name..
 		pBase->m_szName = str;
 	}
 }

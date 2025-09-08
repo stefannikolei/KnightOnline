@@ -2241,8 +2241,7 @@ void CMapMng::LoadObjectPostData(LPCTSTR lpszFileName)
 			pShape->PosSet(vPos);
 			pShape->RotSet(qtRot);
 			pShape->ScaleSet(vScale);
-			pShape->ReCalcMatrix(); // 행렬 다시 계산..
-			// Recalculate matrix..
+			pShape->ReCalcMatrix(); // 행렬 다시 계산.. // Recalculate matrix..
 
 			pShape->m_iBelong = iBelong;
 			pShape->m_iEventID = iEventID;
@@ -2488,15 +2487,11 @@ void CMapMng::DeleteUnusedFiles()
 
 	dlg.DoModal();
 	
-	// 모두 업데이트..
-	// Update all..
-	m_pSelSourceObj = nullptr; // 이렇게 해주어야 뻑이 안난다.
-	// You have to do this to avoid crashes.
+	// 모두 업데이트.. // Update all..
+	m_pSelSourceObj = nullptr; // 이렇게 해주어야 뻑이 안난다. // You have to do this to avoid crashes.
 	m_SelOutputObjArray.RemoveAll();
-	this->LoadSourceObjects(); // Source Object 를 다시 읽고..
-	// Read Source Objects again..
-	this->UpdateAll(); // 몽땅 업데이트...
-	// Update everything...
+	this->LoadSourceObjects(); // Source Object 를 다시 읽고.. // Read Source Objects again..
+	this->UpdateAll(); // 몽땅 업데이트... // Update everything...
 }
 
 void CMapMng::DeleteOverlappedObjects() // 위치가 겹친 젝트를 찾는다.
@@ -2535,13 +2530,10 @@ void CMapMng::DeleteOverlappedObjects() // 위치가 겹친 젝트를 찾는다.
 		m_pSceneOutput->ShapeDelete(OverlappedObjects[i]); // 겹친거 지우기..
 	}
 
-	// 업데이트...
-	// Update...
-	m_pSelSourceObj = nullptr; // 이렇게 해주어야 뻑이 안난다.
-	// You have to do this to avoid crashes.
+	// 업데이트... // Update...
+	m_pSelSourceObj = nullptr; // 이렇게 해주어야 뻑이 안난다. // You have to do this to avoid crashes.
 	m_SelOutputObjArray.RemoveAll();
-	if (m_pDlgOutputList) m_pDlgOutputList->UpdateTree(m_pSceneOutput); // 몽땅 업데이트...
-	// Update everything...
+	if (m_pDlgOutputList) m_pDlgOutputList->UpdateTree(m_pSceneOutput); // 몽땅 업데이트... // Update everything...
 }
 
 void CMapMng::DeleteSelectedSourceObjects()
@@ -2568,14 +2560,11 @@ void CMapMng::DeleteSelectedSourceObjects()
 		m_pSceneOutput->ShapeDelete(SameObjects[i]); // 겹친거 지우기..
 	}
 
-	// 업데이트...
-	// Update...
+	// 업데이트... // Update...
 	m_pSceneSource->ShapeDelete((CN3Shape*)m_pSelSourceObj);
-	m_pSelSourceObj = nullptr; // 이렇게 해주어야 뻑이 안난다.
-	// You have to do this to avoid crashes.
+	m_pSelSourceObj = nullptr; // 이렇게 해주어야 뻑이 안난다. // You have to do this to avoid crashes.
 	m_SelOutputObjArray.RemoveAll();
-	this->UpdateAll(); // 몽땅 업데이트...
-	// Update everything...
+	this->UpdateAll(); // 몽땅 업데이트... // Update everything...
 }
 
 CN3Camera* CMapMng::CameraGet()
