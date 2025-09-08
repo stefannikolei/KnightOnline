@@ -20,13 +20,13 @@ public:
 	int	GetCount() { return FXBList.size(); }
 	__FXBInfo* GetFXBInfo(int idx);
 
-	virtual bool	Load(HANDLE hFile); // 핸들에서 읽어오기..
-	bool	Save(HANDLE hFile);	// 저장하기..
+	virtual bool	Load(HANDLE hFile); // 핸들에서 읽어오기.. [Korean comment]
+	bool	Save(HANDLE hFile);	// 저장하기.. Save
 	
 	CN3FXGroup();	
 	virtual ~CN3FXGroup();
 
-#ifdef _N3TOOL	//툴에서만 쓰는 함수들...
+#ifdef _N3TOOL	//툴에서만 쓰는 함수들... Function
 public:
 	bool	DecodeScriptFile(const char* lpPathName);
 #endif // end of _N3TOOL

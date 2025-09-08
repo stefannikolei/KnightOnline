@@ -22,24 +22,24 @@ public:
 	int			m_iNumTex;
 	int			m_iTexIdx;
 	
-	__Vector3	m_vCreatePoint;	//생성기준위치..
-	__Vector3	m_vAxis;		//기준방향..(회전축)
-	__Vector3	m_vVelocity;	//진행방향..
+	__Vector3	m_vCreatePoint;	//생성기준위치.. Create
+	__Vector3	m_vAxis;		//기준방향..(회전축) Rotate
+	__Vector3	m_vVelocity;	//진행방향.. [Korean comment]
 	__Vector3	m_vAccel;		//
 
 	float		m_fDropVel;		//
 	float		m_fDropY;		//
 	float		m_fRot;			//
-	__Vector3	m_vLcPos;		//로컬...
+	__Vector3	m_vLcPos;		//로컬... [Korean comment]
 	__Vector3	m_vWdPos;		//	
 	uint32_t		m_dwColor;		//
-	float		m_fSize;		//원래크기
-	//float		m_fCurrSize;	//현재
+	float		m_fSize;		//원래크기 Size
+	//float		m_fCurrSize;	//현재 [Korean comment]
 
 public:
 	bool Tick();
 	
-//생성자 소멸자..
+//생성자 소멸자.. Constructor
 	CN3FXParticle();	
 	virtual ~CN3FXParticle();
 };

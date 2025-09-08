@@ -15,18 +15,18 @@ CN3SPart::CN3SPart()
 {
 	m_dwType |= OBJ_SHAPE_PART;
 
-	m_vPivot.Set(0,0,0); // Local 축
-	m_Matrix.Identity(); // World Matrix.. Shape Loading 때 미리 계산해야 좋다..		
-	m_bOutOfCameraRange = TRUE; // Camera 범위 바깥에 있음...
+	m_vPivot.Set(0,0,0); // Local 축 [Korean comment]
+	m_Matrix.Identity(); // World Matrix.. Shape Loading 때 미리 계산해야 좋다..		 Calculate
+	m_bOutOfCameraRange = TRUE; // Camera 범위 바깥에 있음... [Korean comment]
 	m_Mtl.Init(); // Material
 	m_fTexFPS = 10.0f; // Texture Animation Interval;
-	m_fTexIndex = 0; // Current Texture Index.. Animation 시킬때 필요한 인덱스이다..
+	m_fTexIndex = 0; // Current Texture Index.. Animation 시킬때 필요한 인덱스이다.. Index
 
-//	m_vWindFactorCur.Zero();		// 현재 바람 부는 값.. 이값으로 회전을 시킨다..
-//	m_vWindFactorToReach.Zero();	// 바람 부는 값..
-	m_fTimeToSetWind = 0;			// 바람 부는 값을 바꾸기 위한 시간..
-	m_fWindFactorCur = 0;			// 현재 바람 부는 값.. 이값으로 회전을 시킨다..
-	m_fWindFactorToReach = 0;		// 바람 부는 값..
+//	m_vWindFactorCur.Zero();		// 현재 바람 부는 값.. 이값으로 회전을 시킨다.. Rotate
+//	m_vWindFactorToReach.Zero();	// 바람 부는 값.. [Korean comment]
+	m_fTimeToSetWind = 0;			// 바람 부는 값을 바꾸기 위한 시간.. Time
+	m_fWindFactorCur = 0;			// 현재 바람 부는 값.. 이값으로 회전을 시킨다.. Rotate
+	m_fWindFactorToReach = 0;		// 바람 부는 값.. [Korean comment]
 }
 
 CN3SPart::~CN3SPart()
@@ -37,18 +37,18 @@ CN3SPart::~CN3SPart()
 
 void CN3SPart::Release()
 {
-	m_vPivot.Set(0,0,0); // Local 축
-	m_Matrix.Identity(); // World Matrix.. Shape Loading 때 미리 계산해야 좋다..		
-	m_bOutOfCameraRange = TRUE; // Camera 범위 바깥에 있음...
+	m_vPivot.Set(0,0,0); // Local 축 [Korean comment]
+	m_Matrix.Identity(); // World Matrix.. Shape Loading 때 미리 계산해야 좋다..		 Calculate
+	m_bOutOfCameraRange = TRUE; // Camera 범위 바깥에 있음... [Korean comment]
 	m_Mtl.Init(); // Material
 	m_fTexFPS = 10.0f; // Texture Animation Interval;
-	m_fTexIndex = 0; // Current Texture Index.. Animation 시킬때 필요한 인덱스이다..
+	m_fTexIndex = 0; // Current Texture Index.. Animation 시킬때 필요한 인덱스이다.. Index
 
-//	m_vWindFactorCur.Zero();		// 현재 바람 부는 값.. 이값으로 회전을 시킨다..
-//	m_vWindFactorToReach.Zero();	// 바람 부는 값..
-	m_fTimeToSetWind = 0;			// 바람 부는 값을 바꾸기 위한 시간..
-	m_fWindFactorCur = 0;			// 현재 바람 부는 값.. 이값으로 회전을 시킨다..
-	m_fWindFactorToReach = 0;		// 바람 부는 값..
+//	m_vWindFactorCur.Zero();		// 현재 바람 부는 값.. 이값으로 회전을 시킨다.. Rotate
+//	m_vWindFactorToReach.Zero();	// 바람 부는 값.. [Korean comment]
+	m_fTimeToSetWind = 0;			// 바람 부는 값을 바꾸기 위한 시간.. Time
+	m_fWindFactorCur = 0;			// 현재 바람 부는 값.. 이값으로 회전을 시킨다.. Rotate
+	m_fWindFactorToReach = 0;		// 바람 부는 값.. [Korean comment]
 
 	int iTC = m_TexRefs.size();
 	for(int i = 0; i < iTC; i++) s_MngTex.Delete(&m_TexRefs[i]);
@@ -79,9 +79,9 @@ void CN3SPart::Tick(const __Matrix44& mtxParent, const __Quaternion& qRot, float
 
 	m_bOutOfCameraRange = FALSE;
 
-	// 카메라와 멀리 떨어지면 지나간다..
+	// 카메라와 멀리 떨어지면 지나간다.. [Korean comment]
 	__Vector3 vCenter = (this->Min() + this->Max()) * 0.5f;
-	if(s_CameraData.IsOutOfFrustum(vCenter, this->Radius() * fScale)) // 카메라 사면체 바깥이면 지나간다..
+	if(s_CameraData.IsOutOfFrustum(vCenter, this->Radius() * fScale)) // 카메라 사면체 바깥이면 지나간다.. [Korean comment]
 	{
 		m_bOutOfCameraRange = TRUE;
 		return;
@@ -97,20 +97,20 @@ void CN3SPart::Tick(const __Matrix44& mtxParent, const __Quaternion& qRot, float
 	m_PMInst.SetLOD(fLOD);
 	
 	int iTC = m_TexRefs.size();
-	if(iTC > 1) // 텍스처 에니메이션
+	if(iTC > 1) // 텍스처 에니메이션 Texture
 	{
 		m_fTexIndex += CN3Base::s_fSecPerFrm * m_fTexFPS;
-		if(m_fTexIndex >= iTC) m_fTexIndex -= (iTC * m_fTexIndex) / iTC; // 정수로 나누면 소숫점만 남기게 된다??(하여튼 비슷해~)
+		if(m_fTexIndex >= iTC) m_fTexIndex -= (iTC * m_fTexIndex) / iTC; // 정수로 나누면 소숫점만 남기게 된다??(하여튼 비슷해~) [Korean comment]
 	}
 
-	if(m_Mtl.nRenderFlags & RF_BOARD_Y) // 카메라를 바라봐야하는 거면..
+	if(m_Mtl.nRenderFlags & RF_BOARD_Y) // 카메라를 바라봐야하는 거면.. [Korean comment]
 	{
 		__Vector3 vPos = m_vPivot * mtxParent;
 		__Vector3 vDir = s_CameraData.vEye - vPos;
 		if( vDir.x > 0.0f ) m_Matrix.RotationY(-atanf(vDir.z/vDir.x) - (D3DX_PI * 0.5f));
 		else m_Matrix.RotationY(-atanf(vDir.z/vDir.x) + (D3DX_PI * 0.5f));
 
-		// 부모 회전과 반대로 회전을 시킨다..
+		// 부모 회전과 반대로 회전을 시킨다.. Rotate
 		float fAngle;
 		qRot.AxisAngle(vDir, fAngle);
 		if(fAngle != 0)
@@ -124,7 +124,7 @@ void CN3SPart::Tick(const __Matrix44& mtxParent, const __Quaternion& qRot, float
 		m_Matrix.PosSet(vPos);
 	}
 
-	if(m_Mtl.nRenderFlags & RF_WINDY) // 바람에 살짝 날려야 하면..
+	if(m_Mtl.nRenderFlags & RF_WINDY) // 바람에 살짝 날려야 하면.. [Korean comment]
 	{
 		m_fTimeToSetWind -= CN3Base::s_fSecPerFrm;
 
@@ -132,11 +132,11 @@ void CN3SPart::Tick(const __Matrix44& mtxParent, const __Quaternion& qRot, float
 		if(m_fTimeToSetWind <= 0)
 		{
 //			m_vWindFactorToReach.x = 0.05f - (0.1f * (rand()%100) / 100.0f);
-//			m_vWindFactorToReach.y = 0.05f - (0.1f * (rand()%100) / 100.0f); // 위아래로는 조금만 불게 한다.
+//			m_vWindFactorToReach.y = 0.05f - (0.1f * (rand()%100) / 100.0f); // 위아래로는 조금만 불게 한다. [Korean comment]
 //			m_vWindFactorToReach.z = 0.05f - (0.1f * (rand()%100) / 100.0f);
 
 			m_fWindFactorToReach = (rand()%100)/100.0f;
-			m_fTimeToSetWind = 3.0f * ((rand()%100)/100.0f); // 바람이 지속될 값..
+			m_fTimeToSetWind = 3.0f * ((rand()%100)/100.0f); // 바람이 지속될 값.. [Korean comment]
 		}
 		else if(m_fWindFactorToReach != m_fWindFactorCur)
 //		else if(m_vWindFactorToReach != m_vWindFactorCur)
@@ -184,7 +184,7 @@ void CN3SPart::Render()
 		if(iTexIndex >= 0 && iTexIndex < iTC && m_TexRefs[iTexIndex]) lpTex = m_TexRefs[iTexIndex]->Get();
 	}
 
-	if(m_Mtl.nRenderFlags & RF_ALPHABLENDING) // Alpha 사용
+	if(m_Mtl.nRenderFlags & RF_ALPHABLENDING) // Alpha 사용 [Korean comment]
 	{
 		__AlphaPrimitive* pAP = s_AlphaMgr.Add();
 		if(pAP)
@@ -205,7 +205,7 @@ void CN3SPart::Render()
 			pAP->pwIndices			= m_PMInst.GetIndices();
 		}
 
-		return; // 렌더링 안하지롱.
+		return; // 렌더링 안하지롱. Rendering
 	}
 
 //	static uint32_t dwAlpha, dwFog, dwCull;
@@ -219,7 +219,7 @@ void CN3SPart::Render()
 	CN3Base::s_RenderInfo.nShape_Polygon += m_PMInst.GetNumIndices() / 3; // Rendering Information Update...
 #endif
 
-	if(m_Mtl.nRenderFlags & RF_NOTUSEFOG) // Fog 무시..
+	if(m_Mtl.nRenderFlags & RF_NOTUSEFOG) // Fog 무시.. [Korean comment]
 	{
 		s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
 		if(TRUE == dwFog) s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, FALSE);
@@ -230,7 +230,7 @@ void CN3SPart::Render()
 		s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	}
 
-	s_lpD3DDev->SetMaterial(&m_Mtl); // 재질 설정..
+	s_lpD3DDev->SetMaterial(&m_Mtl); // 재질 설정.. Set
 	s_lpD3DDev->SetTexture(0, lpTex);
 	if(nullptr != lpTex)
 	{
@@ -244,13 +244,13 @@ void CN3SPart::Render()
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 	}
 
-	// 로딩할때 미리 계산해 놓은 월드 행렬 적용..
+	// 로딩할때 미리 계산해 놓은 월드 행렬 적용.. Calculate
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &m_Matrix);
 
 	m_PMInst.Render();
 
 //	if((m_Mtl.nRenderFlags & RF_ALPHABLENDING) && FALSE == dwAlpha)	s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-	if((m_Mtl.nRenderFlags & RF_NOTUSEFOG) && TRUE == dwFog) 		s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, TRUE); // 안개 사용하지 않는다..
+	if((m_Mtl.nRenderFlags & RF_NOTUSEFOG) && TRUE == dwFog) 		s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, TRUE); // 안개 사용하지 않는다.. [Korean comment]
 	if((m_Mtl.nRenderFlags & RF_DOUBLESIDED) && D3DCULL_NONE != dwCull) 		s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, dwCull);
 }
 
@@ -302,7 +302,7 @@ void CN3SPart::RenderSelected(bool bWireFrame)
 #ifdef _N3TOOL
 void CN3SPart::RenderAxis()
 {
-	// 축그리기..
+	// 축그리기.. Draw
 	float fRadius = 1.0f;
 	if(m_PMInst.GetMesh()) fRadius = m_PMInst.GetMesh()->Radius();
 	static CN3Transform TTmp;
@@ -320,22 +320,22 @@ bool CN3SPart::Load(HANDLE hFile)
 	ReadFile(hFile, &m_vPivot, sizeof(__Vector3), &dwRWC, nullptr);
 
 	ReadFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
-	ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 메시 파일 이름..
+	ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 메시 파일 이름.. File
 	this->MeshSet(szFN);
 
-	ReadFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질
+	ReadFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질 [Korean comment]
 
 	int iTC = 0;
 	ReadFile(hFile, &iTC, 4, &dwRWC, nullptr);
 	ReadFile(hFile, &m_fTexFPS, 4, &dwRWC, nullptr);
 	m_TexRefs.clear();
-	this->TexAlloc(iTC); // Texture Pointer Pointer 할당..
-	for(int j = 0; j < iTC; j++) // Texture Count 만큼 파일 이름 읽어서 텍스처 부르기..
+	this->TexAlloc(iTC); // Texture Pointer Pointer 할당.. [Korean comment]
+	for(int j = 0; j < iTC; j++) // Texture Count 만큼 파일 이름 읽어서 텍스처 부르기.. File
 	{
 		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 		if(nL > 0)
 		{
-			ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 텍스처 파일 이름..
+			ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 텍스처 파일 이름.. File
 			m_TexRefs[j] = s_MngTex.Get(szFN, true, s_Options.iTexLOD_Shape);
 		}
 	}
@@ -360,7 +360,7 @@ bool CN3SPart::Save(HANDLE hFile)
 	if(nL > 0)
 	{
 		
-//		if(-1 == pPMesh->FileName().find("object\\")) // 임시로 경로를 바꾸려고 넣었다.. 나중에 필요없음 지운다..
+//		if(-1 == pPMesh->FileName().find("object\\")) // 임시로 경로를 바꾸려고 넣었다.. 나중에 필요없음 지운다.. [Korean comment]
 //		{
 //			std::string szFNTmp = fmt::format("Object\\{}.N3PMesh", pPMesh->Name());
 //			pPMesh->FileNameSet(szFNTmp);
@@ -373,15 +373,15 @@ bool CN3SPart::Save(HANDLE hFile)
 
 
 
-		WriteFile(hFile, pPMesh->FileName().c_str(), nL, &dwRWC, nullptr); // 메시 파일 이름..
+		WriteFile(hFile, pPMesh->FileName().c_str(), nL, &dwRWC, nullptr); // 메시 파일 이름.. File
 	}
 
-	WriteFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질
+	WriteFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질 [Korean comment]
 
 	int iTC = m_TexRefs.size();
 	WriteFile(hFile, &iTC, 4, &dwRWC, nullptr);
 	WriteFile(hFile, &m_fTexFPS, 4, &dwRWC, nullptr);
-	for(int j = 0; j < iTC; j++) // Texture File 이름 쓰기...
+	for(int j = 0; j < iTC; j++) // Texture File 이름 쓰기... Name
 	{
 		if(m_TexRefs[j]) nL = m_TexRefs[j]->FileName().size();
 		else nL = 0;
@@ -390,9 +390,9 @@ bool CN3SPart::Save(HANDLE hFile)
 		if(nL > 0)
 		{
 			
-//			if(-1 == m_TexRefs[j]->FileName().find("object\\")) // 임시로 경로를 바꾸려고 넣었다.. 나중에 필요없음 지운다..
+//			if(-1 == m_TexRefs[j]->FileName().find("object\\")) // 임시로 경로를 바꾸려고 넣었다.. 나중에 필요없음 지운다.. [Korean comment]
 //			{
-//				// 폴더 이름을 분리하고..
+//				// 폴더 이름을 분리하고.. Name
 //				char szDrive[_MAX_DRIVE], szDir[_MAX_DIR], szFName[_MAX_FNAME], szExt[_MAX_EXT];
 //				_splitpath(m_TexRefs[j]->FileName(), szDrive, szDir, szFName, szExt);
 //
@@ -408,7 +408,7 @@ bool CN3SPart::Save(HANDLE hFile)
 			
 			
 			
-			WriteFile(hFile, m_TexRefs[j]->FileName().c_str(), nL, &dwRWC, nullptr); // 택스처 파일 이름..
+			WriteFile(hFile, m_TexRefs[j]->FileName().c_str(), nL, &dwRWC, nullptr); // 택스처 파일 이름.. File
 		}
 	}
 
@@ -432,7 +432,7 @@ void CN3SPart::PartialRender(int iCount, uint16_t* pIndices)
 		if(iTexIndex >= 0 && iTexIndex < iTC && m_TexRefs[iTexIndex]) lpTex = m_TexRefs[iTexIndex]->Get();
 	}
 
-	if(m_Mtl.nRenderFlags & RF_ALPHABLENDING) // Alpha 사용
+	if(m_Mtl.nRenderFlags & RF_ALPHABLENDING) // Alpha 사용 [Korean comment]
 	{
 		__AlphaPrimitive* pAP = s_AlphaMgr.Add();
 		if(pAP)
@@ -453,7 +453,7 @@ void CN3SPart::PartialRender(int iCount, uint16_t* pIndices)
 			pAP->pwIndices			= m_PMInst.GetIndices();
 		}
 
-		return; // 렌더링 안하지롱.
+		return; // 렌더링 안하지롱. Rendering
 	}
 
 	DWORD dwFog, dwCull;
@@ -462,7 +462,7 @@ void CN3SPart::PartialRender(int iCount, uint16_t* pIndices)
 	CN3Base::s_RenderInfo.nShape_Polygon += m_PMInst.GetNumIndices() / 3; // Rendering Information Update...
 #endif
 
-	if(m_Mtl.nRenderFlags & RF_NOTUSEFOG) // Fog 무시..
+	if(m_Mtl.nRenderFlags & RF_NOTUSEFOG) // Fog 무시.. [Korean comment]
 	{
 		s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
 		if(TRUE == dwFog) s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, FALSE);
@@ -473,7 +473,7 @@ void CN3SPart::PartialRender(int iCount, uint16_t* pIndices)
 		s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	}
 
-	s_lpD3DDev->SetMaterial(&m_Mtl); // 재질 설정..
+	s_lpD3DDev->SetMaterial(&m_Mtl); // 재질 설정.. Set
 	s_lpD3DDev->SetTexture(0, lpTex);
 	if(nullptr != lpTex)
 	{
@@ -487,12 +487,12 @@ void CN3SPart::PartialRender(int iCount, uint16_t* pIndices)
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 	}
 
-	// 로딩할때 미리 계산해 놓은 월드 행렬 적용..
+	// 로딩할때 미리 계산해 놓은 월드 행렬 적용.. Calculate
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &m_Matrix);
 
 	m_PMInst.PartialRender(iCount, pIndices);
 
-	if((m_Mtl.nRenderFlags & RF_NOTUSEFOG) && TRUE == dwFog) 		s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, TRUE); // 안개 사용하지 않는다..
+	if((m_Mtl.nRenderFlags & RF_NOTUSEFOG) && TRUE == dwFog) 		s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, TRUE); // 안개 사용하지 않는다.. [Korean comment]
 	if((m_Mtl.nRenderFlags & RF_DOUBLESIDED) && D3DCULL_NONE != dwCull) 		s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, dwCull);
 }
 
@@ -534,7 +534,7 @@ void CN3Shape::Release()
 	
 	m_iBelong = 0;
 	m_iEventID = 0; // Event ID
-	m_iEventType = 0; // Event Type - 바인드포인트,성문,레버 등등...
+	m_iEventType = 0; // Event Type - 바인드포인트,성문,레버 등등... [Korean comment]
 	m_iNPC_ID = 0;  // NPC 로 쓰는 오브젝트일 경우 NPC ID
 	m_iNPC_Status = 0; // NPC 로 쓰는 오브젝트일 경우 NPC Status
 
@@ -545,13 +545,13 @@ void CN3Shape::Tick(float fFrm)
 {
 	if(false == m_bVisible) return;
 
-	// 만약 가까운 거리면.. 좀더 컬링을 느슨하게 한다..
-	// 가장 큰 스케일 값을 찾아서..
+	// 만약 가까운 거리면.. 좀더 컬링을 느슨하게 한다.. [Korean comment]
+	// 가장 큰 스케일 값을 찾아서.. [Korean comment]
 	float fScale = m_vScale.x;
 	if(fScale < m_vScale.y) fScale = m_vScale.y;
 	if(fScale < m_vScale.z) fScale = m_vScale.z;
 
-	// 카메라와 멀리 떨어지면 지나간다..
+	// 카메라와 멀리 떨어지면 지나간다.. [Korean comment]
 	float fDist = (m_vPos - s_CameraData.vEye).Magnitude();
 	if(fDist > s_CameraData.fFP + m_fRadius * fScale * 2.0f)
 	{
@@ -583,8 +583,8 @@ void CN3Shape::Tick(float fFrm)
 	}
 }
 
-// 카메라 위치, 카메라 평면(관찰 절두체 평면) -> 12개의 벡터 배열로 되어 있다.
-// [0][1]:카메라 위치와 벡터, [2][3]:카메라 범위 위치와 방향 벡터, [4][5] ~ [10][11]:상하좌우평면벡터
+// 카메라 위치, 카메라 평면(관찰 절두체 평면) -> 12개의 벡터 배열로 되어 있다. Position
+// [0][1]:카메라 위치와 벡터, [2][3]:카메라 범위 위치와 방향 벡터, [4][5] ~ [10][11]:상하좌우평면벡터 Position
 void CN3Shape::Render()
 {
 	if(false == m_bVisible) return;
@@ -606,7 +606,7 @@ void CN3Shape::Render()
 #ifdef _N3TOOL
 void CN3Shape::RenderSelected(bool bWireFrame)
 {
-	// 축그리기..
+	// 축그리기.. Draw
 	CN3Transform::Render(nullptr, m_fRadius * 3.0f);
 
 	CN3SPart* pPD = nullptr;
@@ -620,7 +620,7 @@ void CN3Shape::RenderSelected(bool bWireFrame)
 
 bool CN3Shape::Load(HANDLE hFile)
 {
-	CN3TransformCollision::Load(hFile); // 기본정보 읽기...
+	CN3TransformCollision::Load(hFile); // 기본정보 읽기... Load
 
 	DWORD dwRWC = 0;
 	
@@ -636,13 +636,13 @@ bool CN3Shape::Load(HANDLE hFile)
 		{
 			m_Parts[i] = new CN3SPart();
 			m_Parts[i]->Load(hFile);
-			m_Parts[i]->ReCalcMatrix(m_Matrix); // Part Matrix 계산
+			m_Parts[i]->ReCalcMatrix(m_Matrix); // Part Matrix 계산 Calculate
 		}
 	}
 		
-	ReadFile(hFile, &m_iBelong, 4, &dwRWC, nullptr);	// 소속
+	ReadFile(hFile, &m_iBelong, 4, &dwRWC, nullptr);	// 소속 [Korean comment]
 	ReadFile(hFile, &m_iEventID, 4, &dwRWC, nullptr);	// Event ID
-	ReadFile(hFile, &m_iEventType, 4, &dwRWC, nullptr); // Event Type - 바인드 포인트, 성문, 레버 등등...
+	ReadFile(hFile, &m_iEventType, 4, &dwRWC, nullptr); // Event Type - 바인드 포인트, 성문, 레버 등등... [Korean comment]
 	ReadFile(hFile, &m_iNPC_ID, 4, &dwRWC, nullptr);	// NPC 로 쓰는 오브젝트일 경우 NPC ID
 	ReadFile(hFile, &m_iNPC_Status, 4, &dwRWC, nullptr); // NPC 로 쓰는 오브젝트일 경우 NPC Status
 
@@ -653,13 +653,13 @@ bool CN3Shape::Load(HANDLE hFile)
 
 bool CN3Shape::LoadTransformOnly(HANDLE hFile)
 {
-	return CN3Transform::Load(hFile); // 기본정보 읽기...
+	return CN3Transform::Load(hFile); // 기본정보 읽기... Load
 }
 
 #ifdef _N3TOOL
 bool CN3Shape::Save(HANDLE hFile)
 {
-	CN3TransformCollision::Save(hFile); // 기본정보 읽기...
+	CN3TransformCollision::Save(hFile); // 기본정보 읽기... Load
 	
 	DWORD dwRWC = 0;
 	
@@ -673,9 +673,9 @@ bool CN3Shape::Save(HANDLE hFile)
 		m_Parts[i]->Save(hFile);
 	}
 
-	WriteFile(hFile, &m_iBelong, 4, &dwRWC, nullptr);		// 소속
+	WriteFile(hFile, &m_iBelong, 4, &dwRWC, nullptr);		// 소속 [Korean comment]
 	WriteFile(hFile, &m_iEventID, 4, &dwRWC, nullptr);		// Event ID
-	WriteFile(hFile, &m_iEventType, 4, &dwRWC, nullptr);		// Event Type - 바인드 포인트, 성문, 레버 등등...
+	WriteFile(hFile, &m_iEventType, 4, &dwRWC, nullptr);		// Event Type - 바인드 포인트, 성문, 레버 등등... [Korean comment]
 	WriteFile(hFile, &m_iNPC_ID, 4, &dwRWC, nullptr);		// NPC 로 쓰는 오브젝트일 경우 NPC ID
 	WriteFile(hFile, &m_iNPC_Status, 4, &dwRWC, nullptr);	// NPC 로 쓰는 오브젝트일 경우 NPC Status
 
@@ -730,15 +730,15 @@ bool CN3Shape::IsPMeshProcessed()
 
 void CN3Shape::ReCalcMatrix()
 {
-	CN3Transform::ReCalcMatrix(); // Transfomr Matrix 를 계산 해주고..
+	CN3Transform::ReCalcMatrix(); // Transfomr Matrix 를 계산 해주고.. Calculate
 
-	// 각 파트의 매트릭스를 다시 계산해 준다..
+	// 각 파트의 매트릭스를 다시 계산해 준다.. Calculate
 	ReCalcPartMatrix();
 }
 
 void CN3Shape::ReCalcPartMatrix()
 {
-	// 각 파트의 매트릭스를 다시 계산해 준다..
+	// 각 파트의 매트릭스를 다시 계산해 준다.. Calculate
 	int iPC = m_Parts.size();
 	for(int i = 0; i < iPC; i++)
 	{
@@ -760,13 +760,13 @@ void CN3Shape::FindMinMax()
 	__Vector3 vMinTmp(0,0,0);
 	__Vector3 vMaxTmp(0,0,0);
 
-	// 가장 큰 지점찾기..
+	// 가장 큰 지점찾기.. [Korean comment]
 	static __Matrix44 mtxWI;
 	D3DXMatrixInverse(&mtxWI, nullptr, &m_Matrix); // World Matrix Inverse
 	for(int i = 0; i < iPC; i++)
 	{
-		vMinTmp = m_Parts[i]->Min() * mtxWI; // 월드 상의 최소값을 로컬 좌표로 바꾸어준다..
-		vMaxTmp = m_Parts[i]->Max() * mtxWI; // 월드 상의 최대값을 로컬 좌표로 바꾸어준다..
+		vMinTmp = m_Parts[i]->Min() * mtxWI; // 월드 상의 최소값을 로컬 좌표로 바꾸어준다.. [Korean comment]
+		vMaxTmp = m_Parts[i]->Max() * mtxWI; // 월드 상의 최대값을 로컬 좌표로 바꾸어준다.. [Korean comment]
 
 		if(vMinTmp.x < m_vMin.x) m_vMin.x = vMinTmp.x;
 		if(vMinTmp.y < m_vMin.y) m_vMin.y = vMinTmp.y;
@@ -776,7 +776,7 @@ void CN3Shape::FindMinMax()
 		if(vMaxTmp.z > m_vMax.z) m_vMax.z = vMaxTmp.z;
 	}
 
-	// 최대 최소값을 갖고 반지름 계산한다..
+	// 최대 최소값을 갖고 반지름 계산한다.. Calculate
 	m_fRadius = (m_vMax - m_vMin).Magnitude() * 0.5f;
 }
 
@@ -802,7 +802,7 @@ int CN3Shape::CheckCollisionPrecisely(bool bIgnoreBoxCheck, int ixScreen, int iy
 
 int CN3Shape::CheckCollisionPrecisely(bool bIgnoreBoxCheck, const __Vector3& vPos, const __Vector3& vDir, __Vector3* pVCol, __Vector3* pVNormal)
 {
-	if(false == bIgnoreBoxCheck && false == ::_CheckCollisionByBox(vPos, vDir, m_vMin * m_Matrix, m_vMax * m_Matrix)) return -1; // 박스 체크 먼저한다..
+	if(false == bIgnoreBoxCheck && false == ::_CheckCollisionByBox(vPos, vDir, m_vMin * m_Matrix, m_vMax * m_Matrix)) return -1; // 박스 체크 먼저한다.. Check
 
 	__Vector3 vPos2 = vPos, vDir2 = vDir;
 	int iPC = m_Parts.size();
@@ -816,14 +816,14 @@ int CN3Shape::CheckCollisionPrecisely(bool bIgnoreBoxCheck, const __Vector3& vPo
 		int nIndexCount = pPMI->GetNumIndices();
 
 		int nFC = nIndexCount / 3; // Face Count
-		if(nFC > 64 && false == ::_CheckCollisionByBox(vPos, vDir, m_Parts[i]->Min(), m_Parts[i]->Max())) continue;  // Face 수가 24 개보다 많은 경우 일단 박스체크를 한다..
+		if(nFC > 64 && false == ::_CheckCollisionByBox(vPos, vDir, m_Parts[i]->Min(), m_Parts[i]->Max())) continue;  // Face 수가 24 개보다 많은 경우 일단 박스체크를 한다.. Check
 		
 		static __Matrix44 mtxWI;
 		D3DXMatrixInverse(&mtxWI, nullptr, &(m_Parts[i]->m_Matrix)); // World Matrix Inverse
 
 		vPos2 = vPos * mtxWI;
 		mtxWI.PosSet(0,0,0);
-		vDir2 = vDir * mtxWI; // 역행렬로 회전..
+		vDir2 = vDir * mtxWI; // 역행렬로 회전.. Rotate
 
 		int nCI0, nCI1, nCI2;
 		__Vector3 v0, v1, v2;
@@ -845,8 +845,8 @@ int CN3Shape::CheckCollisionPrecisely(bool bIgnoreBoxCheck, const __Vector3& vPo
 				(*pVNormal).Normalize();
 
 				D3DXMatrixInverse(&mtxWI, nullptr, &(m_Parts[i]->m_Matrix)); // World Matrix Inverse
-				mtxWI.PosSet(0,0,0); // 역행렬로 회전..
-				(*pVNormal) *= mtxWI; // 역행렬로 회전..
+				mtxWI.PosSet(0,0,0); // 역행렬로 회전.. Rotate
+				(*pVNormal) *= mtxWI; // 역행렬로 회전.. Rotate
 			}
 			return i;
 		}
@@ -855,7 +855,7 @@ int CN3Shape::CheckCollisionPrecisely(bool bIgnoreBoxCheck, const __Vector3& vPo
 	return -1;
 }
 
-bool CN3Shape::MakeCollisionMeshByParts()  // 충돌 메시를 박스로 만든다...
+bool CN3Shape::MakeCollisionMeshByParts()  // 충돌 메시를 박스로 만든다... Mesh
 {
 	int iPC = m_Parts.size();
 	int iVC = 0, iIC = 0;
@@ -909,10 +909,10 @@ bool CN3Shape::MakeCollisionMeshByParts()  // 충돌 메시를 박스로 만든�
 	}
 
 	int iCount = CN3Base::s_MngVMesh.Count();
-	std::string buff = fmt::format("{}_collision_{}.n3vmesh", m_szFileName.c_str(), iCount); // 임시로 이름일 짓고..
+	std::string buff = fmt::format("{}_collision_{}.n3vmesh", m_szFileName.c_str(), iCount); // 임시로 이름일 짓고.. Name
 
 	pVMesh->FileNameSet(buff);
-	CN3Base::s_MngVMesh.Delete(&m_pMeshCollision); // 전의 거 지우고..
+	CN3Base::s_MngVMesh.Delete(&m_pMeshCollision); // 전의 거 지우고.. [Korean comment]
 	CN3Base::s_MngVMesh.Add(pVMesh);
 	m_pMeshCollision = s_MngVMesh.Get(pVMesh->FileName());
 
@@ -921,7 +921,7 @@ bool CN3Shape::MakeCollisionMeshByParts()  // 충돌 메시를 박스로 만든�
 	return true;
 }
 
-bool CN3Shape::MakeCollisionMeshByPartsDetail()  // 현재 모습 그대로... 충돌 메시를 만든다...
+bool CN3Shape::MakeCollisionMeshByPartsDetail()  // 현재 모습 그대로... 충돌 메시를 만든다... Mesh
 {
 	int iPC = m_Parts.size();
 	int iMaxNumVertices = 0, iMaxNumIndices = 0;
@@ -985,10 +985,10 @@ bool CN3Shape::MakeCollisionMeshByPartsDetail()  // 현재 모습 그대로... �
 	}
 
 	int iCount = CN3Base::s_MngVMesh.Count();
-	std::string buff = fmt::format("{}_collision_{}.n3vmesh", m_szFileName.c_str(), iCount); // 임시로 이름일 짓고..
+	std::string buff = fmt::format("{}_collision_{}.n3vmesh", m_szFileName.c_str(), iCount); // 임시로 이름일 짓고.. Name
 
 	pVMesh->FileNameSet(buff);
-	CN3Base::s_MngVMesh.Delete(&m_pMeshCollision); // 전의 거 지우고..
+	CN3Base::s_MngVMesh.Delete(&m_pMeshCollision); // 전의 거 지우고.. [Korean comment]
 	CN3Base::s_MngVMesh.Add(pVMesh);
 	m_pMeshCollision = s_MngVMesh.Get(pVMesh->FileName());
 
@@ -1000,7 +1000,7 @@ bool CN3Shape::MakeCollisionMeshByPartsDetail()  // 현재 모습 그대로... �
 #ifdef _N3TOOL
 void CN3Shape::MakeDefaultMaterial()
 {
-	// 각 파트의 재질을 기본적인 흰색으로 해준다..
+	// 각 파트의 재질을 기본적인 흰색으로 해준다.. Color
 	__Material mtlBasic;
 	mtlBasic.Init();
 
@@ -1015,11 +1015,11 @@ void CN3Shape::MakeDefaultMaterial()
 #ifdef _N3TOOL
 void CN3Shape::RemoveRenderFlags(int nFlags)
 {
-	// 각 파트의 매트릭스를 다시 계산해 준다..
+	// 각 파트의 매트릭스를 다시 계산해 준다.. Calculate
 	int iPC = m_Parts.size();
 	for(int i = 0; i < iPC; i++)
 	{
-		m_Parts[i]->m_Mtl.nRenderFlags &= (~nFlags);; // 기본 흰색..
+		m_Parts[i]->m_Mtl.nRenderFlags &= (~nFlags);; // 기본 흰색.. Color
 	}
 }
 #endif // end of _N3TOOL
@@ -1049,7 +1049,7 @@ bool CN3Shape::SaveToSameFolder(const std::string& szFullPath)
 	for(i = 0; i < iPC; i++)
 	{
 		szOldFN = m_Parts[i]->Mesh()->FileName();
-		OldPartFNs.push_back(szOldFN); // 파일 이름 보관..
+		OldPartFNs.push_back(szOldFN); // 파일 이름 보관.. File
 
 		_splitpath(szOldFN.c_str(), szDrive, szDir, szFName, szExt);
 		szNameTmp = szPath + szFName + szExt;
@@ -1061,7 +1061,7 @@ bool CN3Shape::SaveToSameFolder(const std::string& szFullPath)
 			CN3Texture* pTex = m_Parts[i]->Tex(j);
 
 			szOldFN = pTex->FileName();
-			OldTexFNs.push_back(szOldFN); // 파일 이름 보관..
+			OldTexFNs.push_back(szOldFN); // 파일 이름 보관.. File
 
 			_splitpath(szOldFN.c_str(), szDrive, szDir, szFName, szExt);
 			szNameTmp = szPath + szFName + szExt;
@@ -1075,7 +1075,7 @@ bool CN3Shape::SaveToSameFolder(const std::string& szFullPath)
 	this->SaveToFile(szNameTmp);
 	m_szFileName = szOldFN;
 
-	// 원래대로 파일 이름 돌려놓기..
+	// 원래대로 파일 이름 돌려놓기.. File
 	iPC = m_Parts.size();
 	int iSeq = 0;
 	for(i = 0; i < iPC; i++)
@@ -1090,7 +1090,7 @@ bool CN3Shape::SaveToSameFolder(const std::string& szFullPath)
 		}
 	}
 
-//	By : Ecli666 ( On 2002-10-16 오전 11:44:19 )
+//	By : Ecli666 ( On 2002-10-16 오전 11:44:19 ) [Korean comment]
 //
 	// TODO(srmeier): m_pvCollisions is undefined, if I need this I'll have to revisit this
 	/*
@@ -1101,7 +1101,7 @@ bool CN3Shape::SaveToSameFolder(const std::string& szFullPath)
 	CollisionMesh()->FileNameSet(szOldFN);	
 	*/
 
-//	~(By Ecli666 On 2002-10-16 오전 11:44:19 )
+//	~(By Ecli666 On 2002-10-16 오전 11:44:19 ) [Korean comment]
 
 	return true;
 }
@@ -1153,7 +1153,7 @@ bool CN3Shape::SaveToSameFolderAndMore(const std::string& szFullPath, const std:
 	this->SaveToFile(szNameTmp);
 	m_szFileName = szRelativePath + szFName + szExt;
 
-//	By : Ecli666 ( On 2002-10-16 오전 11:44:19 )
+//	By : Ecli666 ( On 2002-10-16 오전 11:44:19 ) [Korean comment]
 //
 	if (CollisionMesh())
 	{
@@ -1163,14 +1163,14 @@ bool CN3Shape::SaveToSameFolderAndMore(const std::string& szFullPath, const std:
 		szOldFN = szFName; szOldFN += szExt; 
 		CollisionMesh()->FileNameSet(szRelativePath + szFName + szExt);	
 	}
-//	~(By Ecli666 On 2002-10-16 오전 11:44:19 )
+//	~(By Ecli666 On 2002-10-16 오전 11:44:19 ) [Korean comment]
 
 	return true;
 }
 
 #endif // end of _N3TOOL
 
-//	By : Ecli666 ( On 2002-08-06 오후 4:33:32 )
+//	By : Ecli666 ( On 2002-08-06 오후 4:33:32 ) [Korean comment]
 //
 void CN3Shape::SetMaxLOD()
 {
@@ -1248,5 +1248,5 @@ void CN3Shape::PartialGetCollision(int iIndex, __Vector3& vec)
 	CollisionMesh()->PartialGetCollision(iIndex, vec);
 }
 
-//	~(By Ecli666 On 2002-08-06 오후 4:33:32 )
+//	~(By Ecli666 On 2002-08-06 오후 4:33:32 ) [Korean comment]
 

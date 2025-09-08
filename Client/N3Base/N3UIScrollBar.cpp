@@ -40,7 +40,7 @@ bool CN3UIScrollBar::Load(HANDLE hFile)
 	if (false == CN3UIBase::Load(hFile)) return false;
 	__ASSERT(nullptr == m_pTrackBarRef, "scrollbar가 초기화되어 있지 않아여");
 
-	// m_pTrackBarRef, m_pBtnRef  설정하기
+	// m_pTrackBarRef, m_pBtnRef  설정하기 Set
 	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
@@ -61,7 +61,7 @@ bool CN3UIScrollBar::Load(HANDLE hFile)
 void CN3UIScrollBar::SetRegion(const RECT& Rect)
 {
 	CN3UIBase::SetRegion(Rect);
-	// 우선 임시로 스크롤 영역 크기와 같게 배치
+	// 우선 임시로 스크롤 영역 크기와 같게 배치 Size
 //	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 //	{
 //		(*itor)->SetRegion(Rect);
@@ -106,7 +106,7 @@ void CN3UIScrollBar::operator = (const CN3UIScrollBar& other)
 	CN3UIBase::operator = (other);
 	m_iLineSize = other.m_iLineSize;		// 버튼을 눌렀을때 trackbar가 움직여지는 크기
 
-	// m_pTrackBarRef, m_pBtnRef  설정하기
+	// m_pTrackBarRef, m_pBtnRef  설정하기 Set
 	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
@@ -137,6 +137,6 @@ void CN3UIScrollBar::CreateTrackBarAndBtns()
 	
 	m_pTrackBarRef = new CN3UITrackBar();
 	m_pTrackBarRef->Init(this);
-	m_pTrackBarRef->CreateImages();			// trackbar의 이미지 생성
+	m_pTrackBarRef->CreateImages();			// trackbar의 이미지 생성 Create
 }
 #endif

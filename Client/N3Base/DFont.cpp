@@ -202,7 +202,7 @@ HRESULT CDFont::SetText(const std::string& szText, uint32_t dwFlags)
 	int iStrLen = szText.size();
 
 	HRESULT hr;
-	// \n을 빼고 한줄로 만들어서 글자 길이 계산하기
+	// \n을 빼고 한줄로 만들어서 글자 길이 계산하기 Calculate
 	int iCount=0;
 	int iTempCount = 0;
 	SIZE size;
@@ -214,11 +214,11 @@ HRESULT CDFont::SetText(const std::string& szText, uint32_t dwFlags)
 		{
 			++iCount;
 		}
-		else if (0x80 & szText[iCount])	// 2BYTE 문자
+		else if (0x80 & szText[iCount])	// 2BYTE 문자 [Korean comment]
 		{
-			if((iCount + 2) > iStrLen) // 이상한 문자열이다..
+			if((iCount + 2) > iStrLen) // 이상한 문자열이다.. [Korean comment]
 			{
-//				__ASSERT(0, "이상한 문자열이다.!!!");
+//				__ASSERT(0, "이상한 문자열이다.!!!"); [Korean comment]
 				break;
 			}
 			else
@@ -227,17 +227,17 @@ HRESULT CDFont::SetText(const std::string& szText, uint32_t dwFlags)
 				iTempCount += 2; iCount += 2;
 			}
 		}
-		else								// 1BYTE 문자
+		else								// 1BYTE 문자 [Korean comment]
 		{
 			memcpy(&(szTemp[iTempCount]), &(szText[iCount]), 1);
 			++iTempCount; ++iCount;
 		}
-		__ASSERT(iCount<=iStrLen, "??");	// 이상한 문자가 들어왔을 경우
+		__ASSERT(iCount<=iStrLen, "??");	// 이상한 문자가 들어왔을 경우 [Korean comment]
 	}
 
 //	szTemp[iTempCount] = 0x00;
 
-	// 텍스쳐 사이즈 결정하기
+	// 텍스쳐 사이즈 결정하기 [Korean comment]
 	SelectObject(s_hDC, m_hFont);
 	GetTextExtentPoint32( s_hDC, szTemp.c_str(), szTemp.size(), &size );
 	szTemp = "";
@@ -249,7 +249,7 @@ HRESULT CDFont::SetText(const std::string& szText, uint32_t dwFlags)
 	}
 	int	iExtent = size.cx*size.cy;
 
-	SIZE size2;	// 한글 반글자의 크기..
+	SIZE size2;	// 한글 반글자의 크기.. Size
 	GetTextExtentPoint32( s_hDC, "진", lstrlen("진"), &size2 );
 	size2.cx = ((size2.cx/2) + (size2.cx%2));
 
@@ -277,7 +277,7 @@ HRESULT CDFont::SetText(const std::string& szText, uint32_t dwFlags)
         m_dwTexWidth = m_dwTexHeight = d3dCaps.MaxTextureWidth;
     }
 
-	// 기존 텍스쳐 크기가 새로 만들 텍스쳐 크기와 다를 경우 다시 만든다.
+	// 기존 텍스쳐 크기가 새로 만들 텍스쳐 크기와 다를 경우 다시 만든다. Size
 	if (m_pTexture)
 	{
 		D3DSURFACE_DESC sd;
@@ -294,7 +294,7 @@ HRESULT CDFont::SetText(const std::string& szText, uint32_t dwFlags)
 	if (nullptr == m_pTexture)
 	{
 		int iMipMapCount = 1;
-		if( dwFlags & D3DFONT_FILTERED ) iMipMapCount = 0; // 필터링 텍스트는 밉맵을 만든다..
+		if( dwFlags & D3DFONT_FILTERED ) iMipMapCount = 0; // 필터링 텍스트는 밉맵을 만든다.. [Korean comment]
 
 		hr = m_pd3dDevice->CreateTexture( m_dwTexWidth, m_dwTexHeight, iMipMapCount,
 										0, D3DFMT_A4R4G4B4,
@@ -334,7 +334,7 @@ HRESULT CDFont::SetText(const std::string& szText, uint32_t dwFlags)
     // Loop through all printable character and output them to the bitmap..
     // Meanwhile, keep track of the corresponding tex coords for each character.
 
-// 글씨 찍기 및 글씨 찍을 판떼기 만들기
+// 글씨 찍기 및 글씨 찍을 판떼기 만들기 [Korean comment]
 	if (m_Is2D)
 	{
 		Make2DVertex(size.cy, szText);
@@ -370,8 +370,8 @@ HRESULT CDFont::SetText(const std::string& szText, uint32_t dwFlags)
     // Done updating texture, so clean up used objects
     m_pTexture->UnlockRect(0);
 	
-	::SelectObject(s_hDC, hObjPrev); // 반드시 전의걸 선택해야..
-	DeleteObject( hbmBitmap ); // 제대로 지워진다..
+	::SelectObject(s_hDC, hObjPrev); // 반드시 전의걸 선택해야.. Select
+	DeleteObject( hbmBitmap ); // 제대로 지워진다.. [Korean comment]
 
 	////////////////////////////////////////////////////////////
 	// 필터링 텍스처는... MipMap 만든다..
@@ -387,7 +387,7 @@ HRESULT CDFont::SetText(const std::string& szText, uint32_t dwFlags)
 
 			if(lpSurfSrc && lpSurfDest)
 			{
-				::D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr, D3DX_FILTER_TRIANGLE, 0); // 서피스 복사
+				::D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr, D3DX_FILTER_TRIANGLE, 0); // 서피스 복사 [Korean comment]
 			}
 
 			if(lpSurfSrc) lpSurfSrc->Release();
@@ -423,11 +423,11 @@ void CDFont::Make2DVertex(const int iFontHeight, const std::string& szText)
 	int iCount = 0; int iTempCount = 0;
 
 	char	szTempChar[3] = "";
-	uint32_t dwColor = 0xffffffff;			// 폰트의 색
+	uint32_t dwColor = 0xffffffff;			// 폰트의 색 Color
 	m_dwFontColor = 0xffffffff;
 	SIZE size;
 
-	float fMaxX = 0.0f, fMaxY = 0.0f;	// 글씨가 찍히는 범위의 최대 최소값을 조사하기 위해서.
+	float fMaxX = 0.0f, fMaxY = 0.0f;	// 글씨가 찍히는 범위의 최대 최소값을 조사하기 위해서. [Korean comment]
 
 	while(iCount<iStrLen)
 	{
@@ -435,7 +435,7 @@ void CDFont::Make2DVertex(const int iFontHeight, const std::string& szText)
 		{
 			++iCount;
 
-			// vertex 만들기
+			// vertex 만들기 [Korean comment]
 			if (sx != x)
 			{
 				FLOAT tx1 = ((FLOAT)(sx))/m_dwTexWidth;
@@ -446,7 +446,7 @@ void CDFont::Make2DVertex(const int iFontHeight, const std::string& szText)
 				FLOAT w = (tx2-tx1) *  m_dwTexWidth / m_fTextScale;
 				FLOAT h = (ty2-ty1) * m_dwTexHeight / m_fTextScale;
 
-				__ASSERT(dwNumTriangles+2 < MAX_NUM_VERTICES, "??");		// Vertex buffer가 모자란다.
+				__ASSERT(dwNumTriangles+2 < MAX_NUM_VERTICES, "??");		// Vertex buffer가 모자란다. [Korean comment]
 				if (dwNumTriangles+2 >= MAX_NUM_VERTICES) break;
 
 				FLOAT fLeft = vtx_sx+0-0.5f;	FLOAT fRight  = vtx_sx+w-0.5f;
@@ -464,18 +464,18 @@ void CDFont::Make2DVertex(const int iFontHeight, const std::string& szText)
 				if (fMaxY < fBottom) fMaxY = fBottom;
 
 			}
-			// 화면의 다음 줄로 넘기기
+			// 화면의 다음 줄로 넘기기 [Korean comment]
 			sx = x;
 			vtx_sx = 0;	vtx_sy = vtx_sy + ((float)(iFontHeight)) / m_fTextScale;
 			continue;
 		}
-		else if (0x80 & szText[iCount])	// 2BYTE 문자
+		else if (0x80 & szText[iCount])	// 2BYTE 문자 [Korean comment]
 		{
 			memcpy(szTempChar, &(szText[iCount]), 2);
 			iCount += 2;
 			szTempChar[2] = 0x00;
 		}
-		else								// 1BYTE 문자
+		else								// 1BYTE 문자 [Korean comment]
 		{
 			memcpy(szTempChar, &(szText[iCount]), 1);
 			iCount += 1;
@@ -485,8 +485,8 @@ void CDFont::Make2DVertex(const int iFontHeight, const std::string& szText)
 		SelectObject(s_hDC, m_hFont);
 		GetTextExtentPoint32( s_hDC, szTempChar, lstrlen(szTempChar), &size );
 		if ( (x + size.cx) > m_dwTexWidth)	
-		{	// vertex 만들고 다음 줄로 넘기기..
-			// vertex 만들기
+		{	// vertex 만들고 다음 줄로 넘기기.. [Korean comment]
+			// vertex 만들기 [Korean comment]
 			if (sx != x)
 			{
 				FLOAT tx1 = ((FLOAT)(sx))/m_dwTexWidth;
@@ -497,7 +497,7 @@ void CDFont::Make2DVertex(const int iFontHeight, const std::string& szText)
 				FLOAT w = (tx2-tx1) *  m_dwTexWidth / m_fTextScale;
 				FLOAT h = (ty2-ty1) * m_dwTexHeight / m_fTextScale;
 
-				__ASSERT(dwNumTriangles+2 < MAX_NUM_VERTICES, "??");		// Vertex buffer가 모자란다.
+				__ASSERT(dwNumTriangles+2 < MAX_NUM_VERTICES, "??");		// Vertex buffer가 모자란다. [Korean comment]
 				if (dwNumTriangles+2 >= MAX_NUM_VERTICES) break;
 
 				FLOAT fLeft = vtx_sx+0-0.5f;	FLOAT fRight  = vtx_sx+w-0.5f;
@@ -513,7 +513,7 @@ void CDFont::Make2DVertex(const int iFontHeight, const std::string& szText)
 				if (fMaxX < fRight ) fMaxX = fRight;
 				if (fMaxY < fBottom) fMaxY = fBottom;
 
-				// 텍스쳐의 다음 줄로 넘기기
+				// 텍스쳐의 다음 줄로 넘기기 [Korean comment]
 				x = sx = 0;	y += iFontHeight;
 				vtx_sx = vtx_sx+w;
 			}
@@ -523,7 +523,7 @@ void CDFont::Make2DVertex(const int iFontHeight, const std::string& szText)
 			}
 		}
 		
-		// dc에 찍기
+		// dc에 찍기 [Korean comment]
 		SelectObject(s_hDC, m_hFont);
 		ExtTextOut( s_hDC, x, y, ETO_OPAQUE, nullptr, szTempChar, lstrlen(szTempChar), nullptr );		
 		x += size.cx;
@@ -540,7 +540,7 @@ void CDFont::Make2DVertex(const int iFontHeight, const std::string& szText)
 		FLOAT w = (tx2-tx1) *  m_dwTexWidth / m_fTextScale;
 		FLOAT h = (ty2-ty1) * m_dwTexHeight / m_fTextScale;
 
-		__ASSERT(dwNumTriangles+2 < MAX_NUM_VERTICES, "??");		// Vertex buffer가 모자란다.
+		__ASSERT(dwNumTriangles+2 < MAX_NUM_VERTICES, "??");		// Vertex buffer가 모자란다. [Korean comment]
 
 		FLOAT fLeft = vtx_sx+0-0.5f;	FLOAT fRight  = vtx_sx+w-0.5f;
 		FLOAT fTop  = vtx_sy+0-0.5f;	FLOAT fBottom = vtx_sy+h-0.5f;
@@ -586,7 +586,7 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 	char	szTempChar[3] = "";
 	SIZE size;
 
-	float fMaxX = 0.0f, fMaxY = 0.0f;	// 글씨가 찍히는 범위의 최대 최소값을 조사하기 위해서.
+	float fMaxX = 0.0f, fMaxY = 0.0f;	// 글씨가 찍히는 범위의 최대 최소값을 조사하기 위해서. [Korean comment]
 
 	while(iCount<iStrLen)
 	{
@@ -594,7 +594,7 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 		{
 			++iCount;
 
-			// vertex 만들기
+			// vertex 만들기 [Korean comment]
 			if (sx != x)
 			{
 				FLOAT tx1 = ((FLOAT)(sx))/m_dwTexWidth;
@@ -605,7 +605,7 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 				FLOAT w = (tx2-tx1) *  m_dwTexWidth / m_fTextScale;
 				FLOAT h = (ty2-ty1) * m_dwTexHeight / m_fTextScale;
 
-				__ASSERT(dwNumTriangles+2 < MAX_NUM_VERTICES, "??");		// Vertex buffer가 모자란다.
+				__ASSERT(dwNumTriangles+2 < MAX_NUM_VERTICES, "??");		// Vertex buffer가 모자란다. [Korean comment]
 				if (dwNumTriangles+2 >= MAX_NUM_VERTICES) break;
 
 				FLOAT fLeft = vtx_sx+0;	FLOAT fRight  = vtx_sx+w;
@@ -621,18 +621,18 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 				if (fMaxX < fRight ) fMaxX = fRight;
 				if (fMaxY < (-fBottom)) fMaxY = (-fBottom);
 			}
-			// 화면의 다음 줄로 넘기기
+			// 화면의 다음 줄로 넘기기 [Korean comment]
 			sx = x;
 			vtx_sx = 0;	vtx_sy = vtx_sy - ((float)(iFontHeight)) / m_fTextScale;
 			continue;
 		}
-		else if (0x80 & szText[iCount])	// 2BYTE 문자
+		else if (0x80 & szText[iCount])	// 2BYTE 문자 [Korean comment]
 		{
 			memcpy(szTempChar, &(szText[iCount]), 2);
 			iCount += 2;
 			szTempChar[2] = 0x00;
 		}
-		else								// 1BYTE 문자
+		else								// 1BYTE 문자 [Korean comment]
 		{
 			memcpy(szTempChar, &(szText[iCount]), 1);
 			iCount += 1;
@@ -642,8 +642,8 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 		SelectObject(s_hDC, m_hFont);
 		GetTextExtentPoint32( s_hDC, szTempChar, lstrlen(szTempChar), &size );
 		if ( (x + size.cx) > m_dwTexWidth)	
-		{	// vertex 만들고 다음 줄로 넘기기..
-			// vertex 만들기
+		{	// vertex 만들고 다음 줄로 넘기기.. [Korean comment]
+			// vertex 만들기 [Korean comment]
 			if (sx != x)
 			{
 				FLOAT tx1 = ((FLOAT)(sx))/m_dwTexWidth;
@@ -654,7 +654,7 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 				FLOAT w = (tx2-tx1) *  m_dwTexWidth / m_fTextScale;
 				FLOAT h = (ty2-ty1) * m_dwTexHeight / m_fTextScale;
 
-				__ASSERT(dwNumTriangles+2 < MAX_NUM_VERTICES, "??");		// Vertex buffer가 모자란다.
+				__ASSERT(dwNumTriangles+2 < MAX_NUM_VERTICES, "??");		// Vertex buffer가 모자란다. [Korean comment]
 				if (dwNumTriangles+2 >= MAX_NUM_VERTICES) break;
 
 				FLOAT fLeft = vtx_sx+0;	FLOAT fRight  = vtx_sx+w;
@@ -669,7 +669,7 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 				if (fMaxX < fRight ) fMaxX = fRight;
 				if (fMaxY < (-fBottom)) fMaxY = (-fBottom);
 
-				// 텍스쳐의 다음 줄로 넘기기
+				// 텍스쳐의 다음 줄로 넘기기 [Korean comment]
 				x = sx = 0;	y += iFontHeight;
 				vtx_sx = vtx_sx+w;
 			}
@@ -679,7 +679,7 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 			}
 		}
 		
-		// dc에 찍기
+		// dc에 찍기 [Korean comment]
 		SelectObject(s_hDC, m_hFont);
 		ExtTextOut( s_hDC, x, y, ETO_OPAQUE, nullptr, szTempChar, lstrlen(szTempChar), nullptr );		
 		x += size.cx;
@@ -696,7 +696,7 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 		FLOAT w = (tx2-tx1) *  m_dwTexWidth / m_fTextScale;
 		FLOAT h = (ty2-ty1) * m_dwTexHeight / m_fTextScale;
 
-		__ASSERT(dwNumTriangles+2 < MAX_NUM_VERTICES, "??");		// Vertex buffer가 모자란다.
+		__ASSERT(dwNumTriangles+2 < MAX_NUM_VERTICES, "??");		// Vertex buffer가 모자란다. [Korean comment]
 
 		FLOAT fLeft = vtx_sx+0;	FLOAT fRight  = vtx_sx+w;
 		FLOAT fTop  = vtx_sy+0;	FLOAT fBottom = vtx_sy-h;
@@ -714,7 +714,7 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 	int i;
 	if (dwFlags & D3DFONT_CENTERED)	// 가운데 정렬이면 vertex좌표를 가운데로 계산해서 고쳐넣기
 	{
-		// 제일 긴 줄 찾기..
+		// 제일 긴 줄 찾기.. [Korean comment]
 		int iRectangleCount = dwNumTriangles/2;
 
 		int iContinueCount = 1;
@@ -731,12 +731,12 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 			while( iCount + iContinueCount < iRectangleCount)
 			{
 				if (TempVertices[(iCount + iContinueCount)*6].y == fCY)
-				{	// 다음 사각형과 같은 줄이다.
+				{	// 다음 사각형과 같은 줄이다. [Korean comment]
 					fCX = TempVertices[(iCount + iContinueCount)*6 + 3].x;
 					++iContinueCount;
 				}
 				else
-				{	// 다음 사각형과 다른 줄이다.
+				{	// 다음 사각형과 다른 줄이다. [Korean comment]
 					break;
 				}
 			}
@@ -751,7 +751,7 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 		}
 	}
 
-	// Vertex buffer로 옮기기.
+	// Vertex buffer로 옮기기. [Korean comment]
 	// lock vertex buffer
 	if (FAILED(m_pVB->Lock(0, 0, (void**) &pVertices, 0)))
 		return;
@@ -759,8 +759,8 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 	iCount = dwNumTriangles*3;
 	for (i=0; i<iCount; ++i)
 	{
-		TempVertices[i].x /= ((float)m_dwFontHeight);			// 일정 크기로 줄이기
-		TempVertices[i].y /= ((float)m_dwFontHeight);			// 일정 크기로 줄이기
+		TempVertices[i].x /= ((float)m_dwFontHeight);			// 일정 크기로 줄이기 Size
+		TempVertices[i].y /= ((float)m_dwFontHeight);			// 일정 크기로 줄이기 Size
 
 		*pVertices++ = TempVertices[i];
 	}
@@ -785,7 +785,7 @@ HRESULT CDFont::DrawText( FLOAT sx, FLOAT sy, uint32_t dwColor, uint32_t dwFlags
     if( m_pd3dDevice == nullptr || !m_Is2D)
         return E_FAIL;
 
-	// 위치 색 조정
+	// 위치 색 조정 Position
 	D3DXVECTOR2 vDiff = D3DXVECTOR2(sx, sy) - m_PrevLeftTop;
 	if ( fabs(vDiff.x)>0.5f || fabs(vDiff.y)>0.5f || dwColor != m_dwFontColor)
 	{
@@ -1093,7 +1093,7 @@ void CDFont::AddToAlphaManager(uint32_t dwColor, float fDist, __Matrix44& mtxWor
 		dwFVF = FVF_TRANSFORMED;
 		dwFVFSize = sizeof(__VertexTransformed);
 
-		// 위치 색 조정
+		// 위치 색 조정 Position
 		D3DXVECTOR2 vDiff = D3DXVECTOR2(mtxWorld._41, mtxWorld._42) - m_PrevLeftTop;
 		if ( fabs(vDiff.x)>0.5f || fabs(vDiff.y)>0.5f || dwColor != m_dwFontColor)
 		{
@@ -1159,5 +1159,5 @@ void CDFont::AddToAlphaManager(uint32_t dwColor, float fDist, __Matrix44& mtxWor
 	pAP->pwIndices			= nullptr;
 	pAP->MtxWorld			= mtxWorld;
 
-	if(!(dwFlags & D3DFONT_FILTERED)) pAP->nRenderFlags |= RF_POINTSAMPLING; // 필터링 텍스트를 쓰지 않는다.
+	if(!(dwFlags & D3DFONT_FILTERED)) pAP->nRenderFlags |= RF_POINTSAMPLING; // 필터링 텍스트를 쓰지 않는다. [Korean comment]
 }

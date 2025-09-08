@@ -39,7 +39,7 @@ void CN3PMeshCreate::swap_triangle(uint16_t *t1, uint16_t *t2)
 	swap(t1[2], t2[2]);
 }
 
-// 없어질 삼각형의 넓이 계산, 혹은 변의 길이의 합
+// 없어질 삼각형의 넓이 계산, 혹은 변의 길이의 합 Calculate
 float CN3PMeshCreate::GetTriCollapsesLoss(uint16_t* pTriIndex, bool bArea)
 {
 	// These are the corners of the triangle.
@@ -110,7 +110,7 @@ void CN3PMeshCreate::combine_modified(float &sofar, uint16_t *tri, int which, in
 	// The angle change weighted by the area of the triangle.
 	float weighted_angle_change = (1.0f - cosangdiff) * (oldarea + newarea);
 	if (weighted_angle_change<0.0f) weighted_angle_change = 0.0f;	// cosangdiff가 1보다 아주 조금 클때가 있어서 weighted_angle_change가 -값이 나올때가 있다.
-	//__ASSERT(weighted_angle_change>=0.0f, "weighted_angle_change > 0 이어야 한다.");
+	//__ASSERT(weighted_angle_change>=0.0f, "weighted_angle_change > 0 이어야 한다."); [Korean comment]
 
 	// These numbers are not in the same "units", one being length^3 and the other length^2
 	// And let's put some arbitrary weighting on these things.
@@ -242,13 +242,13 @@ void CN3PMeshCreate::Collapse(uint16_t& pt_to, uint16_t& pt_from, float edge_val
 
 						// So, this triangle became redundant. Try the next triangle,
 						// but don't increment tri_index.
-						// 이번에 검사한 삼각형은 사라졌다. 리스트 맨뒤로 보냈으니
-						// tri_index는 중가시키지 않는다.
+						// 이번에 검사한 삼각형은 사라졌다. 리스트 맨뒤로 보냈으니 Check
+						// tri_index는 중가시키지 않는다. [Korean comment]
 						goto try_same_triangle_location;
 					}
 				}
 
-				// 여기에 오면 이 삼각형은 사라지는 삼각형은 아니다. 그러나 한 점이 다른점으로 옮겨진다.
+				// 여기에 오면 이 삼각형은 사라지는 삼각형은 아니다. 그러나 한 점이 다른점으로 옮겨진다. [Korean comment]
 				// This triangle isn't degenerate if we've got here. But it does
 				// have a reference to the collapsing vertex. This is fine - it can
 				// now just refer to the non-collapsing vertex.
@@ -542,7 +542,7 @@ bool CN3PMeshCreate::FindACollapse(float &val_so_far)
 	Collapse(be_index_a, be_index_b, val_so_far);
 
 #ifdef _SAME_VERTEXPOS
-	// 같은 점 찾기
+	// 같은 점 찾기 [Korean comment]
 	int i;
 	for (i=0; i<m_iNumVertices; ++i)
 	{
@@ -624,7 +624,7 @@ CN3PMesh *CN3PMeshCreate::CreateRendererMesh()
 		fTempValue = src.Value;
 	}
 
-	// mesh 정보
+	// mesh 정보 Info
 	pPMesh->m_iMaxNumIndices  = m_iOriginalNumIndices ;
 	pPMesh->m_iMaxNumVertices = m_iOriginalNumVertices;
 	pPMesh->m_iMinNumIndices  = m_iNumIndices ;
@@ -654,8 +654,8 @@ int CN3PMeshCreate::ReGenerate(CN3PMesh *pPMesh)
 	if(nullptr == pPMesh) return -1;
 	
 	this->Release();
-	this->ConvertFromN3PMesh(pPMesh); // Mesh 로 부터 만들기..
-	this->CreateCollapseList(); // Progressive Mesh 처리..
+	this->ConvertFromN3PMesh(pPMesh); // Mesh 로 부터 만들기.. [Korean comment]
+	this->CreateCollapseList(); // Progressive Mesh 처리.. Process
 
 	pPMesh->m_iTotalIndexChanges = m_iTotalIndexChanges;
 	if (m_iTotalIndexChanges>0)
@@ -696,7 +696,7 @@ int CN3PMeshCreate::ReGenerate(CN3PMesh *pPMesh)
 		fTempValue = src.Value;
 	}
 
-	// mesh 정보
+	// mesh 정보 Info
 	pPMesh->m_iMinNumIndices  = m_iNumIndices ;
 	pPMesh->m_iMinNumVertices = m_iNumVertices;
 
@@ -786,7 +786,7 @@ void CN3PMeshCreate::SwapToEnd(uint16_t swapper, __PMCEdgeCollapse *collapses, _
 	}
 }
 
-bool CN3PMeshCreate::ConvertFromN3Mesh(CN3Mesh* pN3Mesh)	// N3Mesh -> CN3PMeshCreate 로 컨버팅..
+bool CN3PMeshCreate::ConvertFromN3Mesh(CN3Mesh* pN3Mesh)	// N3Mesh -> CN3PMeshCreate 로 컨버팅.. [Korean comment]
 {
 	if (pN3Mesh == nullptr) return false;
 	Release();
@@ -823,7 +823,7 @@ bool CN3PMeshCreate::ConvertFromN3PMesh(CN3PMesh* pN3PMesh)
 	if (pN3PMesh == nullptr) return false;
 	Release();
 
-	CN3PMesh* pPMeshTmp = CN3Base::s_MngPMesh.Get(pN3PMesh->FileName()); // 이래야 참조 카운트가 하나 늘어서 포인터가 안없어진다.
+	CN3PMesh* pPMeshTmp = CN3Base::s_MngPMesh.Get(pN3PMesh->FileName()); // 이래야 참조 카운트가 하나 늘어서 포인터가 안없어진다. Count
 	CN3PMeshInstance PMeshInst(pN3PMesh);
 	PMeshInst.SetLODByNumVertices(pN3PMesh->GetMaxNumVertices());
 
@@ -873,7 +873,7 @@ float CN3PMeshCreate::GetLossOfSamePosVertex(uint16_t pt_to, uint16_t pt_from)
 			m_pVertices[i].y == y &&
 			m_pVertices[i].z == z )
 		{
-			// i는 같은 위치를 가진 버텍스의 인덱스
+			// i는 같은 위치를 가진 버텍스의 인덱스 Position
 			uint16_t* tri;
 			for (tri = m_pIndices; tri<m_pIndices+m_iNumIndices; tri += 3)
 			{

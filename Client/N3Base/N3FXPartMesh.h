@@ -19,8 +19,8 @@ public:
 	uint32_t		m_dwCurrColor;	//
 	
 	char		m_cTextureMoveDir;	//텍스쳐 이동 방향..1:up 2:down, 3:left, 4:right
-	float		m_fu;				//텍스쳐 이동 속도
-	float		m_fv;				//텍스쳐 이동 속도
+	float		m_fu;				//텍스쳐 이동 속도 Move
+	float		m_fv;				//텍스쳐 이동 속도 Move
 
 	__Vector3	m_vUnitScale;
 	__Vector3	m_vScaleVel;
@@ -40,13 +40,13 @@ protected:
 	bool	IsDead();
 
 public:
-	void	Init();				//	각종 변수들을 처음 로딩한 상태로 초기화...
-	void	Start();			//	파트 구동 시작.
-	void	Stop();				//	파트 구동 멈춤..
+	void	Init();				//	각종 변수들을 처음 로딩한 상태로 초기화... Initialize
+	void	Start();			//	파트 구동 시작. [Korean comment]
+	void	Stop();				//	파트 구동 멈춤.. [Korean comment]
 	bool	Tick();				//	ticktick...
-	void	Render();			//	화면에 뿌리기..
-	bool	Load(HANDLE hFile);	//	게임파일 불러오기.
-	bool	Save(HANDLE hFile);	//	게임파일 저장오기.
+	void	Render();			//	화면에 뿌리기.. [Korean comment]
+	bool	Load(HANDLE hFile);	//	게임파일 불러오기. File
+	bool	Save(HANDLE hFile);	//	게임파일 저장오기. Save
 	void	Duplicate(CN3FXPartMesh* pSrc);
 		
 public:

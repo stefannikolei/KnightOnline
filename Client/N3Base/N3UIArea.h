@@ -49,7 +49,7 @@ public:
 #endif
 
 #ifdef _N3TOOL
-// 툴에서 사용하기 위한 함수
+// 툴에서 사용하기 위한 함수 Function
 	virtual void	operator = (const CN3UIArea& other);
 	virtual bool	Save(HANDLE hFile);
 #endif

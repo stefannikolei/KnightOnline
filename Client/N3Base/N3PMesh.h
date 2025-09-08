@@ -16,7 +16,7 @@ class CN3PMesh : public CN3BaseFileAccess
 friend class CN3FXPMeshInstance;
 friend class CN3PMeshInstance;
 friend class CN3PMeshCreate;
-friend class CPMeshEditor;			// N3Viewer의 클래스
+friend class CPMeshEditor;			// N3Viewer의 클래스 [Korean comment]
 
 public:
 	struct  __LODCtrlValue
@@ -33,13 +33,13 @@ public:
 		//int *IndexChanges;
 		int iIndexChanges;	// 포인터 대신 n번째 저장 (0, 1, 2,...)
 		int CollapseTo;
-		bool	bShouldCollapse;	// 여기서 병합/나누기를 멈추면 구멍이 뚤린다. 다음단계를 더 진행해야함.
+		bool	bShouldCollapse;	// 여기서 병합/나누기를 멈추면 구멍이 뚤린다. 다음단계를 더 진행해야함. [Korean comment]
 	};
 
 protected:
 
 	//int m_iNumMaterials;
-	int m_iNumCollapses;			// 삼각형 병합 리스트
+	int m_iNumCollapses;			// 삼각형 병합 리스트 [Korean comment]
 	int m_iTotalIndexChanges;
 	int *m_pAllIndexChanges; // All the index changes
 
@@ -48,7 +48,7 @@ protected:
 
 	__EdgeCollapse	*m_pCollapses;
 
-	// Mesh 정보
+	// Mesh 정보 Info
 	__VertexT1*		m_pVertices;
 	__VertexT2*		m_pVertices2;
 	uint16_t*			m_pIndices;
@@ -56,8 +56,8 @@ protected:
 	int m_iMaxNumVertices, m_iMaxNumIndices;
 	int m_iMinNumVertices, m_iMinNumIndices;
 
-	__Vector3	m_vMin, m_vMax; // 최대 최소값..
-	float		m_fRadius; // 반지름
+	__Vector3	m_vMin, m_vMax; // 최대 최소값.. [Korean comment]
+	float		m_fRadius; // 반지름 [Korean comment]
 
 	// LOD 조정 정보..(거리에 따라서 Vertex의 수를 조정할 수 있다.)
 	int					m_iLODCtrlValueCount;
@@ -81,8 +81,8 @@ public:
 //	__PMLODCtrlValue*	GetLODCtrlValue(int iIndex) const {if (iIndex>=0&&m_iLODCtrlValueCount>iIndex)return m_pLODCtrlValues+iIndex; return nullptr;}
 //	void				SetLODCtrlValues(__PMLODCtrlValue* pValues) {m_pLODCtrlValues = pValues;}
 
-	__Vector3 Min() { return m_vMin; } // 월드 행렬을 적용하지 않은상태의 최소값이다.
-	__Vector3 Max() { return m_vMax; } // 월드 행렬을 적용하지 않은상태의 최대값이다.
+	__Vector3 Min() { return m_vMin; } // 월드 행렬을 적용하지 않은상태의 최소값이다. Status
+	__Vector3 Max() { return m_vMax; } // 월드 행렬을 적용하지 않은상태의 최대값이다. Status
 
 	void Release();
 	HRESULT Create(int iNumVertices, int iNumIndices);

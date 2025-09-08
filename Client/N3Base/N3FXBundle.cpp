@@ -77,7 +77,7 @@ CN3FXBundle::~CN3FXBundle()
 
 //
 //	decode script file..
-//	스크립트 파일 읽고 해석시킴...
+//	스크립트 파일 읽고 해석시킴... File
 //
 #ifdef _N3TOOL
 bool CN3FXBundle::DecodeScriptFile(const char* lpPathName)
@@ -123,7 +123,7 @@ bool CN3FXBundle::DecodeScriptFile(const char* lpPathName)
 
 		if(lstrcmpi(szCommand, "<part>")==0)
 		{
-			//full path 만들기..	
+			//full path 만들기..	 [Korean comment]
 			std::string szFullPath = fmt::format("{}{}", CN3Base::PathGet(), szBuf[0]);
 			
 			FXPARTWITHSTARTTIME* pPart = new FXPARTWITHSTARTTIME;
@@ -172,7 +172,7 @@ bool CN3FXBundle::DecodeScriptFile(const char* lpPathName)
 
 //
 //	GetPartType...
-//	파트의 파일이름으로 타입을 알아내자..
+//	파트의 파일이름으로 타입을 알아내자.. File
 //
 #ifdef _N3TOOL
 CN3FXPartBase* CN3FXBundle::SetPart(const char* pFileName)
@@ -210,7 +210,7 @@ CN3FXPartBase* CN3FXBundle::SetPart(const char* pFileName)
 			else if(lstrcmpi(szBuf[0], "board")==0) PartType = FX_PART_TYPE_BOARD;
 			else if(lstrcmpi(szBuf[0], "mesh")==0) PartType = FX_PART_TYPE_MESH;
 			else if(lstrcmpi(szBuf[0], "ground")==0) PartType = FX_PART_TYPE_BOTTOMBOARD;
-			//^^v 더 넣을꺼 있으면 넣어라..
+			//^^v 더 넣을꺼 있으면 넣어라.. [Korean comment]
 		}		
 	}
 	fclose(stream);
@@ -490,7 +490,7 @@ void CN3FXBundle::Trigger(int iSourceID, int iTargetID, int iTargetJoint, int iS
 
 //
 //	Stop...
-//	멈추는 단계를 시작한다..
+//	멈추는 단계를 시작한다.. [Korean comment]
 //	정말 멈추는 기능은 tick에서 모든 파트가 다 죽었다고 판단될때 tick에서 수행한다.
 //
 void CN3FXBundle::Stop(bool immediately)

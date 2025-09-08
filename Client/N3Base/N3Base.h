@@ -32,7 +32,7 @@ const uint32_t TEX_CAPS_MIPMAP =		0x00000040;
 const uint32_t TEX_CAPS_POW2 =			0x00000080;
 
 const float CAMERA_RADIUS_UNIT = 2.0f;
-const int MAX_CAMERA_RADIUS = 512; // 2미터 단위로 128 개의 도트 프로덕트 미리 계산해 놓는다..
+const int MAX_CAMERA_RADIUS = 512; // 2미터 단위로 128 개의 도트 프로덕트 미리 계산해 놓는다.. Calculate
 
 enum TIMER_COMMAND { TIMER_RESET, TIMER_START, TIMER_STOP, TIMER_ADVANCE,
                      TIMER_GETABSOLUTETIME, TIMER_GETAPPTIME, TIMER_GETELAPSEDTIME };
@@ -56,7 +56,7 @@ struct __CameraData
 
 	float			fFOV; // 카메라 렌즈 각 : Field Of View
 //	float			fInverse_SineHalfOfFOV;
-	float			fAspect; // 종횡비
+	float			fAspect; // 종횡비 [Korean comment]
 	float			fNP; // NearPlane
 	float			fFP; // FarPlane
 	D3DVIEWPORT9	vp; // ViewPort;
@@ -66,12 +66,12 @@ struct __CameraData
 
 	float			fFrustum [6][4];
 
-	// fRadius - 물체의 반지름보다 약간 더 여유 있게 잡고 넣으면 그만큼 클리핑을 여유있게 한다..
+	// fRadius - 물체의 반지름보다 약간 더 여유 있게 잡고 넣으면 그만큼 클리핑을 여유있게 한다.. [Korean comment]
 	BOOL IsOutOfFrustum(const __Vector3& vPosition, float fRadius) 
-		// 미리 계산된 카메라 평면의 도트 프로덕트 값을 기준으로 카메라 사면체 밖에 있으면  참을 돌려준다.
+		// 미리 계산된 카메라 평면의 도트 프로덕트 값을 기준으로 카메라 사면체 밖에 있으면  참을 돌려준다. Calculate
 	{
 		if((vEye - vPosition).Magnitude() > fFP + fRadius) 
-			return TRUE; // Far Plane 거리체크
+			return TRUE; // Far Plane 거리체크 Check
 
 		int p;
 		for( p = 0; p < 6; p++ )
@@ -88,16 +88,16 @@ struct __RenderInfo
 {
 	int nShape;
 	int nShape_Part;
-	int nShape_Polygon; // 단순 폴리곤
+	int nShape_Polygon; // 단순 폴리곤 [Korean comment]
 	
 	int nChr;
 	int nChr_Part;
-	int nChr_Polygon; // 캐릭터 폴리곤
-	int nChr_Plug; // 캐릭터에 붙은 무기등..
-	int	nChr_Plug_Polygon; // 캐릭터에 붙은 무기등의 폴리곤..
+	int nChr_Polygon; // 캐릭터 폴리곤 Character
+	int nChr_Plug; // 캐릭터에 붙은 무기등.. Character
+	int	nChr_Plug_Polygon; // 캐릭터에 붙은 무기등의 폴리곤.. Character
 
-	int nTerrain_Polygon; // 타일 적용된 지형 폴리곤..
-	int nTerrain_Tile_Polygon; // 타일 적용된 지형 폴리곤..
+	int nTerrain_Polygon; // 타일 적용된 지형 폴리곤.. [Korean comment]
+	int nTerrain_Tile_Polygon; // 타일 적용된 지형 폴리곤.. [Korean comment]
 
 	int nAlpha_Polygon;
 	
@@ -124,21 +124,21 @@ struct __ResrcInfo
 struct __Options
 {
 	int iUseShadow;
-	int iTexLOD_Chr;			// 0 - 원래 크기.. 1 - 한단계 작게. 2 - 두단계 작게..
-	int iTexLOD_Shape;			// 0 - 원래 크기.. 1 - 한단계 작게. 2 - 두단계 작게..
-	int iTexLOD_Terrain;		// 0 - 원래 크기.. 1 - 한단계 작게. 2 - 두단계 작게..
+	int iTexLOD_Chr;			// 0 - 원래 크기.. 1 - 한단계 작게. 2 - 두단계 작게.. Size
+	int iTexLOD_Shape;			// 0 - 원래 크기.. 1 - 한단계 작게. 2 - 두단계 작게.. Size
+	int iTexLOD_Terrain;		// 0 - 원래 크기.. 1 - 한단계 작게. 2 - 두단계 작게.. Size
 	int iViewWidth;
 	int iViewHeight;
 	int iViewColorDepth;
 	int iViewDist;
-	int iEffectSndDist;			// 이펙트 사운드 거리
+	int iEffectSndDist;			// 이펙트 사운드 거리 [Korean comment]
 
 	bool bSndEnable;
 	bool bSndBgmEnable;
 	bool bSndEffectEnable;
-	bool bSndDuplicated;	// 중복된 음원 사용
+	bool bSndDuplicated;	// 중복된 음원 사용 [Korean comment]
 
-	bool bWindowCursor;		// 0 - 게임에서 그려주는 커서 1 - 윈도우 커서 사용
+	bool bWindowCursor;		// 0 - 게임에서 그려주는 커서 1 - 윈도우 커서 사용 Window
 	bool bWindowMode;
 
 	bool bVSyncEnabled;
@@ -172,34 +172,34 @@ struct __Options
 class CN3Base
 {
 public:
-	static LPDIRECT3DDEVICE9		s_lpD3DDev; // Device 참조 포인터.. 멋대로 해제하면 안된다..
+	static LPDIRECT3DDEVICE9		s_lpD3DDev; // Device 참조 포인터.. 멋대로 해제하면 안된다.. [Korean comment]
 	static D3DPRESENT_PARAMETERS	s_DevParam; // Device 생성 Present Parameter
-	static D3DCAPS9					s_DevCaps; // Device 호환성...
+	static D3DCAPS9					s_DevCaps; // Device 호환성... [Korean comment]
 	static uint32_t					s_dwTextureCaps; // Texture 지원.. DXT1 ~ DXT5, Square Only
 	static HWND						s_hWndBase; // Init 할때 쓴 Window Handle
 	static HWND						s_hWndPresent; // 최근에 Present 한 Window Handle
 
-	static __CameraData				s_CameraData; // 카메라 데이터 정적 변수..
+	static __CameraData				s_CameraData; // 카메라 데이터 정적 변수.. Variable
 	static __ResrcInfo				s_ResrcInfo; // Rendering Information..
-	static __Options				s_Options;	// 각종 옵션등...
+	static __Options				s_Options;	// 각종 옵션등... [Korean comment]
 #ifdef _DEBUG
 	static __RenderInfo				s_RenderInfo; // Rendering Information..
 #endif
 	static float					s_fFrmPerSec; // Frame Per Second
-	static float					s_fSecPerFrm; // Second Per Frame = 1.0f/s_fFrmPerSec (Dino가 추가)
+	static float					s_fSecPerFrm; // Second Per Frame = 1.0f/s_fFrmPerSec (Dino가 추가) Add
 	
-#ifdef _N3GAME // 게임이 아닌 툴에서는 필요없다...
+#ifdef _N3GAME // 게임이 아닌 툴에서는 필요없다... [Korean comment]
 	static CN3SndMgr				s_SndMgr;
 #endif
-#ifdef _N3TOOL	// ui 에디터일때는 필요하다.
+#ifdef _N3TOOL	// ui 에디터일때는 필요하다. [Korean comment]
 	static CN3SndMgr				s_SndMgr;
 #endif
 
-	static CN3AlphaPrimitiveManager	s_AlphaMgr; // Alpha blend 할 폴리곤들을 관리.. 추가했다가.. 카메라 거리에 ?上?정렬하고 한꺼번에 그린다..
+	static CN3AlphaPrimitiveManager	s_AlphaMgr; // Alpha blend 할 폴리곤들을 관리.. 추가했다가.. 카메라 거리에 ?上?정렬하고 한꺼번에 그린다.. Add
 
 	static CN3Mng<class CN3Texture>		s_MngTex; // Texture Manager
 	static CN3Mng<class CN3Mesh>		s_MngMesh; // Normal Mesh Manager
-	static CN3Mng<class CN3VMesh>		s_MngVMesh; // 단순히 폴리곤만 갖고 있는 메시 - 주로 충돌 체크에 쓴다..
+	static CN3Mng<class CN3VMesh>		s_MngVMesh; // 단순히 폴리곤만 갖고 있는 메시 - 주로 충돌 체크에 쓴다.. Check
 	static CN3Mng<class CN3PMesh>		s_MngPMesh; // Progressive Mesh Manager
 	static CN3Mng<class CN3Joint>		s_MngJoint; // Joint Manager
 	static CN3Mng<class CN3CPartSkins>	s_MngSkins; // Character Part Skin Manager
@@ -209,10 +209,10 @@ public:
 	
 
 protected:
-	static std::string 				s_szPath; // 프로그램이 실행된 경로.. 
+	static std::string 				s_szPath; // 프로그램이 실행된 경로..  [Korean comment]
 
 protected:
-	uint32_t							m_dwType; // "MESH", "CAMERA", "SCENE", "???" .... 등등등...
+	uint32_t							m_dwType; // "MESH", "CAMERA", "SCENE", "???" .... 등등등... [Korean comment]
 
 public:
 	std::string 					m_szName;
@@ -227,7 +227,7 @@ public:
 	
 	static float		TimerProcess( TIMER_COMMAND command );
 
-	uint32_t				Type() { return m_dwType; } // 객체 종류..
+	uint32_t				Type() { return m_dwType; } // 객체 종류.. Type
 
 	void				ReleaseResrc();
 //#ifdef _N3TOOL

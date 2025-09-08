@@ -32,8 +32,8 @@ protected:
 	class CN3FXBundle*	m_pFXB;
 	int					m_nRefIndex;	// referance index (캐릭터 : joint index)
 
-	__Vector3			m_vOffsetPos;	// Joint와 떨어진 정도
-	__Vector3			m_vOffsetDir;	// Joint와 떨어진 방향
+	__Vector3			m_vOffsetPos;	// Joint와 떨어진 정도 [Korean comment]
+	__Vector3			m_vOffsetDir;	// Joint와 떨어진 방향 [Korean comment]
 
 // Operations
 public:
@@ -80,7 +80,7 @@ public:
 	virtual bool	Load(HANDLE hFile);
 
 	void			StopAll(bool bImmediately = false);	// FX Stop
-	void			TriggerAll();						// FX 시작
+	void			TriggerAll();						// FX 시작 [Korean comment]
 
 #ifdef _N3TOOL
 	virtual bool	Save(HANDLE hFile);

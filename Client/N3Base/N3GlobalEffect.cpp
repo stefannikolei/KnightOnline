@@ -21,8 +21,8 @@ CN3GlobalEffect::CN3GlobalEffect()
 	m_bActive = FALSE;
 	m_iVC = 0;
 	m_iIC = 0;
-	m_fFadeTime = 0.0f; // 이시간 동안 차차 목표한 양만큼 파티클의 수가 늘어난다..
-	m_fFadeTimeCur = 0.0f; // 지난시간..
+	m_fFadeTime = 0.0f; // 이시간 동안 차차 목표한 양만큼 파티클의 수가 늘어난다.. Time
+	m_fFadeTimeCur = 0.0f; // 지난시간.. Time
 	m_iFadeMode = 0;
 }
 
@@ -39,8 +39,8 @@ void CN3GlobalEffect::Release()
 	m_bActive = FALSE;
 	m_iVC = 0;
 	m_iIC = 0;
-	m_fFadeTime = 0.0f; // 이시간 동안 차차 목표한 양만큼 파티클의 수가 늘어난다..
-	m_fFadeTimeCur = 0.0f; // 지난시간..
+	m_fFadeTime = 0.0f; // 이시간 동안 차차 목표한 양만큼 파티클의 수가 늘어난다.. Time
+	m_fFadeTimeCur = 0.0f; // 지난시간.. Time
 	m_iFadeMode = 0;
 
 	CN3Transform::Release();
@@ -50,7 +50,7 @@ void CN3GlobalEffect::Tick()
 {
 	CN3Transform::Tick(-1);
 
-	if(m_iFadeMode && m_fFadeTime > 0) // 시간을 지나게 한다..
+	if(m_iFadeMode && m_fFadeTime > 0) // 시간을 지나게 한다.. Time
 	{
 		m_fFadeTimeCur += s_fSecPerFrm;
 		if(m_fFadeTimeCur > m_fFadeTime) m_fFadeTimeCur = m_fFadeTime;

@@ -16,21 +16,21 @@ class CN3IMesh;
 class CN3VMesh : public CN3BaseFileAccess
 {
 protected:
-	__Vector3*	m_pVertices; // 점 버퍼
-	int			m_nVC; // 점 갯수
+	__Vector3*	m_pVertices; // 점 버퍼 [Korean comment]
+	int			m_nVC; // 점 갯수 [Korean comment]
 
 	uint16_t*		m_pwIndices; // Index...
 	int			m_nIC; // Index Count
 
 	__Vector3	m_vMin;
 	__Vector3	m_vMax;
-	float		m_fRadius; // 반지름
+	float		m_fRadius; // 반지름 [Korean comment]
 
 public:
 	__Vector3	Min() { return m_vMin; }
 	__Vector3	Max() { return m_vMax; }
 	bool		Pick(const __Matrix44& MtxWorld, const __Vector3& vPos, const __Vector3& vDir, __Vector3* pVCol = nullptr, __Vector3* pVNormal = nullptr);
-	bool		CheckCollision(const __Matrix44& MtxWorld, const __Vector3& v0, const __Vector3& v1, __Vector3* pVCol = nullptr, __Vector3* pVNormal = nullptr); // Local 좌표를 통한 충돌 체크 판정..
+	bool		CheckCollision(const __Matrix44& MtxWorld, const __Vector3& v0, const __Vector3& v1, __Vector3* pVCol = nullptr, __Vector3* pVNormal = nullptr); // Local 좌표를 통한 충돌 체크 판정.. Check
 	float		Radius() { return m_fRadius; }
 	void		FindMinMax();
 	void		Render(D3DCOLOR crLine);
@@ -55,13 +55,13 @@ public:
 	CN3VMesh();
 	virtual ~CN3VMesh();
 
-//	By : Ecli666 ( On 2002-08-09 오후 2:47:59 )
+//	By : Ecli666 ( On 2002-08-09 오후 2:47:59 ) [Korean comment]
 //
 	int				GetColIndexByiOrder(int iOrder);
 __Vector3	  GetColVertexByIndex(int iIndex); 
 	void			PartialColRender(int iCount, int* piIndices);
 	void			PartialGetCollision(int iIndex, __Vector3& vec);
-//	~(By Ecli666 On 2002-08-09 오후 2:47:59 )
+//	~(By Ecli666 On 2002-08-09 오후 2:47:59 ) [Korean comment]
 };
 
 #endif // !defined(AFX_N3VMesh_h__INCLUDED_)

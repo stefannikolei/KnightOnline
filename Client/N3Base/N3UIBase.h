@@ -46,7 +46,7 @@ class CN3UIBase : public CN3BaseFileAccess
 #ifdef _N3TOOL
 friend class CN3UIBase;
 friend class CHierarchyView;	// 툴에서 child list를 접근하기 위해서.
-friend class CPropertyView;	// 툴에서 각 변수들을 접근하기 위해서 
+friend class CPropertyView;	// 툴에서 각 변수들을 접근하기 위해서  Variable
 friend class CUIEView;	// 툴에서 child list를 접근하기 위해서.
 #endif
 
@@ -87,7 +87,7 @@ public:
 	CN3UIBase*	m_pParentUI;
 
 protected:
-	static std::string	s_szStringTmp;		// 임시 문자열.. 포인터를 넘기기 위해서이다..
+	static std::string	s_szStringTmp;		// 임시 문자열.. 포인터를 넘기기 위해서이다.. [Korean comment]
 
 	int			m_iChildID;
 	CN3UIBase*	m_pParent;		// parent pointer
@@ -95,14 +95,14 @@ protected:
 	eUI_TYPE	m_eType;		// UI Type - button, image .....
 	eUI_STATE	m_eState;		// UI state
 	uint32_t	m_dwStyle;		// style
-	uint32_t	m_dwReserved;	// 기타 임시로 넣고 싶은 정보를 넣으면 된다.
+	uint32_t	m_dwReserved;	// 기타 임시로 넣고 싶은 정보를 넣으면 된다. Info
 
-	RECT		m_rcRegion;		// UI - screen coordinates (screen : main window client area) 중의 : 부모에 대한 상대좌표가 아니다.
+	RECT		m_rcRegion;		// UI - screen coordinates (screen : main window client area) 중의 : 부모에 대한 상대좌표가 아니다. [Korean comment]
 	RECT		m_rcMovable;	// UI를 드래그 하여 움직이게 할 수 있는 영역 - (screen : main window client area)           ~~~~~~~
 
 	bool		m_bVisible;		// 화면에 보이는가 (부모가 보이지 않으면 자식들은 render 하지 않는다.)
-	CN3SndObj*	m_pSnd_OpenUI;	// UI가 화면에 보이는 순간 내는 소리
-	CN3SndObj*	m_pSnd_CloseUI;	// UI가 화면에서 사라지는 순간 내는 소리
+	CN3SndObj*	m_pSnd_OpenUI;	// UI가 화면에 보이는 순간 내는 소리 [Korean comment]
+	CN3SndObj*	m_pSnd_CloseUI;	// UI가 화면에서 사라지는 순간 내는 소리 [Korean comment]
 
 	static CN3UIEdit*		s_pFocusedEdit;		// 현재 포커스를 가지고 있는 Edit, nullptr이면 아무도 포커스를 가지고 있지 않다.
 	
@@ -131,13 +131,13 @@ public:
 		return m_Children;
 	}
 
-	void			SetUIType(eUI_TYPE eUIType) { m_eType = eUIType; }	// by ecli666 툴에 기능 넣기 귀찮아서.. ^^
+	void			SetUIType(eUI_TYPE eUIType) { m_eType = eUIType; }	// by ecli666 툴에 기능 넣기 귀찮아서.. ^^ [Korean comment]
 // Operations
 public:	
 	bool			IsIn(int x, int y);
 	void			AddChild(CN3UIBase* pChild) { m_Children.push_front(pChild); }
 	void			RemoveChild(CN3UIBase* pChild); // 자식 리스트에서 포인터만 없어지고 실제로 delete 되지는 않는다.
-	void			SetParent(CN3UIBase* pParent);	// 부모를 바꾼다.
+	void			SetParent(CN3UIBase* pParent);	// 부모를 바꾼다. [Korean comment]
 	int				GetWidth() { return m_rcRegion.right - m_rcRegion.left; }
 	int				GetHeight() { return m_rcRegion.bottom - m_rcRegion.top; }
 	POINT			GetPos() const;
@@ -153,11 +153,11 @@ public:
 	template <typename T>
 	T* GetChildByID(const std::string_view szID) const;
 
-	virtual void	SetRegion(const RECT& pRect) { m_rcRegion = pRect; }	// 영역 지정
+	virtual void	SetRegion(const RECT& pRect) { m_rcRegion = pRect; }	// 영역 지정 [Korean comment]
 	virtual BOOL	MoveOffset(int iOffsetX, int iOffsetY);	// offset만큼 이동해준다.(region, children, move rect 이동)
-	virtual void	SetSize(int iWidth, int iHeight);	// 크기 지정
+	virtual void	SetSize(int iWidth, int iHeight);	// 크기 지정 Size
 	virtual void	SetState(eUI_STATE eState) { m_eState = eState; }
-	virtual void	SetStyle(uint32_t dwStyle) {m_dwStyle = dwStyle;}	// style지정
+	virtual void	SetStyle(uint32_t dwStyle) {m_dwStyle = dwStyle;}	// style지정 [Korean comment]
 	virtual void	SetVisible(bool bVisible);
 
 	virtual void	SetVisibleWithNoSound(bool bVisible, bool bWork = false, bool bReFocus = false);
@@ -175,8 +175,8 @@ public:
 	virtual bool	OnKeyPressed(int iKey) { return false; }
 	virtual bool	OnMouseWheelEvent(short delta) { return false; }
 
-	static	bool	EnableTooltip(const std::string& szFN);	// tooltip UI를 초기화 해준다.
-	static	void	DestroyTooltip();	// tooltip ui에 관련된 것을 해제해준다.
+	static	bool	EnableTooltip(const std::string& szFN);	// tooltip UI를 초기화 해준다. Initialize
+	static	void	DestroyTooltip();	// tooltip ui에 관련된 것을 해제해준다. [Korean comment]
 
 	int GetChildrenCount() const
 	{

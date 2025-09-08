@@ -83,7 +83,7 @@ void CN3UIImage::SetVB()
 
 			uint32_t dwColor = 0xffffffff;
 			float fRHW = 1.0f;
-			// -0.5f를 해주지 않으면 가끔 이미지가 한 돗트씩 밀리는 경우가 있다.(왜 그런지는 확실하게 모르겠음)
+			// -0.5f를 해주지 않으면 가끔 이미지가 한 돗트씩 밀리는 경우가 있다.(왜 그런지는 확실하게 모르겠음) [Korean comment]
 			pVertices[0].Set((float)m_rcRegion.left-0.5f,	(float)m_rcRegion.top-0.5f,		UI_DEFAULT_Z, fRHW, m_Color, m_frcUVRect.left,		m_frcUVRect.top);
 			pVertices[1].Set((float)m_rcRegion.right-0.5f,	(float)m_rcRegion.top-0.5f,		UI_DEFAULT_Z, fRHW, m_Color, m_frcUVRect.right,	m_frcUVRect.top);
 			pVertices[2].Set((float)m_rcRegion.right-0.5f,	(float)m_rcRegion.bottom-0.5f,	UI_DEFAULT_Z, fRHW, m_Color, m_frcUVRect.right,	m_frcUVRect.bottom);
@@ -137,7 +137,7 @@ void CN3UIImage::Render()
 {
 	if(!m_bVisible) return;
 
-	if (UISTYLE_IMAGE_ANIMATE & m_dwStyle) // Animate되는 이미지이면
+	if (UISTYLE_IMAGE_ANIMATE & m_dwStyle) // Animate되는 이미지이면 [Korean comment]
 	{
 		__ASSERT(m_fCurAnimFrame>=0.0f && m_fCurAnimFrame < (float)m_iAnimCount, "animate image 가 이상작동");
 		__ASSERT(m_pAnimImagesRef, "초기화 이상");
@@ -201,23 +201,23 @@ bool CN3UIImage::Load(HANDLE hFile)
 {
 	if (false == CN3UIBase::Load(hFile)) return false;
 	DWORD dwNum;
-	// texture 정보
+	// texture 정보 Info
 	__ASSERT(nullptr == m_pTexRef, "load 하기 전에 초기화가 되지 않았습니다.");
 	int	iStrLen = 0;
-	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// 파일 이름 길이
+	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// 파일 이름 길이 File
 	char szFName[MAX_PATH] = "";
 	if (iStrLen>0)
 	{
-		ReadFile(hFile, szFName, iStrLen, &dwNum, nullptr);		// 파일 이름
+		ReadFile(hFile, szFName, iStrLen, &dwNum, nullptr);		// 파일 이름 File
 		szFName[iStrLen]='\0';
 		this->SetTex(szFName);
 	} 
 
-	ReadFile(hFile, &m_frcUVRect, sizeof(m_frcUVRect), &dwNum, nullptr);	// uv좌표
+	ReadFile(hFile, &m_frcUVRect, sizeof(m_frcUVRect), &dwNum, nullptr);	// uv좌표 [Korean comment]
 	ReadFile(hFile, &m_fAnimFrame, sizeof(m_fAnimFrame), &dwNum, nullptr);
 
 	// Animate 되는 image이면 관련된 변수 세팅
-	m_iAnimCount = 0; // animate image 수 정하기
+	m_iAnimCount = 0; // animate image 수 정하기 [Korean comment]
 	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 	{
 		if(UI_TYPE_IMAGE == (*itor)->UIType()) m_iAnimCount++;
@@ -231,12 +231,12 @@ bool CN3UIImage::Load(HANDLE hFile)
 		for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 		{
 			if(UI_TYPE_IMAGE == (*itor)->UIType()) m_pAnimImagesRef[i] = (CN3UIImage*)(*itor);
-			__ASSERT(m_pAnimImagesRef[i]->GetReserved() == (uint32_t)i, "animate Image load fail");	// 제대로 정렬이 되지 않았을경우 실패한다.
+			__ASSERT(m_pAnimImagesRef[i]->GetReserved() == (uint32_t)i, "animate Image load fail");	// 제대로 정렬이 되지 않았을경우 실패한다. [Korean comment]
 			++i;
 		}
 	}
 
-	SetVB();	// vertex 세팅
+	SetVB();	// vertex 세팅 [Korean comment]
 	return true;
 }
 
@@ -254,7 +254,7 @@ void CN3UIImage::operator = (const CN3UIImage& other)
 	m_szTexFN = other.m_szTexFN;
 
 	// Animate 되는 image이면 관련된 변수 세팅
-	m_iAnimCount = m_Children.size();	// animate image 수 정하기
+	m_iAnimCount = m_Children.size();	// animate image 수 정하기 [Korean comment]
 	if ((UISTYLE_IMAGE_ANIMATE & m_dwStyle) && m_iAnimCount>0)
 	{
 		m_pAnimImagesRef = new CN3UIImage*[m_iAnimCount];
@@ -264,27 +264,27 @@ void CN3UIImage::operator = (const CN3UIImage& other)
 		{
 			__ASSERT(UI_TYPE_IMAGE == (*itor)->UIType(), "animate image child의 UI type이 image가 아니다.");
 			m_pAnimImagesRef[i] = (CN3UIImage*)(*itor);
-			__ASSERT(m_pAnimImagesRef[i]->GetReserved() == (uint32_t)i, "animate Image load fail");	// 제대로 정렬이 되지 않았을경우 실패한다.
+			__ASSERT(m_pAnimImagesRef[i]->GetReserved() == (uint32_t)i, "animate Image load fail");	// 제대로 정렬이 되지 않았을경우 실패한다. [Korean comment]
 			++i;
 		}
 	}
 
-	SetVB();	// vertex 세팅
+	SetVB();	// vertex 세팅 [Korean comment]
 }
 
 #ifdef _N3TOOL
 bool CN3UIImage::Save(HANDLE hFile)
 {
-	ReorderChildImage();	// child image들 순서대로 정렬
+	ReorderChildImage();	// child image들 순서대로 정렬 [Korean comment]
 	if (false == CN3UIBase::Save(hFile)) return false;
 	DWORD dwNum;
-	// texture 정보
+	// texture 정보 Info
 	if (m_pTexRef) m_szTexFN = m_pTexRef->FileName();
 	int iStrLen = m_szTexFN.size();
-	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// 파일 길이
-	if (iStrLen>0)	WriteFile(hFile, m_szTexFN.c_str(), iStrLen, &dwNum, nullptr);	// 파일 이름
+	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// 파일 길이 File
+	if (iStrLen>0)	WriteFile(hFile, m_szTexFN.c_str(), iStrLen, &dwNum, nullptr);	// 파일 이름 File
 
-	WriteFile(hFile, &m_frcUVRect, sizeof(m_frcUVRect), &dwNum, nullptr);		// uv좌표
+	WriteFile(hFile, &m_frcUVRect, sizeof(m_frcUVRect), &dwNum, nullptr);		// uv좌표 [Korean comment]
 	WriteFile(hFile, &m_fAnimFrame, sizeof(m_fAnimFrame), &dwNum, nullptr);	// Animate frame
 
 	return true;
@@ -314,7 +314,7 @@ void CN3UIImage::ChangeImagePath(const std::string& szPathOld, const std::string
 
 void CN3UIImage::GatherImageFileName(std::set<std::string>& setImgFile)
 {
-	CN3UIBase::GatherImageFileName(setImgFile); // child 정보
+	CN3UIBase::GatherImageFileName(setImgFile); // child 정보 Info
 	
 	std::string szImgFN = m_szTexFN;
 	if(!szImgFN.empty())
@@ -347,7 +347,7 @@ void CN3UIImage::ReorderChildImage()
 		RemoveChild(pSelChild);
 	}
 	
-	for (i=0; i<m_iAnimCount; ++i) m_Children.push_back(pNewList[i]);	// 작은 순서대로 넣기
+	for (i=0; i<m_iAnimCount; ++i) m_Children.push_back(pNewList[i]);	// 작은 순서대로 넣기 [Korean comment]
 
 	delete [] pNewList;
 }
@@ -360,12 +360,12 @@ CN3UIImage* CN3UIImage::GetChildImage(int iIndex)
 
 void CN3UIImage::SetAnimImage(int iAnimCount)
 {
-	// 이미 설정 되어 있는것이 있으면 지우기
+	// 이미 설정 되어 있는것이 있으면 지우기 Set
 	int i;
 	if (m_pAnimImagesRef)
 	{
 		for (i=0; i<m_iAnimCount; ++i)
-		{	// 자식 지우기
+		{	// 자식 지우기 [Korean comment]
 			if (m_pAnimImagesRef[i]) {delete m_pAnimImagesRef[i]; m_pAnimImagesRef[i] = nullptr;}
 		}
 		delete [] m_pAnimImagesRef; m_pAnimImagesRef = nullptr;
@@ -424,7 +424,7 @@ bool CN3UIImage::ReplaceAllTextures(const std::string& strFind, const std::strin
 			}
 			else
 			{	// *.tga ->
-				if (lstrcmpi(szFindExt, szTexExt) != 0 ) break;	// 확장자가 같지 않으므로 그냥 리턴
+				if (lstrcmpi(szFindExt, szTexExt) != 0 ) break;	// 확장자가 같지 않으므로 그냥 리턴 [Korean comment]
 
 				if (lstrcmpi(szReplaceFName, "*") == 0)	strNew += szTexFName;
 				else strNew += szReplaceFName;
@@ -434,7 +434,7 @@ bool CN3UIImage::ReplaceAllTextures(const std::string& strFind, const std::strin
 		}
 		else
 		{
-			if (lstrcmpi(szFindFName, szTexFName) != 0 ) break;	// 이름이 같지 않으므로 그냥 리턴
+			if (lstrcmpi(szFindFName, szTexFName) != 0 ) break;	// 이름이 같지 않으므로 그냥 리턴 Name
 
 			if (lstrcmpi(szFindExt, ".*") == 0)
 			{	// abc.* ->
@@ -444,8 +444,8 @@ bool CN3UIImage::ReplaceAllTextures(const std::string& strFind, const std::strin
 				else strNew += szReplaceExt;
 			}
 			else
-			{	// 찾는 파일명과 확장자가 지정되어 있을경우 // abc.tga ->
-				if (lstrcmpi(szFindExt, szTexExt) != 0 ) break;	// 확장자가 같지 않으므로 그냥 리턴
+			{	// 찾는 파일명과 확장자가 지정되어 있을경우 // abc.tga -> File
+				if (lstrcmpi(szFindExt, szTexExt) != 0 ) break;	// 확장자가 같지 않으므로 그냥 리턴 [Korean comment]
 
 				if (lstrcmpi(szReplaceFName, "*") == 0)	strNew += szFindFName;
 				else strNew += szReplaceFName;
@@ -453,7 +453,7 @@ bool CN3UIImage::ReplaceAllTextures(const std::string& strFind, const std::strin
 				else strNew += szReplaceExt;
 			}
 		}
-		// 텍스쳐 다시 지정하기
+		// 텍스쳐 다시 지정하기 [Korean comment]
 		SetTex(strNew);
 		break;
 	}

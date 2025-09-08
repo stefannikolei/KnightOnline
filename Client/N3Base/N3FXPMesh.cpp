@@ -134,7 +134,7 @@ bool CN3FXPMesh::Load(HANDLE hFile)
 	{
 		m_pCollapses = new __EdgeCollapse[m_iNumCollapses+1];	// +1을 한 이유 : PMeshInstance::SplitOne() 함수에서 부득이하게 포인터가 경계선을 가르키게 해야 하는 경우가 있어서.
 		ReadFile(hFile, m_pCollapses, m_iNumCollapses*sizeof(__EdgeCollapse), &dwNum, nullptr);
-		ZeroMemory(m_pCollapses + m_iNumCollapses, sizeof(__EdgeCollapse));	// 위의 +1을 한이유와 같음. 만약을 대비해 마지막 데이타를 초기화 해둠
+		ZeroMemory(m_pCollapses + m_iNumCollapses, sizeof(__EdgeCollapse));	// 위의 +1을 한이유와 같음. 만약을 대비해 마지막 데이타를 초기화 해둠 Initialize
 
 		bool bFixed = false;
 		for(int i = 0; i < m_iNumCollapses; i++)
@@ -210,7 +210,7 @@ void CN3FXPMesh::FindMinMax()
 		return;
 	}
 
-	// 최소, 최대 점을 찾는다.
+	// 최소, 최대 점을 찾는다. [Korean comment]
 	m_vMin.Set(FLT_MAX, FLT_MAX, FLT_MAX);
 	m_vMax.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
@@ -225,7 +225,7 @@ void CN3FXPMesh::FindMinMax()
 		if(m_pColorVertices[i].z > m_vMax.z) m_vMax.z = m_pColorVertices[i].z;
 	}
 
-	// 최대 최소값을 갖고 반지름 계산한다..
+	// 최대 최소값을 갖고 반지름 계산한다.. Calculate
 	m_fRadius  = (m_vMax - m_vMin).Magnitude() * 0.5f;
 }
 

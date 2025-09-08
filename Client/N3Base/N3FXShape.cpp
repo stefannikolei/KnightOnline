@@ -44,12 +44,12 @@ CN3FXSPart::~CN3FXSPart()
 
 void CN3FXSPart::Release()
 {
-	m_vPivot.Set(0,0,0); // Local 축
-	m_WorldMtx.Identity(); // World Matrix.. Shape Loading 때 미리 계산해야 좋다..		
-	m_bOutOfCameraRange = TRUE; // Camera 범위 바깥에 있음...
+	m_vPivot.Set(0,0,0); // Local 축 [Korean comment]
+	m_WorldMtx.Identity(); // World Matrix.. Shape Loading 때 미리 계산해야 좋다..		 Calculate
+	m_bOutOfCameraRange = TRUE; // Camera 범위 바깥에 있음... [Korean comment]
 
 	m_fTexFPS = 10.0f; // Texture Animation Interval;
-	m_fTexIndex = 0; // Current Texture Index.. Animation 시킬때 필요한 인덱스이다..
+	m_fTexIndex = 0; // Current Texture Index.. Animation 시킬때 필요한 인덱스이다.. Index
 
 	int iTC = m_TexRefs.size();
 	for(int i = 0; i < iTC; i++) s_MngTex.Delete(&m_TexRefs[i]);
@@ -114,10 +114,10 @@ void CN3FXSPart::Tick(const __Matrix44& mtxParent)
 	m_WorldMtx *= mtxParent;
 
 	////////////////////////////////////////////////////////////////////////////
-	// 카메라와 멀리 떨어지면 지나간다..
+	// 카메라와 멀리 떨어지면 지나간다.. [Korean comment]
 	float fDist = (m_WorldMtx.Pos() - s_CameraData.vEye).Magnitude();
 	float fRadius = Radius();
-	if(s_CameraData.IsOutOfFrustum(this->m_WorldMtx.Pos(), fRadius * 3.0f)) // 카메라 사면체 바깥이면 지나간다..
+	if(s_CameraData.IsOutOfFrustum(this->m_WorldMtx.Pos(), fRadius * 3.0f)) // 카메라 사면체 바깥이면 지나간다.. [Korean comment]
 	{
 		m_bOutOfCameraRange = TRUE;
 		return;
@@ -153,7 +153,7 @@ void CN3FXSPart::Render()
 		else return;
 	}
 
-	if(m_Mtl.nRenderFlags & RF_ALPHABLENDING) // Alpha 사용
+	if(m_Mtl.nRenderFlags & RF_ALPHABLENDING) // Alpha 사용 [Korean comment]
 	{
 		__AlphaPrimitive* pAP = s_AlphaMgr.Add();
 		if(pAP)
@@ -174,10 +174,10 @@ void CN3FXSPart::Render()
 			pAP->pVertices			= m_FXPMInst.GetVertices();
 			pAP->pwIndices			= m_FXPMInst.GetIndices();
 		}
-		return; // 렌더링 안하지롱.
+		return; // 렌더링 안하지롱. Rendering
 	}
 
-	s_lpD3DDev->SetMaterial(&m_Mtl); // 재질 설정..
+	s_lpD3DDev->SetMaterial(&m_Mtl); // 재질 설정.. Set
 	s_lpD3DDev->SetTexture(0, lpTex);
 	if(nullptr != lpTex)
 	{
@@ -229,9 +229,9 @@ bool CN3FXSPart::Load(HANDLE hFile)
 	ReadFile(hFile, &m_vPivot, sizeof(__Vector3), &dwRWC, nullptr);
 
 	ReadFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
-	ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 메시 파일 이름..
+	ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 메시 파일 이름.. File
 
-	//m_pRefShape의 경로와 읽어들인 파일명을 합쳐라...
+	//m_pRefShape의 경로와 읽어들인 파일명을 합쳐라... File
 	char szPath[_MAX_PATH];
 	char szFName[_MAX_FNAME], szExt[_MAX_EXT];
 	char szDir[_MAX_DIR];
@@ -241,19 +241,19 @@ bool CN3FXSPart::Load(HANDLE hFile)
 
 	if(!this->MeshSet(szPath)) return false;
 
-	ReadFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질
+	ReadFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질 [Korean comment]
 
 	int iTC = 0;
 	ReadFile(hFile, &iTC, 4, &dwRWC, nullptr);
 	ReadFile(hFile, &m_fTexFPS, 4, &dwRWC, nullptr);
 	m_TexRefs.clear();
-	this->TexAlloc(iTC); // Texture Pointer Pointer 할당..
-	for(int j = 0; j < iTC; j++) // Texture Count 만큼 파일 이름 읽어서 텍스처 부르기..
+	this->TexAlloc(iTC); // Texture Pointer Pointer 할당.. [Korean comment]
+	for(int j = 0; j < iTC; j++) // Texture Count 만큼 파일 이름 읽어서 텍스처 부르기.. File
 	{
 		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 		if(nL > 0)
 		{
-			ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 텍스처 파일 이름..
+			ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 텍스처 파일 이름.. File
 			
 			_splitpath(szFN, nullptr, nullptr, szFName, szExt);
 			_makepath(szPath, nullptr, szDir, szFName, szExt);
@@ -276,8 +276,8 @@ void CN3FXSPart::Duplicate(CN3FXSPart* pSrc)
 	m_fTexFPS = m_fTexFPS;
 
 	m_TexRefs.clear();	
-	this->TexAlloc(iTC); // Texture Pointer Pointer 할당..
-	for(int j = 0; j < iTC; j++) // Texture Count 만큼 파일 이름 읽어서 텍스처 부르기..
+	this->TexAlloc(iTC); // Texture Pointer Pointer 할당.. [Korean comment]
+	for(int j = 0; j < iTC; j++) // Texture Count 만큼 파일 이름 읽어서 텍스처 부르기.. File
 	{
 		if(pSrc->Tex(j))
 			m_TexRefs[j] = s_MngTex.Get(pSrc->Tex(j)->FileName());
@@ -355,8 +355,8 @@ void CN3FXShape::Tick(float fFrm)
 	}
 }
 
-// 카메라 위치, 카메라 평면(관찰 절두체 평면) -> 12개의 벡터 배열로 되어 있다.
-// [0][1]:카메라 위치와 벡터, [2][3]:카메라 범위 위치와 방향 벡터, [4][5] ~ [10][11]:상하좌우평면벡터
+// 카메라 위치, 카메라 평면(관찰 절두체 평면) -> 12개의 벡터 배열로 되어 있다. Position
+// [0][1]:카메라 위치와 벡터, [2][3]:카메라 범위 위치와 방향 벡터, [4][5] ~ [10][11]:상하좌우평면벡터 Position
 void CN3FXShape::Render()
 {
 	int iPC = m_Parts.size();
@@ -368,7 +368,7 @@ void CN3FXShape::Render()
 
 bool CN3FXShape::Load(HANDLE hFile)
 {
-	CN3TransformCollision::Load(hFile); // 기본정보 읽기...
+	CN3TransformCollision::Load(hFile); // 기본정보 읽기... Load
 
 	DWORD dwRWC = 0;
 	
@@ -385,16 +385,16 @@ bool CN3FXShape::Load(HANDLE hFile)
 			m_Parts[i] = new CN3FXSPart();
 			m_Parts[i]->m_pRefShape = this;
 			if(!m_Parts[i]->Load(hFile)) return false;
-			//m_Parts[i]->ReCalcMatrix(m_Matrix); // Part Matrix 계산
+			//m_Parts[i]->ReCalcMatrix(m_Matrix); // Part Matrix 계산 Calculate
 		}
 	}
 
 	uint32_t dwTmp;		
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 소속
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 0
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 1
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 2
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 3
+	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 소속 [Korean comment]
+	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 0 [Korean comment]
+	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 1 [Korean comment]
+	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 2 [Korean comment]
+	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 3 [Korean comment]
 
 	this->FindMinMax();
 
@@ -404,7 +404,7 @@ bool CN3FXShape::Load(HANDLE hFile)
 bool CN3FXShape::Save(HANDLE hFile)
 {
 	/*
-	CN3TransformCollision::Save(hFile); // 기본정보 읽기...
+	CN3TransformCollision::Save(hFile); // 기본정보 읽기... Load
 	
 	DWORD dwRWC = 0;
 	
@@ -418,11 +418,11 @@ bool CN3FXShape::Save(HANDLE hFile)
 		m_Parts[i]->Save(hFile);
 	}
 
-	WriteFile(hFile, &m_iBelong, 4, &dwRWC, nullptr); // 소속
-	WriteFile(hFile, &m_iAttr0, 4, &dwRWC, nullptr); // 속성 0
-	WriteFile(hFile, &m_iAttr1, 4, &dwRWC, nullptr); // 속성 1
-	WriteFile(hFile, &m_iAttr2, 4, &dwRWC, nullptr); // 속성 2
-	WriteFile(hFile, &m_iAttr3, 4, &dwRWC, nullptr); // 속성 3
+	WriteFile(hFile, &m_iBelong, 4, &dwRWC, nullptr); // 소속 [Korean comment]
+	WriteFile(hFile, &m_iAttr0, 4, &dwRWC, nullptr); // 속성 0 [Korean comment]
+	WriteFile(hFile, &m_iAttr1, 4, &dwRWC, nullptr); // 속성 1 [Korean comment]
+	WriteFile(hFile, &m_iAttr2, 4, &dwRWC, nullptr); // 속성 2 [Korean comment]
+	WriteFile(hFile, &m_iAttr3, 4, &dwRWC, nullptr); // 속성 3 [Korean comment]
 	*/
 	return true;
 }
@@ -453,15 +453,15 @@ void CN3FXShape::FindMinMax()
 	__Vector3 vMinTmp(0,0,0);
 	__Vector3 vMaxTmp(0,0,0);
 
-	// 가장 큰 지점찾기..
+	// 가장 큰 지점찾기.. [Korean comment]
 	static __Matrix44 mtxWI;
 	D3DXMatrixInverse(&mtxWI, nullptr, &m_mtxFinalTransform); // World Matrix Inverse
 	int iPC = m_Parts.size();
 	for(int i = 0; i < iPC; i++)
 	{
 		//m_Parts[i]->ReCalcMatrix(m_mtxFinalTransform);
-		vMinTmp = m_Parts[i]->Min() * mtxWI; // 월드 상의 최소값을 로컬 좌표로 바꾸어준다..
-		vMaxTmp = m_Parts[i]->Max() * mtxWI; // 월드 상의 최대값을 로컬 좌표로 바꾸어준다..
+		vMinTmp = m_Parts[i]->Min() * mtxWI; // 월드 상의 최소값을 로컬 좌표로 바꾸어준다.. [Korean comment]
+		vMaxTmp = m_Parts[i]->Max() * mtxWI; // 월드 상의 최대값을 로컬 좌표로 바꾸어준다.. [Korean comment]
 
 		if(vMinTmp.x < vMin.x) vMin.x = vMinTmp.x;
 		if(vMinTmp.y < vMin.y) vMin.y = vMinTmp.y;
@@ -471,11 +471,11 @@ void CN3FXShape::FindMinMax()
 		if(vMaxTmp.z > vMax.z) vMax.z = vMaxTmp.z;
 	}
 
-	// 최대 최소값을 저장
+	// 최대 최소값을 저장 Save
 	m_vMin = vMin * m_mtxFinalTransform;
 	m_vMax = vMax * m_mtxFinalTransform;
 
-	// 최대 최소값을 갖고 반지름 계산한다..
+	// 최대 최소값을 갖고 반지름 계산한다.. Calculate
 	m_fRadius  = (m_vMax - m_vMin).Magnitude() * 0.5f;
 }
 
@@ -492,7 +492,7 @@ void CN3FXShape::Duplicate(CN3FXShape* pSrc)
 	m_dwLight = pSrc->m_dwLight;
 	m_dwDoubleSide = pSrc->m_dwDoubleSide;
 		
-	//CN3TransformCollision::Load(hFile); // 기본정보 읽기...
+	//CN3TransformCollision::Load(hFile); // 기본정보 읽기... Load
 	//transform collision...
 	SetRadius(pSrc->Radius());
 	SetMin(pSrc->Min());
@@ -532,7 +532,7 @@ void CN3FXShape::Duplicate(CN3FXShape* pSrc)
 			m_Parts[i] = new CN3FXSPart();
 			m_Parts[i]->m_pRefShape = this;
 			m_Parts[i]->Duplicate(pSrc->m_Parts[i]);
-			//m_Parts[i]->ReCalcMatrix(m_Matrix); // Part Matrix 계산
+			//m_Parts[i]->ReCalcMatrix(m_Matrix); // Part Matrix 계산 Calculate
 		}
 	}
 

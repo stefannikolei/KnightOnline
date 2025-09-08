@@ -64,7 +64,7 @@ bool CN3UIStatic::Load(HANDLE hFile)
 {
 	if (false == CN3UIBase::Load(hFile)) return false;
 
-	// m_pImageBkGnd,  m_pBuffOutRef 설정하기
+	// m_pImageBkGnd,  m_pBuffOutRef 설정하기 Set
 	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
@@ -81,7 +81,7 @@ bool CN3UIStatic::Load(HANDLE hFile)
 	// 이전 uif파일을 컨버팅 하려면 사운드 로드 하는 부분 막기
 	int iSndFNLen = 0;
 	DWORD dwNum;
-	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
+	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이 File
 	if (iSndFNLen>0)
 	{
 		std::vector<char> buffer(iSndFNLen+1, '\0');
@@ -111,11 +111,11 @@ uint32_t CN3UIStatic::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POIN
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
 	if (!m_bVisible) return dwRet;
 
-	if((dwFlags & UI_MOUSE_LBCLICK) && IsIn(ptCur.x, ptCur.y))  // 왼쪽버튼 눌르는 순간 영역 안이면
+	if((dwFlags & UI_MOUSE_LBCLICK) && IsIn(ptCur.x, ptCur.y))  // 왼쪽버튼 눌르는 순간 영역 안이면 Button
 	{
 		if (m_pSnd_Click) m_pSnd_Click->Play();	// 사운드가 있으면 play하기
 
-		if(m_pParent) m_pParent->ReceiveMessage(this, UIMSG_BUTTON_CLICK); // 부모에게 버튼 클릭 통지..
+		if(m_pParent) m_pParent->ReceiveMessage(this, UIMSG_BUTTON_CLICK); // 부모에게 버튼 클릭 통지.. Button
 		dwRet |= (UI_MOUSEPROC_DONESOMETHING|UI_MOUSEPROC_INREGION);
 		return dwRet;
 	}
@@ -131,7 +131,7 @@ void CN3UIStatic::operator = (const CN3UIStatic& other)
 
 	SetSndClick(other.GetSndFName_Click());
 
-	// m_pImageBkGnd,  m_pBuffOutRef 설정하기
+	// m_pImageBkGnd,  m_pBuffOutRef 설정하기 Set
 	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
@@ -153,7 +153,7 @@ bool CN3UIStatic::Save(HANDLE hFile)
 	DWORD dwNum;
 	int iSndFNLen = 0;
 	if (m_pSnd_Click) iSndFNLen = m_pSnd_Click->m_szFileName.size();
-	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
+	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이 File
 	if (iSndFNLen>0) WriteFile(hFile, m_pSnd_Click->m_szFileName.c_str(), iSndFNLen, &dwNum, nullptr);
 	return true;
 }
@@ -180,7 +180,7 @@ void CN3UIStatic::SetSndClick(const std::string& strFileName)
 	if (0 == strFileName.size()) return;
 
 	CN3BaseFileAccess tmpBase;
-	tmpBase.FileNameSet(strFileName);	// Base경로에 대해서 상대적 경로를 넘겨준다.
+	tmpBase.FileNameSet(strFileName);	// Base경로에 대해서 상대적 경로를 넘겨준다. [Korean comment]
 
 	SetCurrentDirectory(tmpBase.PathGet().c_str());
 	m_pSnd_Click = s_SndMgr.CreateObj(tmpBase.FileName(), SNDTYPE_2D);

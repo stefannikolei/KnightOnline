@@ -66,7 +66,7 @@ bool CN3FXPartBottomBoard::ParseScript(char* szCommand, char* szBuff0, char* szB
 {
 	if(CN3FXPartBase::ParseScript(szCommand, szBuff0, szBuff1, szBuff2, szBuff3)) return true;
 
-	//	보드 크기.
+	//	보드 크기. Size
 	if(lstrcmpi(szCommand, "<ground_size>")==0)
 	{
 		m_fCurrSizeX = m_fSizeX = atof(szBuff0);
@@ -298,16 +298,16 @@ bool CN3FXPartBottomBoard::Tick()
 		}
 	}
 
-	//위치이동..
+	//위치이동.. Position
 	m_vCurrVelocity += m_vAcceleration*CN3Base::s_fSecPerFrm;
 	m_vCurrPos += m_vCurrVelocity*CN3Base::s_fSecPerFrm;
 
-	//회전...
+	//회전... Rotate
 	__Matrix44 mtxRot;
 	mtxRot.Identity();
 	mtxRot.RotationY(m_fCurrLife*m_vRotVelocity.y);
 
-	//스케일변환..
+	//스케일변환.. [Korean comment]
 	m_fCurrScaleVelX += m_fScaleAccelX*CN3Base::s_fSecPerFrm;
 	m_fCurrScaleVelZ += m_fScaleAccelZ*CN3Base::s_fSecPerFrm;
 	m_fCurrSizeX += m_fCurrScaleVelX*CN3Base::s_fSecPerFrm;
@@ -368,14 +368,14 @@ bool CN3FXPartBottomBoard::IsDead()
 
 //
 //	render...
-//	일단은 파티클 하나씩 그리고....
-//	나중에는 같은 텍스쳐 쓰는 것들끼리 묶어서 그리자...
+//	일단은 파티클 하나씩 그리고.... [Korean comment]
+//	나중에는 같은 텍스쳐 쓰는 것들끼리 묶어서 그리자... [Korean comment]
 //
 void CN3FXPartBottomBoard::Render()
 {
 	if(m_iTexIdx >= m_iNumTex) return;
 
-	if(m_bAlpha) // Alpha 사용
+	if(m_bAlpha) // Alpha 사용 [Korean comment]
 	{
 		__AlphaPrimitive* pAP = s_AlphaMgr.Add();
 		if(pAP)
@@ -401,7 +401,7 @@ void CN3FXPartBottomBoard::Render()
 			pAP->pwIndices			= nullptr;
 		}
 
-		return; // 렌더링 안하지롱.
+		return; // 렌더링 안하지롱. Rendering
 	}
 	else 
 	{

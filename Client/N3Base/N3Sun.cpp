@@ -101,9 +101,9 @@ void CN3Sun::Render(__Matrix44& matView, __Matrix44& matProj)
 		if ( rcSun[i].right < rcScreen.left ||
 			rcSun[i].bottom < rcScreen.top ||
 			rcSun[i].left > rcScreen.right ||
-			rcSun[i].top > rcScreen.bottom) continue;	// 화면 밖에 그려진다.
+			rcSun[i].top > rcScreen.bottom) continue;	// 화면 밖에 그려진다. [Korean comment]
 
-		// 2D로 그리기
+		// 2D로 그리기 Draw
 		pSP->pVertices[0].x = (float)rcSun[i].left;		pSP->pVertices[0].y = (float)rcSun[i].top;
 		pSP->pVertices[1].x = (float)rcSun[i].right;	pSP->pVertices[1].y = (float)rcSun[i].top;
 		pSP->pVertices[2].x = (float)rcSun[i].right;	pSP->pVertices[2].y = (float)rcSun[i].bottom;
@@ -121,7 +121,7 @@ void CN3Sun::Render(__Matrix44& matView, __Matrix44& matProj)
 
 void CN3Sun::Tick()
 {
-	// 해의 색, 크기 변화 계산
+	// 해의 색, 크기 변화 계산 Calculate
 	int i;
 	for(i=0; i<NUM_SUNPART; ++i)
 	{
@@ -149,7 +149,7 @@ void CN3Sun::Init(const std::string* pszFNs)
 		m_Parts[i].pVertices[3].Set( 0, 0, fZ, rhw, color, 0.0f, 1.0f);
 	}
 
-	m_Parts[SUNPART_SUN].Delta.ChangeDelta(0.1f); // ViewPort 에서 상대적인 크기
+	m_Parts[SUNPART_SUN].Delta.ChangeDelta(0.1f); // ViewPort 에서 상대적인 크기 Size
 	m_Parts[SUNPART_GLOW].Delta.ChangeDelta(0.25f);
 	m_Parts[SUNPART_FLARE].Delta.ChangeDelta(0.13f);
 }

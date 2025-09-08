@@ -23,12 +23,12 @@ public:
 	void		Tick();
 	void		SetPercentage(float fPercentage);
 protected:
-	D3DCOLOR	m_CurColor;	// 현재 색.
-	D3DCOLOR	m_PrevColor;	// 변화하기 전 색.
-	D3DCOLOR	m_NextColor;	// 최종적으로 변화할 색.
-	float		m_fPercentage;	// 현재 변화된 정도(0.0 ~ 1.0)
-	float		m_fRate;		// 초당 변화율
-	float		m_fTempSec;		// 임시 시간 저장 변수
+	D3DCOLOR	m_CurColor;	// 현재 색. Color
+	D3DCOLOR	m_PrevColor;	// 변화하기 전 색. Color
+	D3DCOLOR	m_NextColor;	// 최종적으로 변화할 색. Color
+	float		m_fPercentage;	// 현재 변화된 정도(0.0 ~ 1.0) [Korean comment]
+	float		m_fRate;		// 초당 변화율 [Korean comment]
+	float		m_fTempSec;		// 임시 시간 저장 변수 Save
 };
 
 class CN3DeltaChange  : public CN3Base
@@ -44,13 +44,13 @@ public:
 	void		Tick();
 	void		SetPercentage(float fPercentage);
 protected:
-	float		m_fCurDelta;	// 현재 색.
-	float		m_fPrevDelta;	// 변화하기 전 색.
-	float		m_fNextDelta;	// 최종적으로 변화할 색.
+	float		m_fCurDelta;	// 현재 색. Color
+	float		m_fPrevDelta;	// 변화하기 전 색. Color
+	float		m_fNextDelta;	// 최종적으로 변화할 색. Color
 
-	float		m_fPercentage;	// 현재 변화된 정도(0.0 ~ 1.0)
-	float		m_fRate;		// 초당 변화율
-	float		m_fTempSec;		// 임시 시간 저장 변수
+	float		m_fPercentage;	// 현재 변화된 정도(0.0 ~ 1.0) [Korean comment]
+	float		m_fRate;		// 초당 변화율 [Korean comment]
+	float		m_fTempSec;		// 임시 시간 저장 변수 Save
 };
 
 #endif // !defined(AFX_N3COLORCHANGE_H__6A4576D3_1880_40A4_AED9_39B306508D0C__INCLUDED_)

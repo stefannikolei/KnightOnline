@@ -20,7 +20,7 @@ static char THIS_FILE[]=__FILE__;
 
 CN3FXPartParticles::CN3FXPartParticles()
 {
-	m_iVersion = SUPPORTED_PART_VERSION;	//3이하는 다 무시해버려..
+	m_iVersion = SUPPORTED_PART_VERSION;	//3이하는 다 무시해버려.. [Korean comment]
 
 	m_iNumParticle		= 0;
 	m_iNumLodParticle	= 0;
@@ -135,7 +135,7 @@ bool CN3FXPartParticles::ParseScript(char* szCommand, char* szBuff0, char* szBuf
 {
 	if(CN3FXPartBase::ParseScript(szCommand, szBuff0, szBuff1, szBuff2, szBuff3)) return true;
 
-	//	파티클 수.
+	//	파티클 수. [Korean comment]
 	if(lstrcmpi(szCommand, "<particle_count>")==0)
 	{
 		m_iNumParticle = atoi(szBuff0);
@@ -143,7 +143,7 @@ bool CN3FXPartParticles::ParseScript(char* szCommand, char* szBuff0, char* szBuf
 		return true;
 	}
 
-	//	파티클 크기.
+	//	파티클 크기. Size
 	if(lstrcmpi(szCommand, "<particle_size>")==0)
 	{
 		m_pair_fParticleSize.first = m_pair_fParticleSize.second = atof(szBuff0);
@@ -156,7 +156,7 @@ bool CN3FXPartParticles::ParseScript(char* szCommand, char* szBuff0, char* szBuf
 		return true;
 	}
 
-	//	파티클 생명.
+	//	파티클 생명. [Korean comment]
 	if(lstrcmpi(szCommand, "<particle_life>")==0)
 	{
 		m_pair_fParticleLife.first = atof(szBuff0);
@@ -178,21 +178,21 @@ bool CN3FXPartParticles::ParseScript(char* szCommand, char* szBuff0, char* szBuf
 		return true;
 	}
 
-	//	파티클 한번에 생성 갯수
+	//	파티클 한번에 생성 갯수 Create
 	if(lstrcmpi(szCommand, "<create_count>")==0)
 	{
 		m_iNumCreate = atoi(szBuff0);
 		return true;
 	}
 
-	//	파티클 한번에 생성 시간 범위
+	//	파티클 한번에 생성 시간 범위 Create
 	if(lstrcmpi(szCommand, "<create_delay>")==0)
 	{
 		m_CurrCreateDelay = m_fCreateDelay = atof(szBuff0);
 		return true;
 	}
 
-	//	시작하는 방법.
+	//	시작하는 방법. [Korean comment]
 	if(lstrcmpi(szCommand, "<emit_type>")==0)
 	{
 		if(lstrcmpi(szBuff0, "spread")==0)
@@ -598,7 +598,7 @@ bool CN3FXPartParticles::Tick()
 
 	if(m_bAnimKey && m_pShape)
 	{
-		//frm 계산..
+		//frm 계산.. Calculate
 		float fFrm = m_fCurrLife * m_fMeshFPS;
 		int share = (int) (fFrm / m_pShape->GetWholeFrm());
 		fFrm -= ((float) share * m_pShape->GetWholeFrm());
@@ -631,7 +631,7 @@ bool CN3FXPartParticles::Tick()
 	}
 	
 	// make particles...
-	if(m_CurrCreateDelay >= m_fCreateDelay && m_dwState==FX_PART_STATE_LIVE)	//파티클 생성...
+	if(m_CurrCreateDelay >= m_fCreateDelay && m_dwState==FX_PART_STATE_LIVE)	//파티클 생성... Create
 	{
 		m_CurrCreateDelay = 0.0f;
 		CreateParticles();		
@@ -695,14 +695,14 @@ void CN3FXPartParticles::Scaling()
 
 //
 //	render...
-//	일단은 파티클 하나씩 그리고....
-//	나중에는 같은 텍스쳐 쓰는 것들끼리 묶어서 그리자...
+//	일단은 파티클 하나씩 그리고.... [Korean comment]
+//	나중에는 같은 텍스쳐 쓰는 것들끼리 묶어서 그리자... [Korean comment]
 //
 void CN3FXPartParticles::Render()
 {
 	if(m_pVBList_Alive.size()==0) return;
 
-	if(m_bAlpha) // Alpha 사용
+	if(m_bAlpha) // Alpha 사용 [Korean comment]
 	{
 		std::list<CN3FXParticle*>::iterator it;
 		it = m_pVBList_Alive.begin();
@@ -738,7 +738,7 @@ void CN3FXPartParticles::Render()
 			}
 		}		
 
-		return; // 렌더링 안하지롱.
+		return; // 렌더링 안하지롱. Rendering
 	}
 		
 	CN3Base::s_lpD3DDev->SetFVF(FVF_XYZCOLORT1);
@@ -1001,7 +1001,7 @@ void CN3FXPartParticles::CreateParticles_Spread()
 
 		__Quaternion Qt;
 
-		//bundle의 방향 적용..
+		//bundle의 방향 적용.. [Korean comment]
 		if(m_pRefBundle)
 		{			
 			if(RotateQuaternion(v, m_pRefBundle->m_vDir, &Qt))
@@ -1019,7 +1019,7 @@ void CN3FXPartParticles::CreateParticles_Spread()
 			}
 		}
 
-		//part(emiiter)의 방향 적용
+		//part(emiiter)의 방향 적용 [Korean comment]
 		//if(m_vEmitterDir.Magnitude()!=0)
 		if(vDirPart.Magnitude()!=0)
 		{
@@ -1039,7 +1039,7 @@ void CN3FXPartParticles::CreateParticles_Spread()
 			}
 		}
 
-		//뿌려지는 방향 적용..
+		//뿌려지는 방향 적용.. [Korean comment]
 		//if(RotateQuaternion(v, m_vPtEmitDir, &Qt))
 		if(RotateQuaternion(v, vDirEmit, &Qt))
 		{
@@ -1179,7 +1179,7 @@ void CN3FXPartParticles::CreateParticles_Gather()
 
 		__Quaternion Qt;
 
-		//bundle의 방향 적용..
+		//bundle의 방향 적용.. [Korean comment]
 		if(m_pRefBundle)
 		{			
 			if(RotateQuaternion(v, m_pRefBundle->m_vDir, &Qt))
@@ -1197,7 +1197,7 @@ void CN3FXPartParticles::CreateParticles_Gather()
 			}
 		}
 
-		//part(emiiter)의 방향 적용
+		//part(emiiter)의 방향 적용 [Korean comment]
 		if(vDirPart.Magnitude()!=0)
 		{
 			if(RotateQuaternion(v, vDirPart, &Qt))
@@ -1214,7 +1214,7 @@ void CN3FXPartParticles::CreateParticles_Gather()
 				vDirEmit *= -1.0f;
 			}
 		}
-		//뿌려지는 방향 적용..
+		//뿌려지는 방향 적용.. [Korean comment]
 		//if(RotateQuaternion(v, m_vPtEmitDir, &Qt))
 		if(RotateQuaternion(v, vDirEmit, &Qt))
 		{
@@ -1465,7 +1465,7 @@ bool CN3FXPartParticles::RotateQuaternion(__Vector3 vSrcDir, __Vector3 vDestDir,
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // related sort list...
 // list의 sort함수 베꼈당..-.-
-// 제대로 동작 안하더라..ㅠ.ㅠ
+// 제대로 동작 안하더라..ㅠ.ㅠ [Korean comment]
 //
 
 void CN3FXPartParticles::PSort()

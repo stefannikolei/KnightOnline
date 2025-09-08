@@ -55,7 +55,7 @@ public:
 	bool				m_bVisible;
 protected:
 	CN3Texture*			m_pTexRef;
-	CN3Texture*			m_pTexOverlapRef; // 위에 덧칠할 텍스처
+	CN3Texture*			m_pTexOverlapRef; // 위에 덧칠할 텍스처 Texture
 //	std::vector<class CN3AnimatedTexture*> m_AnimatedTextures;
 	CN3CPartSkins*		m_pSkinsRef;
 public:
@@ -66,7 +66,7 @@ public:
 	CN3Texture*		TexSet(const std::string& szFN) { s_MngTex.Delete(&m_pTexRef); m_pTexRef = s_MngTex.Get(szFN, true, s_Options.iTexLOD_Chr); return m_pTexRef; }
 	void			TexSet(CN3Texture* pTex) { s_MngTex.Delete(&m_pTexRef); m_pTexRef = pTex; }
 	
-	CN3Texture*		TexOverlap() { return m_pTexOverlapRef; }  // 위에 덧칠할 텍스처
+	CN3Texture*		TexOverlap() { return m_pTexOverlapRef; }  // 위에 덧칠할 텍스처 Texture
 	CN3Texture*		TexOverlapSet(const std::string& szFN);
 	void			TexOverlapSet(CN3Texture* pTex);
 	
@@ -138,7 +138,7 @@ public:
 	CN3Texture* TexSet(const std::string& szFN) { s_MngTex.Delete(&m_pTexRef); m_pTexRef = s_MngTex.Get(szFN, true, s_Options.iTexLOD_Chr); return m_pTexRef; }
 	void		TexSet(CN3Texture* pTex) { s_MngTex.Delete(&m_pTexRef); m_pTexRef = pTex; }
 
-	CN3Texture* TexOverlap() { return m_pTexOverlapRef; }  // 위에 덧칠할 텍스처
+	CN3Texture* TexOverlap() { return m_pTexOverlapRef; }  // 위에 덧칠할 텍스처 Texture
 	CN3Texture* TexOverlapSet(const std::string& szFN);
 	void		TexOverlapSet(CN3Texture* pTex);
 	
@@ -154,10 +154,10 @@ class CN3CPlug: public CN3CPlugBase
 {
 public:
 	bool			m_bRenderTrace;
-	int 			m_nTraceStep; // 궤적의 길이..
-	D3DCOLOR		m_crTrace; // 궤적 색깔.. 검은색이면 없다..
-	float			m_fTrace0; // 궤적 위치..
-	float			m_fTrace1; // 궤적 위치..
+	int 			m_nTraceStep; // 궤적의 길이.. [Korean comment]
+	D3DCOLOR		m_crTrace; // 궤적 색깔.. 검은색이면 없다.. Color
+	float			m_fTrace0; // 궤적 위치.. Position
+	float			m_fTrace1; // 궤적 위치.. Position
 
 	//fx.......
 	CN3PMeshInstance			m_PMeshInstFX; // FX 에 쓸 PMesh Instance
@@ -172,7 +172,7 @@ public:
 #ifdef _N3TOOL
 	virtual bool	Save(HANDLE hFile);
 	void			ImportPMesh(const std::string& szFileName);
-	void			RenderFXLines(const __Matrix44& mtxParent, const __Matrix44& mtxJoint); // FX 들어갈 곳에 선을 그려준다.
+	void			RenderFXLines(const __Matrix44& mtxParent, const __Matrix44& mtxJoint); // FX 들어갈 곳에 선을 그려준다. [Korean comment]
 #endif // end of _N3TOOL
 	virtual void	Render(const __Matrix44& mtxParent, const __Matrix44& mtxJoint);
 	virtual void	Release();
@@ -209,9 +209,9 @@ protected:
 #endif
 };
 
-const int MAX_CHR_ANI_PART = 2; // 0 - 상체, 1 - 하체 ::: 관절들을 나누어서 나누어서 에니메이션 설정..
-const int MAX_PLUG_TRACE = 2; // 최대 두개의 무기 궤적을 남긴다..
-const int MAX_PLUG_TRACE_VERTEX = 64; // 무기 궤적 점의 수.. 점 8 개로는 잔상이 3단계로 남는다..
+const int MAX_CHR_ANI_PART = 2; // 0 - 상체, 1 - 하체 ::: 관절들을 나누어서 나누어서 에니메이션 설정.. Set
+const int MAX_PLUG_TRACE = 2; // 최대 두개의 무기 궤적을 남긴다.. [Korean comment]
+const int MAX_PLUG_TRACE_VERTEX = 64; // 무기 궤적 점의 수.. 점 8 개로는 잔상이 3단계로 남는다.. [Korean comment]
 
 typedef std::vector<CN3CPart*>::iterator	it_CPart;
 typedef std::vector<CN3CPlug*>::iterator	it_CPlug;
@@ -222,25 +222,25 @@ class CN3Chr : public CN3TransformCollision
 	friend class CPlayerMySelf;
 
 public:
-	int							m_nLOD; // Level Of Detail - 강제로 세팅할수 있도록 한다..
+	int							m_nLOD; // Level Of Detail - 강제로 세팅할수 있도록 한다.. [Korean comment]
 	int							m_nLOD_0; // Level Of Detail - 0가장 디테일한 값으로 계산된 LOD 강제로 세팅할수 있도록 한다..
 
 protected:
-	static int s_iLODDelta; // LOD 계산에 필요한 인덱스..
+	static int s_iLODDelta; // LOD 계산에 필요한 인덱스.. Calculate
 
-	CN3Joint*					m_pRootJointRef; // 한개의 뼈대만을 쓴다..
+	CN3Joint*					m_pRootJointRef; // 한개의 뼈대만을 쓴다.. [Korean comment]
 	
-	std::vector<CN3Joint*>		m_JointRefs; // 각 조인트에 참조 포인터
-	std::vector<__Matrix44>		m_MtxJoints; // 각 조인트의 행렬.. 포인터로 두지 않은 이유는 각 캐릭터마다 따로 에니메이션이 되기 위함이다..
-	std::vector<__Matrix44>		m_MtxInverses; // 조인트에 대한 역행렬
+	std::vector<CN3Joint*>		m_JointRefs; // 각 조인트에 참조 포인터 [Korean comment]
+	std::vector<__Matrix44>		m_MtxJoints; // 각 조인트의 행렬.. 포인터로 두지 않은 이유는 각 캐릭터마다 따로 에니메이션이 되기 위함이다.. Character
+	std::vector<__Matrix44>		m_MtxInverses; // 조인트에 대한 역행렬 [Korean comment]
 
 	std::vector<CN3CPart*>		m_Parts; // 각 캐릭터의 부분별 Data Pointer List
 	std::vector<CN3CPlug*>		m_Plugs; // 이 캐릭터에 붙이는 무기등의 Data Pointer List
 	std::vector<__VertexColor*>	m_vTraces; // Plug Trace Polygon
 	class CN3FXPlug*			m_pFXPlug;	// 캐릭터에 FX를 붙이는 것.
 
-	int							m_nJointPartStarts[MAX_CHR_ANI_PART]; // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
-	int							m_nJointPartEnds[MAX_CHR_ANI_PART]; // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
+	int							m_nJointPartStarts[MAX_CHR_ANI_PART]; // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호 Index
+	int							m_nJointPartEnds[MAX_CHR_ANI_PART]; // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호 Index
 	
 //	CN3Skin*	m_pSkinCollision;
 	
@@ -248,32 +248,32 @@ protected:
 
 	struct __FrmCtrl
 	{
-		__AnimData*		pAniData;	// 현재 에니메이션 데이터 포인터..
+		__AnimData*		pAniData;	// 현재 에니메이션 데이터 포인터.. Data
 
-		int		iAni;					// 현재 에니메이션
-		bool	bOnceAndFreeze;			// 한번만 하고 멈춰야 하는가??
-		bool	bProcessingDelayNow;	// 지금 지연시간을 처리하는가??
-		float	fFrmCur;				// 현재 프레임
-		float	fFrmPrev;				// 최근 프레임
-		int		iAniLoop;				// 에니메이션이 끝났나??
-		float	fBlendFrm;				// 현재 에니메이션의 시작프레임과 블렌딩할 프레임
-		float	fBlendTimeCur;			// 현재 블렌딩 시간..
-		float	fBlendTime;				// 블렌딩할 시간. (초단위)
-		float	fFreezeTime;			// 멈출 시간..
+		int		iAni;					// 현재 에니메이션 [Korean comment]
+		bool	bOnceAndFreeze;			// 한번만 하고 멈춰야 하는가?? [Korean comment]
+		bool	bProcessingDelayNow;	// 지금 지연시간을 처리하는가?? Process
+		float	fFrmCur;				// 현재 프레임 [Korean comment]
+		float	fFrmPrev;				// 최근 프레임 [Korean comment]
+		int		iAniLoop;				// 에니메이션이 끝났나?? [Korean comment]
+		float	fBlendFrm;				// 현재 에니메이션의 시작프레임과 블렌딩할 프레임 [Korean comment]
+		float	fBlendTimeCur;			// 현재 블렌딩 시간.. Time
+		float	fBlendTime;				// 블렌딩할 시간. (초단위) Time
+		float	fFreezeTime;			// 멈출 시간.. Time
 
 		void Init()
 		{
 			pAniData = nullptr;
-			iAni = -1;						// 현재 에니메이션
-			bOnceAndFreeze = false;			// 돌아갈 에니메이션..
-			bProcessingDelayNow = false;	// 지금 지연시간을 처리하는가??
+			iAni = -1;						// 현재 에니메이션 [Korean comment]
+			bOnceAndFreeze = false;			// 돌아갈 에니메이션.. [Korean comment]
+			bProcessingDelayNow = false;	// 지금 지연시간을 처리하는가?? Process
 
 			fFrmCur = 0;
-			fFrmPrev = 0;					// 최근 프레임
-			iAniLoop = 0;					// 에니메이션이 끝났는가?
-			fBlendFrm = 0;					// 블렌딩할 에니메이션 데이터 포인터..
-			fBlendTimeCur = 0;				// 현재 블렌딩 시간..
-			fBlendTime = 0;					// 블렌딩할 시간. (초단위)
+			fFrmPrev = 0;					// 최근 프레임 [Korean comment]
+			iAniLoop = 0;					// 에니메이션이 끝났는가? [Korean comment]
+			fBlendFrm = 0;					// 블렌딩할 에니메이션 데이터 포인터.. Data
+			fBlendTimeCur = 0;				// 현재 블렌딩 시간.. Time
+			fBlendTime = 0;					// 블렌딩할 시간. (초단위) Time
 		}
 		__FrmCtrl()
 		{
@@ -281,8 +281,8 @@ protected:
 		}
 	};
 	__FrmCtrl		m_FrmCtrl;
-	__FrmCtrl		m_FrmCtrlUpper;	// 상체용...
-	float			m_fAniSpeedDelta; // 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다..
+	__FrmCtrl		m_FrmCtrlUpper;	// 상체용... [Korean comment]
+	float			m_fAniSpeedDelta; // 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다.. Variable
 
 public:
 	int				CheckCollisionPrecisely(const __Vector3& vPos, const __Vector3& vDir, __Vector3* pvPick = nullptr);
@@ -290,7 +290,7 @@ public:
 	static void		LODDeltaSet(int iLODDelta) { if(s_iLODDelta >= 0 && iLODDelta <= 3) s_iLODDelta = iLODDelta; }
 	static int 		LODDelta() { return s_iLODDelta; }
 
-	void			FindMinMax(); // 최대 최소값을 찾는다.
+	void			FindMinMax(); // 최대 최소값을 찾는다. [Korean comment]
 	int				JointPartStart(int nAniPart) { if(nAniPart < 0 || nAniPart >= MAX_CHR_ANI_PART) return -1; return m_nJointPartStarts[nAniPart]; }
 	int				JointPartEnd(int nAniPart) { if(nAniPart < 0 || nAniPart >= MAX_CHR_ANI_PART) return -1; return m_nJointPartEnds[nAniPart]; }
 	void			JointPartSet(int nAniPart, int nJS, int nJE);
@@ -350,54 +350,54 @@ public:
 	void		TickPlugs(float fLOD);
 	void		RemakePlugTracePolygons();
 
-	float		Height() { return m_vMax.y * m_vScale.y; } // 스케일을 적용한 키 ...
-	float		Radius() { return m_fRadius * m_vScale.y; } // 스케일을 적용한 너비...
+	float		Height() { return m_vMax.y * m_vScale.y; } // 스케일을 적용한 키 ... [Korean comment]
+	float		Radius() { return m_fRadius * m_vScale.y; } // 스케일을 적용한 너비... [Korean comment]
 
 	CN3Joint*	Joint() { return m_pRootJointRef; }
 	void		JointSet(const std::string& szFN);
 
-	// Animation 관련 함수
+	// Animation 관련 함수 Function
 #ifdef _N3TOOL
 	void		AniDefaultSet();
 #endif // #ifdef _N3TOOL
 	CN3AnimControl* AniCtrl() { return m_pAniCtrlRef; }
 	void		AniCtrlSet(const std::string& szFN);
 	int			AniIndexCur() { return m_FrmCtrl.iAni; }
-	int			AniCurSet(	int iAni,							// Animation 번호,
-							bool bOnceAndFreeze = false,		// 한번만 돌고 멈추어야 하는가??
-							float fBlendTime = FLT_MIN,			// 블렌딩하는 시간(초단위), 
-							float fFreezeTime = 0, 				// 멈출시간...
-							bool bStopUpperAnimation = true);	// 상체 에니메이션이 있으면.. 멈추도록
+	int			AniCurSet(	int iAni,							// Animation 번호, [Korean comment]
+							bool bOnceAndFreeze = false,		// 한번만 돌고 멈추어야 하는가?? [Korean comment]
+							float fBlendTime = FLT_MIN,			// 블렌딩하는 시간(초단위),  Time
+							float fFreezeTime = 0, 				// 멈출시간... Time
+							bool bStopUpperAnimation = true);	// 상체 에니메이션이 있으면.. 멈추도록 [Korean comment]
 	void		AniUpperSet(int nAni, float fFreezeTime = 0);
-	void		AniFixToLastFrame( int iAni ); // 마지막 프레임으로 고정 시켜 버린다.
+	void		AniFixToLastFrame( int iAni ); // 마지막 프레임으로 고정 시켜 버린다. [Korean comment]
 
-	bool		IsAnimEnd(); // 한번 하고 멈추는 에니메이션 일경우 .. 끝났는지?? 혹은 한번하고 전의 동작으로 돌아가는 에니메이션일 경우 돌아갔는지?
+	bool		IsAnimEnd(); // 한번 하고 멈추는 에니메이션 일경우 .. 끝났는지?? 혹은 한번하고 전의 동작으로 돌아가는 에니메이션일 경우 돌아갔는지? [Korean comment]
 
 	float		FrmCur() { return m_FrmCtrl.fFrmCur; }
 	float		FrmPrev() { return m_FrmCtrl.fFrmPrev; }
 	float		AniBlendDelta();
-	float		AniSpeedDelta() { return m_fAniSpeedDelta; } // 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다..
-	void		AniSpeedDeltaSet(float fDelta) { if(fDelta > 0.1f && fDelta < 10.0f) m_fAniSpeedDelta = fDelta; } // 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다..
+	float		AniSpeedDelta() { return m_fAniSpeedDelta; } // 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다.. Variable
+	void		AniSpeedDeltaSet(float fDelta) { if(fDelta > 0.1f && fDelta < 10.0f) m_fAniSpeedDelta = fDelta; } // 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다.. Variable
 
-	// Sound Player 관련 함수
+	// Sound Player 관련 함수 Function
 	bool		NeedPlaySound0();
 	bool		NeedPlaySound1();
 
-	// 가짜 타격을 위한 함수..
+	// 가짜 타격을 위한 함수.. Function
 	bool		NeedStrike0();
 	bool		NeedStrike1();
 
-	// 루핑이 다시 시작되는 타이밍인가?
+	// 루핑이 다시 시작되는 타이밍인가? [Korean comment]
 	bool		IsLoopingAgain();
 	
 //////////////////////////////////////////////////
-//	Coded (By Dino On 2002-10-10 오후 2:35:32 )
+//	Coded (By Dino On 2002-10-10 오후 2:35:32 ) [Korean comment]
 //	FXPlug
 	class CN3FXPlug*	FXPlugSet(const std::string& strFN);
 	class CN3FXPlug*	FXPlugCreate();
 	class CN3FXPlug*	FXPlugGet() {return m_pFXPlug;}
 	void				FXPlugDelete();
-//	End Of Code (By Dino On 2002-10-10 오후 2:35:32 )
+//	End Of Code (By Dino On 2002-10-10 오후 2:35:32 ) [Korean comment]
 //////////////////////////////////////////////////
 
 	void		Init();
@@ -419,7 +419,7 @@ public:
 
 };
 
-inline bool CN3Chr::IsAnimEnd() // 한번 하고 멈추는 에니메이션 일경우 .. 끝났는지?? 혹은 한번하고 전의 동작으로 돌아가는 에니메이션일 경우 돌아갔는지?
+inline bool CN3Chr::IsAnimEnd() // 한번 하고 멈추는 에니메이션 일경우 .. 끝났는지?? 혹은 한번하고 전의 동작으로 돌아가는 에니메이션일 경우 돌아갔는지? [Korean comment]
 {
 	if(m_FrmCtrlUpper.pAniData)
 	{
@@ -439,7 +439,7 @@ inline float CN3Chr::AniBlendDelta()
 	return m_FrmCtrl.fBlendTimeCur / m_FrmCtrl.fBlendTime;
 }
 
-// Sound Player 관련 함수
+// Sound Player 관련 함수 Function
 inline bool	CN3Chr::NeedPlaySound0()
 {
 	if(nullptr == m_FrmCtrl.pAniData) return false;
@@ -459,7 +459,7 @@ inline bool	CN3Chr::NeedPlaySound0()
 	return false;
 }
 
-inline bool CN3Chr::IsLoopingAgain()	// 루핑이 다시 시작되는 타이밍인가?
+inline bool CN3Chr::IsLoopingAgain()	// 루핑이 다시 시작되는 타이밍인가? [Korean comment]
 {
 	if(nullptr == m_FrmCtrl.pAniData) return false;
 
@@ -469,7 +469,7 @@ inline bool CN3Chr::IsLoopingAgain()	// 루핑이 다시 시작되는 타이밍�
 		if(	m_FrmCtrlUpper.fFrmPrev > m_FrmCtrlUpper.fFrmCur) return true;
 	}
 
-	if(m_FrmCtrl.iAniLoop <= 0) return false;	// 루핑이 아니다.
+	if(m_FrmCtrl.iAniLoop <= 0) return false;	// 루핑이 아니다. [Korean comment]
 	if(	m_FrmCtrl.fFrmPrev > m_FrmCtrl.fFrmCur) return true;
 
 	return false;

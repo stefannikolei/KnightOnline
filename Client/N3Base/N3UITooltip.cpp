@@ -50,7 +50,7 @@ void CN3UITooltip::Render()
 	{
 		CN3UIStatic::Render();
 	}
-	// 이미지가 없으면 디폴트로 그려주자
+	// 이미지가 없으면 디폴트로 그려주자 [Korean comment]
 	else
 	{
 		__VertexTransformedColor pVB[8];
@@ -76,15 +76,15 @@ void CN3UITooltip::Render()
 
 		// draw
 		s_lpD3DDev->SetFVF(FVF_TRANSFORMEDCOLOR);
-		s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, pVB, sizeof(__VertexTransformedColor));	// 배경색 칠하기
+		s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, pVB, sizeof(__VertexTransformedColor));	// 배경색 칠하기 Color
 
 		__VertexTransformedColor* pTemp = pVB;
 		for (int i = 0; i < 4; ++i, ++pTemp)
-			pTemp->color = BorderColorOut;	// 바깥 테두리 색을 바꾼다.
+			pTemp->color = BorderColorOut;	// 바깥 테두리 색을 바꾼다. Color
 
-		s_lpD3DDev->DrawIndexedPrimitiveUP(D3DPT_LINELIST, 0, 8, 8, pIB, D3DFMT_INDEX16, pVB, sizeof(__VertexTransformedColor));	// 테두리 칠하기
+		s_lpD3DDev->DrawIndexedPrimitiveUP(D3DPT_LINELIST, 0, 8, 8, pIB, D3DFMT_INDEX16, pVB, sizeof(__VertexTransformedColor));	// 테두리 칠하기 [Korean comment]
 
-		// 글씨 그리기
+		// 글씨 그리기 Draw
 		m_pBuffOutRef->Render();
 	}
 }
@@ -130,7 +130,7 @@ void CN3UITooltip::SetText(const std::string& szText, D3DCOLOR crTooltip)
 		{
 			dwNewStyle = UISTYLE_STRING_SINGLELINE | UISTYLE_STRING_ALIGNCENTER | UISTYLE_STRING_ALIGNVCENTER;
 		}
-		// single line이므로 적당한 크기를 계산한다.
+		// single line이므로 적당한 크기를 계산한다. Calculate
 		else
 		{
 			SIZE CharSize = { 0, 0 };
@@ -170,7 +170,7 @@ void CN3UITooltip::SetText(const std::string& szText, D3DCOLOR crTooltip)
 	m_pBuffOutRef->SetString(szText);
 	m_pBuffOutRef->SetColor(crTooltip);
 
-	// 위치 조정
+	// 위치 조정 Position
 	POINT ptNew = m_ptCursor;
 	ptNew.x -= (m_rcRegion.right - m_rcRegion.left) / 2;
 	ptNew.y -= (m_rcRegion.bottom - m_rcRegion.top) + 10;
@@ -203,7 +203,7 @@ void CN3UITooltip::Tick()
 
 	constexpr float fDisplayTime = 0.3f;
 	if (iOldTime < fDisplayTime && m_fHoverTime >= iOldTime)
-		SetVisible(true);	// tool tip 표시
+		SetVisible(true);	// tool tip 표시 [Korean comment]
 }
 
 uint32_t CN3UITooltip::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld)
@@ -218,9 +218,9 @@ uint32_t CN3UITooltip::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POI
 		m_fHoverTime = 0.0f;
 		m_bSetText = false;
 
-		SetVisible(false); // tool tip을 없앤다.
+		SetVisible(false); // tool tip을 없앤다. [Korean comment]
 	}
-	// 안움직이면 커서 위치 저장
+	// 안움직이면 커서 위치 저장 Save
 	else
 	{
 		m_ptCursor = ptCur;

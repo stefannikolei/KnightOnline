@@ -27,7 +27,7 @@ static const int N3FORMAT_VER_DEFAULT = N3FORMAT_VER_1264;//N3FORMAT_VER_1068;
 class CN3BaseFileAccess : public CN3Base
 {
 protected:
-	std::string		m_szFileName; // Base Path 를 제외한 로컬 경로 + 파일 이름
+	std::string		m_szFileName; // Base Path 를 제외한 로컬 경로 + 파일 이름 File
 
 public:
 	uint32_t m_iFileFormatVersion;
@@ -37,13 +37,13 @@ public:
 	const std::string& FileName() const { return m_szFileName; } // Full Path
 	void FileNameSet(const std::string& szFileName);
 
-	bool LoadFromFile(); // 파일에서 읽어오기.
-	virtual bool LoadFromFile(const std::string& szFileName, uint32_t iVer = N3FORMAT_VER_DEFAULT); // 파일에서 읽어오기.
-	virtual bool Load(HANDLE hFile); // 핸들에서 읽어오기..
+	bool LoadFromFile(); // 파일에서 읽어오기. File
+	virtual bool LoadFromFile(const std::string& szFileName, uint32_t iVer = N3FORMAT_VER_DEFAULT); // 파일에서 읽어오기. File
+	virtual bool Load(HANDLE hFile); // 핸들에서 읽어오기.. [Korean comment]
 
-	virtual bool SaveToFile(); // 현재 파일 이름대로 저장.
-	virtual bool SaveToFile(const std::string& szFileName); // 새이름으로 저장.
-	virtual bool Save(HANDLE hFile); // 핸들을 통해 저장..
+	virtual bool SaveToFile(); // 현재 파일 이름대로 저장. Save
+	virtual bool SaveToFile(const std::string& szFileName); // 새이름으로 저장. Save
+	virtual bool Save(HANDLE hFile); // 핸들을 통해 저장.. Save
 
 public:
 	void Release();

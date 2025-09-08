@@ -70,7 +70,7 @@ bool CN3Texture::Create(int nWidth, int nHeight, D3DFORMAT Format, BOOL bGenerat
 	if(nWidth <= 1 || nHeight <= 1 || D3DFMT_UNKNOWN == Format) return false;
 	if(m_lpTexture != nullptr) this->Release();
 
-	if(s_dwTextureCaps & TEX_CAPS_POW2) // 2 의 승수만 된다면..
+	if(s_dwTextureCaps & TEX_CAPS_POW2) // 2 의 승수만 된다면.. [Korean comment]
 	{
 		int nW, nH;
 		for(nW = 1; nW <= nWidth; nW *= 2); nW /= 2;
@@ -80,20 +80,20 @@ bool CN3Texture::Create(int nWidth, int nHeight, D3DFORMAT Format, BOOL bGenerat
 		nHeight = nH;
 	}
 
-	if((s_dwTextureCaps & TEX_CAPS_SQUAREONLY) && nWidth != nHeight) // 정사각형 텍스처만 되면..
+	if((s_dwTextureCaps & TEX_CAPS_SQUAREONLY) && nWidth != nHeight) // 정사각형 텍스처만 되면.. Texture
 	{
 		if(nWidth > nHeight) nWidth = nHeight;
 		else nHeight = nWidth;
 	}
 
-	// 비디오 카드가 256 이상의 텍스처를 지원 하지 못하면..
+	// 비디오 카드가 256 이상의 텍스처를 지원 하지 못하면.. Texture
 	if(nWidth > 256 && CN3Base::s_DevCaps.MaxTextureWidth <= 256) nWidth = CN3Base::s_DevCaps.MaxTextureWidth;
 	if(nHeight > 256 && CN3Base::s_DevCaps.MaxTextureHeight <= 256) nHeight = CN3Base::s_DevCaps.MaxTextureHeight;
 
-	// 헤더 세팅..
+	// 헤더 세팅.. [Korean comment]
 	memset(&m_Header, 0, sizeof(m_Header));
 
-	// MipMap 단계 결정..
+	// MipMap 단계 결정.. [Korean comment]
 	// 4 X 4 픽셀까지만 MipMap 을 만든다..
 	int nMMC = 1;
 	if(bGenerateMipMap)
@@ -168,9 +168,9 @@ bool CN3Texture::LoadFromFile(const std::string& szFileName, uint32_t iVer)
 
 	if(m_lpTexture != nullptr) this->Release();
 
-	this->FileNameSet(szFileName); // 파일 이름을 복사하고..
+	this->FileNameSet(szFileName); // 파일 이름을 복사하고.. File
 	std::string szFullPath;
-	if(-1 != m_szFileName.find(':') || -1 != m_szFileName.find("\\\\") || -1 != m_szFileName.find("//")) // 문자열에 ':', '\\', '//' 이 들어 있으면 전체 경로이다..
+	if(-1 != m_szFileName.find(':') || -1 != m_szFileName.find("\\\\") || -1 != m_szFileName.find("//")) // 문자열에 ':', '\\', '//' 이 들어 있으면 전체 경로이다.. [Korean comment]
 	{
 		szFullPath = m_szFileName;
 	}
@@ -251,8 +251,8 @@ bool CN3Texture::Load(HANDLE hFile)
 	DWORD dwRWC = 0;
 	CWinCrypt crypt;
 
-	__DXT_HEADER HeaderOrg; // 헤더를 저장해 놓고..
-	ReadFile(hFile, &HeaderOrg, sizeof(HeaderOrg), &dwRWC, nullptr); // 헤더를 읽는다..
+	__DXT_HEADER HeaderOrg; // 헤더를 저장해 놓고.. Save
+	ReadFile(hFile, &HeaderOrg, sizeof(HeaderOrg), &dwRWC, nullptr); // 헤더를 읽는다.. [Korean comment]
 	if ('N' != HeaderOrg.szID[0]
 		|| 'T' != HeaderOrg.szID[1]
 		|| 'F' != HeaderOrg.szID[2]
@@ -268,7 +268,7 @@ bool CN3Texture::Load(HANDLE hFile)
 		&& !crypt.Load())
 		return false;
 
-	// DXT Format 을 읽어야 하는데 지원이 되는지 안되는지 보고 지원안되면 대체 포맷을 정한다.
+	// DXT Format 을 읽어야 하는데 지원이 되는지 안되는지 보고 지원안되면 대체 포맷을 정한다. [Korean comment]
 	bool bDXTSupport = FALSE;
 	D3DFORMAT fmtNew = HeaderOrg.Format;
 	if(D3DFMT_DXT1 == HeaderOrg.Format) 
@@ -298,8 +298,8 @@ bool CN3Texture::Load(HANDLE hFile)
 	}
 
 	int iWCreate = HeaderOrg.nWidth, iHCreate = HeaderOrg.nHeight;
-	if(fmtNew != HeaderOrg.Format) { iWCreate /= 2; iHCreate /= 2; }// DXT 지원이 안되면 너비 높이를 줄인다.
-	if(m_iLOD > 0 && m_iLOD <= 2 && HeaderOrg.nWidth >= 16 && HeaderOrg.nHeight >= 16) // LOD 만큼 작게 생성..
+	if(fmtNew != HeaderOrg.Format) { iWCreate /= 2; iHCreate /= 2; }// DXT 지원이 안되면 너비 높이를 줄인다. [Korean comment]
+	if(m_iLOD > 0 && m_iLOD <= 2 && HeaderOrg.nWidth >= 16 && HeaderOrg.nHeight >= 16) // LOD 만큼 작게 생성.. Create
 	{
 		for(int i = 0; i < m_iLOD; i++)
 		{
@@ -307,10 +307,10 @@ bool CN3Texture::Load(HANDLE hFile)
 			iHCreate /= 2;
 		}
 	}
-	else m_iLOD = 0; // LOD 적용이 아니면..
+	else m_iLOD = 0; // LOD 적용이 아니면.. [Korean comment]
 
 	int iLODPrev = m_iLOD;
-	this->Create(iWCreate, iHCreate, fmtNew, HeaderOrg.bMipMap); // 서피스 만들고..
+	this->Create(iWCreate, iHCreate, fmtNew, HeaderOrg.bMipMap); // 서피스 만들고.. [Korean comment]
 	m_iLOD = iLODPrev;
 
 	if (m_lpTexture == nullptr)
@@ -325,28 +325,28 @@ bool CN3Texture::Load(HANDLE hFile)
 	D3DLOCKED_RECT LR;
 	int iMMC = m_lpTexture->GetLevelCount(); // 생성한 MipMap 수
 
-	// 압축 포맷이면..
+	// 압축 포맷이면.. [Korean comment]
 	if(	D3DFMT_DXT1 == HeaderOrg.Format || 
 		D3DFMT_DXT2 == HeaderOrg.Format || 
 		D3DFMT_DXT3 == HeaderOrg.Format || 
 		D3DFMT_DXT4 == HeaderOrg.Format || 
 		D3DFMT_DXT5 == HeaderOrg.Format )
 	{
-		if(TRUE == bDXTSupport) // 압축 텍스처 지원이면..
+		if(TRUE == bDXTSupport) // 압축 텍스처 지원이면.. Texture
 		{
 			if(iMMC > 1)
 			{
-				if (m_iLOD > 0) // LOD 만큼 건너뛰기...
+				if (m_iLOD > 0) // LOD 만큼 건너뛰기... [Korean comment]
 				{
 					int iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
 					for (int i = 0; i < m_iLOD; i++, iWTmp /= 2, iHTmp /= 2)
 					{
 						if (D3DFMT_DXT1 == HeaderOrg.Format)
-							iSkipSize += iWTmp * iHTmp / 2; // DXT1 형식은 16비트 포맷에 비해 1/4 로 압축..
+							iSkipSize += iWTmp * iHTmp / 2; // DXT1 형식은 16비트 포맷에 비해 1/4 로 압축.. [Korean comment]
 						else
-							iSkipSize += iWTmp * iHTmp; // DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축..
+							iSkipSize += iWTmp * iHTmp; // DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축.. [Korean comment]
 					}
-					::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고.
+					::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고. [Korean comment]
 				}
 
 				for (int i = 0; i < iMMC; i++)
@@ -357,16 +357,16 @@ bool CN3Texture::Load(HANDLE hFile)
 
 					m_lpTexture->LockRect(i, &LR, nullptr, 0);
 
-					// 일렬로 된 데이터를 쓰고..
+					// 일렬로 된 데이터를 쓰고.. Data
 					crypt.ReadFile(hFile, LR.pBits, nTexSize, &dwRWC, nullptr);
 
 					m_lpTexture->UnlockRect(i);
 				}
 
-				// 텍스처 압축안되는 비디오 카드를 위한 여분의 데이터 건너뛰기.. 
+				// 텍스처 압축안되는 비디오 카드를 위한 여분의 데이터 건너뛰기..  Data
 				int iWTmp = HeaderOrg.nWidth / 2, iHTmp = HeaderOrg.nHeight / 2;
 				for(; iWTmp >= 4 && iHTmp >= 4; iWTmp /= 2, iHTmp /= 2) // 한픽셀에 두바이트가 들어가는 A1R5G5B5 혹은 A4R4G4B4 포맷으로 되어 있다..
-					::SetFilePointer(hFile, iWTmp * iHTmp * 2, 0, FILE_CURRENT); // 건너뛰고.
+					::SetFilePointer(hFile, iWTmp * iHTmp * 2, 0, FILE_CURRENT); // 건너뛰고. [Korean comment]
 			}
 			else // pair of if(iMMC > 1)
 			{
@@ -376,44 +376,44 @@ bool CN3Texture::Load(HANDLE hFile)
 
 				m_lpTexture->LockRect(0, &LR, nullptr, 0);
 
-				// 일렬로 된 데이터를 쓰고..
+				// 일렬로 된 데이터를 쓰고.. Data
 				crypt.ReadFile(hFile, LR.pBits, nTexSize, &dwRWC, nullptr);
 
 				m_lpTexture->UnlockRect(0);
 
-				// 텍스처 압축안되는 비디오 카드를 위한 여분의 데이터 건너뛰기.. 
-				::SetFilePointer(hFile, HeaderOrg.nWidth * HeaderOrg.nHeight / 4, 0, FILE_CURRENT); // 건너뛰고.
-				if(HeaderOrg.nWidth >= 1024) SetFilePointer(hFile, 256 * 256 * 2, 0, FILE_CURRENT); // 사이즈가 512 보다 클경우 부두용 데이터 건너뛰기..
+				// 텍스처 압축안되는 비디오 카드를 위한 여분의 데이터 건너뛰기..  Data
+				::SetFilePointer(hFile, HeaderOrg.nWidth * HeaderOrg.nHeight / 4, 0, FILE_CURRENT); // 건너뛰고. [Korean comment]
+				if(HeaderOrg.nWidth >= 1024) SetFilePointer(hFile, 256 * 256 * 2, 0, FILE_CURRENT); // 사이즈가 512 보다 클경우 부두용 데이터 건너뛰기.. Data
 			}
 		}
-		else // DXT 지원이 안되면..
+		else // DXT 지원이 안되면.. [Korean comment]
 		{
-			if(iMMC > 1) // LOD 만큼 건너뛰기...
+			if(iMMC > 1) // LOD 만큼 건너뛰기... [Korean comment]
 			{
-				// 압축 데이터 건너뛰기..
+				// 압축 데이터 건너뛰기.. Data
 				int iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
 				for (; iWTmp >= 4 && iHTmp >= 4; iWTmp /= 2, iHTmp /= 2)
 				{
 					if (D3DFMT_DXT1 == HeaderOrg.Format)
-						iSkipSize += iWTmp * iHTmp / 2; // DXT1 형식은 16비트 포맷에 비해 1/4 로 압축..
+						iSkipSize += iWTmp * iHTmp / 2; // DXT1 형식은 16비트 포맷에 비해 1/4 로 압축.. [Korean comment]
 					else
-						iSkipSize += iWTmp * iHTmp; // DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축..
+						iSkipSize += iWTmp * iHTmp; // DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축.. [Korean comment]
 				}
-				::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고.
+				::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고. [Korean comment]
 
-				// LOD 만큼 건너뛰기..
+				// LOD 만큼 건너뛰기.. [Korean comment]
 				iWTmp = HeaderOrg.nWidth / 2; iHTmp = HeaderOrg.nHeight / 2; iSkipSize = 0;
 				if(m_iLOD > 0)
 				{
 					for(int i = 0; i < m_iLOD; i++, iWTmp /= 2, iHTmp /= 2)
-						iSkipSize += iWTmp * iHTmp * 2; // 피치에 너비를 나눈게 픽셀의 크기라 생각한다...
+						iSkipSize += iWTmp * iHTmp * 2; // 피치에 너비를 나눈게 픽셀의 크기라 생각한다... Size
 				}
 
-				// 비디오 카드 지원 텍스처 크기가 작을경우 건너뛰기..
+				// 비디오 카드 지원 텍스처 크기가 작을경우 건너뛰기.. Size
 				for (; iWTmp > static_cast<int>(s_DevCaps.MaxTextureWidth) || iHTmp > static_cast<int>(s_DevCaps.MaxTextureHeight);
 					iWTmp /= 2, iHTmp /= 2)
 					iSkipSize += iWTmp * iHTmp * 2;
-				if(iSkipSize) ::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고.
+				if(iSkipSize) ::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고. [Korean comment]
 
 				for (int i = 0; i < iMMC; i++)
 				{
@@ -431,10 +431,10 @@ bool CN3Texture::Load(HANDLE hFile)
 			}
 			else // pair of if(iMMC > 1)
 			{
-				// 압축 데이터 건너뛰기..
+				// 압축 데이터 건너뛰기.. Data
 				int iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
-				if(D3DFMT_DXT1 == HeaderOrg.Format) iSkipSize = iWTmp * iHTmp / 2; // DXT1 형식은 16비트 포맷에 비해 1/4 로 압축..
-				else iSkipSize = iWTmp * iHTmp; // DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축..
+				if(D3DFMT_DXT1 == HeaderOrg.Format) iSkipSize = iWTmp * iHTmp / 2; // DXT1 형식은 16비트 포맷에 비해 1/4 로 압축.. [Korean comment]
+				else iSkipSize = iWTmp * iHTmp; // DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축.. [Korean comment]
 			}
 		}
 	}
@@ -451,22 +451,22 @@ bool CN3Texture::Load(HANDLE hFile)
 
 		if(iMMC > 1)
 		{
-			if(m_iLOD > 0) // LOD 만큼 건너뛰기...
+			if(m_iLOD > 0) // LOD 만큼 건너뛰기... [Korean comment]
 			{
 				int iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
-				for(int i = 0; i < m_iLOD; i++, iWTmp /= 2, iHTmp /= 2) iSkipSize += iWTmp * iHTmp * iPixelSize; // 피치에 너비를 나눈게 픽셀의 크기라 생각한다...
-				::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고.
+				for(int i = 0; i < m_iLOD; i++, iWTmp /= 2, iHTmp /= 2) iSkipSize += iWTmp * iHTmp * iPixelSize; // 피치에 너비를 나눈게 픽셀의 크기라 생각한다... Size
+				::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고. [Korean comment]
 			}
 
-			// 비디오 카드 지원 텍스처 크기가 작을경우 건너뛰기..
+			// 비디오 카드 지원 텍스처 크기가 작을경우 건너뛰기.. Size
 			int iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
 			for (; iWTmp > static_cast<int>(s_DevCaps.MaxTextureWidth) || iHTmp > static_cast<int>(s_DevCaps.MaxTextureHeight);
 				iWTmp /= 2, iHTmp /= 2)
 				iSkipSize += iWTmp * iHTmp * iPixelSize;
 			if (iSkipSize != 0)
-				::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고.
+				::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고. [Korean comment]
 
-			// 데이터 읽기..
+			// 데이터 읽기.. Load
 			for (int i = 0; i < iMMC; i++)
 			{
 				m_lpTexture->GetLevelDesc(i, &sd);
@@ -482,9 +482,9 @@ bool CN3Texture::Load(HANDLE hFile)
 		}
 		else // pair of if(iMMC > 1)
 		{
-			// 비디오 카드 지원 텍스처 크기가 작을경우 건너뛰기..
+			// 비디오 카드 지원 텍스처 크기가 작을경우 건너뛰기.. Size
 			if(HeaderOrg.nWidth >= 512 && m_Header.nWidth <= 256)
-				::SetFilePointer(hFile, HeaderOrg.nWidth * HeaderOrg.nHeight * iPixelSize, 0, FILE_CURRENT); // 건너뛰고.
+				::SetFilePointer(hFile, HeaderOrg.nWidth * HeaderOrg.nHeight * iPixelSize, 0, FILE_CURRENT); // 건너뛰고. [Korean comment]
 
 			m_lpTexture->LockRect(0, &LR, nullptr, 0);
 			D3DSURFACE_DESC sd;
@@ -498,11 +498,11 @@ bool CN3Texture::Load(HANDLE hFile)
 			m_lpTexture->UnlockRect(0);
 
 			if (m_Header.nWidth >= 512 && m_Header.nHeight >= 512)
-				SetFilePointer(hFile, 256 * 256 * 2, 0, FILE_CURRENT); // 사이즈가 512 보다 클경우 부두용 데이터 건너뛰기..
+				SetFilePointer(hFile, 256 * 256 * 2, 0, FILE_CURRENT); // 사이즈가 512 보다 클경우 부두용 데이터 건너뛰기.. Data
 		}
 	}
 
-	//	this->GenerateMipMap(); // Mip Map 을 만든다..
+	//	this->GenerateMipMap(); // Mip Map 을 만든다.. [Korean comment]
 	return true;
 }
 
@@ -510,9 +510,9 @@ bool CN3Texture::SkipFileHandle(HANDLE hFile)
 {
 	CN3BaseFileAccess::Load(hFile);
 
-	__DXT_HEADER HeaderOrg; // 헤더를 저장해 놓고..
+	__DXT_HEADER HeaderOrg; // 헤더를 저장해 놓고.. Save
 	DWORD dwRWC = 0;
-	ReadFile(hFile, &HeaderOrg, sizeof(HeaderOrg), &dwRWC, nullptr); // 헤더를 읽는다..
+	ReadFile(hFile, &HeaderOrg, sizeof(HeaderOrg), &dwRWC, nullptr); // 헤더를 읽는다.. [Korean comment]
 	if(	'N' != HeaderOrg.szID[0] || 'T' != HeaderOrg.szID[1] || 'F' != HeaderOrg.szID[2] || 3 != HeaderOrg.szID[3] ) // "NTF"3 - Noah Texture File Ver. 3.0
 	{
 #ifdef _N3GAME
@@ -520,7 +520,7 @@ bool CN3Texture::SkipFileHandle(HANDLE hFile)
 #endif
 	}
 
-	// 압축 포맷이면..
+	// 압축 포맷이면.. [Korean comment]
 	if(	D3DFMT_DXT1 == HeaderOrg.Format || 
 		D3DFMT_DXT2 == HeaderOrg.Format || 
 		D3DFMT_DXT3 == HeaderOrg.Format || 
@@ -530,29 +530,29 @@ bool CN3Texture::SkipFileHandle(HANDLE hFile)
 		int iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
 		if(HeaderOrg.bMipMap)
 		{
-			// 압축 데이터 건너뛰기..
+			// 압축 데이터 건너뛰기.. Data
 			for(; iWTmp >= 4 && iHTmp >= 4; iWTmp/=2, iHTmp/=2)
 			{
 				if(D3DFMT_DXT1 == HeaderOrg.Format) iSkipSize += iWTmp * iHTmp / 2;
 				else iSkipSize += iWTmp * iHTmp;
 			}
-			// 텍스처 압축안되는 비디오 카드를 위한 여분의 데이터 건너뛰기.. 
+			// 텍스처 압축안되는 비디오 카드를 위한 여분의 데이터 건너뛰기..  Data
 			iWTmp = HeaderOrg.nWidth / 2; iHTmp = HeaderOrg.nHeight / 2;
 			for(; iWTmp >= 4 && iHTmp >= 4; iWTmp /= 2, iHTmp /= 2) // 한픽셀에 두바이트가 들어가는 A1R5G5B5 혹은 A4R4G4B4 포맷으로 되어 있다..
-				iSkipSize += iWTmp * iHTmp * 2; // 건너뛰고.
+				iSkipSize += iWTmp * iHTmp * 2; // 건너뛰고. [Korean comment]
 		}
 		else // pair of if(HeaderOrg.bMipMap)
 		{
-			// 압축 데이터 건너뛰기..
+			// 압축 데이터 건너뛰기.. Data
 			if(D3DFMT_DXT1 == HeaderOrg.Format) iSkipSize += HeaderOrg.nWidth * HeaderOrg.nHeight / 2;
 			else iSkipSize += iSkipSize += HeaderOrg.nWidth * HeaderOrg.nHeight;
 
-			// 텍스처 압축안되는 비디오 카드를 위한 여분의 데이터 건너뛰기.. 
+			// 텍스처 압축안되는 비디오 카드를 위한 여분의 데이터 건너뛰기..  Data
 			iSkipSize += HeaderOrg.nWidth * HeaderOrg.nHeight * 2;
-			if(HeaderOrg.nWidth >= 1024) iSkipSize += 256 * 256 * 2; // 사이즈가 1024 보다 클경우 부두용 데이터 건너뛰기..
+			if(HeaderOrg.nWidth >= 1024) iSkipSize += 256 * 256 * 2; // 사이즈가 1024 보다 클경우 부두용 데이터 건너뛰기.. Data
 		}
 
-		::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고.
+		::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고. [Korean comment]
 	}
 	else
 	{
@@ -574,10 +574,10 @@ bool CN3Texture::SkipFileHandle(HANDLE hFile)
 		else
 		{
 			iSkipSize += iWTmp * iHTmp * iPixelSize;
-			if(HeaderOrg.nWidth >= 512) iSkipSize += 256 * 256 * 2; // 사이즈가 512 보다 클경우 부두용 데이터 건너뛰기..
+			if(HeaderOrg.nWidth >= 512) iSkipSize += 256 * 256 * 2; // 사이즈가 512 보다 클경우 부두용 데이터 건너뛰기.. Data
 		}
 		
-		::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고.
+		::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고. [Korean comment]
 	}
 	return true;
 }
@@ -618,7 +618,7 @@ bool CN3Texture::Save(HANDLE hFile)
 
 	int nMMC = m_lpTexture->GetLevelCount();
 	(nMMC > 1) ? m_Header.bMipMap = TRUE : m_Header.bMipMap = FALSE;
-	if(TRUE == m_Header.bMipMap) // MipMap 갯수가 맞는지 확인..
+	if(TRUE == m_Header.bMipMap) // MipMap 갯수가 맞는지 확인.. [Korean comment]
 	{
 		int nMMC2 = 0;
 		for(int nW = sd.Width, nH = sd.Height; nW >=4 && nH >= 4; nW /=2, nH /= 2) nMMC2++;
@@ -644,7 +644,7 @@ bool CN3Texture::Save(HANDLE hFile)
 	m_Header.nHeight = sd.Height;
 	m_Header.bMipMap = (nMMC > 1) ? TRUE : FALSE;
 	
-	WriteFile(hFile, &m_Header, sizeof(m_Header), &dwRWC, nullptr); // 헤더를 쓰고
+	WriteFile(hFile, &m_Header, sizeof(m_Header), &dwRWC, nullptr); // 헤더를 쓰고 [Korean comment]
 
 	if(m_lpTexture == nullptr) return false;
 
@@ -663,12 +663,12 @@ bool CN3Texture::Save(HANDLE hFile)
 			uint32_t nTexSize = GetTextureSize(sd);
 
 			m_lpTexture->LockRect(i, &LR, nullptr, 0);
-			WriteFile(hFile, (uint8_t*)LR.pBits, nTexSize, &dwRWC, nullptr); // 일렬로 된 데이터를 쓰고..
+			WriteFile(hFile, (uint8_t*)LR.pBits, nTexSize, &dwRWC, nullptr); // 일렬로 된 데이터를 쓰고.. Data
 			m_lpTexture->UnlockRect(i);
 		}
 
-		// 추가로 압축되지 않은 형식을 써준다.. 절반 크기이다.
-		// 압축되지 않은 형식을 해상도를 한단계 낮추어서 저장.
+		// 추가로 압축되지 않은 형식을 써준다.. 절반 크기이다. Size
+		// 압축되지 않은 형식을 해상도를 한단계 낮추어서 저장. Save
 		LPDIRECT3DSURFACE9 lpSurfSrc = nullptr, lpSurfDest = nullptr;
 		D3DFORMAT fmtExtra = D3DFMT_UNKNOWN;
 		if(D3DFMT_DXT1 == sd.Format) fmtExtra = D3DFMT_A1R5G5B5;
@@ -682,7 +682,7 @@ bool CN3Texture::Save(HANDLE hFile)
 			m_lpTexture->GetSurfaceLevel(i, &lpSurfSrc);
 			int nW = sd.Width / 2, nH = sd.Height / 2;
 			s_lpD3DDev->CreateOffscreenPlainSurface(nW, nH, fmtExtra, D3DPOOL_MANAGED, &lpSurfDest, nullptr);
-			D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr, D3DX_FILTER_TRIANGLE, 0); // 서피스 복사.
+			D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr, D3DX_FILTER_TRIANGLE, 0); // 서피스 복사. [Korean comment]
 			int nPixelSize = 2;
 			lpSurfDest->LockRect(&LR, nullptr, 0);
 			for(int y = 0; y < nH; y++)
@@ -694,13 +694,13 @@ bool CN3Texture::Save(HANDLE hFile)
 			lpSurfSrc->Release(); lpSurfSrc = nullptr;
 		}
 
-		if(nMMC == 1 && m_Header.nWidth >= 1024) // 부두를 위해 256 * 256 짜리 하나 더 저장해준다..
+		if(nMMC == 1 && m_Header.nWidth >= 1024) // 부두를 위해 256 * 256 짜리 하나 더 저장해준다.. Save
 		{
 			m_lpTexture->GetLevelDesc(0, &sd);
 			m_lpTexture->GetSurfaceLevel(0, &lpSurfSrc);
 			int nW = 256, nH = 256;
 			s_lpD3DDev->CreateOffscreenPlainSurface(nW, nH, fmtExtra, D3DPOOL_MANAGED, &lpSurfDest, nullptr);
-			D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr, D3DX_FILTER_TRIANGLE, 0); // 서피스 복사.
+			D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr, D3DX_FILTER_TRIANGLE, 0); // 서피스 복사. [Korean comment]
 			int nPixelSize = 2;
 			lpSurfDest->LockRect(&LR, nullptr, 0);
 			for(int y = 0; y < nH; y++)
@@ -712,7 +712,7 @@ bool CN3Texture::Save(HANDLE hFile)
 			lpSurfSrc->Release(); lpSurfSrc = nullptr;
 		}
 	}
-	else // 일반적인 포맷이면.
+	else // 일반적인 포맷이면. [Korean comment]
 	{
 		int nPixelSize = 0;
 		if(	D3DFMT_A1R5G5B5 == sd.Format ||
@@ -730,12 +730,12 @@ bool CN3Texture::Save(HANDLE hFile)
 			m_lpTexture->GetLevelDesc(i, &sd);
 			m_lpTexture->LockRect(i, &LR, nullptr, 0); // 각 레벨 Lock
 			int nH = sd.Height;
-			for(int y = 0; y < nH; y++) // 그냥 픽셀 저장..
+			for(int y = 0; y < nH; y++) // 그냥 픽셀 저장.. Save
 				WriteFile(hFile, (uint8_t*)LR.pBits + y * LR.Pitch, sd.Width * nPixelSize, &dwRWC, nullptr);
 			m_lpTexture->UnlockRect(i);
 		}
 
-		if(nMMC == 1 && m_Header.nWidth >= 512) // 부두를 위해 256 * 256 짜리 하나 더 저장해준다..
+		if(nMMC == 1 && m_Header.nWidth >= 512) // 부두를 위해 256 * 256 짜리 하나 더 저장해준다.. Save
 		{
 			LPDIRECT3DSURFACE9 lpSurfSrc = nullptr, lpSurfDest = nullptr;
 
@@ -743,7 +743,7 @@ bool CN3Texture::Save(HANDLE hFile)
 			m_lpTexture->GetSurfaceLevel(0, &lpSurfSrc);
 			int nW = 256, nH = 256;
 			s_lpD3DDev->CreateOffscreenPlainSurface(nW, nH, sd.Format, D3DPOOL_MANAGED, &lpSurfDest, nullptr);
-			HRESULT rval = D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr, D3DX_FILTER_TRIANGLE, 0); // 서피스 복사.
+			HRESULT rval = D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr, D3DX_FILTER_TRIANGLE, 0); // 서피스 복사. [Korean comment]
 			lpSurfDest->LockRect(&LR, nullptr, 0);
 			for(int y = 0; y < nH; y++)
 			{
@@ -780,7 +780,7 @@ bool CN3Texture::Convert(D3DFORMAT Format, int nWidth, int nHeight, BOOL bGenera
 	{
 		LPDIRECT3DSURFACE9 lpTSOld;
 		lpTexOld->GetSurfaceLevel(0, &lpTSOld);
-		this->GenerateMipMap(lpTSOld); // MipMap 생성
+		this->GenerateMipMap(lpTSOld); // MipMap 생성 Create
 		lpTSOld->Release();
 	}
 	else
@@ -789,7 +789,7 @@ bool CN3Texture::Convert(D3DFORMAT Format, int nWidth, int nHeight, BOOL bGenera
 		LPDIRECT3DSURFACE9 lpTSOld;
 		m_lpTexture->GetSurfaceLevel(0, &lpTSNew);
 		lpTexOld->GetSurfaceLevel(0, &lpTSOld);
-		D3DXLoadSurfaceFromSurface(lpTSNew, nullptr, nullptr, lpTSOld, nullptr, nullptr, D3DX_FILTER_NONE, 0); // 첫번재 레벨 서피스 복사.
+		D3DXLoadSurfaceFromSurface(lpTSNew, nullptr, nullptr, lpTSOld, nullptr, nullptr, D3DX_FILTER_NONE, 0); // 첫번재 레벨 서피스 복사. [Korean comment]
 		lpTSOld->Release();
 		lpTSNew->Release();
 	}
@@ -805,7 +805,7 @@ bool CN3Texture::GenerateMipMap(LPDIRECT3DSURFACE9 lpSurfSrc)
 {
 	if(m_lpTexture == nullptr) return false;
 
-	// MipMap 이 몇개 필요한지 계산..
+	// MipMap 이 몇개 필요한지 계산.. Calculate
 	int nMMC = m_lpTexture->GetLevelCount();
 	int nMMC2 = 0;
 	for(int nW = m_Header.nWidth, nH = m_Header.nHeight; nW >=4 && nH >= 4; nW /=2, nH /= 2) nMMC2++;
@@ -818,7 +818,7 @@ bool CN3Texture::GenerateMipMap(LPDIRECT3DSURFACE9 lpSurfSrc)
 	}
 
 	HRESULT rval = D3D_OK;
-	if(nMMC < nMMC2) // 적으면 새로 생성..
+	if(nMMC < nMMC2) // 적으면 새로 생성.. Create
 	{
 		LPDIRECT3DTEXTURE9 lpTexOld = m_lpTexture;
 		m_lpTexture = nullptr;
@@ -841,14 +841,14 @@ bool CN3Texture::GenerateMipMap(LPDIRECT3DSURFACE9 lpSurfSrc)
 
 		return created;
 	}
-	else // MipMap 이 있으면 그냥 표면만 복사
+	else // MipMap 이 있으면 그냥 표면만 복사 [Korean comment]
 	{
-		if(false == bNeedReleaseSurf) // 다른 서피스에서 복사해야 되는 거면 0 레벨도 복사..
+		if(false == bNeedReleaseSurf) // 다른 서피스에서 복사해야 되는 거면 0 레벨도 복사.. [Korean comment]
 		{
 			LPDIRECT3DSURFACE9 lpSurfDest;
 			m_lpTexture->GetSurfaceLevel(0, &lpSurfDest);
-			uint32_t dwFilter = D3DX_FILTER_TRIANGLE; // 기본 필터는 없다..
-			HRESULT rval = D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr, dwFilter, 0); // 작은 맵 체인에 서피스 이미지 축소 복사 
+			uint32_t dwFilter = D3DX_FILTER_TRIANGLE; // 기본 필터는 없다.. [Korean comment]
+			HRESULT rval = D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr, dwFilter, 0); // 작은 맵 체인에 서피스 이미지 축소 복사  [Korean comment]
 			lpSurfDest->Release(); lpSurfDest = nullptr;
 		}
 
@@ -857,8 +857,8 @@ bool CN3Texture::GenerateMipMap(LPDIRECT3DSURFACE9 lpSurfSrc)
 			LPDIRECT3DSURFACE9 lpSurfDest, lpSurfUp;
 			m_lpTexture->GetSurfaceLevel(i-1, &lpSurfUp);
 			m_lpTexture->GetSurfaceLevel(i, &lpSurfDest);
-			uint32_t dwFilter = D3DX_FILTER_TRIANGLE; // 기본 필터는 없다..
-			HRESULT rval = D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfUp, nullptr, nullptr, dwFilter, 0); // 작은 맵 체인에 서피스 이미지 축소 복사 
+			uint32_t dwFilter = D3DX_FILTER_TRIANGLE; // 기본 필터는 없다.. [Korean comment]
+			HRESULT rval = D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfUp, nullptr, nullptr, dwFilter, 0); // 작은 맵 체인에 서피스 이미지 축소 복사  [Korean comment]
 			lpSurfDest->Release();
 			lpSurfUp->Release();
 		}
@@ -897,7 +897,7 @@ bool CN3Texture::SaveToBitmapFile(const std::string& szFN)
 	s_lpD3DDev->CreateOffscreenPlainSurface(m_Header.nWidth, m_Header.nHeight, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &lpSurfDest, nullptr);
 
 	if(nullptr == lpSurfDest) return false;
-	if(D3D_OK != D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr, D3DX_FILTER_TRIANGLE, 0)) // 서피스 복사.
+	if(D3D_OK != D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr, D3DX_FILTER_TRIANGLE, 0)) // 서피스 복사. [Korean comment]
 	{
 		lpSurfDest->Release(); lpSurfDest = nullptr;
 		lpSurfSrc->Release(); lpSurfSrc = nullptr;

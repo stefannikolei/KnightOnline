@@ -28,15 +28,15 @@ public:
 protected:	
 	__VertexTransformed		m_pVertices[4];
 	CN3Texture				*m_pTexture;
-	float					m_fCurRadian;		// 현재 달의 회전위치
+	float					m_fCurRadian;		// 현재 달의 회전위치 Position
 	float					m_fMoonRatio;		// 달의 pixel싸이즈
-	int						m_iMoonPhaseIndex;	// 달의 모양 인덱스 0~23;
+	int						m_iMoonPhaseIndex;	// 달의 모양 인덱스 0~23; Index
 
 // Operations
 public:
 	void	Init(const std::string& szTexFN);
-	void	SetMoonPhase(int iIndex);	// 달의 모양 설정
-	void	SetCurAngle(float fAngle)	{m_fCurRadian = D3DXToRadian(fAngle);}	// 현재 각도설정
+	void	SetMoonPhase(int iIndex);	// 달의 모양 설정 Set
+	void	SetCurAngle(float fAngle)	{m_fCurRadian = D3DXToRadian(fAngle);}	// 현재 각도설정 Set
 
 	void	Render(__Matrix44& matView, __Matrix44& matProj);
 	void	Release();

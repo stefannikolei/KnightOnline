@@ -55,14 +55,14 @@ bool CN3TransformCollision::Load(HANDLE hFile)
 	ReadFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
 	if(nL > 0)
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 메시 파일 이름..
+		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 메시 파일 이름.. File
 		m_pMeshCollision = s_MngVMesh.Get(szFN);
 	}
 
 	ReadFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
 	if(nL > 0)
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 메시 파일 이름..
+		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 메시 파일 이름.. File
 		m_pMeshClimb = s_MngVMesh.Get(szFN);
 	}
 	return true;
@@ -80,7 +80,7 @@ bool CN3TransformCollision::Save(HANDLE hFile)
 	WriteFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
 	if(nL > 0) 
 	{
-		if(m_pMeshCollision->FileName().find("object\\") < 0) // 임시로 경로를 바꾸려고 넣었다.. 나중에 필요없음 지운다..
+		if(m_pMeshCollision->FileName().find("object\\") < 0) // 임시로 경로를 바꾸려고 넣었다.. 나중에 필요없음 지운다.. [Korean comment]
 		{
 			std::string szFNTmp = fmt::format("Object\\{}.N3VMesh", m_pMeshCollision->m_szName);
 			m_pMeshCollision->FileNameSet(szFNTmp);
@@ -98,7 +98,7 @@ bool CN3TransformCollision::Save(HANDLE hFile)
 	WriteFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
 	if(nL > 0) 
 	{
-		if(-1 == m_pMeshClimb->FileName().find("object\\")) // 임시로 경로를 바꾸려고 넣었다.. 나중에 필요없음 지운다..
+		if(-1 == m_pMeshClimb->FileName().find("object\\")) // 임시로 경로를 바꾸려고 넣었다.. 나중에 필요없음 지운다.. [Korean comment]
 		{
 			std::string szFNTmp = fmt::format("Object\\{}.N3VMesh", m_pMeshClimb->m_szName);
 			m_pMeshClimb->FileNameSet(szFNTmp);
@@ -143,7 +143,7 @@ void CN3TransformCollision::RenderCollisionMesh()
 	if(nullptr == m_pMeshCollision) return;
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &m_Matrix);
 
-	m_pMeshCollision->Render(0xffff0000); // 빨간색.
+	m_pMeshCollision->Render(0xffff0000); // 빨간색. Color
 }
 
 void CN3TransformCollision::RenderClimbMesh()
@@ -151,7 +151,7 @@ void CN3TransformCollision::RenderClimbMesh()
 	if(nullptr == m_pMeshClimb) return;
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &m_Matrix);
 
-	m_pMeshClimb->Render(0xff0000ff); // 파란색..
+	m_pMeshClimb->Render(0xff0000ff); // 파란색.. Color
 }
 #endif
 
@@ -275,6 +275,6 @@ void CN3TransformCollision::FindMinMax()
 		if(pVs[i].z > m_vMax.z) m_vMax.z = pVs[i].z;
 	}
 
-	// 최대 최소값을 갖고 반지름 계산한다..
+	// 최대 최소값을 갖고 반지름 계산한다.. Calculate
 	m_fRadius  = (m_vMax - m_vMin).Magnitude() * 0.5f;
 }

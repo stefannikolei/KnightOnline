@@ -184,14 +184,14 @@ void CN3CPart::Render(int nLOD)
 #endif
 
 	DWORD dwAlpha, dwFog, dwCull;
-	if(m_Mtl.nRenderFlags & RF_ALPHABLENDING) // Alpha 사용
+	if(m_Mtl.nRenderFlags & RF_ALPHABLENDING) // Alpha 사용 [Korean comment]
 	{
 		s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
 		if(TRUE != dwAlpha) s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 		s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND,   m_Mtl.dwSrcBlend);
 		s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND,  m_Mtl.dwDestBlend);
 	}
-	if(m_Mtl.nRenderFlags & RF_NOTUSEFOG) // Fog 무시..
+	if(m_Mtl.nRenderFlags & RF_NOTUSEFOG) // Fog 무시.. [Korean comment]
 	{
 		s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
 		if(TRUE == dwFog) s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, FALSE);
@@ -242,7 +242,7 @@ void CN3CPart::Render(int nLOD)
 	}
 
 	if((m_Mtl.nRenderFlags & RF_ALPHABLENDING) && FALSE == dwAlpha)		s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-	if((m_Mtl.nRenderFlags & RF_NOTUSEFOG) && TRUE == dwFog) 			s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, TRUE); // 안개 사용하지 않는다..
+	if((m_Mtl.nRenderFlags & RF_NOTUSEFOG) && TRUE == dwFog) 			s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, TRUE); // 안개 사용하지 않는다.. [Korean comment]
 	if((m_Mtl.nRenderFlags & RF_DOUBLESIDED) && D3DCULL_NONE != dwCull) s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, dwCull);
 }
 
@@ -326,7 +326,7 @@ void CN3CPlugBase::ReCalcMatrix()
 //	m_Matrix *= m_MtxRot;
 //	m_Matrix.PosSet(m_vPosition);
 //
-//	__Matrix44 mtxScale; // 일부러 스케일 값을 나중에 적용하도록 바꾸었다...
+//	__Matrix44 mtxScale; // 일부러 스케일 값을 나중에 적용하도록 바꾸었다... [Korean comment]
 //	mtxScale.Scale(m_vScale);
 //	m_Matrix *= mtxScale;
 }
@@ -347,14 +347,14 @@ void CN3CPlugBase::Render(const __Matrix44& mtxParent, const __Matrix44& mtxJoin
 #endif
 
 	DWORD dwAlpha = 0, dwFog = 0, dwCull = 0;
-	if(m_Mtl.nRenderFlags & RF_ALPHABLENDING) // Alpha 사용
+	if(m_Mtl.nRenderFlags & RF_ALPHABLENDING) // Alpha 사용 [Korean comment]
 	{
 		s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
 		if(TRUE != dwAlpha) s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 		s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND,   m_Mtl.dwSrcBlend);
 		s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND,  m_Mtl.dwDestBlend);
 	}
-	if(m_Mtl.nRenderFlags & RF_NOTUSEFOG) // Fog 무시..
+	if(m_Mtl.nRenderFlags & RF_NOTUSEFOG) // Fog 무시.. [Korean comment]
 	{
 		s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
 		if(TRUE == dwFog) s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, FALSE);
@@ -402,13 +402,13 @@ void CN3CPlugBase::Render(const __Matrix44& mtxParent, const __Matrix44& mtxJoin
 	}
 
 	if((m_Mtl.nRenderFlags & RF_ALPHABLENDING) && FALSE == dwAlpha)	s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-	if((m_Mtl.nRenderFlags & RF_NOTUSEFOG) && TRUE == dwFog) 		s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, TRUE); // 안개 사용하지 않는다..
+	if((m_Mtl.nRenderFlags & RF_NOTUSEFOG) && TRUE == dwFog) 		s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, TRUE); // 안개 사용하지 않는다.. [Korean comment]
 	if((m_Mtl.nRenderFlags & RF_DOUBLESIDED) && D3DCULL_NONE != dwCull) 		s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, dwCull);
 
 	if(bUseTwoUV) m_PMeshInst.RenderTwoUV();
 	else m_PMeshInst.Render();
 
-	if(bUseTwoUV) // 텍스처 스테이지 두개로 렌더링한다...!!
+	if(bUseTwoUV) // 텍스처 스테이지 두개로 렌더링한다...!! Rendering
 	{
 		s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
 		s_lpD3DDev->SetTexture(1, nullptr);
@@ -455,7 +455,7 @@ bool CN3CPlugBase::Load(HANDLE hFile)
 	ReadFile(hFile, &m_MtxRot, sizeof(m_MtxRot), &dwRWC, nullptr);
 	ReadFile(hFile, &m_vScale, sizeof(m_vScale), &dwRWC, nullptr);
 
-	ReadFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질
+	ReadFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질 [Korean comment]
 
 	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 	if(nL > 0)
@@ -471,7 +471,7 @@ bool CN3CPlugBase::Load(HANDLE hFile)
 		this->TexSet(szFN);
 	}	
 
-	this->ReCalcMatrix(); // 행렬 계산...
+	this->ReCalcMatrix(); // 행렬 계산... Calculate
 
 	return 0;
 }
@@ -491,7 +491,7 @@ bool CN3CPlugBase::Save(HANDLE hFile)
 	WriteFile(hFile, &m_MtxRot, sizeof(m_MtxRot), &dwRWC, nullptr);
 	WriteFile(hFile, &m_vScale, sizeof(m_vScale), &dwRWC, nullptr);
 
-	WriteFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질
+	WriteFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질 [Korean comment]
 
 	nL = 0;
 	CN3PMesh* pPMesh = m_PMeshInst.GetMesh();
@@ -534,10 +534,10 @@ CN3CPlug::CN3CPlug()
 	m_ePlugType = PLUGTYPE_NORMAL;
 
 	m_bRenderTrace = false;
-	m_nTraceStep = 0; // 궤적 소멸 시간..
-	m_crTrace = 0xfffffff; // 궤적 색깔.. 검은색이면 없다..
-	m_fTrace0 = 0; // 궤적 위치..
-	m_fTrace1 = 0; // 궤적 위치..
+	m_nTraceStep = 0; // 궤적 소멸 시간.. Time
+	m_crTrace = 0xfffffff; // 궤적 색깔.. 검은색이면 없다.. Color
+	m_fTrace0 = 0; // 궤적 위치.. Position
+	m_fTrace1 = 0; // 궤적 위치.. Position
 
 	m_pFXMainBundle = nullptr;
 	m_pFXPart = nullptr;
@@ -565,10 +565,10 @@ void CN3CPlug::Release()
 	CN3CPlugBase::Release();
 
 	m_bRenderTrace = false;
-	m_nTraceStep = 0; // 궤적 소멸 시간..
-	m_crTrace = 0xffffffff; // 궤적 색깔.. 검은색이면 없다..
-	m_fTrace0 = 0; // 궤적 위치..
-	m_fTrace1 = 0; // 궤적 위치..
+	m_nTraceStep = 0; // 궤적 소멸 시간.. Time
+	m_crTrace = 0xffffffff; // 궤적 색깔.. 검은색이면 없다.. Color
+	m_fTrace0 = 0; // 궤적 위치.. Position
+	m_fTrace1 = 0; // 궤적 위치.. Position
 
 	m_PMeshInstFX.Release(); // FX 에 쓸 PMesh Instance
 
@@ -585,17 +585,17 @@ bool CN3CPlug::Load(HANDLE hFile)
 	CN3CPlugBase::Load(hFile);
 	DWORD dwRWC = 0;
 
-	ReadFile(hFile, &m_nTraceStep, 4, &dwRWC, nullptr); // 궤적 갯수..
+	ReadFile(hFile, &m_nTraceStep, 4, &dwRWC, nullptr); // 궤적 갯수.. [Korean comment]
 	if(m_nTraceStep > 0)
 	{
-		ReadFile(hFile, &m_crTrace, 4, &dwRWC, nullptr); // 궤적 색깔.. 검은색이면 없다..
-		ReadFile(hFile, &m_fTrace0, 4, &dwRWC, nullptr); // 궤적 위치..
-		ReadFile(hFile, &m_fTrace1, 4, &dwRWC, nullptr); // 궤적 위치..
+		ReadFile(hFile, &m_crTrace, 4, &dwRWC, nullptr); // 궤적 색깔.. 검은색이면 없다.. Color
+		ReadFile(hFile, &m_fTrace0, 4, &dwRWC, nullptr); // 궤적 위치.. Position
+		ReadFile(hFile, &m_fTrace1, 4, &dwRWC, nullptr); // 궤적 위치.. Position
 	}
 	else m_nTraceStep = 0;
 
 	int iUseVMesh = 0;
-	ReadFile(hFile, &iUseVMesh, 4, &dwRWC, nullptr); // 메시를 쓰는가??
+	ReadFile(hFile, &iUseVMesh, 4, &dwRWC, nullptr); // 메시를 쓰는가?? Mesh
 	if(iUseVMesh)
 	{
 		CN3PMesh* pPMesh = new CN3PMesh();
@@ -694,17 +694,17 @@ bool CN3CPlug::Save(HANDLE hFile)
 	CN3CPlugBase::Save(hFile);
 	DWORD dwRWC = 0;
 
-	WriteFile(hFile, &m_nTraceStep, 4, &dwRWC, nullptr); // 궤적 갯수..
+	WriteFile(hFile, &m_nTraceStep, 4, &dwRWC, nullptr); // 궤적 갯수.. [Korean comment]
 	if(m_nTraceStep > 0 && m_nTraceStep <= MAX_PLUG_TRACE_VERTEX/2 - 1)
 	{
-		WriteFile(hFile, &m_crTrace, 4, &dwRWC, nullptr); // 궤적 색깔.. 검은색이면 없다..
-		WriteFile(hFile, &m_fTrace0, 4, &dwRWC, nullptr); // 궤적 위치..
-		WriteFile(hFile, &m_fTrace1, 4, &dwRWC, nullptr); // 궤적 위치..
+		WriteFile(hFile, &m_crTrace, 4, &dwRWC, nullptr); // 궤적 색깔.. 검은색이면 없다.. Color
+		WriteFile(hFile, &m_fTrace0, 4, &dwRWC, nullptr); // 궤적 위치.. Position
+		WriteFile(hFile, &m_fTrace1, 4, &dwRWC, nullptr); // 궤적 위치.. Position
 	}
 	else m_nTraceStep = 0;
 	
 	int iUseVMesh = (m_PMeshInstFX.GetMesh()) ? true : false; // 메쉬.. FX에 쓴다..
-	WriteFile(hFile, &iUseVMesh, 4, &dwRWC, nullptr); // 위치 정보 메시를 쓰는가??
+	WriteFile(hFile, &iUseVMesh, 4, &dwRWC, nullptr); // 위치 정보 메시를 쓰는가?? Info
 	if(iUseVMesh) m_PMeshInstFX.GetMesh()->Save(hFile);
 
 	return 0;
@@ -721,7 +721,7 @@ void CN3CPlug::ImportPMesh(const std::string& szFileName)
 #endif
 
 #ifdef _N3TOOL
-void CN3CPlug::RenderFXLines(const __Matrix44& mtxParent, const __Matrix44& mtxJoint) // FX 들어갈 곳에 선을 그려준다.
+void CN3CPlug::RenderFXLines(const __Matrix44& mtxParent, const __Matrix44& mtxJoint) // FX 들어갈 곳에 선을 그려준다. [Korean comment]
 {
 	static __Matrix44 mtx;
 	mtx = m_Matrix;
@@ -797,7 +797,7 @@ void CN3CPlug::RenderFX(const __Matrix44& mtxParent, const __Matrix44& mtxJoint)
 	//main...
 	/////////////////////////////////////////////////////////////////////
 	///
-	if(m_pFXPart->m_dwRenderFlag & RF_ALPHABLENDING) // Alpha 사용
+	if(m_pFXPart->m_dwRenderFlag & RF_ALPHABLENDING) // Alpha 사용 [Korean comment]
 	{
 		int iTexIdx = m_pFXPart->m_iTexIdx;
 		mtx = m_Matrix;
@@ -1033,7 +1033,7 @@ void CN3CPlug_Cloak::SetLOD(int nLOD)
 
 // Part, Plug....
 ////////////////////////////////
-int CN3Chr::s_iLODDelta = 0; // LOD 계산에 필요한 인덱스..
+int CN3Chr::s_iLODDelta = 0; // LOD 계산에 필요한 인덱스.. Calculate
 
 CN3Chr::CN3Chr()
 {
@@ -1047,7 +1047,7 @@ CN3Chr::CN3Chr()
 	m_pFXPlug = nullptr;
 
 //	m_pSkinCollision = nullptr;
-	m_fAniSpeedDelta = 1.0f;			// 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다..
+	m_fAniSpeedDelta = 1.0f;			// 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다.. Variable
 
 	this->Release();
 }
@@ -1071,7 +1071,7 @@ CN3Chr::~CN3Chr()
 	// Animation Control
 	s_MngAniCtrl.Delete(&m_pAniCtrlRef);
 
-	// 충돌 메시는 캐릭터에서는 지운다..
+	// 충돌 메시는 캐릭터에서는 지운다.. Character
 	delete m_pMeshCollision; m_pMeshCollision = nullptr;
 
 	delete m_pFXPlug;
@@ -1107,16 +1107,16 @@ void CN3Chr::Release()
 
 	for(int i = 0; i < MAX_CHR_ANI_PART; i++)
 	{
-		m_nJointPartStarts[i] = -1; // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
-		m_nJointPartEnds[i] = -1; // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
+		m_nJointPartStarts[i] = -1; // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호 Index
+		m_nJointPartEnds[i] = -1; // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호 Index
 
 		m_FrmCtrl.Init();
 		m_FrmCtrlUpper.Init();
 	}
 
-	m_fAniSpeedDelta = 1.0f;			// 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다..
+	m_fAniSpeedDelta = 1.0f;			// 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다.. Variable
 
-	// 충돌 메시는 캐릭터에서는 지운다..
+	// 충돌 메시는 캐릭터에서는 지운다.. Character
 	delete m_pMeshCollision; m_pMeshCollision = nullptr;
 
 	if (m_pFXPlug) {delete m_pFXPlug; m_pFXPlug = nullptr;}
@@ -1137,7 +1137,7 @@ bool CN3Chr::Load(HANDLE hFile)
 
 	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 	ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
-	this->JointSet(szFN); // 뼈대 세팅..
+	this->JointSet(szFN); // 뼈대 세팅.. [Korean comment]
 
 	// Part Allocation, Loading .. 
 	int iPC = 0;
@@ -1204,11 +1204,11 @@ bool CN3Chr::Load(HANDLE hFile)
 		this->AniCtrlSet(szFN);
 	}
 
-	ReadFile(hFile, m_nJointPartStarts, sizeof(m_nJointPartStarts), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
-	ReadFile(hFile, m_nJointPartEnds, sizeof(m_nJointPartEnds), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
+	ReadFile(hFile, m_nJointPartStarts, sizeof(m_nJointPartStarts), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호 Index
+	ReadFile(hFile, m_nJointPartEnds, sizeof(m_nJointPartEnds), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호 Index
 
 //////////////////////////////////////////////////
-//	Coded (By Dino On 2002-10-10 오후 2:33:07 )
+//	Coded (By Dino On 2002-10-10 오후 2:33:07 ) [Korean comment]
 //	FXPlug
 	nL = 0;
 	ReadFile(hFile, &nL, sizeof(nL), &dwRWC, nullptr);
@@ -1217,11 +1217,11 @@ bool CN3Chr::Load(HANDLE hFile)
 		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
 		FXPlugSet(szFN);
 	}
-//	End Of Code (By Dino On 2002-10-10 오후 2:33:07 )
+//	End Of Code (By Dino On 2002-10-10 오후 2:33:07 ) [Korean comment]
 //////////////////////////////////////////////////
 	
 
-	this->Init(); // 에니메이션, 조인트, 플러그등.... 초기화 작업 수행..
+	this->Init(); // 에니메이션, 조인트, 플러그등.... 초기화 작업 수행.. Initialize
 
 	return 0;
 }
@@ -1246,7 +1246,7 @@ bool CN3Chr::Save(HANDLE hFile)
 	DWORD dwRWC = 0;
 	int nL = 0;
 
-	// 관절 파일 이름 써주기..
+	// 관절 파일 이름 써주기.. File
 	if(m_pRootJointRef) nL = m_pRootJointRef->FileName().size();
 	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
 	if(nL > 0) WriteFile(hFile, m_pRootJointRef->FileName().c_str(), nL, &dwRWC, nullptr);
@@ -1275,18 +1275,18 @@ bool CN3Chr::Save(HANDLE hFile)
 			}
 		}
 
-		if(bHaveData) // 실제 데이터가 있으면..
+		if(bHaveData) // 실제 데이터가 있으면.. Data
 		{
 			m_Parts.push_back(pPart);
 		}
-		else // 없으면..
+		else // 없으면.. [Korean comment]
 		{
-			delete pPart; // 지운다..
+			delete pPart; // 지운다.. [Korean comment]
 			*it = nullptr;
 		}
 	}
 
-	// 실제 저장..
+	// 실제 저장.. Save
 	int iPC = m_Parts.size();
 	WriteFile(hFile, &iPC, 4, &dwRWC, nullptr);
 	int i;
@@ -1336,11 +1336,11 @@ bool CN3Chr::Save(HANDLE hFile)
 		WriteFile(hFile, m_pAniCtrlRef->FileName().c_str(), nL, &dwRWC, nullptr);
 	}
 
-	WriteFile(hFile, m_nJointPartStarts, sizeof(m_nJointPartStarts), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
-	WriteFile(hFile, m_nJointPartEnds, sizeof(m_nJointPartEnds), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
+	WriteFile(hFile, m_nJointPartStarts, sizeof(m_nJointPartStarts), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호 Index
+	WriteFile(hFile, m_nJointPartEnds, sizeof(m_nJointPartEnds), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호 Index
 
 //////////////////////////////////////////////////
-//	Coded (By Dino On 2002-10-11 오후 2:19:11 )
+//	Coded (By Dino On 2002-10-11 오후 2:19:11 ) [Korean comment]
 //	FXPlug
 	nL = 0;
 	if (m_pFXPlug) nL = m_pFXPlug->FileName().size();
@@ -1350,7 +1350,7 @@ bool CN3Chr::Save(HANDLE hFile)
 		WriteFile(hFile, m_pFXPlug->FileName().c_str(), nL, &dwRWC, nullptr);
 		m_pFXPlug->SaveToFile();
 	}
-//	End Of Code (By Dino On 2002-10-11 오후 2:19:11 )
+//	End Of Code (By Dino On 2002-10-11 오후 2:19:11 ) [Korean comment]
 //////////////////////////////////////////////////
 
 	return true;
@@ -1365,7 +1365,7 @@ void CN3Chr::Tick(float fFrm)
 		return;
 	}
 
-	// 카메라와 멀리 떨어지면 지나간다..
+	// 카메라와 멀리 떨어지면 지나간다.. [Korean comment]
 	float fDist = (m_vPos - s_CameraData.vEye).Magnitude();
 	if(fDist > s_CameraData.fFP + m_fRadius * 2.0f)
 	{
@@ -1373,9 +1373,9 @@ void CN3Chr::Tick(float fFrm)
 		return;
 	}
 
-	// LOD 결정...
+	// LOD 결정... [Korean comment]
 	m_nLOD = MAX_CHR_LOD;
-	float fLOD = fDist * s_CameraData.fFOV / (m_fRadius * m_vScale.x); // 덩치에 비례하게 한다..
+	float fLOD = fDist * s_CameraData.fFOV / (m_fRadius * m_vScale.x); // 덩치에 비례하게 한다.. [Korean comment]
 	for(int i = 0; i < MAX_CHR_LOD; i++)
 	{
 		if(fLOD < CHR_LOD_CALCULATION_VALUES[0][i]) // 일단 가장 큰값을 기준으로 하고 LOD 값을 정한 다음..... Render 에서 변경한다....
@@ -1384,20 +1384,20 @@ void CN3Chr::Tick(float fFrm)
 			break;
 		}
 	}
-	if(m_nLOD < 0 && m_nLOD >= MAX_CHR_LOD) return; // LOD 밖이면 나간다.
+	if(m_nLOD < 0 && m_nLOD >= MAX_CHR_LOD) return; // LOD 밖이면 나간다. [Korean comment]
 
 	static __Vector3 vPos2;
 	vPos2 = m_vPos;
 	vPos2.y += 1.8f;
 	float fOffset = m_fRadius * 3.0f + 2.0f;
 	if(	s_CameraData.IsOutOfFrustum(m_vPos, fOffset) &&
-		s_CameraData.IsOutOfFrustum(vPos2, fOffset) ) // 카메라 사면체 바깥이면 지나간다.. 현 지점과 머리 끝점을 조사..
+		s_CameraData.IsOutOfFrustum(vPos2, fOffset) ) // 카메라 사면체 바깥이면 지나간다.. 현 지점과 머리 끝점을 조사.. [Korean comment]
 	{
 		m_nLOD = -1;
 		return;
 	}
 
-	m_FrmCtrl.fFrmPrev = m_FrmCtrl.fFrmCur; // 마지막 에니메이션 프레임을 기억해 놓고..
+	m_FrmCtrl.fFrmPrev = m_FrmCtrl.fFrmCur; // 마지막 에니메이션 프레임을 기억해 놓고.. [Korean comment]
 	m_FrmCtrlUpper.fFrmPrev = m_FrmCtrlUpper.fFrmCur;
 
 	if(fFrm == FRAME_SELFPLAY) this->TickAnimationFrame();
@@ -1419,19 +1419,19 @@ void CN3Chr::Tick(float fFrm)
 	if(!m_Plugs.empty()) this->TickPlugs(fLOD); // 붙은 무기 Tick
 
 //////////////////////////////////////////////////
-//	Coded (By Dino On 2002-10-11 오전 11:21:21 )
+//	Coded (By Dino On 2002-10-11 오전 11:21:21 ) [Korean comment]
 //	FXPlug
 	if (m_pFXPlug) m_pFXPlug->Tick(this);
-//	End Of Code (By Dino On 2002-10-11 오전 11:21:21 )
+//	End Of Code (By Dino On 2002-10-11 오전 11:21:21 ) [Korean comment]
 //////////////////////////////////////////////////
 
 }
 
 void CN3Chr::TickAnimationFrame()
 {
-	if(nullptr == m_FrmCtrl.pAniData) return; // 에니메이션 데이터 가 없다!!
+	if(nullptr == m_FrmCtrl.pAniData) return; // 에니메이션 데이터 가 없다!! Data
 
-	// 루핑중이고 지연시간이 있으면..
+	// 루핑중이고 지연시간이 있으면.. Time
 	if(	(m_FrmCtrl.pAniData->iBlendFlags & 1) &&
 		m_FrmCtrl.iAniLoop > 0 && 
 		m_FrmCtrl.bProcessingDelayNow && 
@@ -1444,32 +1444,32 @@ void CN3Chr::TickAnimationFrame()
 		m_FrmCtrl.iAniLoop = 0;
 	}
 
-	float fDelta = s_fSecPerFrm * m_fAniSpeedDelta;			// 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다..
+	float fDelta = s_fSecPerFrm * m_fAniSpeedDelta;			// 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다.. Variable
 
-	if(0.0f != m_FrmCtrl.fBlendTime) // Blending 할 에니메이션이 있으면..
+	if(0.0f != m_FrmCtrl.fBlendTime) // Blending 할 에니메이션이 있으면.. [Korean comment]
 	{
 		m_FrmCtrl.fBlendTimeCur += fDelta;
-		if(m_FrmCtrl.fBlendTimeCur > m_FrmCtrl.fBlendTime) // Blending 이 끝났다.
+		if(m_FrmCtrl.fBlendTimeCur > m_FrmCtrl.fBlendTime) // Blending 이 끝났다. [Korean comment]
 		{
 			m_FrmCtrl.fBlendTime = 0.0f;
 			m_FrmCtrl.fBlendTimeCur = 0.0f;
-			m_FrmCtrl.bProcessingDelayNow = false; // 지연처리 끝..
+			m_FrmCtrl.bProcessingDelayNow = false; // 지연처리 끝.. Process
 		}
 	}
-	else // 블렌딩 할게 없으면..
+	else // 블렌딩 할게 없으면.. [Korean comment]
 	{
 		m_FrmCtrl.fFrmCur += m_FrmCtrl.pAniData->fFrmPerSec * fDelta; // Frame Tick
 		if(m_FrmCtrl.fFrmCur < m_FrmCtrl.pAniData->fFrmStart) m_FrmCtrl.fFrmCur = m_FrmCtrl.pAniData->fFrmStart;
-		if(m_FrmCtrl.fFrmCur > m_FrmCtrl.pAniData->fFrmEnd) // 에니메이션이 한번 순환하면..
+		if(m_FrmCtrl.fFrmCur > m_FrmCtrl.pAniData->fFrmEnd) // 에니메이션이 한번 순환하면.. [Korean comment]
 		{
-			if(m_FrmCtrl.fFreezeTime > 0) // 멈춰야 된다면..
+			if(m_FrmCtrl.fFreezeTime > 0) // 멈춰야 된다면.. [Korean comment]
 			{
-				m_FrmCtrl.fFrmCur = m_FrmCtrl.pAniData->fFrmEnd; // 에니메이션 데이터의 마지막 프레임으로 하고..
-				m_FrmCtrl.fFreezeTime -= fDelta; // 멈출 시간..
+				m_FrmCtrl.fFrmCur = m_FrmCtrl.pAniData->fFrmEnd; // 에니메이션 데이터의 마지막 프레임으로 하고.. Data
+				m_FrmCtrl.fFreezeTime -= fDelta; // 멈출 시간.. Time
 				if(m_FrmCtrl.fFreezeTime < 0)
 				{
-					m_FrmCtrl.fFreezeTime = 0; // 멈추는 시간 다시 세팅..
-					m_FrmCtrl.iAniLoop++; // 에니메이션 한번 했다~
+					m_FrmCtrl.fFreezeTime = 0; // 멈추는 시간 다시 세팅.. Time
+					m_FrmCtrl.iAniLoop++; // 에니메이션 한번 했다~ [Korean comment]
 				}
 			}
 			else
@@ -1477,11 +1477,11 @@ void CN3Chr::TickAnimationFrame()
 				m_FrmCtrl.fFreezeTime = 0;
 				m_FrmCtrl.iAniLoop++;
 
-				if(m_FrmCtrl.bOnceAndFreeze) m_FrmCtrl.fFrmCur = m_FrmCtrl.pAniData->fFrmEnd; // 한번 에니메이션 하고 멈춰야 한다면.. 걍 멈춰 있는다..
-				else if(m_FrmCtrl.pAniData->iBlendFlags & 1) // 루핑 지연시간이 있으면..
+				if(m_FrmCtrl.bOnceAndFreeze) m_FrmCtrl.fFrmCur = m_FrmCtrl.pAniData->fFrmEnd; // 한번 에니메이션 하고 멈춰야 한다면.. 걍 멈춰 있는다.. [Korean comment]
+				else if(m_FrmCtrl.pAniData->iBlendFlags & 1) // 루핑 지연시간이 있으면.. Time
 				{
 					m_FrmCtrl.fFrmCur = m_FrmCtrl.pAniData->fFrmEnd;
-					m_FrmCtrl.bProcessingDelayNow = true; // 지연 처리.. 시작..
+					m_FrmCtrl.bProcessingDelayNow = true; // 지연 처리.. 시작.. Process
 				}
 				else
 				{
@@ -1491,49 +1491,49 @@ void CN3Chr::TickAnimationFrame()
 				}
 			}
 		}
-	} // end of else // 블렌딩 할게 없으면..
+	} // end of else // 블렌딩 할게 없으면.. [Korean comment]
 
-	if(m_FrmCtrlUpper.pAniData) // 상하체를 분리해야 하면.. // 따로 처리해야 한다면..
+	if(m_FrmCtrlUpper.pAniData) // 상하체를 분리해야 하면.. // 따로 처리해야 한다면.. Process
 	{
-		if(0.0f != m_FrmCtrlUpper.fBlendTime) // Blending 할 에니메이션이 있으면..
+		if(0.0f != m_FrmCtrlUpper.fBlendTime) // Blending 할 에니메이션이 있으면.. [Korean comment]
 		{
 			m_FrmCtrlUpper.fBlendTimeCur += fDelta;
-			if(	m_FrmCtrlUpper.fBlendTimeCur > m_FrmCtrlUpper.fBlendTime) // Blending 이 끝났다.
+			if(	m_FrmCtrlUpper.fBlendTimeCur > m_FrmCtrlUpper.fBlendTime) // Blending 이 끝났다. [Korean comment]
 			{
-				if( m_FrmCtrlUpper.iAniLoop > 0) // 블렌딩 끝.. 이젠 하체로만 에니메이션 맞춘다.
-					m_FrmCtrlUpper.Init(); // 상체 에니메이션 끝!!				
+				if( m_FrmCtrlUpper.iAniLoop > 0) // 블렌딩 끝.. 이젠 하체로만 에니메이션 맞춘다. [Korean comment]
+					m_FrmCtrlUpper.Init(); // 상체 에니메이션 끝!!				 [Korean comment]
 				else
 					m_FrmCtrlUpper.fBlendTime = 0;
 			}
 		}
-		else // 블렌딩 할게 없으면..
+		else // 블렌딩 할게 없으면.. [Korean comment]
 		{
 			m_FrmCtrlUpper.fFrmCur += m_FrmCtrlUpper.pAniData->fFrmPerSec * fDelta; // Frame Tick
 			if(m_FrmCtrlUpper.fFrmCur < m_FrmCtrlUpper.pAniData->fFrmStart) m_FrmCtrlUpper.fFrmCur = m_FrmCtrlUpper.pAniData->fFrmStart;
-			if(m_FrmCtrlUpper.fFrmCur > m_FrmCtrlUpper.pAniData->fFrmEnd) // 에니메이션이 한번 순환하면..
+			if(m_FrmCtrlUpper.fFrmCur > m_FrmCtrlUpper.pAniData->fFrmEnd) // 에니메이션이 한번 순환하면.. [Korean comment]
 			{
-				if(m_FrmCtrlUpper.fFreezeTime > 0) // 멈춰야 된다면..
+				if(m_FrmCtrlUpper.fFreezeTime > 0) // 멈춰야 된다면.. [Korean comment]
 				{
-					m_FrmCtrlUpper.fFrmCur = m_FrmCtrlUpper.pAniData->fFrmEnd; // 에니메이션 데이터의 마지막 프레임으로 하고..
+					m_FrmCtrlUpper.fFrmCur = m_FrmCtrlUpper.pAniData->fFrmEnd; // 에니메이션 데이터의 마지막 프레임으로 하고.. Data
 
-					m_FrmCtrlUpper.fFreezeTime -= fDelta; // 멈출 시간..
+					m_FrmCtrlUpper.fFreezeTime -= fDelta; // 멈출 시간.. Time
 					if(m_FrmCtrlUpper.fFreezeTime < 0) m_FrmCtrlUpper.fFreezeTime = 0;
 				}
-				else // 멈출거 없음.. 하체 에니메이션으로 블렌딩을 한다.
+				else // 멈출거 없음.. 하체 에니메이션으로 블렌딩을 한다. [Korean comment]
 				{
-					m_FrmCtrlUpper.iAniLoop++; // 이렇게 에니메이션이 끝나면.. 하체 에니메이션으로 블렌딩이 된다.
+					m_FrmCtrlUpper.iAniLoop++; // 이렇게 에니메이션이 끝나면.. 하체 에니메이션으로 블렌딩이 된다. [Korean comment]
 					m_FrmCtrlUpper.fBlendFrm = m_FrmCtrlUpper.pAniData->fFrmEnd;
 					m_FrmCtrlUpper.fBlendTime = m_FrmCtrlUpper.pAniData->fTimeBlend;
 					m_FrmCtrlUpper.fBlendTimeCur = 0;
 				}
 			}
-		} // end of else // 블렌딩 할게 없으면..
+		} // end of else // 블렌딩 할게 없으면.. [Korean comment]
 	}
 }
 
 void CN3Chr::TickJoints()
 {
-	if(nullptr == m_FrmCtrlUpper.pAniData) // 상하체 통째로 처리..
+	if(nullptr == m_FrmCtrlUpper.pAniData) // 상하체 통째로 처리.. Process
 	{
 		int iJC = m_JointRefs.size();
 		for(int i = 0; i < iJC; i++)
@@ -1551,18 +1551,18 @@ void CN3Chr::TickJoints()
 			m_MtxJoints[i] = m_JointRefs[i]->m_Matrix;
 		}
 	}
-	else // 상하체 따로 처리해야 한다면..
+	else // 상하체 따로 처리해야 한다면.. Process
 	{
 		__FrmCtrl* pFrmCtrls[2] = { &m_FrmCtrl, &m_FrmCtrlUpper };
 		for(int i = 0; i < MAX_CHR_ANI_PART; i++)
 		{
-			// 하체일경우 루트 조인트 작동...
+			// 하체일경우 루트 조인트 작동... [Korean comment]
 			if(0 == i)
 			{
-				if(pFrmCtrls[i]->fBlendTime > 0) // Motion Blending 이 필요하면...
+				if(pFrmCtrls[i]->fBlendTime > 0) // Motion Blending 이 필요하면... [Korean comment]
 				{
 					float fBlendFactor = pFrmCtrls[i]->fBlendTimeCur / pFrmCtrls[i]->fBlendTime;
-					m_pRootJointRef->ReCalcMatrixBlended(pFrmCtrls[i]->fFrmCur, pFrmCtrls[i]->fBlendFrm, fBlendFactor); // Joint Animation Blending...// 하체 일경우
+					m_pRootJointRef->ReCalcMatrixBlended(pFrmCtrls[i]->fFrmCur, pFrmCtrls[i]->fBlendFrm, fBlendFactor); // Joint Animation Blending...// 하체 일경우 [Korean comment]
 				}
 				else
 				{
@@ -1599,7 +1599,7 @@ void CN3Chr::TickPlugs(float fLOD)
 	CN3CPlug*	pPlug = nullptr;
 	
 	float fFrmCur = m_FrmCtrl.fFrmCur;
-//	if(m_FrmCtrlUpper.pAniData) fFrmCur = m_FrmCtrlUpper.fFrmCur; // 상체 에니메이션이 있으면...
+//	if(m_FrmCtrlUpper.pAniData) fFrmCur = m_FrmCtrlUpper.fFrmCur; // 상체 에니메이션이 있으면... [Korean comment]
 
 	int iPC = m_Plugs.size();
 	for(int i = 0; i < iPC; i++)
@@ -1614,11 +1614,11 @@ void CN3Chr::TickPlugs(float fLOD)
 			if(pPlug->m_nTraceStep <= 0) continue;
 			
 			pPlug->m_bRenderTrace = false;
-			if(!(pAniData->fFrmPlugTraceEnd - pAniData->fFrmPlugTraceStart)) continue; // 궤적 프레임의 시작과 끝이 차이가 없으면..
+			if(!(pAniData->fFrmPlugTraceEnd - pAniData->fFrmPlugTraceStart)) continue; // 궤적 프레임의 시작과 끝이 차이가 없으면.. [Korean comment]
 			
 			if(	pPlug->m_nTraceStep > 0 && 
 				fFrmCur >= pAniData->fFrmPlugTraceStart &&
-				fFrmCur <= pAniData->fFrmPlugTraceEnd) // 궤적 프레임의 안에 있으면..
+				fFrmCur <= pAniData->fFrmPlugTraceEnd) // 궤적 프레임의 안에 있으면.. [Korean comment]
 			{
 				pPlug->m_bRenderTrace = true;
 
@@ -1628,7 +1628,7 @@ void CN3Chr::TickPlugs(float fLOD)
 				D3DCOLOR crTraceU = pPlug->m_crTrace;
 				D3DCOLOR crTraceL = pPlug->m_crTrace;
 
-				for(int j = 0, k = pPlug->m_nTraceStep; j < pPlug->m_nTraceStep; j++, k--) // 폴리곤을 만든다..
+				for(int j = 0, k = pPlug->m_nTraceStep; j < pPlug->m_nTraceStep; j++, k--) // 폴리곤을 만든다.. [Korean comment]
 				{
 					fFrmTmp = fFrmCur - (j*0.2f);
 					iJTmp = 0;
@@ -1697,12 +1697,12 @@ void CN3Chr::Render()
 
 
 
-	// LOD 최종 결정...
+	// LOD 최종 결정... [Korean comment]
 	if(s_iLODDelta > 0)
 	{
 		m_nLOD = MAX_CHR_LOD;
 		float fDist = (m_vPos - s_CameraData.vEye).Magnitude();
-		float fLOD = fDist * s_CameraData.fFOV / (m_fRadius * m_vScale.x); // 덩치에 비례하게 한다..
+		float fLOD = fDist * s_CameraData.fFOV / (m_fRadius * m_vScale.x); // 덩치에 비례하게 한다.. [Korean comment]
 		for(int i = 0; i < MAX_CHR_LOD; i++)
 		{
 			if(fLOD < CHR_LOD_CALCULATION_VALUES[s_iLODDelta][i]) // 일단 가장 큰값을 기준으로 하고 LOD 값을 정한 다음..... Render 에서 변경한다....
@@ -1711,7 +1711,7 @@ void CN3Chr::Render()
 				break;
 			}
 		}
-		if(m_nLOD >= MAX_CHR_LOD) m_nLOD = MAX_CHR_LOD - 1; // LOD 밖이면 ... 
+		if(m_nLOD >= MAX_CHR_LOD) m_nLOD = MAX_CHR_LOD - 1; // LOD 밖이면 ...  [Korean comment]
 	}
 
 
@@ -1721,8 +1721,8 @@ void CN3Chr::Render()
 
 
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &m_Matrix);
-	this->TickJoints(); // 조인트 행렬들 계산...
-	this->BuildMesh(); // 행렬에 따라 점위치 계산..
+	this->TickJoints(); // 조인트 행렬들 계산... Calculate
+	this->BuildMesh(); // 행렬에 따라 점위치 계산.. Calculate
 
 	int iPC = m_Parts.size();
 	for(int i = 0; i < iPC; i++)
@@ -1746,7 +1746,7 @@ void CN3Chr::Render()
 		pPlug->Render(m_Matrix, m_MtxJoints[pPlug->m_nJointIndex]);
 
 		////////////////////////////////////////////////////
-		// 검기 그리기...
+		// 검기 그리기... Draw
 		if (pPlug->m_ePlugType == PLUGTYPE_NORMAL)
 		{
 			if(pPlug->m_nTraceStep <= 1) continue;
@@ -1778,15 +1778,15 @@ void CN3Chr::Render()
 		else if (pPlug->m_ePlugType == PLUGTYPE_CLOAK)
 		{
 		}
-		// 검기 그리기...
+		// 검기 그리기... Draw
 		////////////////////////////////////////////////////
 	}
 
 //////////////////////////////////////////////////
-//	Coded (By Dino On 2002-10-11 오전 11:20:19 )
+//	Coded (By Dino On 2002-10-11 오전 11:20:19 ) [Korean comment]
 //	FXPlug
 	if (m_pFXPlug) m_pFXPlug->Render();
-//	End Of Code (By Dino On 2002-10-11 오전 11:20:19 )
+//	End Of Code (By Dino On 2002-10-11 오전 11:20:19 ) [Korean comment]
 //////////////////////////////////////////////////
 }
 
@@ -1821,13 +1821,13 @@ void CN3Chr::BuildMesh()
 		__Vector3 vFinal;
 		int nAffect = 0;
 		float* pfWeights = nullptr;
-		for(j = 0; j < nVC; j++) // j < m_nBoneVertices 와 같다..
+		for(j = 0; j < nVC; j++) // j < m_nBoneVertices 와 같다.. [Korean comment]
 		{
 
 			nAffect = pVSrc[j].nAffect;
 			if(1 == nAffect)
 			{
-				// 단일 뼈대...
+				// 단일 뼈대... [Korean comment]
 				nJIndex = pVSrc[j].pnJoints[0];
 				pVDest[j] = (pVSrc[j].vOrigin * pMtxJIs[nJIndex]) * pMtxJs[nJIndex];
 			}
@@ -1862,12 +1862,12 @@ void CN3Chr::BuildMesh()
 		{
 			int nAffect = 0;
 			float* pfWeights = nullptr;
-			for(j = 0; j < nVC; j++) // j < m_nBoneVertices 와 같다..
+			for(j = 0; j < nVC; j++) // j < m_nBoneVertices 와 같다.. [Korean comment]
 			{
 				nAffect = pVSrc[j].nAffect;
 				if(1 == nAffect)
 				{
-					// 단일 뼈대...
+					// 단일 뼈대... [Korean comment]
 					nJIndex = pVSrc[j].pnJoints[0];
 					pVDest[j] = (pVSrc[j].vOrigin * pMtxJIs[nJIndex]) * pMtxJs[nJIndex];
 				}
@@ -1920,13 +1920,13 @@ void CN3Chr::BuildMesh(int nLOD)
 		__Vector3 vFinal;
 		int nAffect = 0;
 		float* pfWeights = nullptr;
-		for(j = 0; j < nVC; j++) // j < m_nBoneVertices 와 같다..
+		for(j = 0; j < nVC; j++) // j < m_nBoneVertices 와 같다.. [Korean comment]
 		{
 
 			nAffect = pVSrc[j].nAffect;
 			if(1 == nAffect)
 			{
-				// 단일 뼈대...
+				// 단일 뼈대... [Korean comment]
 				nJIndex = pVSrc[j].pnJoints[0];
 				pVDest[j] = (pVSrc[j].vOrigin * pMtxJIs[nJIndex]) * pMtxJs[nJIndex];
 			}
@@ -1949,7 +1949,7 @@ void CN3Chr::Init()
 {
 	if(nullptr == m_pRootJointRef) return;
 
-	// 관절이 몇개 있는지 계산하고.. 포인터 할당..
+	// 관절이 몇개 있는지 계산하고.. 포인터 할당.. Calculate
 
 	int iJC = 0;
 	__Matrix44 mtxTmp; mtxTmp.Identity();
@@ -1959,12 +1959,12 @@ void CN3Chr::Init()
 	m_MtxInverses.assign(iJC, mtxTmp);
 	
 	int nJI = 0;
-	m_pRootJointRef->Tick(0); // 초기에 관절 위치 계산..
-	for(int i = 0; i < iJC; i++) // 관절 갯수 만큼 각 관절의 참조 포인터와 역행렬을 얻어놓는다..
+	m_pRootJointRef->Tick(0); // 초기에 관절 위치 계산.. Calculate
+	for(int i = 0; i < iJC; i++) // 관절 갯수 만큼 각 관절의 참조 포인터와 역행렬을 얻어놓는다.. [Korean comment]
 	{
 		m_JointRefs[i] = nullptr;
 		m_pRootJointRef->FindPointerByID(i, m_JointRefs[i]);
-		::D3DXMatrixInverse(&(m_MtxInverses[i]), nullptr, &(m_JointRefs[i]->m_Matrix)); // 로컬 축에 대한 역행렬을 구한다..
+		::D3DXMatrixInverse(&(m_MtxInverses[i]), nullptr, &(m_JointRefs[i]->m_Matrix)); // 로컬 축에 대한 역행렬을 구한다.. [Korean comment]
 		m_MtxJoints[i] = m_JointRefs[i]->m_Matrix;
 	}
 
@@ -1972,7 +1972,7 @@ void CN3Chr::Init()
 
 	this->FindMinMax();
 	
-	// 충돌 체크를 위한 폴리곤.. 크기에 맞게 변환..
+	// 충돌 체크를 위한 폴리곤.. 크기에 맞게 변환.. Check
 	if(nullptr == m_pMeshCollision) m_pMeshCollision = new CN3VMesh();
 	m_pMeshCollision->CreateCube(m_vMin, m_vMax);
 }
@@ -1981,13 +1981,13 @@ void CN3Chr::JointSet(const std::string& szFN)
 {
 	bool bNeedInit = false;
 	if(nullptr == m_pRootJointRef) bNeedInit = true;
-	else if(m_pRootJointRef && m_pRootJointRef->FileName() != szFN) bNeedInit = true;// 파일 이름이 달라야 지우고 새로 한다..
+	else if(m_pRootJointRef && m_pRootJointRef->FileName() != szFN) bNeedInit = true;// 파일 이름이 달라야 지우고 새로 한다.. File
 
 	if(bNeedInit)
 	{
 		s_MngJoint.Delete(&m_pRootJointRef);
 		m_pRootJointRef = s_MngJoint.Get(szFN);
-		this->Init(); // 초기화...
+		this->Init(); // 초기화... Initialize
 	}
 }
 
@@ -2092,51 +2092,51 @@ void CN3Chr::AniCtrlSet(const std::string& szFN)
 	for(int i = 0; i < MAX_CHR_ANI_PART; i++)
 	{
 		m_FrmCtrl.iAni = -1;
-		m_FrmCtrl.bOnceAndFreeze = false;	// 한번만 하고 멈춰야 되는가??
+		m_FrmCtrl.bOnceAndFreeze = false;	// 한번만 하고 멈춰야 되는가?? [Korean comment]
 		m_FrmCtrl.fFrmCur = 0;
-		m_FrmCtrl.fFrmPrev = 0;				// 최근 프레임
+		m_FrmCtrl.fFrmPrev = 0;				// 최근 프레임 [Korean comment]
 		m_FrmCtrl.iAniLoop = 0;
 		m_FrmCtrl.pAniData = nullptr;
 	}
 }
 
-int	CN3Chr::AniCurSet(	int iAni,					// Animation 번호,
-						bool bOnceAndFreeze,		// 한번만 돌고 멈추어야 하는가??
-						float fBlendTime,			// 블렌딩하는 시간(초단위), 
-						float fFreezeTime,			// 멈출시간...
-						bool bStopUpperAnimation)	// 상체 에니메이션이 있으면.. 멈추도록
+int	CN3Chr::AniCurSet(	int iAni,					// Animation 번호, [Korean comment]
+						bool bOnceAndFreeze,		// 한번만 돌고 멈추어야 하는가?? [Korean comment]
+						float fBlendTime,			// 블렌딩하는 시간(초단위),  Time
+						float fFreezeTime,			// 멈출시간... Time
+						bool bStopUpperAnimation)	// 상체 에니메이션이 있으면.. 멈추도록 [Korean comment]
 {
 	if(nullptr == m_pAniCtrlRef) return -1;
-	if(iAni == m_FrmCtrl.iAni) return -1; // 같은 에니메이션이면 돌아간다.
-//	if(iAni == m_FrmCtrl.iAni) { m_FrmCtrl.iAniLoop = 0; return -1; } // 같은 에니메이션이면 루핑 참조 카운트만 초기화하고 돌아간다.
+	if(iAni == m_FrmCtrl.iAni) return -1; // 같은 에니메이션이면 돌아간다. [Korean comment]
+//	if(iAni == m_FrmCtrl.iAni) { m_FrmCtrl.iAniLoop = 0; return -1; } // 같은 에니메이션이면 루핑 참조 카운트만 초기화하고 돌아간다. Initialize
 	if(iAni < 0 || iAni >= m_pAniCtrlRef->Count()) return -1;
 
-	int iAniPrev = m_FrmCtrl.iAni; // 전의 걸 기억하고..
-	float fFrmPrev = m_FrmCtrl.fFrmCur; // 최근의 프레임..
+	int iAniPrev = m_FrmCtrl.iAni; // 전의 걸 기억하고.. [Korean comment]
+	float fFrmPrev = m_FrmCtrl.fFrmCur; // 최근의 프레임.. [Korean comment]
 
 	if(bStopUpperAnimation)
-		m_FrmCtrlUpper.Init(); // 상체 에니메이션 강제 종료 !!
+		m_FrmCtrlUpper.Init(); // 상체 에니메이션 강제 종료 !! [Korean comment]
 	m_FrmCtrl.Init();
 
 	m_FrmCtrl.iAni = iAni;
-	m_FrmCtrl.bOnceAndFreeze = bOnceAndFreeze; // 한번만 하고 멈추어야 하는가....
+	m_FrmCtrl.bOnceAndFreeze = bOnceAndFreeze; // 한번만 하고 멈추어야 하는가.... [Korean comment]
 	m_FrmCtrl.fFreezeTime = fFreezeTime;
 	m_FrmCtrl.pAniData = m_pAniCtrlRef->DataGet(iAni);
 
-	m_FrmCtrl.fFrmCur = m_FrmCtrl.pAniData->fFrmStart; // 프레임을 처음으로 세팅..
+	m_FrmCtrl.fFrmCur = m_FrmCtrl.pAniData->fFrmStart; // 프레임을 처음으로 세팅.. [Korean comment]
 	m_FrmCtrl.fFrmPrev = m_FrmCtrl.pAniData->fFrmEnd;
 	if(FLT_MIN != fBlendTime) m_FrmCtrl.fBlendTime = fBlendTime; // 모션 Blending 값 설정..
 	else m_FrmCtrl.fBlendTime = m_FrmCtrl.pAniData->fTimeBlend;
 	if(m_FrmCtrl.fBlendTime > 0) m_FrmCtrl.fBlendFrm = fFrmPrev; // Blending 할 에니메이션 Frame..
-	else m_FrmCtrl.fBlendFrm = m_FrmCtrl.fFrmCur; // Blending 할 에니메이션 은 없다!!
+	else m_FrmCtrl.fBlendFrm = m_FrmCtrl.fFrmCur; // Blending 할 에니메이션 은 없다!! [Korean comment]
 
 	return iAniPrev;
 }
 
-void CN3Chr::AniFixToLastFrame( int iAni ) // 마지막 프레임으로 고정 시켜 버린다.
+void CN3Chr::AniFixToLastFrame( int iAni ) // 마지막 프레임으로 고정 시켜 버린다. [Korean comment]
 {
 	if(nullptr == m_pAniCtrlRef) return;
-	if(iAni == m_FrmCtrl.iAni) return; // 같은 에니메이션이면 돌아간다.
+	if(iAni == m_FrmCtrl.iAni) return; // 같은 에니메이션이면 돌아간다. [Korean comment]
 	if(iAni < 0 || iAni >= m_pAniCtrlRef->Count()) return;
 
 	__AnimData* pAniData = m_pAniCtrlRef->DataGet(iAni);
@@ -2144,12 +2144,12 @@ void CN3Chr::AniFixToLastFrame( int iAni ) // 마지막 프레임으로 고정 �
 
 	m_FrmCtrl.Init();
 	m_FrmCtrl.iAni = iAni;
-	m_FrmCtrl.bOnceAndFreeze = true; // 한번만 하고 멈추어야 하는가....
+	m_FrmCtrl.bOnceAndFreeze = true; // 한번만 하고 멈추어야 하는가.... [Korean comment]
 	m_FrmCtrl.pAniData = m_pAniCtrlRef->DataGet(iAni);
 	m_FrmCtrl.fBlendTime = 0; // 모션 Blending 값 설정..
 	m_FrmCtrl.fBlendFrm = pAniData->fFrmEnd; // Blending 할 에니메이션 Frame..
-	m_FrmCtrl.fFreezeTime = 1000.0f; // 멈출 시간..
-	m_FrmCtrl.fFrmCur = pAniData->fFrmEnd; // 프레임을 처음으로 세팅..
+	m_FrmCtrl.fFreezeTime = 1000.0f; // 멈출 시간.. Time
+	m_FrmCtrl.fFrmCur = pAniData->fFrmEnd; // 프레임을 처음으로 세팅.. [Korean comment]
 	m_FrmCtrl.fFrmPrev = pAniData->fFrmEnd;
 
 	return;
@@ -2159,7 +2159,7 @@ void CN3Chr::AniUpperSet(int iAni, float fFreezeTime)
 {
 	if(nullptr == m_pAniCtrlRef) return;
 	if(iAni < 0 || iAni >= m_pAniCtrlRef->Count()) return;
-	if(iAni == m_FrmCtrlUpper.iAni) return; // 전의 것과 같으면 넘어간다..
+	if(iAni == m_FrmCtrlUpper.iAni) return; // 전의 것과 같으면 넘어간다.. [Korean comment]
 
 	m_FrmCtrlUpper.Init();
 
@@ -2171,9 +2171,9 @@ void CN3Chr::AniUpperSet(int iAni, float fFreezeTime)
 	m_FrmCtrlUpper.fBlendTime = m_FrmCtrlUpper.pAniData->fTimeBlend;
 	m_FrmCtrlUpper.fBlendTimeCur = 0;
 	m_FrmCtrlUpper.fBlendFrm = m_FrmCtrl.fFrmCur; // 하체 프레임과 Blending 할 에니메이션 Frame..
-	m_FrmCtrlUpper.fFreezeTime = fFreezeTime; // 멈출 시간..
+	m_FrmCtrlUpper.fFreezeTime = fFreezeTime; // 멈출 시간.. Time
 
-	m_FrmCtrlUpper.fFrmCur = m_FrmCtrlUpper.pAniData->fFrmStart; // 프레임을 처음으로 세팅..
+	m_FrmCtrlUpper.fFrmCur = m_FrmCtrlUpper.pAniData->fFrmStart; // 프레임을 처음으로 세팅.. [Korean comment]
 	m_FrmCtrlUpper.fFrmPrev = m_FrmCtrlUpper.pAniData->fFrmEnd;
 }
 
@@ -2222,9 +2222,9 @@ void CN3Chr::FindMinMax()
 	m_vMin.Set(FLT_MAX, FLT_MAX, FLT_MAX);
 	m_vMax.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-	for(int i = 0; i < iJC; i++) // 관절 갯수 만큼 각 관절의 참조 포인터와 역행렬을 얻어놓는다..
+	for(int i = 0; i < iJC; i++) // 관절 갯수 만큼 각 관절의 참조 포인터와 역행렬을 얻어놓는다.. [Korean comment]
 	{
-		// 각 조인트의 관절 위치 값에 대해 최대 최소값을 찾는다.
+		// 각 조인트의 관절 위치 값에 대해 최대 최소값을 찾는다. Position
 		vTmp = m_JointRefs[i]->m_Matrix.Pos();
 		if(vTmp.x < m_vMin.x) m_vMin.x = vTmp.x;
 		if(vTmp.y < m_vMin.y) m_vMin.y = vTmp.y;
@@ -2234,12 +2234,12 @@ void CN3Chr::FindMinMax()
 		if(vTmp.z > m_vMax.z) m_vMax.z = vTmp.z;
 	}
 
-	// 너무 작으면 늘려준다..
+	// 너무 작으면 늘려준다.. [Korean comment]
 	if(m_vMax.x - m_vMin.x < 0.5f) { m_vMax.x += 0.25f; m_vMin.x -= 0.25f; }
 	if(m_vMax.y - m_vMin.y < 0.5f) { m_vMax.y += 0.25f; m_vMin.y -= 0.25f; }
 	if(m_vMax.z - m_vMin.z < 0.5f) { m_vMax.z += 0.25f; m_vMin.z -= 0.25f; }
 
-	// 최대 최소값을 갖고 반지름 계산한다..
+	// 최대 최소값을 갖고 반지름 계산한다.. Calculate
 	m_fRadius  = (m_vMax - m_vMin).Magnitude() * 0.5f;
 }
 
@@ -2266,7 +2266,7 @@ int CN3Chr::CheckCollisionPrecisely(int ixScreen, int iyScreen, __Vector3* pvPic
 	if(!pvMesh->Pick(Mtx, vPos, vDir, pvPick))
 		return -1;
 
-	// 멀리 있는 캐릭터는 박스로만 체크하고 가까이 있는건 디테일하게 충돌체크를 한다...
+	// 멀리 있는 캐릭터는 박스로만 체크하고 가까이 있는건 디테일하게 충돌체크를 한다... Check
 	if(m_nLOD >= 3)
 		return 1;
 
@@ -2276,7 +2276,7 @@ int CN3Chr::CheckCollisionPrecisely(int ixScreen, int iyScreen, __Vector3* pvPic
 
 int CN3Chr::CheckCollisionPrecisely(const __Vector3 &vPos, const __Vector3 &vDir, __Vector3* pvPick)
 {
-	this->TickJoints(); // 조인트 행렬들 계산...
+	this->TickJoints(); // 조인트 행렬들 계산... Calculate
 	BuildMesh(m_nLOD);
 
 	__Vector3 v0, v1, v2;
@@ -2300,10 +2300,10 @@ int CN3Chr::CheckCollisionPrecisely(const __Vector3 &vPos, const __Vector3 &vDir
 }
 
 //////////////////////////////////////////////////
-//	Coded (By Dino On 2002-10-10 오후 2:36:28 )
+//	Coded (By Dino On 2002-10-10 오후 2:36:28 ) [Korean comment]
 //	FXPlug
 
-// FXPlugSet : FXPlug 파일을 지정해주는 함수
+// FXPlugSet : FXPlug 파일을 지정해주는 함수 Function
 CN3FXPlug* CN3Chr::FXPlugSet(const std::string& strFN)
 {
 	if (m_pFXPlug) m_pFXPlug->Release();
@@ -2321,7 +2321,7 @@ CN3FXPlug*	CN3Chr::FXPlugCreate()
 		
 		if (m_szName.size()>0)
 		{
-			std::string szFN = fmt::format("Chr\\{}.N3FXPlug", m_szName);	// 캐릭터의 이름을 붙인다.
+			std::string szFN = fmt::format("Chr\\{}.N3FXPlug", m_szName);	// 캐릭터의 이름을 붙인다. Character
 			m_pFXPlug->FileNameSet(szFN);
 		}
 		else m_pFXPlug->FileNameSet("Chr\\Default.N3FXPlug");	// 그냥 default이름을 붙인다.
@@ -2334,5 +2334,5 @@ void	CN3Chr::FXPlugDelete()
 	if (m_pFXPlug) delete m_pFXPlug;
 	m_pFXPlug = nullptr;
 }
-//	End Of Code (By Dino On 2002-10-10 오후 2:36:28 )
+//	End Of Code (By Dino On 2002-10-10 오후 2:36:28 ) [Korean comment]
 //////////////////////////////////////////////////

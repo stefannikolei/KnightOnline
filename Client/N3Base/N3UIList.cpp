@@ -20,7 +20,7 @@ CN3UIList::CN3UIList()
 {
 	m_eType = UI_TYPE_LIST;
 
-	m_iCurSel = 0;		// 현재 선택..
+	m_iCurSel = 0;		// 현재 선택.. Select
 	m_pScrollBarRef = nullptr;
 
 	m_szFontName = "굴림체";
@@ -282,10 +282,10 @@ bool CN3UIList::Load(HANDLE hFile)
 {
 	bool bSuccess = CN3UIBase::Load(hFile);
 
-	// font 정보
+	// font 정보 Info
 	DWORD dwNum;
 	int iStrLen = 0;
-	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이 
+	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이  Name
 	__ASSERT(iStrLen>0, "No font name");
 	if (iStrLen>0)
 	{
@@ -311,7 +311,7 @@ bool CN3UIList::Load(HANDLE hFile)
 //			if(	pString->GetFontName != m_szFontName ||
 //				pString->GetFontHeight() != m_dwFontHeight ||
 //				m_bFontBold != (pString->GetFontFlags() & D3DFONT_BOLD) ||
-//				m_bFontItalic != (pString->GetFontFlags() & D3DFONT_ITALIC) ) // 폰트가 다르면.. 적용
+//				m_bFontItalic != (pString->GetFontFlags() & D3DFONT_ITALIC) ) // 폰트가 다르면.. 적용 [Korean comment]
 //			{
 //				pString->SetFont(m_szFontName, m_dwFontHeight, m_bFontBold, m_bFontItalic);
 //			}
@@ -328,10 +328,10 @@ bool CN3UIList::Save(HANDLE hFile)
 	
 	DWORD dwNum;
 	
-	// font 정보
+	// font 정보 Info
 	int iStrLen = m_szFontName.size();
 	__ASSERT(iStrLen>0, "No font name");
-	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이 
+	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이  Name
 	if (iStrLen>0)
 	{
 		WriteFile(hFile, m_szFontName.c_str(), iStrLen, &dwNum, nullptr);				// string
@@ -363,7 +363,7 @@ uint32_t CN3UIList::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
 	if (!m_bVisible || UI_STATE_LIST_DISABLE == m_eState) return dwRet;
 
-	// 특정 이벤트에 대해 메시지 전송..
+	// 특정 이벤트에 대해 메시지 전송.. Mesh
 	if(IsIn(ptCur.x, ptCur.y) && ((dwFlags & UI_MOUSE_LBCLICK) || (dwFlags & UI_MOUSE_LBDBLCLK)) )	
 	{
 		RECT rc = this->GetRegion(), rcStr;
@@ -386,12 +386,12 @@ uint32_t CN3UIList::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 				m_iCurSel = i;
 				if(dwFlags & UI_MOUSE_LBCLICK)
 				{
-					if(m_pParent) m_pParent->ReceiveMessage(this, UIMSG_LIST_SELCHANGE); // 부모에게 버튼 클릭 통지..
+					if(m_pParent) m_pParent->ReceiveMessage(this, UIMSG_LIST_SELCHANGE); // 부모에게 버튼 클릭 통지.. Button
 					dwRet |= UIMSG_LIST_SELCHANGE;
 				}
 				else
 				{
-					if(m_pParent) m_pParent->ReceiveMessage(this, UIMSG_LIST_DBLCLK); // 부모에게 버튼 클릭 통지..
+					if(m_pParent) m_pParent->ReceiveMessage(this, UIMSG_LIST_DBLCLK); // 부모에게 버튼 클릭 통지.. Button
 					dwRet |= UIMSG_LIST_DBLCLK;
 				}
 				dwRet |= UI_MOUSEPROC_DONESOMETHING;
@@ -416,7 +416,7 @@ void CN3UIList::Render()
 		CN3UIString* pStr = *it;
 		if(pStr)
 		{
-			RECT rc = pStr->GetRegion(); // 선택 표시
+			RECT rc = pStr->GetRegion(); // 선택 표시 Select
 		
 			__VertexTransformedColor vLines[5];
 			vLines[0].Set((float)rc.left, (float)rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);

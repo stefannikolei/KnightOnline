@@ -522,8 +522,8 @@ inline __Matrix44 __Matrix44::operator * (const D3DXMATRIX& mtx)
 	mtxTmp._43 = _41 * mtx._13 + _42 * mtx._23 + _43 * mtx._33 + _44 * mtx._43;
 	mtxTmp._44 = _41 * mtx._14 + _42 * mtx._24 + _43 * mtx._34 + _44 * mtx._44;
 
-	// 최적화 된 코드..	
-	// dino 막음.. 아래 코드는 4번째 행들의 계산을 생략하여서 부정확한 계산을 한다.
+	// 최적화 된 코드..	 [Korean comment]
+	// dino 막음.. 아래 코드는 4번째 행들의 계산을 생략하여서 부정확한 계산을 한다. Calculate
 	// 보통 4번째 행이 (0, 0, 0, 1)인 matrix를 쓰지만 projection matrix의 경우
 	// (0, 0, 1, 0)인 matrix를 쓰므로 이상한 결과를 초래한다.
 //	mtxTmp._11 = _11 * mtx._11 + _12 * mtx._21 + _13 * mtx._31;
@@ -575,7 +575,7 @@ inline void __Matrix44::operator *= (const D3DXMATRIX& mtx)
 	_43 = mtxTmp._41 * mtx._13 + mtxTmp._42 * mtx._23 + mtxTmp._43 * mtx._33 + mtxTmp._44 * mtx._43;
 	_44 = mtxTmp._41 * mtx._14 + mtxTmp._42 * mtx._24 + mtxTmp._43 * mtx._34 + mtxTmp._44 * mtx._44;
 
-	// dino 막음.. 아래 코드는 4번째 행들의 계산을 생략하여서 부정확한 계산을 한다.
+	// dino 막음.. 아래 코드는 4번째 행들의 계산을 생략하여서 부정확한 계산을 한다. Calculate
 	// 보통 4번째 행이 (0, 0, 0, 1)인 matrix를 쓰지만 projection matrix의 경우
 	// (0, 0, 1, 0)인 matrix를 쓰므로 이상한 결과를 초래한다.
 //	_11 = mtxTmp._11 * mtx._11 + mtxTmp._12 * mtx._21 + mtxTmp._13 * mtx._31;
@@ -746,24 +746,24 @@ const uint32_t FVF_XYZNORMALCOLORT1	= D3DFVF_XYZ | D3DFVF_NORMAL  | D3DFVF_DIFFU
 
 const uint32_t RF_NOTHING			= 0x0;
 const uint32_t RF_ALPHABLENDING	= 0x1;		// Alpha blending
-const uint32_t RF_NOTUSEFOG		= 0x2;		// 안개 무시
+const uint32_t RF_NOTUSEFOG		= 0x2;		// 안개 무시 [Korean comment]
 const uint32_t RF_DOUBLESIDED		= 0x4;		// 양면 - D3DCULL_NONE
-const uint32_t RF_BOARD_Y			= 0x8;		// Y 축으로 해서.. 카메라를 본다.
+const uint32_t RF_BOARD_Y			= 0x8;		// Y 축으로 해서.. 카메라를 본다. [Korean comment]
 const uint32_t RF_POINTSAMPLING	= 0x10;		// MipMap 에서.. PointSampling 으로 한다..
 const uint32_t RF_WINDY			= 0x20;		// 바람에 날린다.. 바람의 값은 CN3Base::s_vWindFactor 를 참조 한다..
 const uint32_t RF_NOTUSELIGHT		= 0x40;		// Light Off
 const uint32_t RF_DIFFUSEALPHA		= 0x80;		// Diffuse 값을 갖고 투명하게 Alpha blending
-const uint32_t RF_NOTZWRITE		= 0x100;	// ZBuffer 에 안쓴다.
+const uint32_t RF_NOTZWRITE		= 0x100;	// ZBuffer 에 안쓴다. [Korean comment]
 const uint32_t RF_UV_CLAMP			= 0x200;	// texture UV적용을 Clamp로 한다..default는 wrap이다..
-const uint32_t RF_NOTZBUFFER		= 0x400;	// ZBuffer 무시.
+const uint32_t RF_NOTZBUFFER		= 0x400;	// ZBuffer 무시. [Korean comment]
 
 struct __Material : public _D3DMATERIAL9
 {
 public:
 	uint32_t	dwColorOp, dwColorArg1, dwColorArg2;
 	BOOL	nRenderFlags; // 1-AlphaBlending | 2-안개랑 관계없음 | 4-Double Side | 8- ??
-	uint32_t	dwSrcBlend; // 소스 블렌딩 방법
-	uint32_t	dwDestBlend; // 데스트 블렌딩 방법
+	uint32_t	dwSrcBlend; // 소스 블렌딩 방법 [Korean comment]
+	uint32_t	dwDestBlend; // 데스트 블렌딩 방법 [Korean comment]
 
 public:
 	void Init(const _D3DCOLORVALUE& diffuseColor)
@@ -784,7 +784,7 @@ public:
 		dwDestBlend = D3DBLEND_INVSRCALPHA;
 	}
 
-	void Init() // 기본 흰색으로 만든다..
+	void Init() // 기본 흰색으로 만든다.. Color
 	{
 		D3DCOLORVALUE crDiffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
 		this->Init(crDiffuse);
@@ -896,7 +896,7 @@ struct __VertexTransformed : public __Vector3
 {
 public:
 	float rhw;
-	D3DCOLOR color; // 필요 없다..
+	D3DCOLOR color; // 필요 없다.. [Korean comment]
 	float tu, tv;
 
 public:
@@ -1065,7 +1065,7 @@ public:
 
 
 
-const int MAX_MIPMAP_COUNT = 10; // 1024 * 1024 단계까지 생성
+const int MAX_MIPMAP_COUNT = 10; // 1024 * 1024 단계까지 생성 Create
 
 const uint32_t OBJ_UNKNOWN					= 0;
 const uint32_t OBJ_BASE					= 0x1;
@@ -1198,37 +1198,37 @@ inline bool _CheckCollisionByBox(const __Vector3& vOrig, const __Vector3& vDir, 
 	static __Vector3 Vertices[36];
 	int nFace = 0;
 
-	// z 축 음의 면
+	// z 축 음의 면 [Korean comment]
 	nFace = 0;
 	Vertices[nFace+0].Set(vMin.x, vMax.y, vMin.z); Vertices[nFace+1].Set(vMax.x, vMax.y, vMin.z); Vertices[nFace+2].Set(vMax.x, vMin.y, vMin.z);
 	Vertices[nFace+3] = Vertices[nFace+0]; Vertices[nFace+4] = Vertices[nFace+2]; Vertices[nFace+5].Set(vMin.x, vMin.y, vMin.z);
 
-	// x 축 양의 면
+	// x 축 양의 면 [Korean comment]
 	nFace = 6;
 	Vertices[nFace+0].Set(vMax.x, vMax.y, vMin.z); Vertices[nFace+1].Set(vMax.x, vMax.y, vMax.z); Vertices[nFace+2].Set(vMax.x, vMin.y, vMax.z);
 	Vertices[nFace+3] = Vertices[nFace+0]; Vertices[nFace+4] = Vertices[nFace+2]; Vertices[nFace+5].Set(vMax.x, vMin.y, vMin.z);
 
-	// z 축 양의 면
+	// z 축 양의 면 [Korean comment]
 	nFace = 12;
 	Vertices[nFace+0].Set(vMax.x, vMax.y, vMax.z); Vertices[nFace+1].Set(vMin.x, vMax.y, vMax.z); Vertices[nFace+2].Set(vMin.x, vMin.y, vMax.z);
 	Vertices[nFace+3] = Vertices[nFace+0]; Vertices[nFace+4] = Vertices[nFace+2]; Vertices[nFace+5].Set(vMax.x, vMin.y, vMax.z);
 
-	// x 축 음의 면
+	// x 축 음의 면 [Korean comment]
 	nFace = 18;
 	Vertices[nFace+0].Set(vMin.x, vMax.y, vMax.z); Vertices[nFace+1].Set(vMin.x, vMax.y, vMin.z); Vertices[nFace+2].Set(vMin.x, vMin.y, vMin.z);
 	Vertices[nFace+3] = Vertices[nFace+0]; Vertices[nFace+4] = Vertices[nFace+2]; Vertices[nFace+5].Set(vMin.x, vMin.y, vMax.z);
 
-	// y 축 양의 면
+	// y 축 양의 면 [Korean comment]
 	nFace = 24;
 	Vertices[nFace+0].Set(vMin.x, vMax.y, vMax.z); Vertices[nFace+1].Set(vMax.x, vMax.y, vMax.z); Vertices[nFace+2].Set(vMax.x, vMax.y, vMin.z);
 	Vertices[nFace+3] = Vertices[nFace+0]; Vertices[nFace+4] = Vertices[nFace+2]; Vertices[nFace+5].Set(vMin.x, vMax.y, vMin.z);
 
-	// y 축 음의 면
+	// y 축 음의 면 [Korean comment]
 	nFace = 30;
 	Vertices[nFace+0].Set(vMin.x, vMin.y, vMin.z); Vertices[nFace+1].Set(vMax.x, vMin.y, vMin.z); Vertices[nFace+2].Set(vMax.x, vMin.y, vMax.z);
 	Vertices[nFace+3] = Vertices[nFace+0]; Vertices[nFace+4] = Vertices[nFace+2]; Vertices[nFace+5].Set(vMin.x, vMin.y, vMax.z);
 
-	// 각 면에 대해서 충돌 검사..
+	// 각 면에 대해서 충돌 검사.. Check
 	for(int i = 0; i < 12; i++)
 	{
 		if(true == ::_IntersectTriangle(vOrig, vDir, Vertices[i*3+0], Vertices[i*3+1], Vertices[i*3+2]))
@@ -1251,20 +1251,20 @@ inline bool _IntersectTriangle(const __Vector3& vOrig, const __Vector3& vDir,
     // Begin calculating determinant - also used to calculate U parameter
     __Vector3 pVec;	float fDet;
 	
-//	By : Ecli666 ( On 2001-09-12 오전 10:39:01 )
+//	By : Ecli666 ( On 2001-09-12 오전 10:39:01 ) [Korean comment]
 
 	pVec.Cross(vEdge1, vEdge2);
 	fDet = pVec.Dot(vDir);
 	if ( fDet > -0.0001f )
 		return FALSE;
 
-//	~(By Ecli666 On 2001-09-12 오전 10:39:01 )
+//	~(By Ecli666 On 2001-09-12 오전 10:39:01 ) [Korean comment]
 
     pVec.Cross(vDir, vEdge2);
 
     // If determinant is near zero, ray lies in plane of triangle
     fDet = vEdge1.Dot(pVec);
-    if( fDet < 0.0001f )		// 거의 0에 가까우면 삼각형 평면과 지나가는 선이 평행하다.
+    if( fDet < 0.0001f )		// 거의 0에 가까우면 삼각형 평면과 지나가는 선이 평행하다. [Korean comment]
         return FALSE;
 
     // Calculate distance from vert0 to ray origin
@@ -1291,15 +1291,15 @@ inline bool _IntersectTriangle(const __Vector3& vOrig, const __Vector3& vDir,
     fU *= fInvDet;
     fV *= fInvDet;
 
-	// t가 클수록 멀리 직선과 평면과 만나는 점이 멀다.
-	// t*dir + orig 를 구하면 만나는 점을 구할 수 있다.
+	// t가 클수록 멀리 직선과 평면과 만나는 점이 멀다. [Korean comment]
+	// t*dir + orig 를 구하면 만나는 점을 구할 수 있다. [Korean comment]
 	// u와 v의 의미는 무엇일까?
 	// 추측 : v0 (0,0), v1(1,0), v2(0,1) <괄호안은 (U, V)좌표> 이런식으로 어느 점에 가깝나 나타낸 것 같음
 	//
 
-	if(pVCol) (*pVCol) = vOrig + (vDir * fT);	// 접점을 계산..
+	if(pVCol) (*pVCol) = vOrig + (vDir * fT);	// 접점을 계산.. Calculate
 
-	// *t < 0 이면 뒤쪽...
+	// *t < 0 이면 뒤쪽... [Korean comment]
 	if ( fT < 0.0f )
 		return FALSE;
 
@@ -1317,20 +1317,20 @@ inline bool _IntersectTriangle(const __Vector3& vOrig, const __Vector3& vDir, co
     vEdge2 = v2 - v0;
 
 	
-//	By : Ecli666 ( On 2001-09-12 오전 10:39:01 )
+//	By : Ecli666 ( On 2001-09-12 오전 10:39:01 ) [Korean comment]
 
 	pVec.Cross(vEdge1, vEdge2);
 	fDet = pVec.Dot(vDir);
 	if ( fDet > -0.0001f )
 		return FALSE;
 
-//	~(By Ecli666 On 2001-09-12 오전 10:39:01 )
+//	~(By Ecli666 On 2001-09-12 오전 10:39:01 ) [Korean comment]
 
     pVec.Cross(vDir, vEdge2);
 
     // If determinant is near zero, ray lies in plane of triangle
     fDet = vEdge1.Dot(pVec);
-    if( fDet < 0.0001f )		// 거의 0에 가까우면 삼각형 평면과 지나가는 선이 평행하다.
+    if( fDet < 0.0001f )		// 거의 0에 가까우면 삼각형 평면과 지나가는 선이 평행하다. [Korean comment]
         return FALSE;
 
     // Calculate distance from vert0 to ray origin
@@ -1352,7 +1352,7 @@ inline bool _IntersectTriangle(const __Vector3& vOrig, const __Vector3& vDir, co
     // Calculate t, scale parameters, ray intersects triangle
     fT = D3DXVec3Dot( &vEdge2, &qVec ) / fDet;
 
-	// *t < 0 이면 뒤쪽...
+	// *t < 0 이면 뒤쪽... [Korean comment]
 	if ( fT < 0.0f )
 		return FALSE;
 
@@ -1404,7 +1404,7 @@ inline void _Convert2D_To_3DCoordinate(	int ixScreen, int iyScreen,
 inline float _Yaw2D(float fDirX, float fDirZ)
 {
 	////////////////////////////////
-	// 방향을 구하고.. -> 회전할 값을 구하는 루틴이다..
+	// 방향을 구하고.. -> 회전할 값을 구하는 루틴이다.. Rotate
 	if ( fDirX >= 0.0f )						// ^^
 	{
 		if ( fDirZ >= 0.0f ) return (float)(asin(fDirX));
@@ -1415,7 +1415,7 @@ inline float _Yaw2D(float fDirX, float fDirZ)
 		if ( fDirZ >= 0.0f ) return (D3DXToRadian(270.0f) + (float)(acos(-fDirX)));
 		else return(D3DXToRadian(180.0f) + (float)(asin(-fDirX)));
 	}
-	// 방향을 구하고..
+	// 방향을 구하고.. [Korean comment]
 	////////////////////////////////
 }
 

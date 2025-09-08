@@ -23,10 +23,10 @@ public:
 public:
 	int		GetNumStar() const {return m_iCurNumStar;}
 protected:
-	int		m_iCurNumStar;		// 현재 떠있는 별의 수
-	int		m_iNextNumStar;		// 앞으로 보일 별 숫자
-	float	m_fAddTime;			// 별 하나가 추가되거나 없어지는 시간 간격
-	BOOL	m_bIncrease;		// 별이 증가할 것인가 감소할 것인가
+	int		m_iCurNumStar;		// 현재 떠있는 별의 수 [Korean comment]
+	int		m_iNextNumStar;		// 앞으로 보일 별 숫자 [Korean comment]
+	float	m_fAddTime;			// 별 하나가 추가되거나 없어지는 시간 간격 Time
+	BOOL	m_bIncrease;		// 별이 증가할 것인가 감소할 것인가 [Korean comment]
 	__VertexXyzColor	m_Stars[MAX_STAR];
 // Operations
 public:

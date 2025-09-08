@@ -40,9 +40,9 @@ void CN3GERain::Tick()
 
 	int iCount = m_iVC/2;
 	int iActiveCount = iCount;
-	if(m_iFadeMode > 0) // 차차 많아지게 한다..
+	if(m_iFadeMode > 0) // 차차 많아지게 한다.. [Korean comment]
 	{
-		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정..
+		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정.. Time
 		{
 			iActiveCount = (int)(iCount * m_fFadeTimeCur / m_fFadeTime);
 			if(iActiveCount > iCount) iActiveCount = iCount;
@@ -51,7 +51,7 @@ void CN3GERain::Tick()
 	}
 	else if(m_iFadeMode < 0)
 	{
-		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정..
+		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정.. Time
 		{
 			iActiveCount = (int)(iCount * (1.0f - m_fFadeTimeCur / m_fFadeTime));
 			if(iActiveCount > iCount) iActiveCount = iCount;
@@ -77,13 +77,13 @@ void CN3GERain::Tick()
 
 	for (i=0; i<iActiveCount; ++i)
 	{
-		// tail 위치 결정하기
+		// tail 위치 결정하기 Position
 		__VertexXyzColor* pVTail = pVertices+i*2+0;
 		__VertexXyzColor* pVHead = pVertices+i*2+1;
 		pVTail->x += vAdd.x;	pVTail->y += vAdd.y;	pVTail->z += vAdd.z;
 
 		float fDiff = pVTail->y - (fCurY-fHalfHeight);
-		if (fDiff < 0)	// 높이 범위를 벗어났을 경우
+		if (fDiff < 0)	// 높이 범위를 벗어났을 경우 [Korean comment]
 		{
 			pVTail->y -= (((int)(fDiff/m_fHeight)-1)*m_fHeight);
 			pVTail->x = m_fWidth*(rand()%10000-5000)/10000.f;
@@ -92,14 +92,14 @@ void CN3GERain::Tick()
 		else
 		{
 			fDiff = pVTail->y - (fCurY+fHalfHeight);
-			if (fDiff > 0)	// 높이 범위를 반대로 벗어났을경우
+			if (fDiff > 0)	// 높이 범위를 반대로 벗어났을경우 [Korean comment]
 				pVTail->y -= ((int)(fDiff/m_fHeight)+1)*m_fHeight;
-			// x 너비 범위를 벗어났을 경우
+			// x 너비 범위를 벗어났을 경우 [Korean comment]
 			fDiff = pVTail->x - fHalfWidth;
 			if (fDiff > 0) pVTail->x -= ((int)(fDiff/m_fWidth)+1)*m_fWidth;
 			fDiff = pVTail->x + fHalfWidth;
 			if (fDiff < 0) pVTail->x -= ((int)(fDiff/m_fWidth)-1)*m_fWidth;
-			// z 너비 범위를 벗어났을 경우
+			// z 너비 범위를 벗어났을 경우 [Korean comment]
 			fDiff = pVTail->z - fHalfWidth;
 			if (fDiff >  0) pVTail->z -= ((int)(fDiff/m_fWidth)+1)*m_fWidth;
 			fDiff = pVTail->z + fHalfWidth;
@@ -122,9 +122,9 @@ void CN3GERain::Render(__Vector3& vPos)
 	int iCount = m_iVC / 2;
 	
 	int iActiveCount = iCount;
-	if(m_iFadeMode > 0) // 차차 많아지게 한다..
+	if(m_iFadeMode > 0) // 차차 많아지게 한다.. [Korean comment]
 	{
-		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정..
+		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정.. Time
 		{
 			iActiveCount = (int)(iCount * m_fFadeTimeCur / m_fFadeTime);
 			if(iActiveCount > iCount) iActiveCount = iCount;
@@ -133,7 +133,7 @@ void CN3GERain::Render(__Vector3& vPos)
 	}
 	else if(m_iFadeMode < 0)
 	{
-		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정..
+		if(m_fFadeTime > 0 && m_fFadeTimeCur < m_fFadeTime) // Fade시간땜에 건너뛰고 찍을 양 결정.. Time
 		{
 			iActiveCount = (int)(iCount * (1.0f - m_fFadeTimeCur / m_fFadeTime));
 			if(iActiveCount > iCount) iActiveCount = iCount;
@@ -165,7 +165,7 @@ void CN3GERain::Render(__Vector3& vPos)
 
 	// render
 	s_lpD3DDev->SetFVF(FVF_XYZCOLOR);
-	s_lpD3DDev->SetStreamSource(0, m_pVB, 0, sizeof(__VertexXyzColor)); // 버텍스 버퍼 지정
+	s_lpD3DDev->SetStreamSource(0, m_pVB, 0, sizeof(__VertexXyzColor)); // 버텍스 버퍼 지정 [Korean comment]
 	s_lpD3DDev->DrawPrimitive(D3DPT_LINELIST, 0, iActiveCount);
 
 	// restore
@@ -182,11 +182,11 @@ void CN3GERain::Create(float fDensity,
 					   float fRainLength, 
 					   const __Vector3& vVelocity,
 					   float fTimeToFade)
-// fDensity : 1 (세제곱미터) 당 빗방울의 갯수
+// fDensity : 1 (세제곱미터) 당 빗방울의 갯수 [Korean comment]
 // fWidth : 비오는 범위 X,Z 길이
-// fHeight : 비오는 범위의 높이
-// fRainLength : 빗줄기의 길이
-// vVelocity : 빗줄기의 속도
+// fHeight : 비오는 범위의 높이 [Korean comment]
+// fRainLength : 빗줄기의 길이 [Korean comment]
+// vVelocity : 빗줄기의 속도 [Korean comment]
 {
 	if(nullptr == s_lpD3DDev) return;
 
@@ -205,7 +205,7 @@ void CN3GERain::Create(float fDensity,
 	m_vVelocity = vVelocity;
 	int iRainCount = (int)(fVolume*fDensity);
 
-	// m_pVB, m_pIB 만들기
+	// m_pVB, m_pIB 만들기 [Korean comment]
 	m_iVC = iRainCount*2;
 	HRESULT hr = s_lpD3DDev->CreateVertexBuffer(m_iVC*sizeof(__VertexXyzColor), 0, FVF_XYZCOLOR, D3DPOOL_MANAGED, &m_pVB, nullptr);
 
@@ -214,8 +214,8 @@ void CN3GERain::Create(float fDensity,
 	hr = m_pVB->Lock(0, iRainCount*2*sizeof(__VertexXyzColor), (void**)&pVertices, D3DLOCK_NOSYSLOCK);
 	if (FAILED(hr)) return;
 
-	const uint32_t dwColorA = 0x00bfbfbf,	// 꼬리
-				dwColorB = 0x80bfbfbf;	// 머리
+	const uint32_t dwColorA = 0x00bfbfbf,	// 꼬리 [Korean comment]
+				dwColorB = 0x80bfbfbf;	// 머리 [Korean comment]
 	int i;
 	__Vector3 vN = vVelocity; vN.Normalize();
 	__Vector3 vAdd = vN*fRainLength;

@@ -29,14 +29,14 @@ protected:
 		void	SetSize(int iSize);
 		void	SetColor(D3DCOLOR color);
 		void	Render(LPDIRECT3DDEVICE9 lpD3DDev);
-		void	InitFlckering();		// 깜박임 초기화..
-		BOOL	m_bVisible;				// 보이나
+		void	InitFlckering();		// 깜박임 초기화.. Initialize
+		BOOL	m_bVisible;				// 보이나 [Korean comment]
 	protected:
 		int		m_iSize;				// caret의 pixel 크기
-		float	m_fFlickerTimePrev;	// 깜박이기 위한 시간..
+		float	m_fFlickerTimePrev;	// 깜박이기 위한 시간.. Time
 		bool	m_bFlickerStatus;
 //		POINT	m_ptPos;				// caret의 pixel 좌표
-		__VertexTransformedColor	m_pVB[2];	// vertex 버퍼
+		__VertexTransformedColor	m_pVB[2];	// vertex 버퍼 [Korean comment]
 	};
 
 // Attributes
@@ -65,10 +65,10 @@ protected:
 	static CN3Caret		s_Caret;
 	uint32_t			m_nCaretPos;		// 글자 단위위치(byte단위)
 	int					m_iCompLength;		// 현재 조합중인 글자의 byte수 0이면 조합중이 아니다.
-	uint32_t			m_iMaxStrLen;		// 쓸수 있는 글씨의 최대 숫자
+	uint32_t			m_iMaxStrLen;		// 쓸수 있는 글씨의 최대 숫자 [Korean comment]
 	std::string			m_szPassword;		// password buffer
 
-	CN3SndObj*			m_pSnd_Typing;		// 타이핑 할 때 나는 소리
+	CN3SndObj*			m_pSnd_Typing;		// 타이핑 할 때 나는 소리 [Korean comment]
 // Operations
 public:
 	virtual const std::string&	GetString();
@@ -80,13 +80,13 @@ public:
 	virtual void		SetVisible(bool bVisible);
 	virtual uint32_t		MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld);
 	virtual BOOL		MoveOffset(int iOffsetX, int iOffsetY);		// 위치 지정(chilren의 위치도 같이 바꾸어준다. caret위치도 같이 바꾸어줌.)
-	void				KillFocus();			// 포커스를 없앤다.
-	bool				SetFocus();				// 포커스를 준다.
+	void				KillFocus();			// 포커스를 없앤다. [Korean comment]
+	bool				SetFocus();				// 포커스를 준다. [Korean comment]
 	bool				HaveFocus() const {return (this == s_pFocusedEdit);}
-	void				SetCaretPos(uint32_t nPos);	//몇번째 바이트에 있는지 설정한다.
-	void				SetMaxString(uint32_t nMax);		// 최대 글씨 수를 정해준다.
+	void				SetCaretPos(uint32_t nPos);	//몇번째 바이트에 있는지 설정한다. Set
+	void				SetMaxString(uint32_t nMax);		// 최대 글씨 수를 정해준다. [Korean comment]
 protected:
-	BOOL				IsHangulMiddleByte( const char* lpszStr, int iPos );	// 한글의 2번째 바이트 글자인가?
+	BOOL				IsHangulMiddleByte( const char* lpszStr, int iPos );	// 한글의 2번째 바이트 글자인가? [Korean comment]
 
 #ifdef _N3TOOL
 public:	

@@ -31,7 +31,7 @@ void CN3AlphaPrimitiveManager::Render()
 	
 	static __AlphaPrimitive* pBuffs[MAX_ALPHAPRIMITIVE_BUFFER];
 	for(int i = 0; i < m_nToDrawCount; i++) pBuffs[i] = &(m_Buffers[i]);
-	qsort(pBuffs, m_nToDrawCount, 4, SortByCameraDistance); // 버퍼에 쌓인 프리미티브대로 정렬하고..
+	qsort(pBuffs, m_nToDrawCount, 4, SortByCameraDistance); // 버퍼에 쌓인 프리미티브대로 정렬하고.. [Korean comment]
 
 	struct __RenderState
 	{
@@ -128,7 +128,7 @@ void CN3AlphaPrimitiveManager::Render()
 
 		CN3Base::s_lpD3DDev->SetFVF(pBuffs[i]->dwFVF);
 		CN3Base::s_lpD3DDev->SetTexture(0, pBuffs[i]->lpTex);
-		CN3Base::s_lpD3DDev->SetTransform(D3DTS_WORLD, &(pBuffs[i]->MtxWorld)); // 월드 행렬 적용
+		CN3Base::s_lpD3DDev->SetTransform(D3DTS_WORLD, &(pBuffs[i]->MtxWorld)); // 월드 행렬 적용 [Korean comment]
 
 		if(pBuffs[i]->lpTex)
 		{
@@ -142,7 +142,7 @@ void CN3AlphaPrimitiveManager::Render()
 			CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 		}
 	
-		if(pBuffs[i]->pwIndices && pBuffs[i]->nPrimitiveCount > 0) // Index 가 있으면..
+		if(pBuffs[i]->pwIndices && pBuffs[i]->nPrimitiveCount > 0) // Index 가 있으면.. [Korean comment]
 		{
 			if (pBuffs[i]->bUseVB)
 			{
@@ -190,7 +190,7 @@ void CN3AlphaPrimitiveManager::Render()
 #endif
 	}
 		
-	m_nToDrawCount = 0; // 다 그렸다...
+	m_nToDrawCount = 0; // 다 그렸다... [Korean comment]
 
 	// restore
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, RS_old.dwAlpha);
@@ -244,7 +244,7 @@ void CN3AlphaPrimitiveManager::Render()
 	
 	static __AlphaPrimitive* pBuffs[MAX_ALPHAPRIMITIVE_BUFFER];
 	for(int i = 0; i < m_nToDrawCount; i++) pBuffs[i] = &(m_Buffers[i]);
-	qsort(pBuffs, m_nToDrawCount, 4, SortByCameraDistance); // 버퍼에 쌓인 프리미티브대로 정렬하고..
+	qsort(pBuffs, m_nToDrawCount, 4, SortByCameraDistance); // 버퍼에 쌓인 프리미티브대로 정렬하고.. [Korean comment]
 
 	struct __RenderState
 	{
@@ -280,7 +280,7 @@ void CN3AlphaPrimitiveManager::Render()
 		if(pBuffs[i]->nRenderFlags & RF_NOTUSEFOG)
 		{
 			if (FALSE != RS_current.dwFog) { RS_current.dwFog = FALSE;	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, FALSE);}
-		} // Fog 무시..
+		} // Fog 무시.. [Korean comment]
 		else
 		{
 			if (TRUE != RS_current.dwFog) {	RS_current.dwFog = TRUE;	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, TRUE);	}
@@ -341,7 +341,7 @@ void CN3AlphaPrimitiveManager::Render()
 
 		CN3Base::s_lpD3DDev->SetFVF(pBuffs[i]->dwFVF);
 		CN3Base::s_lpD3DDev->SetTexture(0, pBuffs[i]->lpTex);
-		CN3Base::s_lpD3DDev->SetTransform(D3DTS_WORLD, &(pBuffs[i]->MtxWorld)); // 월드 행렬 적용
+		CN3Base::s_lpD3DDev->SetTransform(D3DTS_WORLD, &(pBuffs[i]->MtxWorld)); // 월드 행렬 적용 [Korean comment]
 
 		if(pBuffs[i]->lpTex)
 		{
@@ -355,7 +355,7 @@ void CN3AlphaPrimitiveManager::Render()
 			if (D3DTA_DIFFUSE != RS_current.dwCA1) { RS_current.dwCA1 = D3DTA_DIFFUSE;	CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);}
 		}
 	
-		if(pBuffs[i]->pwIndices && pBuffs[i]->nPrimitiveCount > 0) // Index 가 있으면..
+		if(pBuffs[i]->pwIndices && pBuffs[i]->nPrimitiveCount > 0) // Index 가 있으면.. [Korean comment]
 		{
 			if (pBuffs[i]->bUseVB)
 			{
@@ -402,7 +402,7 @@ void CN3AlphaPrimitiveManager::Render()
 #endif
 	}
 		
-	m_nToDrawCount = 0; // 다 그렸다...
+	m_nToDrawCount = 0; // 다 그렸다... [Korean comment]
 
 	// restore
 	if(RS_old.dwAlpha != RS_current.dwAlpha) CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, RS_old.dwAlpha);
@@ -478,7 +478,7 @@ int CN3AlphaPrimitiveManager::SortByCameraDistance(const void *pArg1, const void
 	__AlphaPrimitive *pObj1 = *((__AlphaPrimitive**)pArg1);
 	__AlphaPrimitive *pObj2 = *((__AlphaPrimitive**)pArg2);
 
-	if(pObj1->fCameraDistance > pObj2->fCameraDistance) return -1; // 거리가 먼것부터 소팅..
+	if(pObj1->fCameraDistance > pObj2->fCameraDistance) return -1; // 거리가 먼것부터 소팅.. [Korean comment]
 	else if(pObj1->fCameraDistance < pObj2->fCameraDistance) return 1;
 	else return 0;
 }

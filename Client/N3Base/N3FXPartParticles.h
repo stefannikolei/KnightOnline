@@ -27,34 +27,34 @@ public:
 	__Matrix44					m_mtxVI;				//	inverse view mtx..
 
 	int							m_iNumParticle;			//	파티클의 총 수..(maximum)
-	int							m_iNumLodParticle;		//	거리에 따른 파티클 갯수
-	//float						m_fParticleSize;		//	파티클의 크기
-	std::pair<float, float>		m_pair_fParticleSize;	//	파티클 크기의 범위
-	std::pair<float, float>		m_pair_fParticleLife;	//	파티클 생명의 범위
+	int							m_iNumLodParticle;		//	거리에 따른 파티클 갯수 [Korean comment]
+	//float						m_fParticleSize;		//	파티클의 크기 Size
+	std::pair<float, float>		m_pair_fParticleSize;	//	파티클 크기의 범위 Size
+	std::pair<float, float>		m_pair_fParticleLife;	//	파티클 생명의 범위 [Korean comment]
 	
-	std::list<CN3FXParticle*>	m_pVBList_Alive;		//	살아있는 파티클을 담고 있는 버퍼..
-	std::list<CN3FXParticle*>	m_pVBList_Dead;			//	죽은 파티클을 담고 있는 버퍼..
+	std::list<CN3FXParticle*>	m_pVBList_Alive;		//	살아있는 파티클을 담고 있는 버퍼.. [Korean comment]
+	std::list<CN3FXParticle*>	m_pVBList_Dead;			//	죽은 파티클을 담고 있는 버퍼.. [Korean comment]
 
-	float						m_fCreateDelay;			//	파티클 생성 시간 간격.
+	float						m_fCreateDelay;			//	파티클 생성 시간 간격. Create
 	float						m_CurrCreateDelay;		//	현재 까지 create delay time..
-	int							m_iNumCreate;			//	한번 생성시 만들어지는 파티클 수.
+	int							m_iNumCreate;			//	한번 생성시 만들어지는 파티클 수. Create
 
 	__Vector3					m_MinCreateRange;		//	파티클 생성 자유도 범위..min..
 	__Vector3					m_MaxCreateRange;		//	파티클 생성 자유도 범위..max..
 
 	//emitter...
 	uint32_t					m_dwEmitType;			//	발사형태..(spread, gather)..
-	PARTICLEEMITCONDITION		m_uEmitCon;				//	발사형태에 따른 필요 데이타..
+	PARTICLEEMITCONDITION		m_uEmitCon;				//	발사형태에 따른 필요 데이타.. [Korean comment]
 	__Vector3					m_vEmitterDir;
 	__Vector3					m_vPrevShapePos;
 	__Vector3					m_vShapePos;
 
 	//particle..
-	__Vector3	m_vPtEmitDir;		//emitter에서 파티클 분사방향..
-	float		m_fPtVelocity;		//파티클 분사속도..
-	float		m_fPtAccel;			//분사 가속도..
-	float		m_fPtRotVelocity;	//파티클 회전 속도..
-	float		m_fPtGravity;		//중력가속도..
+	__Vector3	m_vPtEmitDir;		//emitter에서 파티클 분사방향.. [Korean comment]
+	float		m_fPtVelocity;		//파티클 분사속도.. [Korean comment]
+	float		m_fPtAccel;			//분사 가속도.. [Korean comment]
+	float		m_fPtRotVelocity;	//파티클 회전 속도.. Rotate
+	float		m_fPtGravity;		//중력가속도.. [Korean comment]
 
 	//related particle color....
 	uint32_t	m_dwChangeColor[NUM_KEY_COLOR];
@@ -75,7 +75,7 @@ public:
 	bool m_bDistanceNumFix;
 	bool m_bParticleYAxisFix;
 	bool m_bParticle_Not_Rotate;
-	__Vector3 m_vParticle_Not_Rotate_Axis; // 파티클이 회전하지 않도록 하는 축
+	__Vector3 m_vParticle_Not_Rotate_Axis; // 파티클이 회전하지 않도록 하는 축 Rotate
 	float m_fPtRangeMin;
 	float m_fPtRangeMax;
 	// N3FXParticle needs implementation of these methods
@@ -98,7 +98,7 @@ protected:
 	float CameraDist(__Vector3 v1, __Vector3 v2, __Vector3 v3);
 
 	//////////////////////////////////////////////
-	//m_pVBList_Alive를 소트하기위함이야..
+	//m_pVBList_Alive를 소트하기위함이야.. [Korean comment]
 	void	PSort();
 	void	PMerge(std::list<CN3FXParticle*>& l1, std::list<CN3FXParticle*>& l2);
 	bool	PComp(CN3FXParticle* pP1, CN3FXParticle* pP2);
@@ -106,13 +106,13 @@ protected:
 	//////////////////////////////////////////////
 	
 public:
-	void	Init();				//	각종 변수들을 처음 로딩한 상태로 초기화...
-	void	Start();			//	파트 구동 시작.
-	void	Stop();				//	파트 구동 멈춤..
+	void	Init();				//	각종 변수들을 처음 로딩한 상태로 초기화... Initialize
+	void	Start();			//	파트 구동 시작. [Korean comment]
+	void	Stop();				//	파트 구동 멈춤.. [Korean comment]
 	bool	Tick();				//	ticktick...
-	void	Render();			//	화면에 뿌리기..
-	bool	Load(HANDLE hFile);	//	게임파일 불러오기.
-	bool	Save(HANDLE hFile);	//	게임파일 저장오기.
+	void	Render();			//	화면에 뿌리기.. [Korean comment]
+	bool	Load(HANDLE hFile);	//	게임파일 불러오기. File
+	bool	Save(HANDLE hFile);	//	게임파일 저장오기. Save
 	void	Duplicate(CN3FXPartParticles* pSrc);
 
 	bool	GetColor(int key, uint32_t& color);

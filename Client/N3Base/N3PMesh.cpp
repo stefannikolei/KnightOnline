@@ -100,7 +100,7 @@ bool CN3PMesh::Load(HANDLE hFile)
 	{
 		m_pCollapses = new __EdgeCollapse[m_iNumCollapses+1];	// +1을 한 이유 : PMeshInstance::SplitOne() 함수에서 부득이하게 포인터가 경계선을 가르키게 해야 하는 경우가 있어서.
 		ReadFile(hFile, m_pCollapses, m_iNumCollapses*sizeof(__EdgeCollapse), &dwNum, nullptr);
-		ZeroMemory(m_pCollapses + m_iNumCollapses, sizeof(__EdgeCollapse));	// 위의 +1을 한이유와 같음. 만약을 대비해 마지막 데이타를 초기화 해둠
+		ZeroMemory(m_pCollapses + m_iNumCollapses, sizeof(__EdgeCollapse));	// 위의 +1을 한이유와 같음. 만약을 대비해 마지막 데이타를 초기화 해둠 Initialize
 
 		bool bFixed = false;
 		for(int i = 0; i < m_iNumCollapses; i++)
@@ -155,7 +155,7 @@ bool CN3PMesh::Save(HANDLE hFile)
 	if (m_iNumCollapses>0)
 	{
 		for(int i = 0; i < m_iNumCollapses; i++)
-			if(m_pCollapses[i].iIndexChanges < 0) m_pCollapses[i].iIndexChanges = 0; // 저장..
+			if(m_pCollapses[i].iIndexChanges < 0) m_pCollapses[i].iIndexChanges = 0; // 저장.. Save
 		WriteFile(hFile, m_pCollapses, m_iNumCollapses*sizeof(__EdgeCollapse), &dwNum, nullptr);
 	}
 	if (m_iTotalIndexChanges>0) WriteFile(hFile, m_pAllIndexChanges, m_iTotalIndexChanges*sizeof(m_pAllIndexChanges[0]), &dwNum, nullptr);
@@ -177,7 +177,7 @@ void CN3PMesh::FindMinMax()
 		return;
 	}
 
-	// 최소, 최대 점을 찾는다.
+	// 최소, 최대 점을 찾는다. [Korean comment]
 	m_vMin.Set(FLT_MAX, FLT_MAX, FLT_MAX);
 	m_vMax.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
@@ -192,7 +192,7 @@ void CN3PMesh::FindMinMax()
 		if(m_pVertices[i].z > m_vMax.z) m_vMax.z = m_pVertices[i].z;
 	}
 
-	// 최대 최소값을 갖고 반지름 계산한다..
+	// 최대 최소값을 갖고 반지름 계산한다.. Calculate
 	m_fRadius  = (m_vMax - m_vMin).Magnitude() * 0.5f;
 }
 
@@ -227,7 +227,7 @@ void CN3PMesh::CopyMesh(CN3PMesh* pSrcPMesh)
 	{
 		m_pCollapses = new __EdgeCollapse[m_iNumCollapses+1];	// +1을 한 이유 : PMeshInstance::SplitOne() 함수에서 부득이하게 포인터가 경계선을 가르키게 해야 하는 경우가 있어서.
 		CopyMemory(m_pCollapses, pSrcPMesh->m_pCollapses, sizeof(__EdgeCollapse)*m_iNumCollapses);
-		ZeroMemory(m_pCollapses + m_iNumCollapses, sizeof(__EdgeCollapse));	// 위의 +1을 한이유와 같음. 만약을 대비해 마지막 데이타를 초기화 해둠
+		ZeroMemory(m_pCollapses + m_iNumCollapses, sizeof(__EdgeCollapse));	// 위의 +1을 한이유와 같음. 만약을 대비해 마지막 데이타를 초기화 해둠 Initialize
 	}
 
 	hr = Create(m_iMaxNumVertices, m_iMaxNumIndices);
@@ -312,7 +312,7 @@ void CN3PMesh::LODCtrlSet(__LODCtrlValue *pLODCtrls, int nCount)
 		m_pLODCtrlValues = new __LODCtrlValue[nCount];
 		memcpy(m_pLODCtrlValues, pLODCtrls, sizeof(__LODCtrlValue) * nCount);
 
-		// 거리에 따라 정렬
+		// 거리에 따라 정렬 [Korean comment]
 		qsort(m_pLODCtrlValues, m_iLODCtrlValueCount, sizeof(__LODCtrlValue), SortByDistance);
 	}
 }
@@ -336,7 +336,7 @@ void CN3PMesh::ReGenerateSmoothNormal()
 	if(m_iMaxNumVertices <= 0) return;
 
 	CN3PMeshInstance PMI(this);
-	PMI.SetLODByNumVertices(m_iMaxNumVertices); // 최대 점으로 세팅하고..
+	PMI.SetLODByNumVertices(m_iMaxNumVertices); // 최대 점으로 세팅하고.. [Korean comment]
 	int nIC = PMI.GetNumIndices(); // Index Count...
 	uint16_t* pwIndices = PMI.GetIndices(); // Index ...
 
@@ -360,7 +360,7 @@ void CN3PMesh::ReGenerateSmoothNormal()
 				m_pVertices[i] == v1 ||
 				m_pVertices[i] == v2 )
 			{
-				vN.Cross(v1 - v0, v2 - v1); // Normal 값을 계산하고...
+				vN.Cross(v1 - v0, v2 - v1); // Normal 값을 계산하고... Calculate
 				vN.Normalize();
 
 				pnNs[i]++;
@@ -382,7 +382,7 @@ void CN3PMesh::ReGenerateSharpNormal()
 	if(m_iMaxNumVertices <= 0) return;
 
 	CN3PMeshInstance PMI(this);
-	PMI.SetLODByNumVertices(m_iMaxNumVertices); // 최대 점으로 세팅하고..
+	PMI.SetLODByNumVertices(m_iMaxNumVertices); // 최대 점으로 세팅하고.. [Korean comment]
 	int nIC = PMI.GetNumIndices(); // Index Count...
 	uint16_t* pwIndices = PMI.GetIndices(); // Index ...
 
@@ -394,7 +394,7 @@ void CN3PMesh::ReGenerateSharpNormal()
 		v1 = m_pVertices[pwIndices[j*3+1]];
 		v2 = m_pVertices[pwIndices[j*3+2]];
 
-		vN.Cross(v1 - v0, v2 - v1); // Normal 값을 계산하고...
+		vN.Cross(v1 - v0, v2 - v1); // Normal 값을 계산하고... Calculate
 		vN.Normalize();
 
 		m_pVertices[pwIndices[j*3+0]].n = vN;

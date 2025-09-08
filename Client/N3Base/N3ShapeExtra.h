@@ -22,9 +22,9 @@ protected:
 	struct __Rotation
 	{
 		float			fRadianPerSec;	// 초당 회전.. Radian...
-		__Vector3		vAxis;			// 회전축..
-		float			fRadianCur;		// 현재 회전값..
-		float			fRadianToReach;	// 회전시킬값..
+		__Vector3		vAxis;			// 회전축.. Rotate
+		float			fRadianCur;		// 현재 회전값.. Rotate
+		float			fRadianToReach;	// 회전시킬값.. Rotate
 
 		__Rotation()
 		{
@@ -36,7 +36,7 @@ protected:
 	std::vector<__Rotation>	m_Rotations;
 
 public:
-	void RotateTo(int iPart, const __Vector3& vAxis, float fRadianToReach, float fRadianPerSec, bool bImmediately = false); // 원하는 파트를 축에 따라 지정한 각도까지 지정한 속도로 회전시킨다..
+	void RotateTo(int iPart, const __Vector3& vAxis, float fRadianToReach, float fRadianPerSec, bool bImmediately = false); // 원하는 파트를 축에 따라 지정한 각도까지 지정한 속도로 회전시킨다.. Rotate
 
 	bool Load(HANDLE hFile);
 	void Tick(float fFrm);

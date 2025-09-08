@@ -65,7 +65,7 @@ bool CN3FXPartBillBoard::ParseScript(char* szCommand, char* szBuff0, char* szBuf
 {
 	if(CN3FXPartBase::ParseScript(szCommand, szBuff0, szBuff1, szBuff2, szBuff3)) return true;
 
-	//	보드 갯수.
+	//	보드 갯수. [Korean comment]
 	if(lstrcmpi(szCommand, "<billboard_count>")==0)
 	{
 		m_iNum = atoi(szBuff0);
@@ -73,7 +73,7 @@ bool CN3FXPartBillBoard::ParseScript(char* szCommand, char* szBuff0, char* szBuf
 		return true;
 	}
 
-	//	보드 크기.
+	//	보드 크기. Size
 	if(lstrcmpi(szCommand, "<billboard_size>")==0)
 	{
 		m_fSizeX = atof(szBuff0);
@@ -377,21 +377,21 @@ bool CN3FXPartBillBoard::IsDead()
 
 //
 //	render...
-//	일단은 파티클 하나씩 그리고....
-//	나중에는 같은 텍스쳐 쓰는 것들끼리 묶어서 그리자...
+//	일단은 파티클 하나씩 그리고.... [Korean comment]
+//	나중에는 같은 텍스쳐 쓰는 것들끼리 묶어서 그리자... [Korean comment]
 //
 void CN3FXPartBillBoard::Render()
 {
 	if(m_iTexIdx >= m_iNumTex) return;
 
-	//회전...
+	//회전... Rotate
 	__Matrix44 mtxRotZ;
 	mtxRotZ.Identity();
 	mtxRotZ.RotationZ(m_fCurrLife*m_vRotVelocity.x);
 
 	if(!m_bRoateOnlyY)
 	{
-		//위치지정 & 나를 바라보게 셋팅..
+		//위치지정 & 나를 바라보게 셋팅.. Position
 		__Matrix44 mtxVI;
 		mtxVI = s_CameraData.mtxViewInverse;
 		__Vector3 vpp;
@@ -482,7 +482,7 @@ void CN3FXPartBillBoard::Render()
 	}
 	else
 	{
-		//위치지정 & 나를 바라보게 셋팅..
+		//위치지정 & 나를 바라보게 셋팅.. Position
 		__Vector3 AbsoluteCurrPos = Rotate2AbsolutePos(m_vCurrPos);
 		__Vector3 vRadiusPos = s_CameraData.vEye - (AbsoluteCurrPos + m_pRefBundle->m_vPos);
 
@@ -577,7 +577,7 @@ void CN3FXPartBillBoard::Render()
 		}
 	}
 
-	if(m_bAlpha) // Alpha 사용
+	if(m_bAlpha) // Alpha 사용 [Korean comment]
 	{
 		__AlphaPrimitive* pAP = s_AlphaMgr.Add();
 		if(pAP)
@@ -604,7 +604,7 @@ void CN3FXPartBillBoard::Render()
 			pAP->pwIndices			= nullptr;
 		}
 
-		return; // 렌더링 안하지롱.
+		return; // 렌더링 안하지롱. Rendering
 	}
 	else 
 	{

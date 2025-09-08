@@ -15,17 +15,17 @@ protected:
 	static __VertexT1	s_Vertices[MAX_IMESH_BUFFER];
 	static __VertexT2	s_Vertices2[MAX_IMESH_BUFFER];
 
-	int					m_nFC; // 삼각형 갯수
+	int					m_nFC; // 삼각형 갯수 [Korean comment]
 
 	int					m_nVC; // Vertex Count
-	uint16_t*				m_pwVtxIndices; // 점 인덱스 리스트. 
+	uint16_t*				m_pwVtxIndices; // 점 인덱스 리스트.  Index
 	int					m_nUVC; // UV 좌표 Count
-	uint16_t*				m_pwUVsIndices; // 텍스처 좌표 인덱스 리스트.
+	uint16_t*				m_pwUVsIndices; // 텍스처 좌표 인덱스 리스트. Index
 
-	float*				m_pfUVs; // UV Data - m_nUVC * 2 만큼 할당한다.
+	float*				m_pfUVs; // UV Data - m_nUVC * 2 만큼 할당한다. [Korean comment]
 //	LPDIRECT3DVERTEXBUFFER8 m_lpVB;
 
-	__Vector3			m_vMin, m_vMax; // 최소, 최대점.. 변하긴 하지만 대략적으로...
+	__Vector3			m_vMin, m_vMax; // 최소, 최대점.. 변하긴 하지만 대략적으로... [Korean comment]
 
 public:
 #ifdef _N3TOOL
@@ -37,8 +37,8 @@ public:
 	__Vector3			Max()	{ return m_vMax; }
 	void				FindMinMax();
 	void				Render(bool bUseTwoUV = false);
-	__VertexT1*			BuildVertexList(); // Vertex Buffer 에다가 점을 만든다.. 동시에 두번 사용하지 않도록 주의가 필요
-	__VertexT2*			BuildVertexListTwoUV(); // Vertex Buffer 에다가 점을 만든다.. 동시에 두번 사용하지 않도록 주의가 필요
+	__VertexT1*			BuildVertexList(); // Vertex Buffer 에다가 점을 만든다.. 동시에 두번 사용하지 않도록 주의가 필요 [Korean comment]
+	__VertexT2*			BuildVertexListTwoUV(); // Vertex Buffer 에다가 점을 만든다.. 동시에 두번 사용하지 않도록 주의가 필요 [Korean comment]
 	
 	int					FaceCount() { return m_nFC; }
 	int					VertexCount() { return m_nVC; }
@@ -64,7 +64,7 @@ public:
 	CN3IMesh();
 	virtual ~CN3IMesh();
 
-//	By : Ecli666 ( On 2002-07-23 오후 5:31:41 )
+//	By : Ecli666 ( On 2002-07-23 오후 5:31:41 ) [Korean comment]
 //
 #ifdef _N3GAME
 	void				TickForShadow(bool bUseTwoUV = false);
@@ -75,7 +75,7 @@ private:
 	__Vector3*			m_pVertexT1;
 #endif
 
-//	~(By Ecli666 On 2002-07-23 오후 5:31:41 )
+//	~(By Ecli666 On 2002-07-23 오후 5:31:41 ) [Korean comment]
 };
 
 #endif // !defined(AFX_N3IMesh_h__INCLUDED_)

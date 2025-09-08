@@ -20,9 +20,9 @@ friend class CN3FXShape;
 
 public:
 	__Material	m_Mtl;					// Material
-	__Vector3	m_vPivot;				// Local 축
-	__Matrix44	m_WorldMtx;				// World Matrix.. Shape Loading 때 미리 계산해야 좋다..		
-	BOOL		m_bOutOfCameraRange;	// Camera 범위 바깥에 있음...
+	__Vector3	m_vPivot;				// Local 축 [Korean comment]
+	__Matrix44	m_WorldMtx;				// World Matrix.. Shape Loading 때 미리 계산해야 좋다..		 Calculate
+	BOOL		m_bOutOfCameraRange;	// Camera 범위 바깥에 있음... [Korean comment]
 
 	float		m_fTexFPS;				// Texture Animation Interval;
 	bool		m_bTexLoop;
@@ -50,8 +50,8 @@ public:
 	CN3Texture* TexSet(int iIndex, const std::string& szFN);
 	void		TexSet(int iIndex, CN3Texture* pTex);
 
-	__Vector3 Min() { if(m_FXPMInst.GetMesh()) return m_FXPMInst.GetMesh()->Min() * m_WorldMtx; else return __Vector3(0,0,0); } // 월드 상의 최소값
-	__Vector3 Max() { if(m_FXPMInst.GetMesh()) return m_FXPMInst.GetMesh()->Max() * m_WorldMtx; else return __Vector3(0,0,0); } // 월드 상의 최대값
+	__Vector3 Min() { if(m_FXPMInst.GetMesh()) return m_FXPMInst.GetMesh()->Min() * m_WorldMtx; else return __Vector3(0,0,0); } // 월드 상의 최소값 [Korean comment]
+	__Vector3 Max() { if(m_FXPMInst.GetMesh()) return m_FXPMInst.GetMesh()->Max() * m_WorldMtx; else return __Vector3(0,0,0); } // 월드 상의 최대값 [Korean comment]
 	float	Radius() { if(m_FXPMInst.GetMesh()) return m_FXPMInst.GetMesh()->Radius(); else return 0.0f; }
 
 

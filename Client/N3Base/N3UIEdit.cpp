@@ -34,7 +34,7 @@ CN3UIEdit::CN3Caret::CN3Caret()
 	m_pVB[0].Set(0,0,UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xffff0000);
 	m_pVB[1].Set(0,10,UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xffff0000);
 	m_bVisible = FALSE;
-	m_fFlickerTimePrev = CN3Base::TimeGet();	// 깜박이기 위한 시간..
+	m_fFlickerTimePrev = CN3Base::TimeGet();	// 깜박이기 위한 시간.. Time
 	m_bFlickerStatus = true;
 
 }
@@ -67,7 +67,7 @@ void CN3UIEdit::CN3Caret::Render(LPDIRECT3DDEVICE9	lpD3DDev)
 {
 	if (FALSE == m_bVisible) return;
 
-	// 깜박임 처리..
+	// 깜박임 처리.. Process
 	float fTime = CN3Base::TimeGet();
 	if(fTime - m_fFlickerTimePrev > CARET_FLICKERING_TIME)
 	{
@@ -85,7 +85,7 @@ void CN3UIEdit::CN3Caret::Render(LPDIRECT3DDEVICE9	lpD3DDev)
 }
 void CN3UIEdit::CN3Caret::InitFlckering()
 {
-	m_fFlickerTimePrev = CN3Base::TimeGet();	// 깜박이기 위한 시간..
+	m_fFlickerTimePrev = CN3Base::TimeGet();	// 깜박이기 위한 시간.. Time
 	m_bFlickerStatus = true;
 }
 
@@ -110,7 +110,7 @@ BOOL CN3UIEdit::CreateEditWindow(HWND hParent, RECT rect)
 	::SendMessage(s_hWndEdit, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
 	::SendMessage(s_hWndEdit, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
 
-	// 배경 지우기...??
+	// 배경 지우기...?? [Korean comment]
 	HDC hDC = GetDC(s_hWndEdit);
 	SetBkMode(hDC, TRANSPARENT);
 	SetROP2(hDC, R2_XORPEN);
@@ -449,7 +449,7 @@ void CN3UIEdit::Render()
 	CN3UIStatic::Render();
 	if (HaveFocus())
 	{
-		s_Caret.Render(s_lpD3DDev);	// 포커스가 있으면 캐럿 그리기
+		s_Caret.Render(s_lpD3DDev);	// 포커스가 있으면 캐럿 그리기 Draw
 	}
 }
 
@@ -457,7 +457,7 @@ void CN3UIEdit::SetVisible(bool bVisible)
 {
 	CN3UIBase::SetVisible(bVisible);
 
-	if (false == bVisible && true == m_bVisible)	// 보이지 않게 할때
+	if (false == bVisible && true == m_bVisible)	// 보이지 않게 할때 [Korean comment]
 	{
 		KillFocus();
 	}
@@ -493,7 +493,7 @@ bool CN3UIEdit::SetFocus()
 
 	s_Caret.m_bVisible = TRUE;
 	s_Caret.InitFlckering();
-	CN3UIEdit::UpdateCaretPosFromEditCtrl(); // 캐럿 포지션 설정
+	CN3UIEdit::UpdateCaretPosFromEditCtrl(); // 캐럿 포지션 설정 Set
 
 	if(s_hWndEdit)
 	{
@@ -524,9 +524,9 @@ uint32_t CN3UIEdit::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 {
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
 	if (!m_bVisible) return dwRet;
-	if(dwFlags & UI_MOUSE_LBCLICK &&IsIn(ptCur.x, ptCur.y))	// 영역 안에서 왼쪽 버튼이 눌렸으면
+	if(dwFlags & UI_MOUSE_LBCLICK &&IsIn(ptCur.x, ptCur.y))	// 영역 안에서 왼쪽 버튼이 눌렸으면 Button
 	{
-		SetFocus();	// 나에게 포커스를 준다.
+		SetFocus();	// 나에게 포커스를 준다. [Korean comment]
 		dwRet |= (UI_MOUSEPROC_DONESOMETHING|UI_MOUSEPROC_INREGION);
 		return dwRet;
 	}
@@ -537,7 +537,7 @@ uint32_t CN3UIEdit::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 void CN3UIEdit::SetCaretPos(uint32_t nPos)
 {
 	if (nPos > m_iMaxStrLen)
-		nPos = m_iMaxStrLen;	// 최대 길이보다 길경우 작게 세팅
+		nPos = m_iMaxStrLen;	// 최대 길이보다 길경우 작게 세팅 [Korean comment]
 	m_nCaretPos = nPos;
 
 	const std::string& szBuff = m_pBuffOutRef->GetString();
@@ -550,7 +550,7 @@ void CN3UIEdit::SetCaretPos(uint32_t nPos)
 	s_Caret.SetPos(m_pBuffOutRef->m_ptDrawPos.x + size.cx, m_pBuffOutRef->m_ptDrawPos.y);
 }
 
-void CN3UIEdit::SetMaxString(uint32_t nMax)		// 최대 글씨 수를 정해준다
+void CN3UIEdit::SetMaxString(uint32_t nMax)		// 최대 글씨 수를 정해준다 [Korean comment]
 {
 	if (nMax == 0)
 	{
@@ -688,7 +688,7 @@ bool CN3UIEdit::Load(HANDLE hFile)
 	int iSndFNLen = 0;
 	DWORD dwNum;
 
-	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
+	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이 File
 	if (iSndFNLen>0)
 	{
 		std::vector<char> buffer(iSndFNLen+1, '\0');
@@ -716,7 +716,7 @@ bool CN3UIEdit::Save(HANDLE hFile)
 
 	int iSndFNLen = 0;
 	if (m_pSnd_Typing) iSndFNLen = m_pSnd_Typing->m_szFileName.size();
-	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
+	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이 File
 	if (iSndFNLen>0) WriteFile(hFile, m_pSnd_Typing->m_szFileName.c_str(), iSndFNLen, &dwNum, nullptr);
 
 	return true;
@@ -728,7 +728,7 @@ void CN3UIEdit::SetSndTyping(const std::string& strFileName)
 	if (0 == strFileName.size()) return;
 
 	CN3BaseFileAccess tmpBase;
-	tmpBase.FileNameSet(strFileName);	// Base경로에 대해서 상대적 경로를 넘겨준다.
+	tmpBase.FileNameSet(strFileName);	// Base경로에 대해서 상대적 경로를 넘겨준다. [Korean comment]
 
 	SetCurrentDirectory(tmpBase.PathGet().c_str());
 	m_pSnd_Typing = s_SndMgr.CreateObj(tmpBase.FileName(), SNDTYPE_2D);
@@ -795,7 +795,7 @@ void CN3UIEdit::SetImeStatus(POINT ptPos, bool bOpen)
 
 /*
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-//	IME 관련해서
+//	IME 관련해서 [Korean comment]
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -813,12 +813,12 @@ bool CN3UIEdit::AddEdit(CN3UIEdit* pEdit)
 	}
 
 	it_Edit it = s_Edits.find(pEdit->m_hWndEdit);
-	if(it == s_Edits.end()) // 중복된게 없으면..
+	if(it == s_Edits.end()) // 중복된게 없으면.. [Korean comment]
 	{
 		s_Edits.insert(val_Edit(pEdit->m_hWndEdit, pEdit));
 		return true;
 	}
-	else // 중복되었으면..
+	else // 중복되었으면.. [Korean comment]
 	{
 		__ASSERT(0, "Edit Handle Duplicate");
 		return false;
