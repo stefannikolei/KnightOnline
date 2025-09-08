@@ -110,14 +110,14 @@ void CFormViewProperty::OnInitialUpdate()
 	
 //enum		eSKY_DAYCHANGE {	SDC_SKYCOLOR=0,		// 하늘색 Color
 //								SDC_FOGCOLOR,		// 안개색 Color
-//								SDC_STARCOUNT,		// 별 수 [Korean comment]
-//								SDC_MOONPHASE,		// 달 모양 [Korean comment]
+//								SDC_STARCOUNT,		// 별 수 Star count
+//								SDC_MOONPHASE,		// 달 모양 Moon phase
 //								SDC_SUNCOLOR,		// 해 색 Color
 //								SDC_GLOWCOLOR,		// 해의 glow색
 //								SDC_FLARECOLOR,		// 해의 flare색
 //								SDC_CLOUD1COLOR,	// 구름층 1의 색 Color
 //								SDC_CLOUD2COLOR,	// 구름층 2의 색 Color
-//								SDC_CLOUDTEX,		// 구름 텍스쳐 바꾸기 [Korean comment]
+//								SDC_CLOUDTEX,		// 구름 텍스쳐 바꾸기 Change cloud texture
 //								NUM_SKYDAYCHANGE,
 //								
 //								SDC_UNKNOWN = 0xffffffff

@@ -115,7 +115,7 @@ void CTexViewer::OnPaint()
 		dc.SetBkColor(RGB(0,0,0));
 		dc.SelectStockObject(NULL_BRUSH);
 		CPen* pOldPen = dc.SelectObject(&m_WhiteDashPen);
-		dc.Rectangle(&rcSelected);	// 흰 점선 펜으로 칠하고 [Korean comment]
+		dc.Rectangle(&rcSelected);	// 흰 점선 펜으로 칠하고 Paint with white dotted pen
 		dc.SelectObject(pOldPen);
 	}
 	// ImageType별 영역이 있으면 그리기 Draw
@@ -155,7 +155,7 @@ void CTexViewer::OnLButtonDown(UINT nFlags, CPoint point)
 		if (DRAGTYPE_NONE == m_eDragType)
 		{
 			CPoint pt = point;
-			ScreenToImage(&pt);				// image 좌표로 변환 [Korean comment]
+			ScreenToImage(&pt);				// image 좌표로 변환 Convert to image coordinates
 			m_rcSelectedRect.SetRect(pt, pt);
 			m_eDragType = DRAGTYPE_SELECT;
 			m_bDeselect = TRUE;
@@ -279,7 +279,7 @@ void CTexViewer::OnMouseMove(UINT nFlags, CPoint point)
 				ScreenToImage(&pt);				// image 좌표로 변환 [Korean comment]
 				m_rcSelectedRect.right = pt.x;
 				m_rcSelectedRect.bottom = pt.y;
-				m_bDeselect = FALSE;		// deselect 해제 [Korean comment]
+				m_bDeselect = FALSE;		// deselect 해제 Cancel deselect
 			}
 			else
 			{	// 영역 변형일 경우 다음과 같이 처리 Process

@@ -71,7 +71,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	DockControlBar(&m_wndToolBar);
 
 	if(!m_Eng.Init(TRUE, m_hWnd, 64, 64, 0, TRUE)) return -1;
-	m_Eng.GridCreate(1000, 1000); // 그리드 만들기.. [Korean comment]
+	m_Eng.GridCreate(1000, 1000); // 그리드 만들기.. Create grid
 
 	m_Camera.m_bFogUse = true;
 
