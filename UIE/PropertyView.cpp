@@ -117,18 +117,18 @@ void CPropertyView::OnInitialUpdate()
 		m_UIBase.AddPropItem("Tooltip text", "", PIT_EDIT, "");		// m_pszTooltipText
 		m_UIBase.AddPropItem("Open sound", "", PIT_FILE, "");		// sound
 		m_UIBase.AddPropItem("Close sound", "", PIT_FILE, "");		// sound
-		m_UIBase.AddPropItem("Delete sound", "", PIT_BUTTON, "");		// sound 설정 지우기 Set
+		m_UIBase.AddPropItem("Delete sound", "", PIT_BUTTON, "");		// sound 설정 지우기 Delete sound settings
 		m_UIBase.AddPropItem("Visible", "", PIT_BUTTON, "");		// visible
 
 		// image
 		m_UIImage.AddPropItem("Texture", "", PIT_FILE, "");			// texture
-		m_UIImage.AddPropItem("UV left", "", PIT_BUTTON, "");			// m_frcUVRect (UV좌표) [Korean comment]
+		m_UIImage.AddPropItem("UV left", "", PIT_BUTTON, "");			// m_frcUVRect (UV좌표) UV coordinates
 		m_UIImage.AddPropItem("UV top", "", PIT_BUTTON, "");
 		m_UIImage.AddPropItem("UV right", "", PIT_BUTTON, "");
 		m_UIImage.AddPropItem("UV bottom", "", PIT_BUTTON, "");
 		m_UIImage.AddPropItem("Color", "", PIT_COLOR, "");			// m_Color
-		m_UIImage.AddPropItem("Animate Frame", "", PIT_EDIT, "");			// Animate frame 초당 몇 프레임으로 에니메이트 될 것인가? [Korean comment]
-		m_UIImage.AddPropItem("Make Animation", "", PIT_BUTTON, "");			// Animation으로 만들기 [Korean comment]
+		m_UIImage.AddPropItem("Animate Frame", "", PIT_EDIT, "");			// Animate frame 초당 몇 프레임으로 에니메이트 될 것인가? How many frames per second will it animate?
+		m_UIImage.AddPropItem("Make Animation", "", PIT_BUTTON, "");			// Animation으로 만들기 Create as animation
 
 		// string
 		m_UIString.AddPropItem("Line", "", PIT_COMBO, "SINGLE LINE|MULTI LINE|");		// style(line)
@@ -262,7 +262,7 @@ BOOL CPropertyView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		}
 		else if(pItem->m_propName == "Visible")
 		{
-			pUI->SetVisible(!pUI->IsVisible());	// 보였다 안보였다하게 하기 [Korean comment]
+			pUI->SetVisible(!pUI->IsVisible());	// 보였다 안보였다하게 하기 Toggle visibility
 			GetDocument()->UpdateAllViews(nullptr);
 		}
 	}
@@ -273,7 +273,7 @@ BOOL CPropertyView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		if (pItem->m_propName == "Texture")
 		{
 			CN3BaseFileAccess tmpBase;
-			tmpBase.FileNameSet((LPCTSTR)pItem->m_curValue);	// Base경로에 대해서 상대적 경로를 넘겨준다. [Korean comment]
+			tmpBase.FileNameSet((LPCTSTR)pItem->m_curValue);	// Base경로에 대해서 상대적 경로를 넘겨준다. Pass relative path to Base path
 
 			pImage->SetTex(tmpBase.FileName());
 			pItem->m_curValue = tmpBase.FileName().c_str();	//tex file name 다시 설정 Set

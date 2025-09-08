@@ -50,7 +50,7 @@ void CUser::Parsing(int len, char* pData)
 			break;
 
 		case LS_SERVERLIST:
-			// 기범이가 ^^; [Korean comment]
+			// 기범이가 ^^; Ki-beom's code ^^;
 			_main->DbProcess.LoadUserCountList();
 
 			SetByte(buff, LS_SERVERLIST, send_index);
@@ -62,7 +62,7 @@ void CUser::Parsing(int len, char* pData)
 				SetString2(buff, pInfo->strServerName, (short) strlen(pInfo->strServerName), send_index);
 
 				if (pInfo->sUserCount <= pInfo->sUserLimit)
-					SetShort(buff, pInfo->sUserCount, send_index);   // 기범이가 ^^; [Korean comment]
+					SetShort(buff, pInfo->sUserCount, send_index);   // 기범이가 ^^; Ki-beom's code ^^;
 				else
 					SetShort(buff, -1, send_index);
 			}
@@ -144,7 +144,7 @@ void CUser::LogInReq(char* pBuf)
 
 fail_return:
 	SetByte(send_buff, LS_LOGIN_REQ, send_index);
-	SetByte(send_buff, AUTH_NOT_FOUND, send_index);				// id, pwd 이상... [Korean comment]
+	SetByte(send_buff, AUTH_NOT_FOUND, send_index);				// id, pwd 이상... id, pwd error...
 	Send(send_buff, send_index);
 }
 
