@@ -5,6 +5,7 @@
 #include "User.h"
 #include "db_resources.h"
 
+#include <ranges>
 #include <shared/DateTime.h>
 #include <shared/globals.h>
 #include <shared/lzf.h>
@@ -12565,7 +12566,7 @@ void CUser::ItemUpgradeProcess(char* pBuf)
 	}
 	else if (upgradeType == ITEM_UPGRADE_ACCESSORIES)
 	{
-		ItemUpgradeAccesories(pBuf + index);
+		ItemUpgradeAccessories(pBuf + index);
 	}
 }
 
@@ -12602,14 +12603,15 @@ void CUser::ItemUpgrade(char* pBuf)
 	// Check if the user is trading
 	if (m_sExchangeUser != -1)
 	{
-		ItemUpgradeFailure(sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_TRADING);
+		ItemUpgradeFailure(sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_TRADING, ITEM_UPGRADE_PROCESS);
 		return;
 	}
 
 	// Check if origin item position is valid
 	if (originPos >= HAVE_MAX)
 	{
-		ItemUpgradeFailure(sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH);
+		ItemUpgradeFailure(
+			sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_PROCESS);
 		return;
 	}
 
@@ -12619,7 +12621,8 @@ void CUser::ItemUpgrade(char* pBuf)
 	{
 		if (materialPos[i] >= HAVE_MAX && materialPos[i] != 255)
 		{
-			ItemUpgradeFailure(sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH);
+			ItemUpgradeFailure(
+				sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_PROCESS);
 			return;
 		}
 
@@ -12630,31 +12633,36 @@ void CUser::ItemUpgrade(char* pBuf)
 
 			if (materialId[i] != itemForCheck.nNum)
 			{
-				ItemUpgradeFailure(sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH);
+				ItemUpgradeFailure(
+					sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_PROCESS);
 				return;
 			}
 
 			if (usedInventoryPositions.contains(materialPos[i]))
 			{
-				ItemUpgradeFailure(sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH);
+				ItemUpgradeFailure(
+					sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_PROCESS);
 				return;
 			}
 
 			usedInventoryPositions.insert(materialPos[i]);
 		}
 	}
+
 	_ITEM_DATA& originItem = m_pUserData->m_sItemArray[SLOT_MAX + originPos];
 	// Validate origin item exists and matches
 	if (originItem.nNum != originItemId)
 	{
-		ItemUpgradeFailure(sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH);
+		ItemUpgradeFailure(
+			sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_PROCESS);
 		return;
 	}
 
 	// Check if the item is sealed (cannot upgrade sealed items)
 	if (m_pUserData->m_sItemArray[SLOT_MAX + originPos].byFlag != ITEM_FLAG_NONE)
 	{
-		ItemUpgradeFailure(sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_ITEM_SEALED);
+		ItemUpgradeFailure(
+			sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_ITEM_SEALED, ITEM_UPGRADE_PROCESS);
 		return;
 	}
 
@@ -12665,7 +12673,8 @@ void CUser::ItemUpgrade(char* pBuf)
 
 	if (itemForUpgrade == nullptr)
 	{
-		ItemUpgradeFailure(sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH);
+		ItemUpgradeFailure(
+			sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_PROCESS);
 		return;
 	}
 
@@ -12767,12 +12776,14 @@ void CUser::ItemUpgrade(char* pBuf)
 
 		if (itemUpgradeElementClass == 1 && itemClass != 1)
 		{
-			ItemUpgradeFailure(sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH);
+			ItemUpgradeFailure(
+				sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_PROCESS);
 			return;
 		}
 		if (itemUpgradeElementClass == 2 && itemClass != 2)
 		{
-			ItemUpgradeFailure(sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH);
+			ItemUpgradeFailure(
+				sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_PROCESS);
 			return;
 		}
 
@@ -12794,7 +12805,8 @@ void CUser::ItemUpgrade(char* pBuf)
 
 		if (upgradeInfo->RequiredCoins > m_pUserData->m_iGold)
 		{
-			ItemUpgradeFailure(sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NEED_COINS);
+			ItemUpgradeFailure(
+				sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NEED_COINS, ITEM_UPGRADE_PROCESS);
 			return;
 		}
 
@@ -12804,7 +12816,8 @@ void CUser::ItemUpgrade(char* pBuf)
 	}
 	if (!foundMatch)
 	{
-		ItemUpgradeFailure(sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH);
+		ItemUpgradeFailure(
+			sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_PROCESS);
 		return;
 	}
 	itemUpgradeElement = m_pMain->m_ItemUpgradeTableMap.GetData(itemUpgradeIndex);
@@ -12918,14 +12931,327 @@ bool CUser::MatchingItemUpgrade(
 	return true;
 }
 
-void CUser::ItemUpgradeAccesories(char* /*pBuf*/)
+void CUser::ItemUpgradeAccessories(char* pBuf)
 {
+	int index = 0, sendIndex = 0;
+	char sendBuffer[128] {};
+
+	uint8_t materialPos[5] {};
+	int32_t materialId[5] {};
+
+	uint16_t npcId = GetShort(pBuf, index);
+
+	for (int i = 0; i < 5; i++)
+	{
+		materialId[i]  = GetDWORD(pBuf, index);
+		materialPos[i] = GetByte(pBuf, index);
+	}
+
+	// Check if the user is trading
+	if (m_sExchangeUser != -1)
+	{
+		ItemUpgradeFailure(
+			sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_TRADING, ITEM_UPGRADE_ACCESSORIES);
+		return;
+	}
+
+	std::set<uint8_t> usedInventoryPositions;
+	// Check if material item positions are valid
+	for (int i = 0; i < ANVIL_ACCESSORIES_MAX; i++)
+	{
+		if (materialPos[i] >= HAVE_MAX && materialPos[i] != 255)
+		{
+			ItemUpgradeFailure(
+				sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_ACCESSORIES);
+			return;
+		}
+
+		// we need to check the items actually exist in those slots and that a slot is only used once
+		if (materialPos[i] != 255)
+		{
+			_ITEM_DATA& itemForCheck = m_pUserData->m_sItemArray[SLOT_MAX + materialPos[i]];
+
+			if (materialId[i] != itemForCheck.nNum)
+			{
+				ItemUpgradeFailure(
+					sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_ACCESSORIES);
+				return;
+			}
+
+			if (usedInventoryPositions.contains(materialPos[i]))
+			{
+				ItemUpgradeFailure(
+					sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_ACCESSORIES);
+				return;
+			}
+
+			// Check if the item is sealed (cannot upgrade sealed items)
+			if (itemForCheck.byFlag != ITEM_FLAG_NONE)
+			{
+				ItemUpgradeFailure(sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_ITEM_SEALED,
+					ITEM_UPGRADE_ACCESSORIES);
+				return;
+			}
+
+			usedInventoryPositions.insert(materialPos[i]);
+		}
+	}
+
+	// Check if all items are accessories (class 3)
+	for (int i = 0; i < 3; i++)
+	{
+		if (materialId[i] / 100000000 != 3)
+		{
+			ItemUpgradeFailure(
+				sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_ACCESSORIES);
+			return;
+		}
+	}
+
+	// Verify all 3 items are the same base type
+	uint32_t baseType0 = materialId[0] / 100000 * 100000 + materialId[0] % 10000;
+	uint32_t baseType1 = materialId[1] / 100000 * 100000 + materialId[1] % 10000;
+	uint32_t baseType2 = materialId[2] / 100000 * 100000 + materialId[2] % 10000;
+
+	if (baseType0 != baseType1 || baseType1 != baseType2)
+	{
+		ItemUpgradeFailure(
+			sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_ACCESSORIES);
+		return;
+	}
+
+	model::Item* itemForUpgrade = m_pMain->m_ItemTableMap.GetData(materialId[0]);
+	if (itemForUpgrade == nullptr)
+	{
+		ItemUpgradeFailure(
+			sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_ACCESSORIES);
+		return;
+	}
+	uint32_t originItemType         = materialId[0] % 1000;
+	int32_t itemId                  = materialId[0];
+
+	model::ItemUpgrade* itemUpgrade = nullptr;
+	for (const auto& itemUpgradeElement : m_pMain->m_ItemUpgradeTableMap | std::views::values)
+	{
+		// We check if it is an accessory
+		if (itemUpgradeElement->Index / 100000 != 3)
+			continue;
+
+		if (itemUpgradeElement->OriginItem != originItemType)
+			continue;
+
+		if (itemUpgradeElement->OriginType != -1)
+		{
+			if (itemId == 310310005 || itemId == 310310006 || itemId == 310310007)
+				continue;
+
+			if (itemUpgradeElement->RequiredCoins == 0)
+				continue;
+		}
+
+		switch (originItemType)
+		{
+			case 18:
+				if (itemUpgradeElement->OriginType != 91)
+					continue;
+
+				if (itemId == 310310005 || itemId == 310310006 || itemId == 310310007)
+					if (itemUpgradeElement->RequiredCoins == 0)
+						continue;
+
+				if (itemId == 310110005 || itemId == 310110006 || itemId == 310110007
+					|| itemId == 310150005 || itemId == 310150006 || itemId == 310150007)
+					if (itemUpgradeElement->RequiredCoins != 0)
+						continue;
+				break;
+			case 19:
+				if (itemForUpgrade->Kind != ITEM_CLASS_AMULET)
+					continue;
+				break;
+			case 20:
+				if (itemForUpgrade->Kind != ITEM_CLASS_RING)
+					continue;
+				break;
+			case 21:
+				if (itemForUpgrade->Kind != ITEM_CLASS_BELT)
+					continue;
+				break;
+		}
+
+		bool materialsMatch = true;
+		for (int i = 0; i < 2; i++)
+		{
+			uint8_t matSlot  = materialPos[3 + i];
+			int32_t matId    = materialId[3 + i];
+			int32_t reqMatId = (i == 0) ? itemUpgradeElement->RequiredItem[0]
+										: itemUpgradeElement->RequiredItem[1];
+
+			if (matSlot == 255)
+				continue;
+
+			if (!MatchingItemUpgrade(matSlot, matId, reqMatId))
+			{
+				materialsMatch = false;
+				break;
+			}
+		}
+		if (materialsMatch)
+		{
+			itemUpgrade = itemUpgradeElement;
+			break;
+		}
+	}
+
+	if (itemUpgrade == nullptr)
+	{
+		ItemUpgradeFailure(
+			sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NO_MATCH, ITEM_UPGRADE_ACCESSORIES);
+		return;
+	}
+
+	if (m_pUserData->m_iGold < itemUpgrade->RequiredCoins)
+	{
+		ItemUpgradeFailure(
+			sendBuffer, sendIndex, ITEM_UPGRADE_ERROR_NEED_COINS, ITEM_UPGRADE_ACCESSORIES);
+		return;
+	}
+
+	GoldLose(itemUpgrade->RequiredCoins);
+
+	int16_t rand        = myrand(0, 10000);
+	int32_t resultItemId = 0; 
+	bool upgradeSuccess = (itemUpgrade->GenRate > rand);
+
+	if (upgradeSuccess)
+	{
+		resultItemId    = materialId[0] + itemUpgrade->GiveItem;
+		model::Item* resultItem = m_pMain->m_ItemTableMap.GetData(resultItemId);
+
+		if (resultItem == nullptr)
+		{
+			upgradeSuccess = false;
+			for (int i = 0; i < 3; i++)
+			{
+				int invPos          = SLOT_MAX + materialPos[i];
+				_ITEM_DATA& item    = m_pUserData->m_sItemArray[SLOT_MAX + invPos];
+
+				item.nNum           = 0;
+				item.sCount         = 0;
+				item.sDuration      = 0;
+				item.nSerialNum     = 0;
+				item.byFlag         = 0;
+				item.sTimeRemaining = 0;
+
+				ItemLogToAgent(m_pUserData->m_id, "UPGRADE2", ITEM_LOG_UPGRADE_FAILED,
+					m_pUserData->m_sItemArray[invPos].nSerialNum, materialId[0],
+					m_pUserData->m_sItemArray[invPos].sCount,
+					m_pUserData->m_sItemArray[invPos].sDuration);
+			}
+		}
+		else
+		{
+			// Log consumed items
+			for (int i = 0; i < 3; i++)
+			{
+				int invPos = SLOT_MAX + materialPos[i];
+				ItemLogToAgent(m_pUserData->m_id, "UPGRADE2", ITEM_LOG_UPGRADE,
+					m_pUserData->m_sItemArray[invPos].nSerialNum, materialId[i], 0, 0);
+			}
+
+			_ITEM_DATA& item    = m_pUserData->m_sItemArray[SLOT_MAX + materialPos[0]];
+
+			// Update first item to result
+			item.nNum           = resultItemId;
+			item.sCount         = 1;
+			item.sDuration      = resultItem->Durability;
+			item.byFlag         = 0;
+			item.sTimeRemaining = 0;
+
+			// Log created item
+			ItemLogToAgent(m_pUserData->m_id, "UPGRADE2", ITEM_LOG_UPGRADE, item.nSerialNum,
+				resultItemId, 1, item.sDuration);
+
+			for (int i = 1; i < 3; i++)
+			{
+				item                = m_pUserData->m_sItemArray[SLOT_MAX + materialPos[i]];
+				item.nNum           = 0;
+				item.sCount         = 0;
+				item.sDuration      = 0;
+				item.nSerialNum     = 0;
+				item.byFlag         = 0;
+				item.sTimeRemaining = 0;
+			}
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			int invPos          = SLOT_MAX + materialPos[i];
+			_ITEM_DATA& item    = m_pUserData->m_sItemArray[SLOT_MAX + invPos];
+
+			item.nNum           = 0;
+			item.sCount         = 0;
+			item.sDuration      = 0;
+			item.nSerialNum     = 0;
+			item.byFlag         = 0;
+			item.sTimeRemaining = 0;
+		}
+	}
+
+	// Consume material items
+	for (int i = 3; i < 5; i++)
+	{
+		if (materialPos[i] < HAVE_MAX)
+		{
+			int invPos = SLOT_MAX + materialPos[i];
+			m_pUserData->m_sItemArray[invPos].sCount--;
+
+			if (m_pUserData->m_sItemArray[invPos].sCount <= 0)
+			{
+				memset(&m_pUserData->m_sItemArray[invPos], 0, sizeof(_ITEM_DATA));
+			}
+		}
+	}
+
+	SetByte(sendBuffer, WIZ_ITEM_UPGRADE, sendIndex);
+	SetByte(sendBuffer, ITEM_UPGRADE_ACCESSORIES, sendIndex);
+
+	if (upgradeSuccess)
+	{
+		SetByte(sendBuffer,  1, sendIndex);
+		SetDWORD(sendBuffer, resultItemId, sendIndex);
+	}
+	else
+	{
+		SetByte(sendBuffer,  0, sendIndex);
+		SetDWORD(sendBuffer, materialId[0], sendIndex);
+	}
+
+	SetByte(sendBuffer, materialPos[0], sendIndex);
+
+	for (int i = 1; i < 5; i++)
+	{
+		SetDWORD(sendBuffer, materialId[i], sendIndex);
+		SetByte(sendBuffer, materialPos[i], sendIndex);
+	}
+	Send(sendBuffer, sendIndex);
+	sendIndex = 0;
+	memset(sendBuffer, 0, sizeof(sendBuffer));
+	SetByte(sendBuffer, 0x33, sendIndex);
+	SetByte(sendBuffer, 0x08, sendIndex);
+	SetByte(sendBuffer, upgradeSuccess ? 1 : 0, sendIndex);
+	SetShort(sendBuffer, npcId, sendIndex);
+
+	m_pMain->Send_Region(
+		sendBuffer, sendIndex, m_pUserData->m_bZone, m_RegionX, m_RegionZ, nullptr, true);
 }
 
-void CUser::ItemUpgradeFailure(char* sendBuffer, int sendIndex, e_ItemUpgradeResult resultCode)
+void CUser::ItemUpgradeFailure(char* sendBuffer, int sendIndex, e_ItemUpgradeResult resultCode,
+	e_ItemUpgradeOpcode upgradeType)
 {
 	SetByte(sendBuffer, WIZ_ITEM_UPGRADE, sendIndex);
-	SetByte(sendBuffer, ITEM_UPGRADE_PROCESS, sendIndex);
+	SetByte(sendBuffer, upgradeType, sendIndex);
 	SetByte(sendBuffer, resultCode, sendIndex);
 	Send(sendBuffer, sendIndex);
 }

@@ -384,41 +384,42 @@ enum e_ZoneID
 };
 
 // ITEM_SLOT DEFINE
-constexpr uint8_t RIGHTEAR        = 0;
-constexpr uint8_t HEAD            = 1;
-constexpr uint8_t LEFTEAR         = 2;
-constexpr uint8_t NECK            = 3;
-constexpr uint8_t BREAST          = 4;
-constexpr uint8_t SHOULDER        = 5;
-constexpr uint8_t RIGHTHAND       = 6;
-constexpr uint8_t WAIST           = 7;
-constexpr uint8_t LEFTHAND        = 8;
-constexpr uint8_t RIGHTRING       = 9;
-constexpr uint8_t LEG             = 10;
-constexpr uint8_t LEFTRING        = 11;
-constexpr uint8_t GLOVE           = 12;
-constexpr uint8_t FOOT            = 13;
-constexpr uint8_t RESERVED        = 14;
+constexpr uint8_t RIGHTEAR              = 0;
+constexpr uint8_t HEAD                  = 1;
+constexpr uint8_t LEFTEAR               = 2;
+constexpr uint8_t NECK                  = 3;
+constexpr uint8_t BREAST                = 4;
+constexpr uint8_t SHOULDER              = 5;
+constexpr uint8_t RIGHTHAND             = 6;
+constexpr uint8_t WAIST                 = 7;
+constexpr uint8_t LEFTHAND              = 8;
+constexpr uint8_t RIGHTRING             = 9;
+constexpr uint8_t LEG                   = 10;
+constexpr uint8_t LEFTRING              = 11;
+constexpr uint8_t GLOVE                 = 12;
+constexpr uint8_t FOOT                  = 13;
+constexpr uint8_t RESERVED              = 14;
 
-constexpr uint8_t SLOT_MAX        = 14;  // 14 equipped item slots
-constexpr uint8_t HAVE_MAX        = 28;  // 28 inventory slots
-constexpr uint8_t WAREHOUSE_MAX   = 192; // 창고 아이템 MAX
-constexpr uint8_t ANVIL_MAX       = 9;
+constexpr uint8_t SLOT_MAX              = 14;  // 14 equipped item slots
+constexpr uint8_t HAVE_MAX              = 28;  // 28 inventory slots
+constexpr uint8_t WAREHOUSE_MAX         = 192; // 창고 아이템 MAX
+constexpr uint8_t ANVIL_MAX             = 9;
+constexpr uint8_t ANVIL_ACCESSORIES_MAX = 5;
 
 // Start of inventory area
-constexpr int INVENTORY_INVENT    = SLOT_MAX;
+constexpr int INVENTORY_INVENT          = SLOT_MAX;
 
 // Total slots in the general-purpose inventory storage
-constexpr int INVENTORY_TOTAL     = SLOT_MAX + HAVE_MAX;
+constexpr int INVENTORY_TOTAL           = SLOT_MAX + HAVE_MAX;
 
-constexpr uint8_t MAX_MERCH_ITEMS = 12;
+constexpr uint8_t MAX_MERCH_ITEMS       = 12;
 
-constexpr int MAX_MERCH_MESSAGE   = 40;
+constexpr int MAX_MERCH_MESSAGE         = 40;
 
-constexpr int ITEMCOUNT_MAX       = 9999;
+constexpr int ITEMCOUNT_MAX             = 9999;
 
-constexpr int MAX_KNIGHTS_MARK    = 2400;
-constexpr int CLAN_SYMBOL_COST    = 5000000;
+constexpr int MAX_KNIGHTS_MARK          = 2400;
+constexpr int CLAN_SYMBOL_COST          = 5000000;
 
 #define NEWCHAR_SUCCESS            uint8_t(0)
 #define NEWCHAR_NO_MORE            uint8_t(1)
