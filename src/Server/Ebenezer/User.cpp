@@ -12908,6 +12908,9 @@ void CUser::ItemUpgrade(char* pBuf)
 						if (originItemModel->Kind != ITEM_CLASS_SHIELD)
 							continue;
 						break;
+
+					default:
+						break;
 				}
 			}
 			// No clue for what these two else if are...
