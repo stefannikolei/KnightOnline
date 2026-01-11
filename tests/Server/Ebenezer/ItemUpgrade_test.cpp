@@ -144,3 +144,136 @@ TEST_F(ItemUpgradeTest, SampleTest)
 	_user->ItemUpgradeProcess(sendBuffer);
 	EXPECT_EQ(_user->GetPacketsSent(), 3);
 }
+
+TEST_F(ItemUpgradeTest, ItemNotInInventory)
+{
+	int sendIndex = 0;
+	char sendBuffer[128] {};
+
+	_ITEM_DATA& reqItem1        = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
+
+	reqItem1                    = { .nNum = 379016000, .sCount = 1 };
+
+	_user->m_pUserData->m_iGold = 100'000'000;
+
+	sendIndex                   = 0;
+	SetByte(sendBuffer, ITEM_UPGRADE_PROCESS, sendIndex);
+	SetShort(sendBuffer, ANVIL_NPC_ID, sendIndex);
+	SetDWORD(sendBuffer, 110110001, sendIndex);
+	SetByte(sendBuffer, 0, sendIndex);
+	SetDWORD(sendBuffer, reqItem1.nNum, sendIndex);
+	SetByte(sendBuffer, 1, sendIndex);
+	SetDWORD(sendBuffer, 0, sendIndex);
+	SetByte(sendBuffer, 255, sendIndex);
+
+	for (int i = 2; i < 10; i++)
+	{
+		SetDWORD(sendBuffer, 0, sendIndex);
+		SetByte(sendBuffer, 255, sendIndex);
+	}
+
+	_user->ResetSend();
+
+	// Expect only the error packet
+	_user->AddSendCallback(
+		[](const char* pBuf, int len)
+		{
+			EXPECT_EQ(len, 3);
+			EXPECT_EQ(pBuf[0], WIZ_ITEM_UPGRADE);
+			EXPECT_EQ(pBuf[1], ITEM_UPGRADE_PROCESS);
+			EXPECT_EQ(pBuf[2], ITEM_UPGRADE_ERROR_NO_MATCH);
+		});
+
+	_user->ItemUpgradeProcess(sendBuffer);
+	EXPECT_EQ(_user->GetPacketsSent(), 1);
+}
+
+TEST_F(ItemUpgradeTest, RequirementItemNotInInventory)
+{
+	int sendIndex = 0;
+	char sendBuffer[128] {};
+
+	_ITEM_DATA& originItem      = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
+
+	originItem                  = { .nNum = 110110001, .sCount = 1 }; // Dagger (+1)
+
+	_user->m_pUserData->m_iGold = 100'000'000;
+
+	sendIndex                   = 0;
+	SetByte(sendBuffer, ITEM_UPGRADE_PROCESS, sendIndex);
+	SetShort(sendBuffer, ANVIL_NPC_ID, sendIndex);
+	SetDWORD(sendBuffer, originItem.nNum, sendIndex);
+	SetByte(sendBuffer, 0, sendIndex);
+	SetDWORD(sendBuffer, 379016000, sendIndex);
+	SetByte(sendBuffer, 1, sendIndex);
+	SetDWORD(sendBuffer, 0, sendIndex);
+	SetByte(sendBuffer, 255, sendIndex);
+
+	for (int i = 2; i < 10; i++)
+	{
+		SetDWORD(sendBuffer, 0, sendIndex);
+		SetByte(sendBuffer, 255, sendIndex);
+	}
+
+	_user->ResetSend();
+
+	_user->AddSendCallback(
+		[](const char* pBuf, int len)
+		{
+			EXPECT_EQ(len, 3);
+			EXPECT_EQ(pBuf[0], WIZ_ITEM_UPGRADE);
+			EXPECT_EQ(pBuf[1], ITEM_UPGRADE_PROCESS);
+			EXPECT_EQ(pBuf[2], ITEM_UPGRADE_ERROR_NO_MATCH);
+		});
+
+	_user->ItemUpgradeProcess(sendBuffer);
+	EXPECT_EQ(_user->GetPacketsSent(), 1);
+}
+
+TEST_F(ItemUpgradeTest, InsufficientGold)
+{
+	int sendIndex = 0;
+	char sendBuffer[128] {};
+
+	_ITEM_DATA& originItem      = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
+	_ITEM_DATA& reqItem1        = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
+	_ITEM_DATA& reqItem2        = _user->m_pUserData->m_sItemArray[SLOT_MAX + 2];
+
+	originItem                  = { .nNum = 110110001, .sCount = 1 }; // Dagger (+1)
+	reqItem1                    = { .nNum = 379025000, .sCount = 1 }; // Blessed Elemental Scroll
+	reqItem2                    = { .nNum = 0, .sCount = 0 };
+
+	// Set gold to -100 - not enough for upgrade
+	_user->m_pUserData->m_iGold = -100;
+
+	sendIndex                   = 0;
+	SetByte(sendBuffer, ITEM_UPGRADE_PROCESS, sendIndex);
+	SetShort(sendBuffer, ANVIL_NPC_ID, sendIndex);
+	SetDWORD(sendBuffer, originItem.nNum, sendIndex);
+	SetByte(sendBuffer, 0, sendIndex);
+	SetDWORD(sendBuffer, reqItem1.nNum, sendIndex);
+	SetByte(sendBuffer, 1, sendIndex);
+	SetDWORD(sendBuffer, reqItem2.nNum, sendIndex);
+	SetByte(sendBuffer, 255, sendIndex);
+
+	for (int i = 2; i < 10; i++)
+	{
+		SetDWORD(sendBuffer, 0, sendIndex);
+		SetByte(sendBuffer, 255, sendIndex);
+	}
+
+	_user->ResetSend();
+
+	_user->AddSendCallback(
+		[](const char* pBuf, int len)
+		{
+			EXPECT_EQ(len, 3);
+			EXPECT_EQ(pBuf[0], WIZ_ITEM_UPGRADE);
+			EXPECT_EQ(pBuf[1], ITEM_UPGRADE_PROCESS);
+			EXPECT_EQ(pBuf[2], ITEM_UPGRADE_ERROR_NEED_COINS);
+		});
+
+	_user->ItemUpgradeProcess(sendBuffer);
+	EXPECT_EQ(_user->GetPacketsSent(), 1);
+}
+
