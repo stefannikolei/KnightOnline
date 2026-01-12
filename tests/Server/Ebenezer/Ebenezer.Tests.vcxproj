@@ -24,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="data\Item_test_data.h" />
+    <ClInclude Include="packet_structs.h" />
     <ClInclude Include="TestApp.h" />
     <ClInclude Include="TestMap.h" />
     <ClInclude Include="TestUser.h" />

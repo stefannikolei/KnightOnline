@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef TESTS_SERVER_EBENEZER_TESTAPP_H
+#define TESTS_SERVER_EBENEZER_TESTAPP_H
+
+#pragma once
 
 #include <Ebenezer/EbenezerApp.h>
 #include <Ebenezer/EbenezerLogger.h>
@@ -104,3 +107,5 @@ public:
 protected:
 	Ebenezer::EbenezerLogger _logger;
 };
+
+#endif // TESTS_SERVER_EBENEZER_TESTAPP_H

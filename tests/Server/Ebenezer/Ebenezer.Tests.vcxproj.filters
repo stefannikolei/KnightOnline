@@ -27,5 +27,8 @@
     <ClInclude Include="TestMap.h">
       <Filter>helpers</Filter>
     </ClInclude>
+    <ClInclude Include="packet_structs.h">
+      <Filter>helpers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,6 +1,7 @@
 ﻿#include <gtest/gtest.h>
 #include "TestApp.h"
 #include "TestUser.h"
+#include "packet_structs.h"
 
 #include "data/Item_test_data.h"
 #include "data/ItemUpgrade_test_data.h"
@@ -67,110 +68,133 @@ protected:
 	}
 };
 
-TEST_F(ItemUpgradeTest, SampleTest)
+TEST_F(ItemUpgradeTest, BasicUpgradeSucceeds)
 {
-	int sendIndex = 0;
+	constexpr int OLD_ITEM_ID       = 110110001; // Dagger (+1)
+	constexpr int NEW_ITEM_ID       = 110110002; // Dagger (+2)
+	constexpr int REQ_ITEM1_ID      = 379016000; // Blessed Item Upgrade Scroll
+	constexpr int START_GOLD        = 100'000'000;
+	constexpr int EXPECTED_COST     = 0;
+	constexpr int EXPECTED_NEW_GOLD = START_GOLD - EXPECTED_COST;
+
 	char sendBuffer[128] {};
+	int sendIndex = 0;
 
-	_ITEM_DATA& originItem      = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
-	_ITEM_DATA& reqItem1        = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
-	_ITEM_DATA& reqItem2        = _user->m_pUserData->m_sItemArray[SLOT_MAX + 2];
+	ItemUpgradeProcessPacket packet {};
 
-	// Dagger (+1)
-	originItem                  = { .nNum = 110110001, .sCount = 1 };
+	_ITEM_DATA& originItem    = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
+	_ITEM_DATA& reqItem1      = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
 
-	// Blessed Item Upgrade Scroll
-	reqItem1                    = { .nNum = 379016000, .sCount = 1 };
-	reqItem2                    = { .nNum = 0, .sCount = 0 };
+	model::Item* oldItemModel = _app->m_ItemTableMap.GetData(OLD_ITEM_ID);
+	model::Item* newItemModel = _app->m_ItemTableMap.GetData(NEW_ITEM_ID);
+
+	EXPECT_TRUE(oldItemModel != nullptr);
+	EXPECT_TRUE(newItemModel != nullptr);
+
+	// Prepare inventory
+	originItem                  = { .nNum = OLD_ITEM_ID, .sDuration = 1, .sCount = 1 };
+	reqItem1                    = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
 
 	// Upgrades need gold
-	_user->m_pUserData->m_iGold = 100'000'000;
+	_user->m_pUserData->m_iGold = START_GOLD;
 
-	// NOTE: We should probably move this into its own method for repeat
-	// usage but we'll still need to pass it invalid data for testing
-	// otherwise, so this will be fine for the moment.
-	sendIndex                   = 0;
-	SetByte(sendBuffer, ITEM_UPGRADE_PROCESS, sendIndex);
-	SetShort(sendBuffer, ANVIL_NPC_ID, sendIndex);
-	SetDWORD(sendBuffer, originItem.nNum, sendIndex);
-	SetByte(sendBuffer, 0, sendIndex);   /* origin position */
-	SetDWORD(sendBuffer, reqItem1.nNum, sendIndex);
-	SetByte(sendBuffer, 1, sendIndex);   /* reqItem1 position */
-	SetDWORD(sendBuffer, reqItem2.nNum, sendIndex);
-	SetByte(sendBuffer, 255, sendIndex); /* reqItem2 position - unused in this case */
-
-	// Remaining unused items
-	// This is all a complete mess that needs cleaning up but
-	// it'll suffice for the moment as a proof of concept
-	for (int i = 2; i < 10; i++)
-	{
-		SetDWORD(sendBuffer, 0, sendIndex);
-		SetByte(sendBuffer, 255, sendIndex);
-	}
+	// Prepare packet data
+	packet.NpcID                = ANVIL_NPC_ID;
+	packet.Item[0]              = { .ID = OLD_ITEM_ID, .Pos = 0 };
+	packet.Item[1]              = { .ID = REQ_ITEM1_ID, .Pos = 1 };
 
 	_user->ResetSend();
 
 	// Expect the gold change packet
 	_user->AddSendCallback(
-		[](const char* pBuf, int len)
+		[=](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, 10);
-			EXPECT_EQ(pBuf[0], WIZ_GOLD_CHANGE);
-			EXPECT_EQ(pBuf[1], GOLD_CHANGE_LOSE);
-			// ... etc
+			EXPECT_EQ(len, sizeof(GoldChangePacket));
+
+			auto packet = reinterpret_cast<const GoldChangePacket*>(pBuf);
+
+			EXPECT_EQ(packet->Opcode, WIZ_GOLD_CHANGE);
+			EXPECT_EQ(packet->SubOpcode, GOLD_CHANGE_LOSE);
+			EXPECT_EQ(packet->ChangeAmount, EXPECTED_COST);
+			EXPECT_EQ(packet->NewGold, EXPECTED_NEW_GOLD);
 		});
 
 	// Then the success packet
 	_user->AddSendCallback(
-		[](const char* pBuf, int len)
+		[=](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, 53);
-			EXPECT_EQ(pBuf[0], WIZ_ITEM_UPGRADE);
-			EXPECT_EQ(pBuf[1], ITEM_UPGRADE_PROCESS);
-			EXPECT_EQ(pBuf[2], ITEM_UPGRADE_ERROR_SUCCEEDED);
-			// ... etc
+			EXPECT_EQ(len, sizeof(ItemUpgradeProcessSuccessResponseSuccessPacket));
+
+			auto packet = reinterpret_cast<const ItemUpgradeProcessSuccessResponseSuccessPacket*>(
+				pBuf);
+
+			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
+			EXPECT_EQ(packet->SubOpcode, ITEM_UPGRADE_PROCESS);
+			EXPECT_EQ(packet->Result, ITEM_UPGRADE_ERROR_SUCCEEDED);
+			EXPECT_EQ(packet->Item[0].ID, NEW_ITEM_ID);
+			EXPECT_EQ(packet->Item[0].Pos, 0);
+			EXPECT_EQ(packet->Item[1].ID, REQ_ITEM1_ID);
+			EXPECT_EQ(packet->Item[1].Pos, 1);
+
+			for (int i = 2; i < 10; i++)
+			{
+				EXPECT_EQ(packet->Item[i].ID, 0);
+				EXPECT_EQ(packet->Item[i].Pos, -1);
+			}
 		});
 
 	// Then the packet to show the visual effect for the anvil
 	_user->AddSendCallback(
 		[](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, 5);
-			EXPECT_EQ(pBuf[0], WIZ_OBJECT_EVENT);
-			EXPECT_EQ(pBuf[1], OBJECT_TYPE_ANVIL);
-			// ... etc
+			EXPECT_EQ(len, sizeof(ObjectEventAnvilResponsePacket));
+
+			auto packet = reinterpret_cast<const ObjectEventAnvilResponsePacket*>(pBuf);
+
+			EXPECT_EQ(packet->Opcode, WIZ_OBJECT_EVENT);
+			EXPECT_EQ(packet->ObjectType, OBJECT_TYPE_ANVIL);
+			EXPECT_TRUE(packet->Successful);
+			EXPECT_EQ(packet->NpcID, ANVIL_NPC_ID);
 		});
 
+	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
+	sendIndex = 0;
+	SetString(sendBuffer, reinterpret_cast<char*>(&packet), sizeof(packet), sendIndex);
 	_user->ItemUpgradeProcess(sendBuffer);
+
 	EXPECT_EQ(_user->GetPacketsSent(), 3);
+
+	// Verify the item ID was updated in the inventory
+	EXPECT_EQ(originItem.nNum, NEW_ITEM_ID);
+
+	// Verify its durability was restored to max
+	EXPECT_EQ(originItem.sDuration, newItemModel->Durability);
 }
 
-TEST_F(ItemUpgradeTest, ItemNotInInventory)
+TEST_F(ItemUpgradeTest, OriginItemNotInInventory)
 {
-	int sendIndex = 0;
-	char sendBuffer[128] {};
+	constexpr int OLD_ITEM_ID  = 110110001; // Dagger (+1)
+	constexpr int REQ_ITEM1_ID = 379016000; // Blessed Item Upgrade Scroll
+	constexpr int START_GOLD   = 100'000'000;
 
+	char sendBuffer[128] {};
+	int sendIndex = 0;
+
+	ItemUpgradeProcessPacket packet {};
+
+	_ITEM_DATA& originItem      = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
 	_ITEM_DATA& reqItem1        = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
 
-	reqItem1                    = { .nNum = 379016000, .sCount = 1 };
+	// Origin item purposefully doesn't exist in the inventory
+	originItem                  = { .nNum = 0, .sCount = 0 };
+	reqItem1                    = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
 
-	_user->m_pUserData->m_iGold = 100'000'000;
+	_user->m_pUserData->m_iGold = START_GOLD;
 
-	sendIndex                   = 0;
-	SetByte(sendBuffer, ITEM_UPGRADE_PROCESS, sendIndex);
-	SetShort(sendBuffer, ANVIL_NPC_ID, sendIndex);
-	SetDWORD(sendBuffer, 110110001, sendIndex);
-	SetByte(sendBuffer, 0, sendIndex);
-	SetDWORD(sendBuffer, reqItem1.nNum, sendIndex);
-	SetByte(sendBuffer, 1, sendIndex);
-	SetDWORD(sendBuffer, 0, sendIndex);
-	SetByte(sendBuffer, 255, sendIndex);
-
-	for (int i = 2; i < 10; i++)
-	{
-		SetDWORD(sendBuffer, 0, sendIndex);
-		SetByte(sendBuffer, 255, sendIndex);
-	}
+	// Prepare packet data
+	packet.NpcID                = ANVIL_NPC_ID;
+	packet.Item[0]              = { .ID = OLD_ITEM_ID, .Pos = 0 };
+	packet.Item[1]              = { .ID = REQ_ITEM1_ID, .Pos = 1 };
 
 	_user->ResetSend();
 
@@ -178,102 +202,109 @@ TEST_F(ItemUpgradeTest, ItemNotInInventory)
 	_user->AddSendCallback(
 		[](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, 3);
-			EXPECT_EQ(pBuf[0], WIZ_ITEM_UPGRADE);
-			EXPECT_EQ(pBuf[1], ITEM_UPGRADE_PROCESS);
-			EXPECT_EQ(pBuf[2], ITEM_UPGRADE_ERROR_NO_MATCH);
+			EXPECT_EQ(len, sizeof(ItemUpgradeProcessFailResponsePacket));
+
+			auto packet = reinterpret_cast<const ItemUpgradeProcessFailResponsePacket*>(pBuf);
+			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
+			EXPECT_EQ(packet->SubOpcode, ITEM_UPGRADE_PROCESS);
+			EXPECT_EQ(packet->Result, ITEM_UPGRADE_ERROR_NO_MATCH);
 		});
 
+	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
+	sendIndex = 0;
+	SetString(sendBuffer, reinterpret_cast<char*>(&packet), sizeof(packet), sendIndex);
 	_user->ItemUpgradeProcess(sendBuffer);
+
 	EXPECT_EQ(_user->GetPacketsSent(), 1);
 }
 
 TEST_F(ItemUpgradeTest, RequirementItemNotInInventory)
 {
-	int sendIndex = 0;
+	constexpr int OLD_ITEM_ID  = 110110001; // Dagger (+1)
+	constexpr int REQ_ITEM1_ID = 379016000; // Blessed Item Upgrade Scroll
+	constexpr int START_GOLD   = 100'000'000;
+
 	char sendBuffer[128] {};
+	int sendIndex = 0;
+
+	ItemUpgradeProcessPacket packet {};
 
 	_ITEM_DATA& originItem      = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
+	_ITEM_DATA& reqItem1        = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
 
-	originItem                  = { .nNum = 110110001, .sCount = 1 }; // Dagger (+1)
+	// Requirement item purposefully doesn't exist in the inventory
+	originItem                  = { .nNum = OLD_ITEM_ID, .sCount = 1 };
+	reqItem1                    = { .nNum = 0, .sCount = 0 };
 
-	_user->m_pUserData->m_iGold = 100'000'000;
+	_user->m_pUserData->m_iGold = START_GOLD;
 
-	sendIndex                   = 0;
-	SetByte(sendBuffer, ITEM_UPGRADE_PROCESS, sendIndex);
-	SetShort(sendBuffer, ANVIL_NPC_ID, sendIndex);
-	SetDWORD(sendBuffer, originItem.nNum, sendIndex);
-	SetByte(sendBuffer, 0, sendIndex);
-	SetDWORD(sendBuffer, 379016000, sendIndex);
-	SetByte(sendBuffer, 1, sendIndex);
-	SetDWORD(sendBuffer, 0, sendIndex);
-	SetByte(sendBuffer, 255, sendIndex);
-
-	for (int i = 2; i < 10; i++)
-	{
-		SetDWORD(sendBuffer, 0, sendIndex);
-		SetByte(sendBuffer, 255, sendIndex);
-	}
+	// Prepare packet data
+	packet.NpcID                = ANVIL_NPC_ID;
+	packet.Item[0]              = { .ID = OLD_ITEM_ID, .Pos = 0 };
+	packet.Item[1]              = { .ID = REQ_ITEM1_ID, .Pos = 1 };
 
 	_user->ResetSend();
-
 	_user->AddSendCallback(
 		[](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, 3);
-			EXPECT_EQ(pBuf[0], WIZ_ITEM_UPGRADE);
-			EXPECT_EQ(pBuf[1], ITEM_UPGRADE_PROCESS);
-			EXPECT_EQ(pBuf[2], ITEM_UPGRADE_ERROR_NO_MATCH);
+			EXPECT_EQ(len, sizeof(ItemUpgradeProcessFailResponsePacket));
+
+			auto packet = reinterpret_cast<const ItemUpgradeProcessFailResponsePacket*>(pBuf);
+			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
+			EXPECT_EQ(packet->SubOpcode, ITEM_UPGRADE_PROCESS);
+			EXPECT_EQ(packet->Result, ITEM_UPGRADE_ERROR_NO_MATCH);
 		});
 
+	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
+	sendIndex = 0;
+	SetString(sendBuffer, reinterpret_cast<char*>(&packet), sizeof(packet), sendIndex);
 	_user->ItemUpgradeProcess(sendBuffer);
+
 	EXPECT_EQ(_user->GetPacketsSent(), 1);
 }
 
 TEST_F(ItemUpgradeTest, InsufficientGold)
 {
-	int sendIndex = 0;
-	char sendBuffer[128] {};
+	constexpr int OLD_ITEM_ID  = 110110001; // Dagger (+1)
+	constexpr int REQ_ITEM1_ID = 379025000; // Blessed Elemental Scroll
+	constexpr int START_GOLD   = -100;      // -100 is not enough for an upgrade
 
+	char sendBuffer[128] {};
+	int sendIndex = 0;
+
+	ItemUpgradeProcessPacket packet {};
 	_ITEM_DATA& originItem      = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
 	_ITEM_DATA& reqItem1        = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
-	_ITEM_DATA& reqItem2        = _user->m_pUserData->m_sItemArray[SLOT_MAX + 2];
 
-	originItem                  = { .nNum = 110110001, .sCount = 1 }; // Dagger (+1)
-	reqItem1                    = { .nNum = 379025000, .sCount = 1 }; // Blessed Elemental Scroll
-	reqItem2                    = { .nNum = 0, .sCount = 0 };
+	// Prepare inventory
+	originItem                  = { .nNum = OLD_ITEM_ID, .sCount = 1 };
+	reqItem1                    = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
 
 	// Set gold to -100 - not enough for upgrade
-	_user->m_pUserData->m_iGold = -100;
+	_user->m_pUserData->m_iGold = START_GOLD;
 
-	sendIndex                   = 0;
-	SetByte(sendBuffer, ITEM_UPGRADE_PROCESS, sendIndex);
-	SetShort(sendBuffer, ANVIL_NPC_ID, sendIndex);
-	SetDWORD(sendBuffer, originItem.nNum, sendIndex);
-	SetByte(sendBuffer, 0, sendIndex);
-	SetDWORD(sendBuffer, reqItem1.nNum, sendIndex);
-	SetByte(sendBuffer, 1, sendIndex);
-	SetDWORD(sendBuffer, reqItem2.nNum, sendIndex);
-	SetByte(sendBuffer, 255, sendIndex);
-
-	for (int i = 2; i < 10; i++)
-	{
-		SetDWORD(sendBuffer, 0, sendIndex);
-		SetByte(sendBuffer, 255, sendIndex);
-	}
+	// Prepare packet data
+	packet.NpcID                = ANVIL_NPC_ID;
+	packet.Item[0]              = { .ID = OLD_ITEM_ID, .Pos = 0 };
+	packet.Item[1]              = { .ID = REQ_ITEM1_ID, .Pos = 1 };
 
 	_user->ResetSend();
-
 	_user->AddSendCallback(
 		[](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, 3);
-			EXPECT_EQ(pBuf[0], WIZ_ITEM_UPGRADE);
-			EXPECT_EQ(pBuf[1], ITEM_UPGRADE_PROCESS);
-			EXPECT_EQ(pBuf[2], ITEM_UPGRADE_ERROR_NEED_COINS);
+			EXPECT_EQ(len, sizeof(ItemUpgradeProcessFailResponsePacket));
+
+			auto packet = reinterpret_cast<const ItemUpgradeProcessFailResponsePacket*>(pBuf);
+			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
+			EXPECT_EQ(packet->SubOpcode, ITEM_UPGRADE_PROCESS);
+			EXPECT_EQ(packet->Result, ITEM_UPGRADE_ERROR_NEED_COINS);
 		});
 
+	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
+	sendIndex = 0;
+	SetString(sendBuffer, reinterpret_cast<char*>(&packet), sizeof(packet), sendIndex);
 	_user->ItemUpgradeProcess(sendBuffer);
+
 	EXPECT_EQ(_user->GetPacketsSent(), 1);
 }
 

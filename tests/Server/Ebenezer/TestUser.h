@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef TESTS_SERVER_EBENEZER_TESTUSER_H
+#define TESTS_SERVER_EBENEZER_TESTUSER_H
+
+#pragma once
 
 #include <Ebenezer/User.h>
 
@@ -63,3 +66,5 @@ private:
 	size_t _packetsSent       = 0;
 	std::queue<SendCallback> _sendCallbacks;
 };
+
+#endif // TESTS_SERVER_EBENEZER_TESTUSER_H

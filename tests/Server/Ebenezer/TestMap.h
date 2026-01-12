@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef TESTS_SERVER_EBENEZER_TESTMAP_H
+#define TESTS_SERVER_EBENEZER_TESTMAP_H
+
+#pragma once
 
 #include <Ebenezer/EbenezerApp.h>
 #include <Ebenezer/Map.h>
@@ -51,3 +54,5 @@ public:
 		return RegionNpcAdd(regionX, regionZ, npc->m_sNid);
 	}
 };
+
+#endif // TESTS_SERVER_EBENEZER_TESTMAP_H
