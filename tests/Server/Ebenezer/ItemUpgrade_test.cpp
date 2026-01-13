@@ -123,9 +123,9 @@ TEST_F(ItemUpgradeTest, BasicUpgradeSucceeds)
 	_user->AddSendCallback(
 		[=](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, sizeof(ItemUpgradeProcessSuccessResponseSuccessPacket));
+			EXPECT_EQ(len, sizeof(ItemUpgradeProcessResponseSuccessPacket));
 
-			auto packet = reinterpret_cast<const ItemUpgradeProcessSuccessResponseSuccessPacket*>(
+			auto packet = reinterpret_cast<const ItemUpgradeProcessResponseSuccessPacket*>(
 				pBuf);
 
 			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
@@ -171,6 +171,105 @@ TEST_F(ItemUpgradeTest, BasicUpgradeSucceeds)
 	EXPECT_EQ(originItem.sDuration, newItemModel->Durability);
 }
 
+TEST_F(ItemUpgradeTest, BasicUpgradeBurns)
+{
+	constexpr int OLD_ITEM_ID       = 110110007; // Dagger (+7)
+	constexpr int REQ_ITEM1_ID      = 379021000; // Blessed Upgrade Scroll (+0)
+	constexpr int START_GOLD        = 100'000'000;
+	constexpr int EXPECTED_COST     = 0;
+	constexpr int EXPECTED_NEW_GOLD = START_GOLD - EXPECTED_COST;
+
+	char sendBuffer[128] {};
+	int sendIndex = 0;
+
+	ItemUpgradeProcessPacket packet {};
+
+	_ITEM_DATA& originItem    = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
+	_ITEM_DATA& reqItem1      = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
+
+	model::Item* oldItemModel = _app->m_ItemTableMap.GetData(OLD_ITEM_ID);
+	EXPECT_TRUE(oldItemModel != nullptr);
+
+	// Prepare inventory
+	originItem                  = { .nNum = OLD_ITEM_ID, .sDuration = 1, .sCount = 1, .nSerialNum = 123456789 };
+	reqItem1                    = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
+
+	// Upgrades need gold
+	_user->m_pUserData->m_iGold = START_GOLD;
+
+	// Prepare packet data
+	packet.NpcID                = ANVIL_NPC_ID;
+	packet.Item[0]              = { .ID = OLD_ITEM_ID, .Pos = 0 };
+	packet.Item[1]              = { .ID = REQ_ITEM1_ID, .Pos = 1 };
+
+	_user->ResetSend();
+
+	// Expect the gold change packet
+	_user->AddSendCallback(
+		[=](const char* pBuf, int len)
+		{
+			EXPECT_EQ(len, sizeof(GoldChangePacket));
+
+			auto packet = reinterpret_cast<const GoldChangePacket*>(pBuf);
+
+			EXPECT_EQ(packet->Opcode, WIZ_GOLD_CHANGE);
+			EXPECT_EQ(packet->SubOpcode, GOLD_CHANGE_LOSE);
+			EXPECT_EQ(packet->ChangeAmount, EXPECTED_COST);
+			EXPECT_EQ(packet->NewGold, EXPECTED_NEW_GOLD);
+		});
+
+	// Then the fail packet
+	_user->AddSendCallback(
+		[=](const char* pBuf, int len)
+		{
+			EXPECT_EQ(len, sizeof(ItemUpgradeProcessResponseSuccessPacket));
+
+			auto packet = reinterpret_cast<const ItemUpgradeProcessResponseSuccessPacket*>(
+				pBuf);
+
+			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
+			EXPECT_EQ(packet->SubOpcode, ITEM_UPGRADE_PROCESS);
+			EXPECT_EQ(packet->Result, ITEM_UPGRADE_ERROR_FAILED);
+			EXPECT_EQ(packet->Item[0].ID, OLD_ITEM_ID);
+			EXPECT_EQ(packet->Item[0].Pos, 0);
+			EXPECT_EQ(packet->Item[1].ID, REQ_ITEM1_ID);
+			EXPECT_EQ(packet->Item[1].Pos, 1);
+
+			for (int i = 2; i < 10; i++)
+			{
+				EXPECT_EQ(packet->Item[i].ID, 0);
+				EXPECT_EQ(packet->Item[i].Pos, -1);
+			}
+		});
+
+	// Then the packet to show the visual effect for the anvil
+	_user->AddSendCallback(
+		[](const char* pBuf, int len)
+		{
+			EXPECT_EQ(len, sizeof(ObjectEventAnvilResponsePacket));
+
+			auto packet = reinterpret_cast<const ObjectEventAnvilResponsePacket*>(pBuf);
+
+			EXPECT_EQ(packet->Opcode, WIZ_OBJECT_EVENT);
+			EXPECT_EQ(packet->ObjectType, OBJECT_TYPE_ANVIL);
+			EXPECT_FALSE(packet->Successful);
+			EXPECT_EQ(packet->NpcID, ANVIL_NPC_ID);
+		});
+
+	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
+	sendIndex = 0;
+	SetString(sendBuffer, reinterpret_cast<char*>(&packet), sizeof(packet), sendIndex);
+	_user->ItemUpgradeProcess(sendBuffer);
+
+	EXPECT_EQ(_user->GetPacketsSent(), 3);
+
+	// Verify the item was removed from the inventory
+	EXPECT_EQ(originItem.nNum, 0);
+	EXPECT_EQ(originItem.sDuration, 0);
+	EXPECT_EQ(originItem.sCount, 0);
+	EXPECT_EQ(originItem.nSerialNum, 0);
+}
+
 TEST_F(ItemUpgradeTest, OriginItemNotInInventory)
 {
 	constexpr int OLD_ITEM_ID  = 110110001; // Dagger (+1)
@@ -202,9 +301,9 @@ TEST_F(ItemUpgradeTest, OriginItemNotInInventory)
 	_user->AddSendCallback(
 		[](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, sizeof(ItemUpgradeProcessFailResponsePacket));
+			EXPECT_EQ(len, sizeof(ItemUpgradeProcessErrorResponsePacket));
 
-			auto packet = reinterpret_cast<const ItemUpgradeProcessFailResponsePacket*>(pBuf);
+			auto packet = reinterpret_cast<const ItemUpgradeProcessErrorResponsePacket*>(pBuf);
 			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
 			EXPECT_EQ(packet->SubOpcode, ITEM_UPGRADE_PROCESS);
 			EXPECT_EQ(packet->Result, ITEM_UPGRADE_ERROR_NO_MATCH);
@@ -247,9 +346,9 @@ TEST_F(ItemUpgradeTest, RequirementItemNotInInventory)
 	_user->AddSendCallback(
 		[](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, sizeof(ItemUpgradeProcessFailResponsePacket));
+			EXPECT_EQ(len, sizeof(ItemUpgradeProcessErrorResponsePacket));
 
-			auto packet = reinterpret_cast<const ItemUpgradeProcessFailResponsePacket*>(pBuf);
+			auto packet = reinterpret_cast<const ItemUpgradeProcessErrorResponsePacket*>(pBuf);
 			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
 			EXPECT_EQ(packet->SubOpcode, ITEM_UPGRADE_PROCESS);
 			EXPECT_EQ(packet->Result, ITEM_UPGRADE_ERROR_NO_MATCH);
@@ -292,9 +391,9 @@ TEST_F(ItemUpgradeTest, InsufficientGold)
 	_user->AddSendCallback(
 		[](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, sizeof(ItemUpgradeProcessFailResponsePacket));
+			EXPECT_EQ(len, sizeof(ItemUpgradeProcessErrorResponsePacket));
 
-			auto packet = reinterpret_cast<const ItemUpgradeProcessFailResponsePacket*>(pBuf);
+			auto packet = reinterpret_cast<const ItemUpgradeProcessErrorResponsePacket*>(pBuf);
 			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
 			EXPECT_EQ(packet->SubOpcode, ITEM_UPGRADE_PROCESS);
 			EXPECT_EQ(packet->Result, ITEM_UPGRADE_ERROR_NEED_COINS);
@@ -307,4 +406,3 @@ TEST_F(ItemUpgradeTest, InsufficientGold)
 
 	EXPECT_EQ(_user->GetPacketsSent(), 1);
 }
-

@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef TESTS_SERVER_EBENEZER_ITEMUPGRADE_TEST_DATA_H
+#define TESTS_SERVER_EBENEZER_ITEMUPGRADE_TEST_DATA_H
+
+#pragma once
 
 #include <Ebenezer/GameDefine.h>
 
@@ -5038,3 +5041,5 @@ static Ebenezer::model::ItemUpgrade s_itemUpgradeData[] =
 	{ .Index = 321703, .OriginType = 20, .OriginItem = 639, .RequiredItem = { 379159000, 0 }, .RequiredCoins = 2000000, .RateType = 8, .GenRate = 0, .GiveItem = 1 }, 
 	{ .Index = 321704, .OriginType = 20, .OriginItem = 640, .RequiredItem = { 379159000, 0 }, .RequiredCoins = 2000000, .RateType = 8, .GenRate = 0, .GiveItem = 1 },
 };
+
+#endif // TESTS_SERVER_EBENEZER_ITEMUPGRADE_TEST_DATA_H

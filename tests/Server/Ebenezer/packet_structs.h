@@ -20,14 +20,14 @@ struct ItemUpgradeProcessPacket
 	ItemPosPair Item[10] = {};
 };
 
-struct ItemUpgradeProcessFailResponsePacket
+struct ItemUpgradeProcessErrorResponsePacket
 {
 	uint8_t Opcode    = WIZ_ITEM_UPGRADE;
 	uint8_t SubOpcode = ITEM_UPGRADE_PROCESS;
 	uint8_t Result    = 0;
 };
 
-struct ItemUpgradeProcessSuccessResponseSuccessPacket
+struct ItemUpgradeProcessResponseSuccessPacket
 {
 	uint8_t Opcode       = WIZ_ITEM_UPGRADE;
 	uint8_t SubOpcode    = ITEM_UPGRADE_PROCESS;
