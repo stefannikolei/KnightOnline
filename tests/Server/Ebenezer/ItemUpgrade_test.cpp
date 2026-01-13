@@ -9,7 +9,7 @@
 #include <shared-server/utilities.h>
 
 #include <cstdlib>
-#include <memory>
+#include <memory> // std::memcpy()
 
 using namespace Ebenezer;
 
@@ -78,8 +78,6 @@ TEST_F(ItemUpgradeTest, BasicUpgradeSucceeds)
 	constexpr int EXPECTED_NEW_GOLD = START_GOLD - EXPECTED_COST;
 
 	char sendBuffer[128] {};
-	int sendIndex = 0;
-
 	ItemUpgradeProcessPacket packet {};
 
 	_ITEM_DATA& originItem    = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
@@ -125,8 +123,7 @@ TEST_F(ItemUpgradeTest, BasicUpgradeSucceeds)
 		{
 			EXPECT_EQ(len, sizeof(ItemUpgradeProcessResponseSuccessPacket));
 
-			auto packet = reinterpret_cast<const ItemUpgradeProcessResponseSuccessPacket*>(
-				pBuf);
+			auto packet = reinterpret_cast<const ItemUpgradeProcessResponseSuccessPacket*>(pBuf);
 
 			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
 			EXPECT_EQ(packet->SubOpcode, ITEM_UPGRADE_PROCESS);
@@ -158,8 +155,7 @@ TEST_F(ItemUpgradeTest, BasicUpgradeSucceeds)
 		});
 
 	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
-	sendIndex = 0;
-	SetString(sendBuffer, reinterpret_cast<char*>(&packet), sizeof(packet), sendIndex);
+	std::memcpy(sendBuffer, &packet, sizeof(packet));
 	_user->ItemUpgradeProcess(sendBuffer);
 
 	EXPECT_EQ(_user->GetPacketsSent(), 3);
@@ -180,8 +176,6 @@ TEST_F(ItemUpgradeTest, BasicUpgradeBurns)
 	constexpr int EXPECTED_NEW_GOLD = START_GOLD - EXPECTED_COST;
 
 	char sendBuffer[128] {};
-	int sendIndex = 0;
-
 	ItemUpgradeProcessPacket packet {};
 
 	_ITEM_DATA& originItem    = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
@@ -191,8 +185,8 @@ TEST_F(ItemUpgradeTest, BasicUpgradeBurns)
 	EXPECT_TRUE(oldItemModel != nullptr);
 
 	// Prepare inventory
-	originItem                  = { .nNum = OLD_ITEM_ID, .sDuration = 1, .sCount = 1, .nSerialNum = 123456789 };
-	reqItem1                    = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
+	originItem = { .nNum = OLD_ITEM_ID, .sDuration = 1, .sCount = 1, .nSerialNum = 123456789 };
+	reqItem1   = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
 
 	// Upgrades need gold
 	_user->m_pUserData->m_iGold = START_GOLD;
@@ -224,8 +218,7 @@ TEST_F(ItemUpgradeTest, BasicUpgradeBurns)
 		{
 			EXPECT_EQ(len, sizeof(ItemUpgradeProcessResponseSuccessPacket));
 
-			auto packet = reinterpret_cast<const ItemUpgradeProcessResponseSuccessPacket*>(
-				pBuf);
+			auto packet = reinterpret_cast<const ItemUpgradeProcessResponseSuccessPacket*>(pBuf);
 
 			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
 			EXPECT_EQ(packet->SubOpcode, ITEM_UPGRADE_PROCESS);
@@ -257,8 +250,7 @@ TEST_F(ItemUpgradeTest, BasicUpgradeBurns)
 		});
 
 	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
-	sendIndex = 0;
-	SetString(sendBuffer, reinterpret_cast<char*>(&packet), sizeof(packet), sendIndex);
+	std::memcpy(sendBuffer, &packet, sizeof(packet));
 	_user->ItemUpgradeProcess(sendBuffer);
 
 	EXPECT_EQ(_user->GetPacketsSent(), 3);
@@ -277,8 +269,6 @@ TEST_F(ItemUpgradeTest, OriginItemNotInInventory)
 	constexpr int START_GOLD   = 100'000'000;
 
 	char sendBuffer[128] {};
-	int sendIndex = 0;
-
 	ItemUpgradeProcessPacket packet {};
 
 	_ITEM_DATA& originItem      = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
@@ -310,8 +300,7 @@ TEST_F(ItemUpgradeTest, OriginItemNotInInventory)
 		});
 
 	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
-	sendIndex = 0;
-	SetString(sendBuffer, reinterpret_cast<char*>(&packet), sizeof(packet), sendIndex);
+	std::memcpy(sendBuffer, &packet, sizeof(packet));
 	_user->ItemUpgradeProcess(sendBuffer);
 
 	EXPECT_EQ(_user->GetPacketsSent(), 1);
@@ -324,8 +313,6 @@ TEST_F(ItemUpgradeTest, RequirementItemNotInInventory)
 	constexpr int START_GOLD   = 100'000'000;
 
 	char sendBuffer[128] {};
-	int sendIndex = 0;
-
 	ItemUpgradeProcessPacket packet {};
 
 	_ITEM_DATA& originItem      = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
@@ -355,8 +342,7 @@ TEST_F(ItemUpgradeTest, RequirementItemNotInInventory)
 		});
 
 	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
-	sendIndex = 0;
-	SetString(sendBuffer, reinterpret_cast<char*>(&packet), sizeof(packet), sendIndex);
+	std::memcpy(sendBuffer, &packet, sizeof(packet));
 	_user->ItemUpgradeProcess(sendBuffer);
 
 	EXPECT_EQ(_user->GetPacketsSent(), 1);
@@ -369,8 +355,6 @@ TEST_F(ItemUpgradeTest, InsufficientGold)
 	constexpr int START_GOLD   = -100;      // -100 is not enough for an upgrade
 
 	char sendBuffer[128] {};
-	int sendIndex = 0;
-
 	ItemUpgradeProcessPacket packet {};
 	_ITEM_DATA& originItem      = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
 	_ITEM_DATA& reqItem1        = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
@@ -400,8 +384,7 @@ TEST_F(ItemUpgradeTest, InsufficientGold)
 		});
 
 	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
-	sendIndex = 0;
-	SetString(sendBuffer, reinterpret_cast<char*>(&packet), sizeof(packet), sendIndex);
+	std::memcpy(sendBuffer, &packet, sizeof(packet));
 	_user->ItemUpgradeProcess(sendBuffer);
 
 	EXPECT_EQ(_user->GetPacketsSent(), 1);
