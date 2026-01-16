@@ -28,9 +28,7 @@ void SetString1(char* tBuf, const char* str, int length, int& index);
 void SetString2(char* tBuf, const std::string_view str, int& index);
 void SetString2(char* tBuf, const char* str, int length, int& index);
 bool ParseSpace(char* tBuf, const char* sBuf, int& bufferIndex);
-void restore_myrand();
 
-extern std::function<int(int min, int max)> myrand_ai;
-extern std::function<int(int min, int max)> myrand_generic;
+extern std::function<int(int min, int max)> myrand;
 
 #endif // SERVER_SHAREDSERVER_UTILITIES_H

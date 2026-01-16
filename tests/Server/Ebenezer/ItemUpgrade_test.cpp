@@ -91,7 +91,7 @@ TEST_F(ItemUpgradeTest, BasicUpgradeSucceeds)
 
 	// The upgrade rate works in reverse from how you'd expect.
 	// For 100%, we'd have to return min (0), not max (10000).
-	myrand_generic              = [](int min, int) { return min; };
+	myrand                      = [](int min, int) { return min; };
 
 	// Prepare inventory
 	originItem                  = { .nNum = OLD_ITEM_ID, .sDuration = 1, .sCount = 1 };
@@ -190,11 +190,11 @@ TEST_F(ItemUpgradeTest, BasicUpgradeBurns)
 
 	// The upgrade rate works in reverse from how you'd expect.
 	// For 0%, we'd have to return max (10000), not min (0).
-	myrand_generic = [](int, int max) { return max; };
+	myrand     = [](int, int max) { return max; };
 
 	// Prepare inventory
-	originItem     = { .nNum = OLD_ITEM_ID, .sDuration = 1, .sCount = 1, .nSerialNum = 123456789 };
-	reqItem1       = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
+	originItem = { .nNum = OLD_ITEM_ID, .sDuration = 1, .sCount = 1, .nSerialNum = 123456789 };
+	reqItem1   = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
 
 	// Upgrades need gold
 	_user->m_pUserData->m_iGold = START_GOLD;

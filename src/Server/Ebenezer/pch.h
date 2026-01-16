@@ -13,6 +13,4 @@
 
 #include <asio.hpp>
 
-#define myrand myrand_generic
-
 #endif // SERVER_EBENEZER_PCH_H

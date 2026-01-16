@@ -16,6 +16,4 @@
 #include <shared-server/server_config.h>
 #include <shared-server/utilities.h>
 
-#define myrand myrand_ai
-
 #endif // SERVER_AISERVER_PCH_H
