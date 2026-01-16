@@ -95,12 +95,7 @@ public:
 		if (modelForInsertion == nullptr)
 			return false;
 
-		if (!m_ItemUpgradeTableMap.PutData(modelForInsertion->Index, modelForInsertion))
-		{
-			delete modelForInsertion;
-			return false;
-		}
-
+		m_ItemUpgradeTableArray.push_back(modelForInsertion);
 		return true;
 	}
 

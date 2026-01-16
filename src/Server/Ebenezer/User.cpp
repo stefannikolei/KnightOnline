@@ -12776,26 +12776,22 @@ void CUser::ItemUpgradeProcess(char* pBuf)
 
 void CUser::ItemUpgrade(char* pBuf)
 {
-	int index          = 0;
+	model::Item *originItemModel = nullptr, *upgradedItemModel = nullptr;
+	const model::ItemUpgrade* matchedItemUpgradeModel = nullptr;
 
 	uint32_t newItemId = 0, itemClass = 0, itemUpgradeElementClass = 0, itemUpgradeIndex = 0;
 	int16_t rand = 0, baseItemId = 0;
 	int32_t originItemId = 0;
+	int index            = 0;
 	uint16_t npcId       = 0;
 	uint8_t originPos    = -1;
+	bool upgradeSuccess  = false;
 	uint8_t reqItemPos[9] {};
 	int32_t reqItemId[9] {};
 
-	model::Item* itemForUpgrade            = nullptr;
-	model::Item* upgradedItem              = nullptr;
-	model::ItemUpgrade* itemUpgradeElement = nullptr;
-
-	bool foundMatch                        = false;
-	bool upgradeSuccess                    = false;
-
-	npcId                                  = GetShort(pBuf, index);
-	originItemId                           = GetDWORD(pBuf, index);
-	originPos                              = GetByte(pBuf, index);
+	npcId        = GetShort(pBuf, index);
+	originItemId = GetDWORD(pBuf, index);
+	originPos    = GetByte(pBuf, index);
 
 	for (int i = 0; i < 9; i++)
 	{
@@ -12869,41 +12865,33 @@ void CUser::ItemUpgrade(char* pBuf)
 		return;
 	}
 
-	baseItemId     = originItemId % 1000;
-	itemClass      = originItemId / 100000000;
+	baseItemId      = originItemId % 1000;
+	itemClass       = originItemId / 100000000;
 
-	itemForUpgrade = m_pMain->m_ItemTableMap.GetData(originItemId);
-	if (itemForUpgrade == nullptr)
+	originItemModel = m_pMain->m_ItemTableMap.GetData(originItemId);
+	if (originItemModel == nullptr)
 	{
 		SendItemUpgradeFailed(ITEM_UPGRADE_ERROR_NO_MATCH);
 		return;
 	}
 
-	for (const auto& [upgradeIndex, upgradeInfo] : m_pMain->m_ItemUpgradeTableMap)
+	for (const model::ItemUpgrade* itemUpgradeModel : m_pMain->m_ItemUpgradeTableArray)
 	{
-		if (upgradeInfo == nullptr)
+		if (itemUpgradeModel == nullptr)
+			continue;
+
+		if (itemUpgradeModel->OriginItem != baseItemId)
+			continue;
+
+		itemUpgradeElementClass = itemUpgradeModel->Index / 100000;
+		if (itemClass != itemUpgradeElementClass && itemUpgradeModel->Index < 300000)
+			continue;
+
+		if (itemUpgradeModel->OriginType != -1)
 		{
-			spdlog::warn("User::ItemUpgrade: Upgrade element not initialized [upgradeIndex={}]",
-				upgradeIndex);
-			continue;
-		}
-
-		if (upgradeInfo->OriginItem != baseItemId)
-			continue;
-
-		itemUpgradeElementClass = upgradeInfo->Index / 100000;
-		if (itemClass != itemUpgradeElementClass && upgradeInfo->Index < 300000)
-			continue;
-
-		model::Item* originItemModel = m_pMain->m_ItemTableMap.GetData(originItemId);
-		if (originItemModel == nullptr)
-			continue;
-
-		if (upgradeInfo->OriginType != -1)
-		{
-			if (upgradeInfo->Index >= 100000 && upgradeInfo->Index < 200000)
+			if (itemUpgradeModel->Index >= 100000 && itemUpgradeModel->Index < 200000)
 			{
-				switch (upgradeInfo->OriginType)
+				switch (itemUpgradeModel->OriginType)
 				{
 					case 0:
 						if (originItemModel->Kind != ITEM_CLASS_DAGGER)
@@ -12975,14 +12963,14 @@ void CUser::ItemUpgrade(char* pBuf)
 				}
 			}
 			// No clue for what these two else if are...
-			else if (upgradeInfo->Index >= 200000 && upgradeInfo->Index < 300000)
+			else if (itemUpgradeModel->Index >= 200000 && itemUpgradeModel->Index < 300000)
 			{
-				if (upgradeInfo->OriginType - originItemModel->Slot != 8)
+				if (itemUpgradeModel->OriginType - originItemModel->Slot != 8)
 					continue;
 			}
-			else if (upgradeInfo->Index < 400000 && upgradeInfo)
+			else if (itemUpgradeModel->Index >= 300000 && itemUpgradeModel->Index < 400000)
 			{
-				if (originItemModel->Slot - upgradeInfo->OriginType != 73)
+				if (originItemModel->Slot - itemUpgradeModel->OriginType != 73)
 					continue;
 			}
 		}
@@ -12997,10 +12985,11 @@ void CUser::ItemUpgrade(char* pBuf)
 		bool matchedRequiredItems = true;
 		for (int j = 0; j < 8; j++)
 		{
-			if (upgradeInfo->RequiredItem[j] == 0)
+			if (itemUpgradeModel->RequiredItem[j] == 0)
 				break;
 
-			if (!MatchingItemUpgrade(reqItemPos[j], reqItemId[j], upgradeInfo->RequiredItem[j]))
+			if (!MatchingItemUpgrade(
+					reqItemPos[j], reqItemId[j], itemUpgradeModel->RequiredItem[j]))
 			{
 				matchedRequiredItems = false;
 				break;
@@ -13010,35 +12999,35 @@ void CUser::ItemUpgrade(char* pBuf)
 		if (!matchedRequiredItems)
 			continue;
 
-		if (upgradeInfo->RequiredCoins > m_pUserData->m_iGold)
+		if (itemUpgradeModel->RequiredCoins > m_pUserData->m_iGold)
 		{
 			SendItemUpgradeFailed(ITEM_UPGRADE_ERROR_NEED_COINS);
 			return;
 		}
 
-		foundMatch       = true;
-		itemUpgradeIndex = upgradeInfo->Index;
+		itemUpgradeIndex        = itemUpgradeModel->Index;
+		matchedItemUpgradeModel = itemUpgradeModel;
 		break;
 	}
 
-	if (!foundMatch)
+	if (matchedItemUpgradeModel == nullptr)
 	{
 		SendItemUpgradeFailed(ITEM_UPGRADE_ERROR_NO_MATCH);
 		return;
 	}
 
-	itemUpgradeElement = m_pMain->m_ItemUpgradeTableMap.GetData(itemUpgradeIndex);
-	GoldLose(itemUpgradeElement->RequiredCoins);
+	GoldLose(matchedItemUpgradeModel->RequiredCoins);
 
-	// The first myRand was officially a separate Randomizer (state-based CRandomizer)
+	// The first myrand was officially a separate Randomizer (state-based CRandomizer)
 	rand           = myrand(0, myrand(9000, 10000));
-	upgradeSuccess = (itemUpgradeElement->GenRate > rand);
+	upgradeSuccess = (matchedItemUpgradeModel->GenRate > rand);
 
 	if (upgradeSuccess)
 	{
-		newItemId    = itemForUpgrade->ID + itemUpgradeElement->GiveItem;
-		upgradedItem = m_pMain->m_ItemTableMap.GetData(newItemId);
-		if (upgradedItem == nullptr)
+		newItemId         = originItemId + matchedItemUpgradeModel->GiveItem;
+
+		upgradedItemModel = m_pMain->m_ItemTableMap.GetData(newItemId);
+		if (upgradedItemModel == nullptr)
 		{
 			upgradeSuccess = false;
 			ItemLogToAgent(m_pUserData->m_id, "UPGRADE", ITEM_LOG_UPGRADE, originItem.nSerialNum,
@@ -13048,12 +13037,12 @@ void CUser::ItemUpgrade(char* pBuf)
 		{
 			originItem.nNum           = newItemId;
 			originItem.sCount         = 1;
-			originItem.sDuration      = upgradedItem->Durability;
+			originItem.sDuration      = upgradedItemModel->Durability;
 			originItem.byFlag         = 0;
 			originItem.sTimeRemaining = 0;
 
 			ItemLogToAgent(m_pUserData->m_id, "UPGRADE", ITEM_LOG_UPGRADE, originItem.nSerialNum,
-				originItemId, 1, upgradedItem->Durability);
+				originItemId, 1, upgradedItemModel->Durability);
 		}
 	}
 	else
@@ -13125,7 +13114,6 @@ void CUser::ItemUpgrade(char* pBuf)
 	SetByte(sendBuffer, OBJECT_TYPE_ANVIL, sendIndex);
 	SetByte(sendBuffer, upgradeSuccess ? 1 : 0, sendIndex);
 	SetShort(sendBuffer, npcId, sendIndex);
-
 	m_pMain->Send_Region(
 		sendBuffer, sendIndex, m_pUserData->m_bZone, m_RegionX, m_RegionZ, nullptr, true);
 }

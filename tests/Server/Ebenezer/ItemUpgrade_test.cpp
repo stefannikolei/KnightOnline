@@ -33,6 +33,10 @@ protected:
 		for (const auto& itemModel : s_itemData)
 			EXPECT_TRUE(_app->AddItemEntry(itemModel));
 
+		// Pre-reserve data so we only need to allocate once.
+		_app->m_ItemUpgradeTableArray.reserve(
+			sizeof(s_itemUpgradeData) / sizeof(s_itemUpgradeData[0]));
+
 		for (const auto& itemUpgradeModel : s_itemUpgradeData)
 			EXPECT_TRUE(_app->AddItemUpgradeEntry(itemUpgradeModel));
 
