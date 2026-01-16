@@ -238,6 +238,8 @@ public:
 	void CloseProcess() override;
 	void Parsing(int len, char* pData) override;
 
+	float GetDistanceSquared2D(float targetX, float targetZ) const;
+	float GetDistance2D(float targetX, float targetZ) const;
 	bool CheckMiddleStatueCapture() const;
 	void SetZoneAbilityChange(int zone);
 	int16_t GetMaxWeightForClient() const;

@@ -10041,7 +10041,6 @@ bool CUser::WarpListObjectEvent(int16_t objectindex, int16_t /*nid*/)
 
 void CUser::SendAnvilRequest(int16_t nid)
 {
-	// We cannot use warp gates when invading.
 	if (m_pUserData->m_bZone != ZONE_MORADON)
 		return;
 
@@ -10050,15 +10049,12 @@ void CUser::SendAnvilRequest(int16_t nid)
 		return;
 
 	// Check distance to anvil
-	float distance = sqrtf(powf(m_pUserData->m_curx - pNpc->m_fCurX, 2.0f)
-						   + powf(m_pUserData->m_curz - pNpc->m_fCurZ, 2.0f));
-
-	if (distance > 11.0f) // Max interaction distance
+	float distance = GetDistanceSquared2D(pNpc->m_fCurX, pNpc->m_fCurZ);
+	if (distance > MAX_INTERACTION_RANGE_SQUARED)
 		return;
 
 	int send_index = 0;
 	char send_buff[4] {};
-
 	SetByte(send_buff, WIZ_ITEM_UPGRADE, send_index);
 	SetByte(send_buff, ITEM_UPGRADE_REQ, send_index);
 	SetShort(send_buff, nid, send_index);
@@ -12786,6 +12782,7 @@ void CUser::ItemUpgrade(char* pBuf)
 	uint16_t npcId       = 0;
 	uint8_t originPos    = -1;
 	bool upgradeSuccess  = false;
+
 	uint8_t reqItemPos[9] {};
 	int32_t reqItemId[9] {};
 
@@ -12811,6 +12808,35 @@ void CUser::ItemUpgrade(char* pBuf)
 	if (originPos >= HAVE_MAX)
 	{
 		SendItemUpgradeFailed(ITEM_UPGRADE_ERROR_NO_MATCH);
+		return;
+	}
+
+	// The requested NPC must exist
+	CNpc* npc = m_pMain->m_NpcMap.GetData(npcId);
+	if (npc == nullptr)
+	{
+		spdlog::error("User::ItemUpgrade: NPC not found [accountId={} characterName={} npcId={}]",
+			m_pUserData->m_Accountid, m_pUserData->m_id, npcId);
+		return;
+	}
+
+	// The requested NPC should be the anvil.
+	if (npc->m_tNpcType != NPC_ANVIL)
+	{
+		spdlog::error("User::ItemUpgrade: NPC is not the anvil [accountId={} characterName={} "
+					  "npcId={} npcType={} npcName={}]",
+			m_pUserData->m_Accountid, m_pUserData->m_id, npcId, npc->m_tNpcType, npc->m_strName);
+		return;
+	}
+
+	// Ensure we're close enough to interact with it.
+	float distance = GetDistanceSquared2D(npc->m_fCurX, npc->m_fCurZ);
+	if (distance > MAX_INTERACTION_RANGE_SQUARED)
+	{
+		spdlog::error("User::ItemUpgrade: NPC is out of range [accountId={} characterName={} "
+					  "npcId={} npcType={} npcName={} ourPos={},{} npcPos={},{} distance={}]",
+			m_pUserData->m_Accountid, m_pUserData->m_id, npcId, npc->m_tNpcType, npc->m_strName,
+			m_pUserData->m_curx, m_pUserData->m_curz, npc->m_fCurX, npc->m_fCurZ, distance);
 		return;
 	}
 
@@ -13622,6 +13648,18 @@ bool CUser::CheckMiddleStatueCapture() const
 		default:
 			return false;
 	}
+}
+
+float CUser::GetDistance2D(float targetX, float targetZ) const
+{
+	return sqrtf(GetDistanceSquared2D(targetX, targetZ));
+}
+
+float CUser::GetDistanceSquared2D(float targetX, float targetZ) const
+{
+	const float dx = m_pUserData->m_curx - targetX;
+	const float dz = m_pUserData->m_curz - targetZ;
+	return (dx * dx) + (dz * dz);
 }
 
 } // namespace Ebenezer

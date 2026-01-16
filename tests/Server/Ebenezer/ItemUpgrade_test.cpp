@@ -22,7 +22,8 @@ protected:
 	static constexpr uint16_t REGION_Z     = 0;
 
 	std::unique_ptr<TestApp> _app;
-	TestUser* _user = nullptr;
+	TestUser* _user           = nullptr;
+	Ebenezer::CNpc* _anvilNpc = nullptr;
 
 	void SetUp() override
 	{
@@ -55,19 +56,20 @@ protected:
 		EXPECT_TRUE(map->Add(_user, REGION_X, REGION_Z));
 
 		// Setup anvil NPC
-		auto anvilNpc = _app->CreateNPC(ANVIL_NPC_ID);
-		EXPECT_TRUE(anvilNpc != nullptr);
+		_anvilNpc = _app->CreateNPC(ANVIL_NPC_ID);
+		EXPECT_TRUE(_anvilNpc != nullptr);
+
+		// Set as anvil type
+		_anvilNpc->m_tNpcType = NPC_ANVIL;
 
 		// Add NPC to map
-		EXPECT_TRUE(map->Add(anvilNpc, REGION_X, REGION_Z));
-
-		// Seed random number generator for consistent RNG lookups.
-		srand(0);
+		EXPECT_TRUE(map->Add(_anvilNpc, REGION_X, REGION_Z));
 	}
 
 	void TearDown() override
 	{
-		_user = nullptr;
+		_user     = nullptr;
+		_anvilNpc = nullptr;
 		_app.reset();
 	}
 };

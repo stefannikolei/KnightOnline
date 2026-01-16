@@ -759,9 +759,8 @@ void EbenezerApp::Send_FilterUnitRegion(
 
 		if (pUser != nullptr && pUser->GetState() == CONNECTION_STATE_GAMESTART)
 		{
-			double fDist = sqrt(pow((pUser->m_pUserData->m_curx - ref_x), 2)
-								+ pow((pUser->m_pUserData->m_curz - ref_z), 2));
-			if (fDist < 32)
+			float dist = pUser->GetDistance2D(ref_x, ref_z);
+			if (dist < 32)
 				pUser->RegionPacketAdd(pBuf, len);
 		}
 	}
