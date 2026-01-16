@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <filesystem>
+#include <functional>
 #include <string_view>
 
 bool CheckGetVarString(int nLength, char* tBuf, const char* sBuf, int nSize, int& index);
@@ -28,7 +28,9 @@ void SetString1(char* tBuf, const char* str, int length, int& index);
 void SetString2(char* tBuf, const std::string_view str, int& index);
 void SetString2(char* tBuf, const char* str, int length, int& index);
 bool ParseSpace(char* tBuf, const char* sBuf, int& bufferIndex);
-int myrand_ai(int min, int max, bool bSame = false);
-int myrand_generic(int min, int max);
+void restore_myrand();
+
+extern std::function<int(int min, int max)> myrand_ai;
+extern std::function<int(int min, int max)> myrand_generic;
 
 #endif // SERVER_SHAREDSERVER_UTILITIES_H

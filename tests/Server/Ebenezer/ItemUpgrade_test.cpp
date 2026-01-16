@@ -89,11 +89,9 @@ TEST_F(ItemUpgradeTest, BasicUpgradeSucceeds)
 	EXPECT_TRUE(oldItemModel != nullptr);
 	EXPECT_TRUE(newItemModel != nullptr);
 
-	// Find its matching entry and fix its upgrade rate to 100% for consistency across platforms.
-	// Specifically: Index=120001 OriginType=-1 OriginItem=1 RequiredItem[0]=379016000
-	model::ItemUpgrade* itemUpgradeModel = _app->m_ItemUpgradeTableMap.GetData(120001);
-	EXPECT_TRUE(itemUpgradeModel != nullptr);
-	itemUpgradeModel->GenRate   = 10'000; /* 100% */
+	// The upgrade rate works in reverse from how you'd expect.
+	// For 100%, we'd have to return min (0), not max (10000).
+	myrand_generic              = [](int min, int) { return min; };
 
 	// Prepare inventory
 	originItem                  = { .nNum = OLD_ITEM_ID, .sDuration = 1, .sCount = 1 };
@@ -190,15 +188,13 @@ TEST_F(ItemUpgradeTest, BasicUpgradeBurns)
 	model::Item* oldItemModel = _app->m_ItemTableMap.GetData(OLD_ITEM_ID);
 	EXPECT_TRUE(oldItemModel != nullptr);
 
-	// Find its matching entry and fix its upgrade rate to 0% for consistency across platforms.
-	// Specifically: Index=100057 OriginType=-1 OriginItem=7 RequiredItem[0]=379021000
-	model::ItemUpgrade* itemUpgradeModel = _app->m_ItemUpgradeTableMap.GetData(100057);
-	EXPECT_TRUE(itemUpgradeModel != nullptr);
-	itemUpgradeModel->GenRate = 0; /* 0% */
+	// The upgrade rate works in reverse from how you'd expect.
+	// For 0%, we'd have to return max (10000), not min (0).
+	myrand_generic = [](int, int max) { return max; };
 
 	// Prepare inventory
-	originItem = { .nNum = OLD_ITEM_ID, .sDuration = 1, .sCount = 1, .nSerialNum = 123456789 };
-	reqItem1   = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
+	originItem     = { .nNum = OLD_ITEM_ID, .sDuration = 1, .sCount = 1, .nSerialNum = 123456789 };
+	reqItem1       = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
 
 	// Upgrades need gold
 	_user->m_pUserData->m_iGold = START_GOLD;

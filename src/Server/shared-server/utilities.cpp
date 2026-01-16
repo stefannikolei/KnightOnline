@@ -3,6 +3,12 @@
 #include <algorithm> // std::clamp()
 #include <limits>    // INT_MAX
 
+int myrand_ai_impl(int min, int max);
+int myrand_generic_impl(int min, int max);
+
+std::function<int(int min, int max)> myrand_ai      = myrand_ai_impl;
+std::function<int(int min, int max)> myrand_generic = myrand_generic_impl;
+
 bool CheckGetVarString(int nLength, char* tBuf, const char* sBuf, int nSize, int& index)
 {
 	int nRet = GetVarString(tBuf, sBuf, nSize, index);
@@ -180,7 +186,13 @@ bool ParseSpace(char* tBuf, const char* sBuf, int& bufferIndex)
 	return true;
 }
 
-int myrand_ai(int min, int max, bool bSame)
+void restore_myrand()
+{
+	myrand_ai      = myrand_ai_impl;
+	myrand_generic = myrand_generic_impl;
+}
+
+int myrand_ai_impl(int min, int max)
 {
 	static int nOld = 0;
 	int nRet        = 0;
@@ -192,9 +204,6 @@ int myrand_ai(int min, int max, bool bSame)
 	while (nLoop--)
 	{
 		nRet = (rand() % (max - min + 1)) + min;
-		if (bSame)
-			return nRet;
-
 		if (nRet != nOld)
 		{
 			nOld = nRet;
@@ -205,7 +214,7 @@ int myrand_ai(int min, int max, bool bSame)
 	return nRet;
 }
 
-int myrand_generic(int min, int max)
+int myrand_generic_impl(int min, int max)
 {
 	if (min == max)
 		return min;
