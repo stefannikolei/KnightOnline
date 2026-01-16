@@ -12775,7 +12775,7 @@ void CUser::ItemUpgrade(char* pBuf)
 	model::Item *originItemModel = nullptr, *upgradedItemModel = nullptr;
 	const model::ItemUpgrade* matchedItemUpgradeModel = nullptr;
 
-	uint32_t newItemId = 0, itemClass = 0, itemUpgradeElementClass = 0, itemUpgradeIndex = 0;
+	uint32_t newItemId = 0, itemClass = 0, itemUpgradeElementClass = 0;
 	int16_t rand = 0, baseItemId = 0;
 	int32_t originItemId = 0;
 	int index            = 0;
@@ -13031,7 +13031,6 @@ void CUser::ItemUpgrade(char* pBuf)
 			return;
 		}
 
-		itemUpgradeIndex        = itemUpgradeModel->Index;
 		matchedItemUpgradeModel = itemUpgradeModel;
 		break;
 	}
