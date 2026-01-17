@@ -12831,6 +12831,16 @@ void CUser::ItemUpgrade(char* pBuf)
 		return;
 	}
 
+	// Ensure we're in the same zone as the NPC.
+	if (npc->m_sCurZone != m_pUserData->m_bZone)
+	{
+		spdlog::error("User::ItemUpgrade: not in same zone as NPC [accountId={} characterName={} "
+					  "npcId={} npcType={} npcName={} ourZoneId={} npcZoneId={}]",
+			m_pUserData->m_Accountid, m_pUserData->m_id, npcId, npc->m_tNpcType, npc->m_strName,
+			m_pUserData->m_bZone, npc->m_sCurZone);
+		return;
+	}
+
 	// Ensure we're close enough to interact with it.
 	float distance = GetDistanceSquared2D(npc->m_fCurX, npc->m_fCurZ);
 	if (distance > MAX_INTERACTION_RANGE_SQUARED)

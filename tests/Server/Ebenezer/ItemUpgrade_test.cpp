@@ -456,6 +456,41 @@ TEST_F(ItemUpgradeTest, WrongNpcTypeDropped)
 	EXPECT_EQ(_user->GetPacketsSent(), 0);
 }
 
+TEST_F(ItemUpgradeTest, NotInZoneDropped)
+{
+	constexpr int OLD_ITEM_ID  = 110110001; // Dagger (+1)
+	constexpr int REQ_ITEM1_ID = 379025000; // Blessed Elemental Scroll
+
+	char sendBuffer[128] {};
+	ItemUpgradeProcessPacket packet {};
+
+	_ITEM_DATA& originItem      = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
+	_ITEM_DATA& reqItem1        = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
+
+	// Prepare inventory (we want to have a fully valid request otherwise)
+	originItem                  = { .nNum = OLD_ITEM_ID, .sCount = 1 };
+	reqItem1                    = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
+
+	// Prepare packet data
+	packet.NpcID                = ANVIL_NPC_ID;
+	packet.Item[0]              = { .ID = OLD_ITEM_ID, .Pos = 0 };
+	packet.Item[1]              = { .ID = REQ_ITEM1_ID, .Pos = 1 };
+
+	_user->m_pUserData->m_bZone = ZONE_ID;
+
+	// Explicitly set the NPC to another zone.
+	_anvilNpc->m_sCurZone       = ZONE_ID + 1;
+
+	_user->ResetSend();
+
+	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
+	std::memcpy(sendBuffer, &packet, sizeof(packet));
+	_user->ItemUpgradeProcess(sendBuffer);
+
+	// Packet is ignored.
+	EXPECT_EQ(_user->GetPacketsSent(), 0);
+}
+
 TEST_F(ItemUpgradeTest, OutOfRangeDropped)
 {
 	constexpr int OLD_ITEM_ID  = 110110001; // Dagger (+1)
