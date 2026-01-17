@@ -16,12 +16,15 @@ using namespace Ebenezer;
 class ItemUpgradeTest : public ::testing::Test
 {
 protected:
-	static constexpr uint16_t ANVIL_NPC_ID = 10001;
-	static constexpr uint8_t ZONE_ID       = 0;
-	static constexpr uint16_t REGION_X     = 0;
-	static constexpr uint16_t REGION_Z     = 0;
+	static constexpr uint16_t ANVIL_NPC_ID     = 10001;
+	static constexpr uint16_t NOT_ANVIL_NPC_ID = 10002;
+
+	static constexpr uint8_t ZONE_ID           = 0;
+	static constexpr uint16_t REGION_X         = 0;
+	static constexpr uint16_t REGION_Z         = 0;
 
 	std::unique_ptr<TestApp> _app;
+	TestMap* _map             = nullptr;
 	TestUser* _user           = nullptr;
 	Ebenezer::CNpc* _anvilNpc = nullptr;
 
@@ -42,8 +45,8 @@ protected:
 			EXPECT_TRUE(_app->AddItemUpgradeEntry(itemUpgradeModel));
 
 		// Setup map
-		auto map = _app->CreateMap(ZONE_ID);
-		EXPECT_TRUE(map != nullptr);
+		_map = _app->CreateMap(ZONE_ID);
+		EXPECT_TRUE(_map != nullptr);
 
 		// Setup user
 		_user = _app->AddUser();
@@ -53,7 +56,7 @@ protected:
 		_user->SetState(CONNECTION_STATE_GAMESTART);
 
 		// Add user to map
-		EXPECT_TRUE(map->Add(_user, REGION_X, REGION_Z));
+		EXPECT_TRUE(_map->Add(_user, REGION_X, REGION_Z));
 
 		// Setup anvil NPC
 		_anvilNpc = _app->CreateNPC(ANVIL_NPC_ID);
@@ -63,13 +66,14 @@ protected:
 		_anvilNpc->m_tNpcType = NPC_ANVIL;
 
 		// Add NPC to map
-		EXPECT_TRUE(map->Add(_anvilNpc, REGION_X, REGION_Z));
+		EXPECT_TRUE(_map->Add(_anvilNpc, REGION_X, REGION_Z));
 	}
 
 	void TearDown() override
 	{
 		_user     = nullptr;
 		_anvilNpc = nullptr;
+		_map      = nullptr;
 		_app.reset();
 	}
 };
@@ -276,7 +280,7 @@ TEST_F(ItemUpgradeTest, BasicUpgradeBurns)
 	EXPECT_EQ(originItem.nSerialNum, 0);
 }
 
-TEST_F(ItemUpgradeTest, OriginItemNotInInventory)
+TEST_F(ItemUpgradeTest, OriginItemNotInInventoryDropped)
 {
 	constexpr int OLD_ITEM_ID  = 110110001; // Dagger (+1)
 	constexpr int REQ_ITEM1_ID = 379016000; // Blessed Item Upgrade Scroll
@@ -301,26 +305,14 @@ TEST_F(ItemUpgradeTest, OriginItemNotInInventory)
 
 	_user->ResetSend();
 
-	// Expect only the error packet
-	_user->AddSendCallback(
-		[](const char* pBuf, int len)
-		{
-			EXPECT_EQ(len, sizeof(ItemUpgradeProcessErrorResponsePacket));
-
-			auto packet = reinterpret_cast<const ItemUpgradeProcessErrorResponsePacket*>(pBuf);
-			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
-			EXPECT_EQ(packet->SubOpcode, ITEM_UPGRADE_PROCESS);
-			EXPECT_EQ(packet->Result, ITEM_UPGRADE_ERROR_NO_MATCH);
-		});
-
 	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
 	std::memcpy(sendBuffer, &packet, sizeof(packet));
 	_user->ItemUpgradeProcess(sendBuffer);
 
-	EXPECT_EQ(_user->GetPacketsSent(), 1);
+	EXPECT_EQ(_user->GetPacketsSent(), 0);
 }
 
-TEST_F(ItemUpgradeTest, RequirementItemNotInInventory)
+TEST_F(ItemUpgradeTest, RequirementItemNotInInventoryDropped)
 {
 	constexpr int OLD_ITEM_ID  = 110110001; // Dagger (+1)
 	constexpr int REQ_ITEM1_ID = 379016000; // Blessed Item Upgrade Scroll
@@ -344,25 +336,15 @@ TEST_F(ItemUpgradeTest, RequirementItemNotInInventory)
 	packet.Item[1]              = { .ID = REQ_ITEM1_ID, .Pos = 1 };
 
 	_user->ResetSend();
-	_user->AddSendCallback(
-		[](const char* pBuf, int len)
-		{
-			EXPECT_EQ(len, sizeof(ItemUpgradeProcessErrorResponsePacket));
-
-			auto packet = reinterpret_cast<const ItemUpgradeProcessErrorResponsePacket*>(pBuf);
-			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
-			EXPECT_EQ(packet->SubOpcode, ITEM_UPGRADE_PROCESS);
-			EXPECT_EQ(packet->Result, ITEM_UPGRADE_ERROR_NO_MATCH);
-		});
 
 	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
 	std::memcpy(sendBuffer, &packet, sizeof(packet));
 	_user->ItemUpgradeProcess(sendBuffer);
 
-	EXPECT_EQ(_user->GetPacketsSent(), 1);
+	EXPECT_EQ(_user->GetPacketsSent(), 0);
 }
 
-TEST_F(ItemUpgradeTest, InsufficientGold)
+TEST_F(ItemUpgradeTest, InsufficientGoldRejected)
 {
 	constexpr int OLD_ITEM_ID  = 110110001; // Dagger (+1)
 	constexpr int REQ_ITEM1_ID = 379025000; // Blessed Elemental Scroll
@@ -402,4 +384,329 @@ TEST_F(ItemUpgradeTest, InsufficientGold)
 	_user->ItemUpgradeProcess(sendBuffer);
 
 	EXPECT_EQ(_user->GetPacketsSent(), 1);
+}
+
+TEST_F(ItemUpgradeTest, MissingNpcDropped)
+{
+	constexpr int OLD_ITEM_ID  = 110110001; // Dagger (+1)
+	constexpr int REQ_ITEM1_ID = 379025000; // Blessed Elemental Scroll
+
+	char sendBuffer[128] {};
+	ItemUpgradeProcessPacket packet {};
+
+	_ITEM_DATA& originItem = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
+	_ITEM_DATA& reqItem1   = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
+
+	// Prepare inventory (we want to have a fully valid request otherwise)
+	originItem             = { .nNum = OLD_ITEM_ID, .sCount = 1 };
+	reqItem1               = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
+
+	// Prepare packet data
+	packet.NpcID           = -1; // doesn't exist
+	packet.Item[0]         = { .ID = OLD_ITEM_ID, .Pos = 0 };
+	packet.Item[1]         = { .ID = REQ_ITEM1_ID, .Pos = 1 };
+
+	_user->ResetSend();
+
+	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
+	std::memcpy(sendBuffer, &packet, sizeof(packet));
+	_user->ItemUpgradeProcess(sendBuffer);
+
+	// Packet is ignored.
+	EXPECT_EQ(_user->GetPacketsSent(), 0);
+}
+
+TEST_F(ItemUpgradeTest, WrongNpcTypeDropped)
+{
+	constexpr int OLD_ITEM_ID  = 110110001; // Dagger (+1)
+	constexpr int REQ_ITEM1_ID = 379025000; // Blessed Elemental Scroll
+
+	char sendBuffer[128] {};
+	ItemUpgradeProcessPacket packet {};
+
+	_ITEM_DATA& originItem = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
+	_ITEM_DATA& reqItem1   = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
+
+	// Prepare inventory (we want to have a fully valid request otherwise)
+	originItem             = { .nNum = OLD_ITEM_ID, .sCount = 1 };
+	reqItem1               = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
+
+	// Prepare packet data
+	packet.NpcID           = NOT_ANVIL_NPC_ID;
+	packet.Item[0]         = { .ID = OLD_ITEM_ID, .Pos = 0 };
+	packet.Item[1]         = { .ID = REQ_ITEM1_ID, .Pos = 1 };
+
+	// Setup NPC that isn't the anvil
+	CNpc* notAnvilNpc      = _app->CreateNPC(NOT_ANVIL_NPC_ID);
+	EXPECT_TRUE(notAnvilNpc != nullptr);
+
+	// Set NPC type to indicate it's not the anvil
+	notAnvilNpc->m_tNpcType = NPC_ARENA;
+
+	// Add NPC to map
+	EXPECT_TRUE(_map->Add(notAnvilNpc, REGION_X, REGION_Z));
+
+	_user->ResetSend();
+
+	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
+	std::memcpy(sendBuffer, &packet, sizeof(packet));
+	_user->ItemUpgradeProcess(sendBuffer);
+
+	// Packet is ignored.
+	EXPECT_EQ(_user->GetPacketsSent(), 0);
+}
+
+TEST_F(ItemUpgradeTest, OutOfRangeDropped)
+{
+	constexpr int OLD_ITEM_ID  = 110110001; // Dagger (+1)
+	constexpr int REQ_ITEM1_ID = 379025000; // Blessed Elemental Scroll
+
+	char sendBuffer[128] {};
+	ItemUpgradeProcessPacket packet {};
+
+	_ITEM_DATA& originItem     = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
+	_ITEM_DATA& reqItem1       = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
+
+	// Prepare inventory (we want to have a fully valid request otherwise)
+	originItem                 = { .nNum = OLD_ITEM_ID, .sCount = 1 };
+	reqItem1                   = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
+
+	// Prepare packet data
+	packet.NpcID               = ANVIL_NPC_ID;
+	packet.Item[0]             = { .ID = OLD_ITEM_ID, .Pos = 0 };
+	packet.Item[1]             = { .ID = REQ_ITEM1_ID, .Pos = 1 };
+
+	// Explicitly set us to 20,20.
+	_user->m_pUserData->m_curx = 20.0f;
+	_user->m_pUserData->m_curz = 20.0f;
+
+	// Explicitly set the anvil NPC to 100,100.
+	// This is more than far enough away.
+	_anvilNpc->m_fCurX         = 100.0f;
+	_anvilNpc->m_fCurZ         = 100.0f;
+
+	_user->ResetSend();
+
+	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
+	std::memcpy(sendBuffer, &packet, sizeof(packet));
+	_user->ItemUpgradeProcess(sendBuffer);
+
+	// Packet is ignored.
+	EXPECT_EQ(_user->GetPacketsSent(), 0);
+}
+
+TEST_F(ItemUpgradeTest, UserTradingRejected)
+{
+	constexpr int OLD_ITEM_ID  = 110110001; // Dagger (+1)
+	constexpr int REQ_ITEM1_ID = 379016000; // Blessed Item Upgrade Scroll
+	constexpr int START_GOLD   = 100'000'000;
+
+	char sendBuffer[128] {};
+	ItemUpgradeProcessPacket packet {};
+
+	_ITEM_DATA& originItem      = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
+	_ITEM_DATA& reqItem1        = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
+
+	// Prepare inventory
+	originItem                  = { .nNum = OLD_ITEM_ID, .sCount = 1 };
+	reqItem1                    = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
+
+	_user->m_sExchangeUser      = 1; // assign a user for trading
+	_user->m_pUserData->m_iGold = START_GOLD;
+
+	// Prepare packet data
+	packet.NpcID                = ANVIL_NPC_ID;
+	packet.Item[0]              = { .ID = OLD_ITEM_ID, .Pos = 0 };
+	packet.Item[1]              = { .ID = REQ_ITEM1_ID, .Pos = 1 };
+
+	_user->ResetSend();
+	_user->AddSendCallback(
+		[](const char* pBuf, int len)
+		{
+			EXPECT_EQ(len, sizeof(ItemUpgradeProcessErrorResponsePacket));
+
+			auto packet = reinterpret_cast<const ItemUpgradeProcessErrorResponsePacket*>(pBuf);
+			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
+			EXPECT_EQ(packet->SubOpcode, ITEM_UPGRADE_PROCESS);
+			EXPECT_EQ(packet->Result, ITEM_UPGRADE_ERROR_TRADING);
+		});
+
+	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
+	std::memcpy(sendBuffer, &packet, sizeof(packet));
+	_user->ItemUpgradeProcess(sendBuffer);
+
+	EXPECT_EQ(_user->GetPacketsSent(), 1);
+}
+
+TEST_F(ItemUpgradeTest, RentalItemRejected)
+{
+	constexpr int OLD_ITEM_ID  = 110110001; // Dagger (+1)
+	constexpr int REQ_ITEM1_ID = 379016000; // Blessed Item Upgrade Scroll
+	constexpr int START_GOLD   = 100'000'000;
+
+	char sendBuffer[128] {};
+	ItemUpgradeProcessPacket packet {};
+
+	_ITEM_DATA& originItem      = _user->m_pUserData->m_sItemArray[SLOT_MAX + 0];
+	_ITEM_DATA& reqItem1        = _user->m_pUserData->m_sItemArray[SLOT_MAX + 1];
+
+	// Prepare inventory
+	originItem                  = { .nNum = OLD_ITEM_ID, .sCount = 1, .byFlag = ITEM_FLAG_RENTED };
+	reqItem1                    = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
+
+	_user->m_pUserData->m_iGold = START_GOLD;
+
+	// Prepare packet data
+	packet.NpcID                = ANVIL_NPC_ID;
+	packet.Item[0]              = { .ID = OLD_ITEM_ID, .Pos = 0 };
+	packet.Item[1]              = { .ID = REQ_ITEM1_ID, .Pos = 1 };
+
+	_user->ResetSend();
+	_user->AddSendCallback(
+		[](const char* pBuf, int len)
+		{
+			EXPECT_EQ(len, sizeof(ItemUpgradeProcessErrorResponsePacket));
+
+			auto packet = reinterpret_cast<const ItemUpgradeProcessErrorResponsePacket*>(pBuf);
+			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
+			EXPECT_EQ(packet->SubOpcode, ITEM_UPGRADE_PROCESS);
+			EXPECT_EQ(packet->Result, ITEM_UPGRADE_ERROR_ITEM_RENTED);
+		});
+
+	// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
+	std::memcpy(sendBuffer, &packet, sizeof(packet));
+	_user->ItemUpgradeProcess(sendBuffer);
+
+	EXPECT_EQ(_user->GetPacketsSent(), 1);
+}
+
+TEST_F(ItemUpgradeTest, MalformedPositionsDropped)
+{
+	constexpr int REQ_ITEM1_ID = 379016000; // Blessed Item Upgrade Scroll
+	constexpr int START_GOLD   = 100'000'000;
+
+	char sendBuffer[128] {};
+	ItemUpgradeProcessPacket packet {};
+
+	// Prepare packet data
+	packet.NpcID = ANVIL_NPC_ID;
+
+	// Prepare initially with valid positions
+	for (int8_t i = 0; i < 10; i++)
+	{
+		// Prepare inventory
+		_ITEM_DATA& reqItem = _user->m_pUserData->m_sItemArray[SLOT_MAX + i];
+		reqItem             = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
+		packet.Item[i]      = { .ID = REQ_ITEM1_ID, .Pos = i };
+	}
+
+	// Now run 10 times with only the one position broken. It should fail on each individually.
+	for (int8_t i = 0; i < 10; i++)
+	{
+		// Restore previous in loop.
+		if (i > 0)
+			packet.Item[i - 1].Pos = i - 1;
+
+		packet.Item[i].Pos          = -20;
+
+		// Reset gold
+		_user->m_pUserData->m_iGold = START_GOLD;
+
+		_user->ResetSend();
+
+		// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
+		std::memcpy(sendBuffer, &packet, sizeof(packet));
+		_user->ItemUpgradeProcess(sendBuffer);
+
+		EXPECT_EQ(_user->GetPacketsSent(), 0);
+	}
+}
+
+TEST_F(ItemUpgradeTest, ReusedPositionsDropped)
+{
+	constexpr int REQ_ITEM1_ID = 379016000; // Blessed Item Upgrade Scroll
+	constexpr int START_GOLD   = 100'000'000;
+
+	char sendBuffer[128] {};
+	ItemUpgradeProcessPacket packet {};
+
+	// Prepare packet data
+	packet.NpcID = ANVIL_NPC_ID;
+
+	// Prepare initially with valid positions
+	for (int8_t i = 0; i < 10; i++)
+	{
+		// Prepare inventory
+		_ITEM_DATA& reqItem = _user->m_pUserData->m_sItemArray[SLOT_MAX + i];
+		reqItem             = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
+		packet.Item[i]      = { .ID = REQ_ITEM1_ID, .Pos = i };
+	}
+
+	// Now run 10 times with only the one position reused. It should fail on each individually.
+	for (int8_t i = 0; i < 10; i++)
+	{
+		if (i > 0)
+		{
+			// Restore previous in loop.
+			packet.Item[i - 1].Pos = i - 1;
+			packet.Item[i].Pos     = i - 1; // reuse previous position
+		}
+		else
+		{
+			packet.Item[i].Pos = i + 1; // reuse next position
+		}
+
+		// Reset gold
+		_user->m_pUserData->m_iGold = START_GOLD;
+
+		_user->ResetSend();
+
+		// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
+		std::memcpy(sendBuffer, &packet, sizeof(packet));
+		_user->ItemUpgradeProcess(sendBuffer);
+
+		EXPECT_EQ(_user->GetPacketsSent(), 0);
+	}
+}
+
+TEST_F(ItemUpgradeTest, MalformedItemIDsDropped)
+{
+	constexpr int REQ_ITEM1_ID = 379016000; // Blessed Item Upgrade Scroll
+	constexpr int START_GOLD   = 100'000'000;
+
+	char sendBuffer[128] {};
+	ItemUpgradeProcessPacket packet {};
+
+	// Prepare packet data
+	packet.NpcID = ANVIL_NPC_ID;
+
+	// Prepare initially with valid positions
+	for (int8_t i = 0; i < 10; i++)
+	{
+		// Prepare inventory
+		_ITEM_DATA& reqItem = _user->m_pUserData->m_sItemArray[SLOT_MAX + i];
+		reqItem             = { .nNum = REQ_ITEM1_ID, .sCount = 1 };
+		packet.Item[i]      = { .ID = REQ_ITEM1_ID, .Pos = i };
+	}
+
+	// Now run 10 times with only the one item ID broken. It should fail on each individually.
+	for (int8_t i = 0; i < 10; i++)
+	{
+		// Restore previous in loop.
+		if (i > 0)
+			packet.Item[i - 1].ID = REQ_ITEM1_ID;
+
+		packet.Item[i].ID           = 123; // not a valid item ID
+
+		// Reset gold
+		_user->m_pUserData->m_iGold = START_GOLD;
+
+		_user->ResetSend();
+
+		// Copy it into the larger buffer in case it were to ever read beyond the struct's size.
+		std::memcpy(sendBuffer, &packet, sizeof(packet));
+		_user->ItemUpgradeProcess(sendBuffer);
+
+		EXPECT_EQ(_user->GetPacketsSent(), 0);
+	}
 }

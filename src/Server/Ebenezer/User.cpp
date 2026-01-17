@@ -12807,7 +12807,9 @@ void CUser::ItemUpgrade(char* pBuf)
 	// Note that originPos is unsigned so we don't care about checking < 0.
 	if (originPos >= HAVE_MAX)
 	{
-		SendItemUpgradeFailed(ITEM_UPGRADE_ERROR_NO_MATCH);
+		spdlog::error(
+			"User::ItemUpgrade: invalid originPos [accountId={} characterName={} originPos={}]",
+			m_pUserData->m_Accountid, m_pUserData->m_id, originPos);
 		return;
 	}
 
@@ -12840,7 +12842,8 @@ void CUser::ItemUpgrade(char* pBuf)
 		return;
 	}
 
-	std::unordered_set<uint8_t> usedReqItemPositions;
+	std::unordered_set<uint8_t> usedItemPositions;
+	usedItemPositions.insert(originPos);
 
 	for (int i = 0; i < ANVIL_MAX; i++)
 	{
@@ -12851,26 +12854,63 @@ void CUser::ItemUpgrade(char* pBuf)
 		// Ensure requirement item positions are valid
 		if (reqItemPos[i] >= HAVE_MAX)
 		{
-			SendItemUpgradeFailed(ITEM_UPGRADE_ERROR_NO_MATCH);
+			spdlog::error("User::ItemUpgrade: invalid reqItemPos [accountId={} "
+						  "characterName={} i={} reqItemPos={}]",
+				m_pUserData->m_Accountid, m_pUserData->m_id, i, reqItemPos[i]);
 			return;
 		}
 
-		// Verify item actually exists in this slot
-		_ITEM_DATA& reqItem = m_pUserData->m_sItemArray[SLOT_MAX + reqItemPos[i]];
-		if (reqItemId[i] != reqItem.nNum && reqItem.sCount > 0)
+		// Verify item ID actually exists
+		const model::Item* reqItemModel = m_pMain->m_ItemTableMap.GetData(reqItemId[i]);
+		if (reqItemModel == nullptr)
 		{
-			SendItemUpgradeFailed(ITEM_UPGRADE_ERROR_NO_MATCH);
+			spdlog::error("User::ItemUpgrade: invalid reqItemId [accountId={} "
+						  "characterName={} i={} reqItemId={}]",
+				m_pUserData->m_Accountid, m_pUserData->m_id, i, reqItemId[i]);
+			return;
+		}
+
+		// Verify we actually have one of this item in the slot
+		const _ITEM_DATA& reqItem = m_pUserData->m_sItemArray[SLOT_MAX + reqItemPos[i]];
+		if (reqItem.sCount <= 0)
+		{
+			spdlog::error("User::ItemUpgrade: invalid stack size [accountId={} "
+						  "characterName={} i={} reqItemId={} reqItemPos={} stackSize={}]",
+				m_pUserData->m_Accountid, m_pUserData->m_id, i, reqItemId[i], reqItemPos[i],
+				reqItem.sCount);
+			return;
+		}
+
+		// And that it is the expected item.
+		if (reqItemId[i] != reqItem.nNum)
+		{
+			spdlog::error("User::ItemUpgrade: unexpected item in requirement slot [accountId={} "
+						  "characterName={} reqItemId={} i={} reqItemPos={} existingItemId={}]",
+				m_pUserData->m_Accountid, m_pUserData->m_id, i, reqItemId[i], reqItemPos[i],
+				reqItem.nNum);
 			return;
 		}
 
 		// Verify this position hasn't already been used before.
-		if (usedReqItemPositions.contains(reqItemPos[i]))
+		if (usedItemPositions.contains(reqItemPos[i]))
 		{
-			SendItemUpgradeFailed(ITEM_UPGRADE_ERROR_NO_MATCH);
+			spdlog::error("User::ItemUpgrade: requirement slot already in use [accountId={} "
+						  "characterName={} i={} reqItemPos={}]",
+				m_pUserData->m_Accountid, m_pUserData->m_id, i, reqItemPos[i]);
 			return;
 		}
 
-		usedReqItemPositions.insert(reqItemPos[i]);
+		usedItemPositions.insert(reqItemPos[i]);
+	}
+
+	// Verify item ID actually exists
+	originItemModel = m_pMain->m_ItemTableMap.GetData(originItemId);
+	if (originItemModel == nullptr)
+	{
+		spdlog::error("User::ItemUpgrade: invalid originItemId [accountId={} characterName={} "
+					  "originItemId={}]",
+			m_pUserData->m_Accountid, m_pUserData->m_id, originItemId);
+		return;
 	}
 
 	_ITEM_DATA& originItem = m_pUserData->m_sItemArray[SLOT_MAX + originPos];
@@ -12878,7 +12918,9 @@ void CUser::ItemUpgrade(char* pBuf)
 	// Verify origin item exists and matches what the client says is in this slot
 	if (originItem.nNum != originItemId)
 	{
-		SendItemUpgradeFailed(ITEM_UPGRADE_ERROR_NO_MATCH);
+		spdlog::error("User::ItemUpgrade: unexpected item in origin slot [accountId={} "
+					  "characterName={} originItemId={} originItemPos={} existingItemId={}]",
+			m_pUserData->m_Accountid, m_pUserData->m_id, originItemId, originPos, originItem.nNum);
 		return;
 	}
 
@@ -12891,15 +12933,8 @@ void CUser::ItemUpgrade(char* pBuf)
 		return;
 	}
 
-	baseItemId      = originItemId % 1000;
-	itemClass       = originItemId / 100000000;
-
-	originItemModel = m_pMain->m_ItemTableMap.GetData(originItemId);
-	if (originItemModel == nullptr)
-	{
-		SendItemUpgradeFailed(ITEM_UPGRADE_ERROR_NO_MATCH);
-		return;
-	}
+	baseItemId = originItemId % 1000;
+	itemClass  = originItemId / 100000000;
 
 	for (const model::ItemUpgrade* itemUpgradeModel : m_pMain->m_ItemUpgradeTableArray)
 	{
