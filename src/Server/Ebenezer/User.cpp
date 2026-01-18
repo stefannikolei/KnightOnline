@@ -13088,7 +13088,10 @@ void CUser::ItemUpgrade(char* pBuf)
 
 	GoldLose(matchedItemUpgradeModel->RequiredCoins);
 
-	// The first myrand was officially a separate Randomizer (state-based CRandomizer)
+	// The outer myrand call officially uses CRandomizer (a state-based randomizer).
+	// It essentially behaves more consistently and predictably, repeating its results
+	// far more frequently than the standard random number generator (which isn't really
+	// a good thing at all).
 	rand           = myrand(0, myrand(9000, 10000));
 	upgradeSuccess = (matchedItemUpgradeModel->GenRate > rand);
 
