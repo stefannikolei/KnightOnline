@@ -12944,7 +12944,7 @@ void CUser::ItemUpgrade(char* pBuf)
 	}
 
 	baseItemId = originItemId % 1000;
-	itemClass  = originItemId / 100000000;
+	itemClass  = originItemId / 100'000'000;
 
 	for (const model::ItemUpgrade* itemUpgradeModel : m_pMain->m_ItemUpgradeTableArray)
 	{
@@ -12954,13 +12954,13 @@ void CUser::ItemUpgrade(char* pBuf)
 		if (itemUpgradeModel->OriginItem != baseItemId)
 			continue;
 
-		itemUpgradeElementClass = itemUpgradeModel->Index / 100000;
-		if (itemClass != itemUpgradeElementClass && itemUpgradeModel->Index < 300000)
+		itemUpgradeElementClass = itemUpgradeModel->Index / 100'000;
+		if (itemClass != itemUpgradeElementClass && itemUpgradeModel->Index < 300'000)
 			continue;
 
 		if (itemUpgradeModel->OriginType != -1)
 		{
-			if (itemUpgradeModel->Index >= 100000 && itemUpgradeModel->Index < 200000)
+			if (itemUpgradeModel->Index >= 100'000 && itemUpgradeModel->Index < 200'000)
 			{
 				switch (itemUpgradeModel->OriginType)
 				{
@@ -13020,7 +13020,7 @@ void CUser::ItemUpgrade(char* pBuf)
 						break;
 
 					case 11:
-						if (itemClass != 19)
+						if ((originItemId / 10'000'000) != 19)
 							continue;
 						break;
 
@@ -13034,12 +13034,12 @@ void CUser::ItemUpgrade(char* pBuf)
 				}
 			}
 			// No clue for what these two else if are...
-			else if (itemUpgradeModel->Index >= 200000 && itemUpgradeModel->Index < 300000)
+			else if (itemUpgradeModel->Index >= 200'000 && itemUpgradeModel->Index < 300'000)
 			{
 				if (itemUpgradeModel->OriginType - originItemModel->Slot != 8)
 					continue;
 			}
-			else if (itemUpgradeModel->Index >= 300000 && itemUpgradeModel->Index < 400000)
+			else if (itemUpgradeModel->Index >= 300'000 && itemUpgradeModel->Index < 400'000)
 			{
 				if (originItemModel->Slot - itemUpgradeModel->OriginType != 73)
 					continue;

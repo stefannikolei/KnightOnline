@@ -80,12 +80,14 @@ protected:
 };
 
 INSTANTIATE_TEST_SUITE_P(UpgradeSuccessTestCases, ItemUpgradeTest,
-	testing::Values(std::make_tuple(110110001, 110110002, 0), // Dagger (+1) Dagger (+2)
-		std::make_tuple(111210001, 111210002, 0),             // Shard (+1) Shard (+2)
-		std::make_tuple(156210001, 156210002, 0),             // Raptor (+1) Raptor (+2)
-		std::make_tuple(126410001, 126410002, 0),             // Mirage (+1) Mirage (+2)
-		std::make_tuple(181110001, 181110002, 0),             // Elixir Staff (+1) Elixir Staff (+2)
-		std::make_tuple(190250271, 190250272, 4)              // Lobo hammer (+1) Lobo hammer (+2)
+	testing::Values( //
+		//               Old item | New item | Cost
+		std::make_tuple(110110001, 110110002, 0), // Dagger (+1) -> Dagger (+2)
+		std::make_tuple(111210001, 111210002, 0), // Shard (+1) -> Shard (+2)
+		std::make_tuple(156210001, 156210002, 0), // Raptor (+1) -> Raptor (+2)
+		std::make_tuple(126410001, 126410002, 0), // Mirage (+1) -> Mirage (+2)
+		std::make_tuple(181110001, 181110002, 0), // Elixir Staff (+1) Elixir Staff (+2)
+		std::make_tuple(190250271, 190250272, 4)  // Lobo hammer (+1) -> Lobo hammer (+2)
 		));
 
 TEST_P(ItemUpgradeTest, BasicUpgradeSucceeds)
@@ -120,8 +122,8 @@ TEST_P(ItemUpgradeTest, BasicUpgradeSucceeds)
 
 	// Prepare packet data
 	packet.NpcID                = ANVIL_NPC_ID;
-	packet.Item[0]              = { .ID = static_cast<uint32_t>(OLD_ITEM_ID), .Pos = 0 };
-	packet.Item[1]              = { .ID = static_cast<uint32_t>(REQ_ITEM1_ID), .Pos = 1 };
+	packet.Item[0]              = { .ID = OLD_ITEM_ID, .Pos = 0 };
+	packet.Item[1]              = { .ID = REQ_ITEM1_ID, .Pos = 1 };
 
 	_user->ResetSend();
 

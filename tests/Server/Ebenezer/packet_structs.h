@@ -9,8 +9,8 @@
 #pragma pack(push, 1)
 struct ItemPosPair
 {
-	uint32_t ID = 0;
-	int8_t Pos  = -1;
+	int32_t ID = 0;
+	int8_t Pos = -1;
 };
 
 struct ItemUpgradeProcessPacket
