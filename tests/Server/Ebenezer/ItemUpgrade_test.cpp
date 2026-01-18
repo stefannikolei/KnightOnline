@@ -10,10 +10,11 @@
 
 #include <cstdlib>
 #include <memory> // std::memcpy()
+#include <utility>
 
 using namespace Ebenezer;
 
-class ItemUpgradeTest : public ::testing::Test
+class ItemUpgradeTest : public ::testing::TestWithParam<std::tuple<int, int, int>>
 {
 protected:
 	static constexpr uint16_t ANVIL_NPC_ID     = 10001;
@@ -78,14 +79,21 @@ protected:
 	}
 };
 
-TEST_F(ItemUpgradeTest, BasicUpgradeSucceeds)
+INSTANTIATE_TEST_SUITE_P(UpgradeSuccessTestCases, ItemUpgradeTest,
+	testing::Values(std::make_tuple(110110001, 110110002, 0), // Dagger (+1) Dagger (+2)
+		std::make_tuple(111210001, 111210002, 0),             // Shard (+1) Shard (+2)
+		std::make_tuple(156210001, 156210002, 0),             // Raptor (+1) Raptor (+2)
+		std::make_tuple(126410001, 126410002, 0),             // Mirage (+1) Mirage (+2)
+		std::make_tuple(181110001, 181110002, 0),             // Elixir Staff (+1) Elixir Staff (+2)
+		std::make_tuple(190250271, 190250272, 4)              // Lobo hammer (+1) Lobo hammer (+2)
+		));
+
+TEST_P(ItemUpgradeTest, BasicUpgradeSucceeds)
 {
-	constexpr int OLD_ITEM_ID       = 110110001; // Dagger (+1)
-	constexpr int NEW_ITEM_ID       = 110110002; // Dagger (+2)
-	constexpr int REQ_ITEM1_ID      = 379016000; // Blessed Item Upgrade Scroll
-	constexpr int START_GOLD        = 100'000'000;
-	constexpr int EXPECTED_COST     = 0;
-	constexpr int EXPECTED_NEW_GOLD = START_GOLD - EXPECTED_COST;
+	auto [OLD_ITEM_ID, NEW_ITEM_ID, EXPECTED_COST] = GetParam();
+	constexpr int REQ_ITEM1_ID                     = 379016000; // Blessed Item Upgrade Scroll
+	constexpr int START_GOLD                       = 100'000'000;
+	int EXPECTED_NEW_GOLD                          = START_GOLD - EXPECTED_COST;
 
 	char sendBuffer[128] {};
 	ItemUpgradeProcessPacket packet {};
@@ -112,8 +120,8 @@ TEST_F(ItemUpgradeTest, BasicUpgradeSucceeds)
 
 	// Prepare packet data
 	packet.NpcID                = ANVIL_NPC_ID;
-	packet.Item[0]              = { .ID = OLD_ITEM_ID, .Pos = 0 };
-	packet.Item[1]              = { .ID = REQ_ITEM1_ID, .Pos = 1 };
+	packet.Item[0]              = { .ID = static_cast<uint32_t>(OLD_ITEM_ID), .Pos = 0 };
+	packet.Item[1]              = { .ID = static_cast<uint32_t>(REQ_ITEM1_ID), .Pos = 1 };
 
 	_user->ResetSend();
 
