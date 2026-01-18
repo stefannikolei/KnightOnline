@@ -93,7 +93,7 @@ INSTANTIATE_TEST_SUITE_P(UpgradeSuccessTestCases, ItemUpgradeTest,
 TEST_P(ItemUpgradeTest, BasicUpgradeSucceeds)
 {
 	auto [OLD_ITEM_ID, NEW_ITEM_ID, EXPECTED_COST] = GetParam();
-	constexpr int REQ_ITEM1_ID                     = 379016000; // Blessed Item Upgrade Scroll
+	constexpr int REQ_ITEM1_ID                     = 379152000; // Blessed Item Upgrade Scroll
 	constexpr int START_GOLD                       = 100'000'000;
 	int EXPECTED_NEW_GOLD                          = START_GOLD - EXPECTED_COST;
 
