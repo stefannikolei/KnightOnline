@@ -18,29 +18,34 @@ public:
 	{
 		spdlog::set_level(spdlog::level::off);
 
-		InitSocketManager(Ebenezer::MAX_USER, 1);
+		InitSocketManager(Ebenezer::MAX_USER);
 	}
 
-	void InitSocketManager(int serverSocketCount, int clientSocketCount)
+	void InitSocketManager(int serverSocketCount)
 	{
-		_socketManager.InitSockets(serverSocketCount, clientSocketCount);
+		_serverSocketManager.InitSockets(serverSocketCount);
 
 		for (int i = 0; i < serverSocketCount; i++)
-			_socketManager._inactiveServerSocketArray[i] = new TestUser();
+		{
+			auto user = std::make_shared<TestUser>();
+			user->SetSocketID(i);
+
+			_serverSocketManager._inactiveSocketArray[i] = std::move(user);
+		}
 	}
 
-	TestUser* AddUser()
+	std::shared_ptr<TestUser> AddUser()
 	{
-		TestUser* user = nullptr;
-		int socketId   = -1;
+		std::shared_ptr<TestUser> user;
+		int socketId = -1;
 
 		{
-			std::lock_guard<std::recursive_mutex> lock(_socketManager._mutex);
-
-			user = static_cast<TestUser*>(_socketManager.AcquireServerSocket(socketId));
-			if (user == nullptr)
-				return nullptr;
+			std::lock_guard<std::recursive_mutex> lock(_serverSocketManager._mutex);
+			user = std::static_pointer_cast<TestUser>(_serverSocketManager.AcquireSocket(socketId));
 		}
+
+		if (user == nullptr)
+			return nullptr;
 
 		user->Initialize();
 

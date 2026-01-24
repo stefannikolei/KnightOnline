@@ -16,4 +16,6 @@
 #include <shared-server/server_config.h>
 #include <shared-server/utilities.h>
 
+#include <spdlog/spdlog.h>
+
 #endif // SERVER_AISERVER_PCH_H

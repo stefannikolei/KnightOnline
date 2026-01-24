@@ -225,10 +225,11 @@ public:
 
 public:
 	CUser(test_tag);
-	CUser(SocketManager* socketManager);
+	CUser(TcpServerSocketManager* socketManager);
 	~CUser() override;
 
 public:
+	std::string_view GetImplName() const override;
 	void Initialize() override;
 	bool PullOutCore(char*& data, int& length) override;
 	int Send(char* pBuf, int length) override;
@@ -335,7 +336,7 @@ public:
 	void AllPointChange();
 	void ClassChangeReq();
 	void FriendReport(char* pBuf);
-	CUser* GetItemRoutingUser(int itemid, int16_t itemcount);
+	std::shared_ptr<CUser> GetItemRoutingUser(int itemid, int16_t itemcount);
 	bool GetStartPosition(int16_t* x, int16_t* z, int zoneId) const;
 	void Home();
 	void ReportBug(char* pBuf);

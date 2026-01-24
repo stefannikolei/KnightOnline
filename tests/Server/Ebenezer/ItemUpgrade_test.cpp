@@ -25,9 +25,9 @@ protected:
 	static constexpr uint16_t REGION_Z         = 0;
 
 	std::unique_ptr<TestApp> _app;
-	TestMap* _map             = nullptr;
-	TestUser* _user           = nullptr;
-	Ebenezer::CNpc* _anvilNpc = nullptr;
+	TestMap* _map                   = nullptr;
+	std::shared_ptr<TestUser> _user = nullptr;
+	Ebenezer::CNpc* _anvilNpc       = nullptr;
 
 	void SetUp() override
 	{
@@ -57,7 +57,7 @@ protected:
 		_user->SetState(CONNECTION_STATE_GAMESTART);
 
 		// Add user to map
-		EXPECT_TRUE(_map->Add(_user, REGION_X, REGION_Z));
+		EXPECT_TRUE(_map->Add(_user.get(), REGION_X, REGION_Z));
 
 		// Setup anvil NPC
 		_anvilNpc = _app->CreateNPC(ANVIL_NPC_ID);
@@ -72,7 +72,7 @@ protected:
 
 	void TearDown() override
 	{
-		_user     = nullptr;
+		_user.reset();
 		_anvilNpc = nullptr;
 		_map      = nullptr;
 		_app.reset();

@@ -9,7 +9,7 @@ namespace AIServer
 {
 
 SendThreadMain::SendThreadMain(AISocketManager* socketManager) :
-	_socketManager(socketManager), _nextRoundRobinSocketId(0)
+	_serverSocketManager(socketManager), _nextRoundRobinSocketId(0)
 {
 }
 
@@ -71,7 +71,7 @@ void SendThreadMain::thread_loop()
 
 void SendThreadMain::tick(std::queue<_SEND_DATA*>& processingQueue)
 {
-	int socketCount = _socketManager->GetServerSocketCount();
+	int socketCount = _serverSocketManager->GetSocketCount();
 	if (socketCount <= 0)
 		return;
 
@@ -88,7 +88,7 @@ void SendThreadMain::tick(std::queue<_SEND_DATA*>& processingQueue)
 			int socketId             = _nextRoundRobinSocketId;
 			++_nextRoundRobinSocketId;
 
-			CGameSocket* gameSocket = _socketManager->GetServerSocketUnchecked(socketId);
+			auto gameSocket = _serverSocketManager->GetSocketUnchecked(socketId);
 			if (gameSocket == nullptr)
 				continue;
 
