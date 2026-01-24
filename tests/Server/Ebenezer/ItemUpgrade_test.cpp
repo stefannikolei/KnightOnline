@@ -32,42 +32,42 @@ protected:
 	void SetUp() override
 	{
 		_app = std::make_unique<TestApp>();
-		EXPECT_TRUE(_app != nullptr);
+		ASSERT_TRUE(_app != nullptr);
 
 		// Load required tables
 		for (const auto& itemModel : s_itemData)
-			EXPECT_TRUE(_app->AddItemEntry(itemModel));
+			ASSERT_TRUE(_app->AddItemEntry(itemModel));
 
 		// Pre-reserve data so we only need to allocate once.
 		_app->m_ItemUpgradeTableArray.reserve(
 			sizeof(s_itemUpgradeData) / sizeof(s_itemUpgradeData[0]));
 
 		for (const auto& itemUpgradeModel : s_itemUpgradeData)
-			EXPECT_TRUE(_app->AddItemUpgradeEntry(itemUpgradeModel));
+			ASSERT_TRUE(_app->AddItemUpgradeEntry(itemUpgradeModel));
 
 		// Setup map
 		_map = _app->CreateMap(ZONE_ID);
-		EXPECT_TRUE(_map != nullptr);
+		ASSERT_TRUE(_map != nullptr);
 
 		// Setup user
 		_user = _app->AddUser();
-		EXPECT_TRUE(_user != nullptr);
+		ASSERT_TRUE(_user != nullptr);
 
 		// Mark player as ingame
 		_user->SetState(CONNECTION_STATE_GAMESTART);
 
 		// Add user to map
-		EXPECT_TRUE(_map->Add(_user.get(), REGION_X, REGION_Z));
+		ASSERT_TRUE(_map->Add(_user.get(), REGION_X, REGION_Z));
 
 		// Setup anvil NPC
 		_anvilNpc = _app->CreateNPC(ANVIL_NPC_ID);
-		EXPECT_TRUE(_anvilNpc != nullptr);
+		ASSERT_TRUE(_anvilNpc != nullptr);
 
 		// Set as anvil type
 		_anvilNpc->m_tNpcType = NPC_ANVIL;
 
 		// Add NPC to map
-		EXPECT_TRUE(_map->Add(_anvilNpc, REGION_X, REGION_Z));
+		ASSERT_TRUE(_map->Add(_anvilNpc, REGION_X, REGION_Z));
 	}
 
 	void TearDown() override
@@ -106,8 +106,8 @@ TEST_P(ItemUpgradeTest, BasicUpgradeSucceeds)
 	model::Item* oldItemModel = _app->m_ItemTableMap.GetData(OLD_ITEM_ID);
 	model::Item* newItemModel = _app->m_ItemTableMap.GetData(NEW_ITEM_ID);
 
-	EXPECT_TRUE(oldItemModel != nullptr);
-	EXPECT_TRUE(newItemModel != nullptr);
+	ASSERT_TRUE(oldItemModel != nullptr);
+	ASSERT_TRUE(newItemModel != nullptr);
 
 	// The upgrade rate works in reverse from how you'd expect.
 	// For 100%, we'd have to return min (0), not max (10000).
@@ -131,7 +131,7 @@ TEST_P(ItemUpgradeTest, BasicUpgradeSucceeds)
 	_user->AddSendCallback(
 		[=](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, sizeof(GoldChangePacket));
+			ASSERT_EQ(len, sizeof(GoldChangePacket));
 
 			auto packet = reinterpret_cast<const GoldChangePacket*>(pBuf);
 
@@ -145,7 +145,7 @@ TEST_P(ItemUpgradeTest, BasicUpgradeSucceeds)
 	_user->AddSendCallback(
 		[=](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, sizeof(ItemUpgradeProcessResponseSuccessPacket));
+			ASSERT_EQ(len, sizeof(ItemUpgradeProcessResponseSuccessPacket));
 
 			auto packet = reinterpret_cast<const ItemUpgradeProcessResponseSuccessPacket*>(pBuf);
 
@@ -168,7 +168,7 @@ TEST_P(ItemUpgradeTest, BasicUpgradeSucceeds)
 	_user->AddSendCallback(
 		[](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, sizeof(ObjectEventAnvilResponsePacket));
+			ASSERT_EQ(len, sizeof(ObjectEventAnvilResponsePacket));
 
 			auto packet = reinterpret_cast<const ObjectEventAnvilResponsePacket*>(pBuf);
 
@@ -230,7 +230,7 @@ TEST_F(ItemUpgradeTest, BasicUpgradeBurns)
 	_user->AddSendCallback(
 		[=](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, sizeof(GoldChangePacket));
+			ASSERT_EQ(len, sizeof(GoldChangePacket));
 
 			auto packet = reinterpret_cast<const GoldChangePacket*>(pBuf);
 
@@ -244,7 +244,7 @@ TEST_F(ItemUpgradeTest, BasicUpgradeBurns)
 	_user->AddSendCallback(
 		[=](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, sizeof(ItemUpgradeProcessResponseSuccessPacket));
+			ASSERT_EQ(len, sizeof(ItemUpgradeProcessResponseSuccessPacket));
 
 			auto packet = reinterpret_cast<const ItemUpgradeProcessResponseSuccessPacket*>(pBuf);
 
@@ -267,7 +267,7 @@ TEST_F(ItemUpgradeTest, BasicUpgradeBurns)
 	_user->AddSendCallback(
 		[](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, sizeof(ObjectEventAnvilResponsePacket));
+			ASSERT_EQ(len, sizeof(ObjectEventAnvilResponsePacket));
 
 			auto packet = reinterpret_cast<const ObjectEventAnvilResponsePacket*>(pBuf);
 
@@ -381,7 +381,7 @@ TEST_F(ItemUpgradeTest, InsufficientGoldRejected)
 	_user->AddSendCallback(
 		[](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, sizeof(ItemUpgradeProcessErrorResponsePacket));
+			ASSERT_EQ(len, sizeof(ItemUpgradeProcessErrorResponsePacket));
 
 			auto packet = reinterpret_cast<const ItemUpgradeProcessErrorResponsePacket*>(pBuf);
 			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
@@ -448,13 +448,13 @@ TEST_F(ItemUpgradeTest, WrongNpcTypeDropped)
 
 	// Setup NPC that isn't the anvil
 	CNpc* notAnvilNpc      = _app->CreateNPC(NOT_ANVIL_NPC_ID);
-	EXPECT_TRUE(notAnvilNpc != nullptr);
+	ASSERT_TRUE(notAnvilNpc != nullptr);
 
 	// Set NPC type to indicate it's not the anvil
 	notAnvilNpc->m_tNpcType = NPC_ARENA;
 
 	// Add NPC to map
-	EXPECT_TRUE(_map->Add(notAnvilNpc, REGION_X, REGION_Z));
+	ASSERT_TRUE(_map->Add(notAnvilNpc, REGION_X, REGION_Z));
 
 	_user->ResetSend();
 
@@ -568,7 +568,7 @@ TEST_F(ItemUpgradeTest, UserTradingRejected)
 	_user->AddSendCallback(
 		[](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, sizeof(ItemUpgradeProcessErrorResponsePacket));
+			ASSERT_EQ(len, sizeof(ItemUpgradeProcessErrorResponsePacket));
 
 			auto packet = reinterpret_cast<const ItemUpgradeProcessErrorResponsePacket*>(pBuf);
 			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
@@ -610,7 +610,7 @@ TEST_F(ItemUpgradeTest, RentalItemRejected)
 	_user->AddSendCallback(
 		[](const char* pBuf, int len)
 		{
-			EXPECT_EQ(len, sizeof(ItemUpgradeProcessErrorResponsePacket));
+			ASSERT_EQ(len, sizeof(ItemUpgradeProcessErrorResponsePacket));
 
 			auto packet = reinterpret_cast<const ItemUpgradeProcessErrorResponsePacket*>(pBuf);
 			EXPECT_EQ(packet->Opcode, WIZ_ITEM_UPGRADE);
