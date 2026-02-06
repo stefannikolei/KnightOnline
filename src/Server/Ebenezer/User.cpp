@@ -13013,15 +13013,14 @@ void CUser::ItemUpgrade(char* pBuf)
 						break;
 				}
 			}
-			// No clue for what these two else if are...
 			else if (itemUpgradeModel->Index >= 200'000 && itemUpgradeModel->Index < 300'000)
 			{
-				if (itemUpgradeModel->OriginType - originItemModel->Slot != 8)
+				if (itemUpgradeModel->OriginType != originItemModel->Slot + 8)
 					continue;
 			}
 			else if (itemUpgradeModel->Index >= 300'000 && itemUpgradeModel->Index < 400'000)
 			{
-				if (originItemModel->Slot - itemUpgradeModel->OriginType != 73)
+				if (originItemModel->Slot != itemUpgradeModel->OriginType + 73)
 					continue;
 			}
 		}
