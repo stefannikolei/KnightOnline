@@ -320,12 +320,12 @@ public:
 	void FriendAccept(char* pBuf);
 	void FriendRequest(char* pBuf);
 	void Friend(char* pBuf);
-	bool WarpListObjectEvent(int16_t objectindex, int16_t nid);
-	bool FlagObjectEvent(int16_t objectindex, int16_t nid);
-	bool GateLeverObjectEvent(int16_t objectindex, int16_t nid);
-	bool GateObjectEvent(int16_t objectindex, int16_t nid);
-	bool BindObjectEvent(int16_t objectindex, int16_t nid);
-	void SendAnvilRequest(int16_t nid);
+	bool WarpListObjectEvent(int16_t objectIndex, int16_t npcId);
+	bool FlagObjectEvent(int16_t objectIndex, int16_t npcId);
+	bool GateLeverObjectEvent(int16_t objectIndex, int16_t npcId);
+	bool GateObjectEvent(int16_t objectIndex, int16_t npcId);
+	bool BindObjectEvent(int16_t objectIndex, int16_t npcId);
+	void SendAnvilRequest(int16_t npcId);
 	void InitType3();
 	bool GetWarpList(int warp_group);
 	void ServerChangeOk(char* pBuf);

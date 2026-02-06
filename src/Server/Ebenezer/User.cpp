@@ -9722,7 +9722,7 @@ void CUser::InitType3()
 	m_bType3Flag = false;
 }
 
-bool CUser::BindObjectEvent(int16_t objectindex, int16_t /*nid*/)
+bool CUser::BindObjectEvent(int16_t objectIndex, int16_t /*npcId*/)
 {
 	int sendIndex = 0, result = 0;
 	char sendBuffer[128] {};
@@ -9731,7 +9731,7 @@ bool CUser::BindObjectEvent(int16_t objectindex, int16_t /*nid*/)
 	if (pMap == nullptr)
 		return false;
 
-	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectindex);
+	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectIndex);
 	if (pEvent == nullptr)
 		return false;
 
@@ -9753,7 +9753,7 @@ bool CUser::BindObjectEvent(int16_t objectindex, int16_t /*nid*/)
 	return true;
 }
 
-bool CUser::GateObjectEvent(int16_t objectindex, int16_t nid)
+bool CUser::GateObjectEvent(int16_t objectIndex, int16_t npcId)
 {
 	// 포인터 참조하면 안됨
 	if (!m_pMain->m_bPointCheckFlag)
@@ -9766,11 +9766,11 @@ bool CUser::GateObjectEvent(int16_t objectindex, int16_t nid)
 	if (pMap == nullptr)
 		return false;
 
-	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectindex);
+	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectIndex);
 	if (pEvent == nullptr)
 		return false;
 
-	CNpc* pNpc = m_pMain->m_NpcMap.GetData(nid);
+	CNpc* pNpc = m_pMain->m_NpcMap.GetData(npcId);
 	if (pNpc == nullptr)
 		return false;
 
@@ -9784,7 +9784,7 @@ bool CUser::GateObjectEvent(int16_t objectindex, int16_t nid)
 		memset(sendBuffer, 0, sizeof(sendBuffer));
 		sendIndex = 0;
 		SetByte(sendBuffer, AG_NPC_GATE_OPEN, sendIndex);
-		SetShort(sendBuffer, nid, sendIndex);
+		SetShort(sendBuffer, npcId, sendIndex);
 		SetByte(sendBuffer, pNpc->m_byGateOpen, sendIndex);
 		m_pMain->Send_AIServer(m_pUserData->m_bZone, sendBuffer, sendIndex);
 	}
@@ -9798,7 +9798,7 @@ bool CUser::GateObjectEvent(int16_t objectindex, int16_t nid)
 	SetByte(sendBuffer, WIZ_OBJECT_EVENT, sendIndex);
 	SetByte(sendBuffer, static_cast<uint8_t>(pEvent->sType), sendIndex);
 	SetByte(sendBuffer, result, sendIndex);
-	SetShort(sendBuffer, nid, sendIndex);
+	SetShort(sendBuffer, npcId, sendIndex);
 	SetByte(sendBuffer, pNpc->m_byGateOpen, sendIndex);
 	m_pMain->Send_Region(
 		sendBuffer, sendIndex, m_pUserData->m_bZone, m_RegionX, m_RegionZ, nullptr, false);
@@ -9806,7 +9806,7 @@ bool CUser::GateObjectEvent(int16_t objectindex, int16_t nid)
 	return true;
 }
 
-bool CUser::GateLeverObjectEvent(int16_t objectindex, int16_t nid)
+bool CUser::GateLeverObjectEvent(int16_t objectIndex, int16_t npcId)
 {
 	// 포인터 참조하면 안됨
 	if (!m_pMain->m_bPointCheckFlag)
@@ -9819,11 +9819,11 @@ bool CUser::GateLeverObjectEvent(int16_t objectindex, int16_t nid)
 	if (pMap == nullptr)
 		return false;
 
-	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectindex);
+	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectIndex);
 	if (pEvent == nullptr)
 		return false;
 
-	CNpc* pNpc = m_pMain->m_NpcMap.GetData(nid);
+	CNpc* pNpc = m_pMain->m_NpcMap.GetData(npcId);
 	if (pNpc == nullptr)
 		return false;
 
@@ -9852,11 +9852,11 @@ bool CUser::GateLeverObjectEvent(int16_t objectindex, int16_t nid)
 			memset(sendBuffer, 0, sizeof(sendBuffer));
 			sendIndex = 0;
 			SetByte(sendBuffer, AG_NPC_GATE_OPEN, sendIndex);
-			SetShort(sendBuffer, nid, sendIndex);
+			SetShort(sendBuffer, npcId, sendIndex);
 			SetByte(sendBuffer, pNpc->m_byGateOpen, sendIndex);
 			m_pMain->Send_AIServer(m_pUserData->m_bZone, sendBuffer, sendIndex);
 
-			pGateNpc->m_byGateOpen = !pGateNpc->m_byGateOpen;
+			pGateNpc->m_byGateOpen = pGateNpc->m_byGateOpen ? 0 : 1;
 			memset(sendBuffer, 0, sizeof(sendBuffer));
 			sendIndex = 0;
 			SetByte(sendBuffer, AG_NPC_GATE_OPEN, sendIndex);
@@ -9886,7 +9886,7 @@ bool CUser::GateLeverObjectEvent(int16_t objectindex, int16_t nid)
 	SetByte(sendBuffer, WIZ_OBJECT_EVENT, sendIndex);
 	SetByte(sendBuffer, static_cast<uint8_t>(pEvent->sType), sendIndex);
 	SetByte(sendBuffer, result, sendIndex);
-	SetShort(sendBuffer, nid, sendIndex);
+	SetShort(sendBuffer, npcId, sendIndex);
 	SetByte(sendBuffer, pNpc->m_byGateOpen, sendIndex);
 	m_pMain->Send_Region(
 		sendBuffer, sendIndex, m_pUserData->m_bZone, m_RegionX, m_RegionZ, nullptr, false);
@@ -9894,7 +9894,7 @@ bool CUser::GateLeverObjectEvent(int16_t objectindex, int16_t nid)
 	return true;
 }
 
-bool CUser::FlagObjectEvent(int16_t objectindex, int16_t nid)
+bool CUser::FlagObjectEvent(int16_t objectIndex, int16_t npcId)
 {
 	// 포인터 참조하면 안됨
 	if (!m_pMain->m_bPointCheckFlag)
@@ -9907,11 +9907,11 @@ bool CUser::FlagObjectEvent(int16_t objectindex, int16_t nid)
 	if (pMap == nullptr)
 		return false;
 
-	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectindex);
+	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectIndex);
 	if (pEvent == nullptr)
 		return false;
 
-	CNpc* pNpc = m_pMain->m_NpcMap.GetData(nid);
+	CNpc* pNpc = m_pMain->m_NpcMap.GetData(npcId);
 	if (pNpc == nullptr)
 		return false;
 
@@ -9948,7 +9948,7 @@ bool CUser::FlagObjectEvent(int16_t objectindex, int16_t nid)
 			memset(sendBuffer, 0, sizeof(sendBuffer));
 			sendIndex = 0;
 			SetByte(sendBuffer, AG_NPC_GATE_OPEN, sendIndex);
-			SetShort(sendBuffer, nid, sendIndex);
+			SetShort(sendBuffer, npcId, sendIndex);
 			SetByte(sendBuffer, pNpc->m_byGateOpen, sendIndex);
 			m_pMain->Send_AIServer(m_pUserData->m_bZone, sendBuffer, sendIndex);
 			memset(sendBuffer, 0, sizeof(sendBuffer));
@@ -9993,7 +9993,7 @@ bool CUser::FlagObjectEvent(int16_t objectindex, int16_t nid)
 	SetByte(sendBuffer, WIZ_OBJECT_EVENT, sendIndex);
 	SetByte(sendBuffer, static_cast<uint8_t>(pEvent->sType), sendIndex);
 	SetByte(sendBuffer, result, sendIndex);
-	SetShort(sendBuffer, nid, sendIndex);
+	SetShort(sendBuffer, npcId, sendIndex);
 	SetByte(sendBuffer, pNpc->m_byGateOpen, sendIndex);
 	m_pMain->Send_Region(
 		sendBuffer, sendIndex, m_pUserData->m_bZone, m_RegionX, m_RegionZ, nullptr, false);
@@ -10001,13 +10001,13 @@ bool CUser::FlagObjectEvent(int16_t objectindex, int16_t nid)
 	return true;
 }
 
-bool CUser::WarpListObjectEvent(int16_t objectindex, int16_t /*nid*/)
+bool CUser::WarpListObjectEvent(int16_t objectIndex, int16_t /*npcId*/)
 {
 	C3DMap* pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
 		return false;
 
-	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectindex);
+	_OBJECT_EVENT* pEvent = pMap->GetObjectEvent(objectIndex);
 	if (pEvent == nullptr)
 		return false;
 
@@ -10025,12 +10025,12 @@ bool CUser::WarpListObjectEvent(int16_t objectindex, int16_t /*nid*/)
 	return true;
 }
 
-void CUser::SendAnvilRequest(int16_t nid)
+void CUser::SendAnvilRequest(int16_t npcId)
 {
 	if (m_pUserData->m_bZone != ZONE_MORADON)
 		return;
 
-	CNpc* pNpc = m_pMain->m_NpcMap.GetData(nid);
+	CNpc* pNpc = m_pMain->m_NpcMap.GetData(npcId);
 	if (pNpc == nullptr || pNpc->m_tNpcType != NPC_ANVIL)
 		return;
 
@@ -10043,25 +10043,25 @@ void CUser::SendAnvilRequest(int16_t nid)
 	char send_buff[4] {};
 	SetByte(send_buff, WIZ_ITEM_UPGRADE, send_index);
 	SetByte(send_buff, ITEM_UPGRADE_REQ, send_index);
-	SetShort(send_buff, nid, send_index);
+	SetShort(send_buff, npcId, send_index);
 	Send(send_buff, send_index);
 }
 
 void CUser::ObjectEvent(char* pBuf)
 {
-	int index = 0, objectindex = 0, nid = 0;
+	int index = 0, objectIndex = 0, npcId = 0;
 	uint8_t objectType    = 0;
 	C3DMap* pMap          = nullptr;
 	_OBJECT_EVENT* pEvent = nullptr;
 
-	objectindex           = GetShort(pBuf, index);
-	nid                   = GetShort(pBuf, index);
+	objectIndex           = GetShort(pBuf, index);
+	npcId                 = GetShort(pBuf, index);
 
 	pMap                  = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
 		return;
 
-	pEvent = pMap->GetObjectEvent(objectindex);
+	pEvent = pMap->GetObjectEvent(objectIndex);
 	if (pEvent == nullptr)
 	{
 		SendObjectEventFailed(objectType);
@@ -10074,40 +10074,40 @@ void CUser::ObjectEvent(char* pBuf)
 	{
 		case OBJECT_TYPE_BIND:
 		case OBJECT_TYPE_REMOVE_BIND:
-			if (!BindObjectEvent(objectindex, nid))
+			if (!BindObjectEvent(objectIndex, npcId))
 				SendObjectEventFailed(objectType);
 			break;
 
 		case OBJECT_TYPE_GATE:
 		case OBJECT_TYPE_DOOR_TOPDOWN:
-			//if (!GateObjectEvent(objectindex, nid))
+			//if (!GateObjectEvent(objectIndex, npcId))
 			// SendObjectEventFailed(objectType);
 			break;
 
 		case OBJECT_TYPE_GATE_LEVER:
-			if (!GateLeverObjectEvent(objectindex, nid))
+			if (!GateLeverObjectEvent(objectIndex, npcId))
 				SendObjectEventFailed(objectType);
 			break;
 
 		// Flag lever
 		case OBJECT_TYPE_FLAG:
-			if (!FlagObjectEvent(objectindex, nid))
+			if (!FlagObjectEvent(objectIndex, npcId))
 				SendObjectEventFailed(objectType);
 			break;
 
 		case OBJECT_TYPE_WARP_GATE:
-			if (!WarpListObjectEvent(objectindex, nid))
+			if (!WarpListObjectEvent(objectIndex, npcId))
 				SendObjectEventFailed(objectType);
 			break;
 
 		case OBJECT_TYPE_ANVIL:
-			SendAnvilRequest(nid);
+			SendAnvilRequest(npcId);
 			break;
 
 		default:
 			spdlog::error("User::ObjectEvent: Unhandled object type {} [objectIndex={} npcId={} "
 						  "accountName={} characterName={}]",
-				pEvent->sType, objectindex, nid, m_strAccountID, m_pUserData->m_id);
+				pEvent->sType, objectIndex, npcId, m_strAccountID, m_pUserData->m_id);
 			SendObjectEventFailed(objectType);
 			break;
 	}
