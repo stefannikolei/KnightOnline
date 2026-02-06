@@ -10025,7 +10025,7 @@ bool CUser::WarpListObjectEvent(int16_t objectIndex, int16_t /*npcId*/)
 	return true;
 }
 
-void CUser::SendAnvilRequest(int16_t npcId)
+void CUser::SendItemUpgradeRequest(int16_t npcId)
 {
 	if (m_pUserData->m_bZone != ZONE_MORADON)
 		return;
@@ -10101,7 +10101,7 @@ void CUser::ObjectEvent(char* pBuf)
 			break;
 
 		case OBJECT_TYPE_ANVIL:
-			SendAnvilRequest(npcId);
+			SendItemUpgradeRequest(npcId);
 			break;
 
 		default:
