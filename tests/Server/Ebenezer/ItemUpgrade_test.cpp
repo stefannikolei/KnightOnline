@@ -86,8 +86,9 @@ INSTANTIATE_TEST_SUITE_P(UpgradeSuccessTestCases, ItemUpgradeTest,
 		std::make_tuple(111210001, 111210002, 0),     // Shard (+1) -> Shard (+2)
 		std::make_tuple(156210001, 156210002, 0),     // Raptor (+1) -> Raptor (+2)
 		std::make_tuple(126410001, 126410002, 0),     // Mirage (+1) -> Mirage (+2)
-		std::make_tuple(181110001, 181110002, 0),     // Elixir Staff (+1) Elixir Staff (+2)
-		std::make_tuple(190250271, 190250272, 240000) // Lobo hammer (+1) -> Lobo hammer (+2)
+		std::make_tuple(190250271, 190250272, 240000), // Lobo hammer (+1) -> Lobo hammer (+2)
+		std::make_tuple(168310001, 168310002, 0), // Iron Crossbow (+1) -> Iron Crossbow (+2)
+		std::make_tuple(181110001, 181110002, 0)     // Elixir Staff (+1) Elixir Staff (+2)
 		));
 
 TEST_P(ItemUpgradeTest, BasicUpgradeSucceeds)
