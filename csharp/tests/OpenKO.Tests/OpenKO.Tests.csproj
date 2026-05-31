@@ -17,6 +17,7 @@
     <ProjectReference Include="../../src/OpenKO.IO/OpenKO.IO.csproj" />
     <ProjectReference Include="../../src/OpenKO.N3/OpenKO.N3.csproj" />
     <ProjectReference Include="../../src/OpenKO.Net/OpenKO.Net.csproj" />
+    <ProjectReference Include="..\..\src\OpenKO.Game\OpenKO.Game.csproj" />
   </ItemGroup>
 
 </Project>
