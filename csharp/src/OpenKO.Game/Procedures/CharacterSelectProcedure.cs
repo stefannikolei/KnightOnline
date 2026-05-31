@@ -68,7 +68,7 @@ public sealed class CharacterSelectProcedure : GameProcedure
         if (count == 0)
             return;
 
-        HighlightedCharacterIndex = (HighlightedCharacterIndex + delta % count + count) % count;
+        HighlightedCharacterIndex = ((HighlightedCharacterIndex + delta) % count + count) % count;
         Context.CharacterSelectIndex = HighlightedCharacterIndex;
     }
 

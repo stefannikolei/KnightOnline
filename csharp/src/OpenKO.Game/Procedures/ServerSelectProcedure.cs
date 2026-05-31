@@ -52,7 +52,7 @@ public sealed class ServerSelectProcedure : GameProcedure
             return;
 
         int count = Context.Servers.Count;
-        HighlightedServerIndex = (HighlightedServerIndex + delta % count + count) % count;
+        HighlightedServerIndex = ((HighlightedServerIndex + delta) % count + count) % count;
     }
 
     public bool TrySelectCurrentServer() => TrySelectServer(HighlightedServerIndex);

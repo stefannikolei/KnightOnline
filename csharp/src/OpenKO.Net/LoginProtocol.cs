@@ -14,6 +14,7 @@ public readonly record struct GameServerInfo(string Ip, string Name, short Concu
 public static class LoginProtocol
 {
     private const ushort MaxNewsContentLength = 4096;
+    private const string ExpectedNewsLabel = "Login Notice";
 
     /// <summary>Default login-server TCP port (port of <c>SOCKET_PORT_LOGIN</c>).</summary>
     public const int LoginServerPort = 15100;
@@ -82,7 +83,7 @@ public static class LoginProtocol
         packet.SyncForRead();
         packet.Read<byte>(); // opcode
         packet.DByte();
-        if (!packet.ReadString(out string label) || label != "Login Notice")
+        if (!packet.ReadString(out string label) || label != ExpectedNewsLabel)
             return null;
 
         ushort contentLength = packet.Read<ushort>();
