@@ -9,6 +9,8 @@ namespace OpenKO.Game.Procedures;
 /// <summary>Basic character-selection state after server selection.</summary>
 public sealed class CharacterSelectProcedure : GameProcedure
 {
+    private const byte InitialZoneJoinFlag = 0x01;
+
     public int HighlightedCharacterIndex { get; private set; }
     private N3UIBase _root = new();
     private readonly List<Rect> _characterRows = new();
@@ -85,7 +87,7 @@ public sealed class CharacterSelectProcedure : GameProcedure
         if (Context.MainSocket is not { IsConnected: true } socket)
             return false;
 
-        socket.Send(GameProtocol.BuildCharacterSelect(Context.Account, info.Name, zoneInit: 0x01, zoneCurrent: info.Zone));
+        socket.Send(GameProtocol.BuildCharacterSelect(Context.Account, info.Name, zoneInit: InitialZoneJoinFlag, zoneCurrent: info.Zone));
         return true;
     }
 
