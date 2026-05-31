@@ -63,4 +63,25 @@ public class LoginProtocolTests
         Assert.Equal(new GameServerInfo("127.0.0.1", "Ronark Land", 123), servers[0]);
         Assert.Equal(new GameServerInfo("10.0.0.5", "Moradon", 45), servers[1]);
     }
+
+    [Fact]
+    public void ParseLoginResultReadsAuthByte()
+    {
+        var pkt = new Packet(LoginOpcode.LoginReq);
+        pkt.Append((byte)AuthResult.Ok);
+
+        Assert.Equal(AuthResult.Ok, LoginProtocol.ParseLoginResult(pkt));
+    }
+
+    [Fact]
+    public void ParseNewsReturnsNoticeBody()
+    {
+        var pkt = new Packet(LoginOpcode.News);
+        pkt.DByte();
+        pkt.AppendString("Login Notice");
+        pkt.Append((ushort)5);
+        pkt.Append(System.Text.Encoding.Latin1.GetBytes("hello"));
+
+        Assert.Equal("hello", LoginProtocol.ParseNews(pkt));
+    }
 }

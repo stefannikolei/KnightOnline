@@ -61,7 +61,8 @@ csharp/
 - [x] `OpenKO.Game` — game-procedure state machine (`GameProcedure`/`GameProcedureManager`/`GameContext`)
 - [x] `OpenKO.Game` + `OpenKO.Client` — 2D UI render path (`IUiRenderer` + OpenGL `UiRenderer`) and a
       working **login screen** (`LoginProcedure`); `OpenKO.Net` login handshake packets (`LoginProtocol`)
-- [ ] Login flow continued: server-select + character-select procedures, real `.uif`/texture assets
+- [~] Login flow continued: basic server-select + character-select procedures are ported (placeholder UI + packet flow),
+      real `.uif`/texture assets still pending
 - [ ] N3 skin / scene loaders (`CN3Skin`, `CN3Joint`, `CN3AnimControl`, `CN3Chr`, `CN3Scene`, terrain/sky)
 - [ ] Game procedures (character select → in-game)
 

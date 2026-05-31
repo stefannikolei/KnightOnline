@@ -1,6 +1,8 @@
+using OpenKO.Common;
 using OpenKO.Game;
 using OpenKO.Game.Procedures;
 using OpenKO.Game.Rendering;
+using OpenKO.Net;
 using OpenKO.N3;
 using OpenKO.Numerics;
 using Xunit;
@@ -104,5 +106,42 @@ public class LoginProcedureTests
 
         // No socket attached -> cannot send.
         Assert.False(proc.TrySendAccountLogin());
+    }
+
+    [Fact]
+    public void ServerListPacketUpdatesContextServers()
+    {
+        var (ctx, _, _) = NewLogin();
+        var pkt = new Packet(LoginOpcode.ServerList);
+        pkt.DByte();
+        pkt.Append((byte)1);
+        pkt.AppendString("127.0.0.1");
+        pkt.AppendString("Ares");
+        pkt.Append((short)321);
+
+        Assert.True(ctx.Procedures.DispatchPacket(pkt));
+        Assert.Single(ctx.Servers);
+        Assert.Equal("Ares", ctx.Servers[0].Name);
+    }
+
+    [Fact]
+    public void SuccessfulLoginTransitionsToServerSelect()
+    {
+        var (ctx, _, _) = NewLogin();
+        var serverList = new Packet(LoginOpcode.ServerList);
+        serverList.DByte();
+        serverList.Append((byte)1);
+        serverList.AppendString("127.0.0.1");
+        serverList.AppendString("Dies");
+        serverList.Append((short)100);
+        ctx.Procedures.DispatchPacket(serverList);
+
+        var loginResult = new Packet(LoginOpcode.LoginReq);
+        loginResult.Append((byte)AuthResult.Ok);
+        ctx.Procedures.DispatchPacket(loginResult);
+        ctx.Procedures.TickActive(0.016f);
+
+        Assert.IsType<ServerSelectProcedure>(ctx.Procedures.Active);
+        Assert.Equal("Dies", ctx.ServerName);
     }
 }

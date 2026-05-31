@@ -136,4 +136,40 @@ public sealed class LoginProcedure : GameProcedure
         socket.Send(pkt);
         return true;
     }
+
+    public override bool ProcessPacket(Packet packet)
+    {
+        switch ((LoginOpcode)packet.Opcode)
+        {
+            case LoginOpcode.ServerList:
+                IReadOnlyList<GameServerInfo> servers = LoginProtocol.ParseServerList(packet);
+                Context.Servers.Clear();
+                Context.Servers.AddRange(servers);
+                if (Context.SelectedServerIndex >= Context.Servers.Count)
+                    Context.SelectedServerIndex = Context.Servers.Count - 1;
+                return true;
+
+            case LoginOpcode.LoginReq:
+            case LoginOpcode.MgameLogin:
+                AuthResult loginResult = LoginProtocol.ParseLoginResult(packet);
+                if (loginResult == AuthResult.Ok)
+                {
+                    if (Context.SelectedServerIndex < 0 && Context.Servers.Count > 0)
+                        Context.SelectedServerIndex = 0;
+                    if (Context.SelectedServerIndex >= 0 && Context.SelectedServerIndex < Context.Servers.Count)
+                        Context.ServerName = Context.Servers[Context.SelectedServerIndex].Name;
+
+                    Context.MainSocket?.Send(LoginProtocol.BuildNewsRequest());
+                    Context.Procedures.SetActive(new ServerSelectProcedure());
+                }
+
+                return true;
+
+            case LoginOpcode.News:
+                Context.LoginNews = LoginProtocol.ParseNews(packet) ?? string.Empty;
+                return true;
+        }
+
+        return false;
+    }
 }

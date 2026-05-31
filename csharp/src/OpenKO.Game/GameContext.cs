@@ -37,6 +37,10 @@ public sealed class GameContext
     public string Password { get; set; } = string.Empty;
     public string ServerName { get; set; } = string.Empty;
     public int CharacterSelectIndex { get; set; }
+    public string LoginNews { get; set; } = string.Empty;
+    public List<GameServerInfo> Servers { get; } = new();
+    public List<CharacterSlotInfo> Characters { get; } = new();
+    public int SelectedServerIndex { get; set; } = -1;
 
     /// <summary>
     /// Drain any packets queued by <see cref="MainSocket"/>'s receive loop and dispatch them to the

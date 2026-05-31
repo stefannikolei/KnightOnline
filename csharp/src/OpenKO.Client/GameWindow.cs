@@ -105,7 +105,40 @@ public sealed class GameWindow : IDisposable
     private void OnKeyDown(IKeyboard keyboard, Key key, int scancode)
     {
         if (key == Key.Escape)
+        {
             _window?.Close();
+            return;
+        }
+
+        if (_context == null || Scene != WindowScene.Login)
+            return;
+
+        GameProcedure? active = _context.Procedures.Active;
+        switch (key)
+        {
+            case Key.Enter:
+                if (active is LoginProcedure login)
+                    login.TrySendAccountLogin();
+                else if (active is ServerSelectProcedure serverSelect)
+                    serverSelect.TrySelectCurrentServer();
+                else if (active is CharacterSelectProcedure characterSelect)
+                    characterSelect.TrySelectCurrentCharacter();
+                break;
+
+            case Key.Up:
+                if (active is ServerSelectProcedure serverSelectUp)
+                    serverSelectUp.MoveSelection(-1);
+                else if (active is CharacterSelectProcedure characterSelectUp)
+                    characterSelectUp.MoveSelection(-1);
+                break;
+
+            case Key.Down:
+                if (active is ServerSelectProcedure serverSelectDown)
+                    serverSelectDown.MoveSelection(1);
+                else if (active is CharacterSelectProcedure characterSelectDown)
+                    characterSelectDown.MoveSelection(1);
+                break;
+        }
     }
 
     private void OnResize(Vector2D<int> size)

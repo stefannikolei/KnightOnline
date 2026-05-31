@@ -63,4 +63,30 @@ public static class LoginProtocol
 
         return servers;
     }
+
+    /// <summary>Parse login-result packet payload (<c>LS_LOGIN_REQ</c>/<c>LS_MGAME_LOGIN</c>).</summary>
+    public static AuthResult ParseLoginResult(Packet packet)
+    {
+        packet.SyncForRead();
+        packet.Read<byte>(); // opcode
+        return (AuthResult)packet.Read<byte>();
+    }
+
+    /// <summary>
+    /// Parse login news payload (<c>LS_NEWS</c>). Returns null when the label/content is malformed.
+    /// </summary>
+    public static string? ParseNews(Packet packet)
+    {
+        packet.SyncForRead();
+        packet.Read<byte>(); // opcode
+        packet.DByte();
+        if (!packet.ReadString(out string label) || label != "Login Notice")
+            return null;
+
+        ushort contentLength = packet.Read<ushort>();
+        if (contentLength == 0 || contentLength >= 4096)
+            return null;
+
+        return packet.ReadStringFixed(contentLength);
+    }
 }
