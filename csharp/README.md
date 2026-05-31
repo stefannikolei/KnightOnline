@@ -34,7 +34,8 @@ csharp/
 ├── src/
 │   ├── OpenKO.Common/             # ByteBuffer, Packet, opcodes, crypto  (port of shared/)
 │   ├── OpenKO.Numerics/           # Vector2/3/4, Matrix44, Quaternion    (port of MathUtils/)
-│   ├── OpenKO.IO/                 # File access + N3 file-format base     (port of FileIO/, N3Base file IO)
+│   ├── OpenKO.IO/                 # File access, N3 base + .tbl tables     (port of FileIO/, N3Base file IO)
+│   ├── OpenKO.N3/                 # N3 resources (indexed meshes, …)       (port of N3Base resource types)
 │   ├── OpenKO.Net/                # TCP game/login client                 (port of CAPISocket)
 │   └── OpenKO.Client/             # cross-platform entry point (Silk.NET)
 └── tests/
@@ -47,9 +48,11 @@ csharp/
 - [x] `OpenKO.Common` — byte buffer, packet, opcode enums, JvCryption, CRC32, circular buffer
 - [x] `OpenKO.Numerics` — vectors, 4x4 matrix, quaternion
 - [x] `OpenKO.IO` — file reader/writer, N3 base file access + version flags
+- [x] `OpenKO.IO` — `.tbl` data tables (typed rows + KO stream-cipher decryption)
+- [x] `OpenKO.N3` — indexed mesh loader (`N3IMesh`) with bounds computation
 - [x] `OpenKO.Net` — cross-platform async TCP client with KO packet framing & encryption
 - [x] `OpenKO.Client` — Silk.NET windowed entry point (opens a window + GL clear)
-- [ ] N3 mesh / texture / scene loaders
+- [ ] N3 texture / skin / scene loaders
 - [ ] Renderer (OpenGL)
 - [ ] UI system (N3UI*)
 - [ ] Game procedures (login → character select → in-game)

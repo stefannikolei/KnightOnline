@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>OpenKO.N3</RootNamespace>
+    <AssemblyName>OpenKO.N3</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../OpenKO.Common/OpenKO.Common.csproj" />
+    <ProjectReference Include="../OpenKO.IO/OpenKO.IO.csproj" />
+    <ProjectReference Include="../OpenKO.Numerics/OpenKO.Numerics.csproj" />
+  </ItemGroup>
+
+</Project>
