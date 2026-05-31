@@ -55,8 +55,9 @@ csharp/
 - [x] `OpenKO.Net` — cross-platform async TCP client with KO packet framing & encryption
 - [x] `OpenKO.Client` — OpenGL renderer (shader + VBO mesh + DXT/uncompressed texture upload)
 - [x] `OpenKO.N3` — UI tree loader (`.uif`): `N3UIBase`/`N3UIImage`/`N3UIArea`, recursive hierarchy
-- [ ] N3 UI controls: button / string / edit / static / progress / scrollbar / list
-- [ ] N3 skin / scene loaders
+- [x] `OpenKO.N3` — UI controls: button / string / edit / static / progress / scrollbar / trackbar / tooltip / list
+      (the full set the engine-level `.uif` loader can instantiate; icon types are runtime-only, game-layer)
+- [ ] N3 skin / scene loaders (`CN3Skin`, `CN3Joint`, `CN3AnimControl`, `CN3Chr`, `CN3Scene`, terrain/sky)
 - [ ] Game procedures (login → character select → in-game)
 
 ## Building

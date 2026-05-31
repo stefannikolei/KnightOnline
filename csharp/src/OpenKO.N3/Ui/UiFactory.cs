@@ -8,6 +8,13 @@ namespace OpenKO.N3;
 /// ported cannot be skipped safely — doing so would desynchronise the shared file cursor and corrupt
 /// every subsequent control. So unported types throw a clear <see cref="NotSupportedException"/>
 /// rather than silently producing garbage; this is by design until each control's Load is ported.
+///
+/// This list matches the child-type switch in <c>CN3UIBase::Load</c> exactly. Note that
+/// <c>UI_TYPE_ICON</c> and <c>UI_TYPE_ICON_MANAGER</c> are never serialised as children of a
+/// ".uif" file — the original engine creates those at runtime from game dialogs (item/skill bars),
+/// and its loader has no case for them (it would hit <c>__ASSERT(pChild)</c>). <c>UI_TYPE_ICONSLOT</c>
+/// is only handled under the <c>_REPENT</c> build. All three therefore belong to the later game-UI
+/// layer (Client/WarFare/), not the engine-level loader, so they intentionally throw here.
 /// </summary>
 public static class UiFactory
 {
