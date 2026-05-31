@@ -1,0 +1,48 @@
+name: Build C# client (cross-platform)
+
+# Builds and tests the cross-platform C# port of the client (csharp/) on
+# Windows, Linux and macOS to verify it stays portable.
+
+on:
+  push:
+    paths:
+      - 'csharp/**'
+      - '.github/workflows/build_csharp_client.yml'
+  pull_request:
+    paths:
+      - 'csharp/**'
+      - '.github/workflows/build_csharp_client.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        working-directory: csharp
+        run: dotnet restore
+
+      - name: Build
+        working-directory: csharp
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        working-directory: csharp
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+      - name: Headless self-test
+        working-directory: csharp
+        run: dotnet run --project src/OpenKO.Client --configuration Release --no-build -- --selftest

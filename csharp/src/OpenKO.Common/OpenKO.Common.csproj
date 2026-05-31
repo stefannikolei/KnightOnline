@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>OpenKO.Common</RootNamespace>
+    <AssemblyName>OpenKO.Common</AssemblyName>
+  </PropertyGroup>
+
+</Project>

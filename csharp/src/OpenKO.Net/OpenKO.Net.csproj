@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>OpenKO.Net</RootNamespace>
+    <AssemblyName>OpenKO.Net</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../OpenKO.Common/OpenKO.Common.csproj" />
+  </ItemGroup>
+
+</Project>
