@@ -57,6 +57,9 @@ public sealed class GameWindow : IDisposable
     /// <summary>If &gt; 0, the window auto-closes after this many rendered frames (for headless smoke tests).</summary>
     public int MaxFrames { get; init; }
 
+    /// <summary>If set, the final rendered frame is captured to this path as a BMP before closing.</summary>
+    public string? ScreenshotPath { get; init; }
+
     public void Run()
     {
         var options = WindowOptions.Default with
@@ -122,7 +125,28 @@ public sealed class GameWindow : IDisposable
             RenderLogin((float)delta);
 
         if (MaxFrames > 0 && ++_frameCount >= MaxFrames)
+        {
+            if (ScreenshotPath != null)
+                CaptureScreenshot(ScreenshotPath);
             _window?.Close();
+        }
+    }
+
+    private unsafe void CaptureScreenshot(string path)
+    {
+        Vector2D<int> fb = _window!.FramebufferSize;
+        int w = fb.X, h = fb.Y;
+        var pixels = new byte[w * h * 4];
+
+        fixed (byte* p = pixels)
+            _gl!.ReadPixels(0, 0, (uint)w, (uint)h, PixelFormat.Rgba, PixelType.UnsignedByte, p);
+
+        if (path.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+            PngWriter.WriteRgbaBottomUp(path, w, h, pixels);
+        else
+            BmpWriter.WriteRgbaBottomUp(path, w, h, pixels);
+
+        Console.WriteLine($"Saved screenshot to {path} ({w}x{h}).");
     }
 
     private void RenderLogin(float delta)

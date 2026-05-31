@@ -106,8 +106,10 @@ public sealed class LoginProcedure : GameProcedure
                 r.DrawQuad(control.Region, color);
         }
 
-        // Children are stored push_front; draw them after the parent so they layer on top.
-        for (int i = control.Children.Count - 1; i >= 0; i--)
+        // Children are stored push_front (last-added first), so index 0 is the earliest-added
+        // background element. Draw front-to-back like the original engine: index 0 first, later
+        // siblings layered on top.
+        for (int i = 0; i < control.Children.Count; i++)
             RenderControl(r, control.Children[i]);
     }
 

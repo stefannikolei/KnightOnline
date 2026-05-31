@@ -15,9 +15,16 @@ using OpenKO.Net;
 // runnable in a container.
 
 bool selftest = args.Contains("--selftest");
-bool renderTest = args.Contains("--render-test");
 bool demo3d = args.Contains("--demo3d");
 WindowScene scene = demo3d ? WindowScene.Demo3D : WindowScene.Login;
+
+// --screenshot [path]: render a few frames, save the last to a BMP, then exit.
+int shotIdx = Array.IndexOf(args, "--screenshot");
+string? screenshotPath = shotIdx < 0
+    ? null
+    : (shotIdx + 1 < args.Length && !args[shotIdx + 1].StartsWith("--") ? args[shotIdx + 1] : "openko-screenshot.bmp");
+
+bool renderTest = args.Contains("--render-test") || screenshotPath != null;
 bool hasDisplay = OperatingSystem.IsWindows()
     || OperatingSystem.IsMacOS()
     || !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DISPLAY"))
@@ -33,7 +40,12 @@ if (selftest || (!renderTest && !hasDisplay))
 
 try
 {
-    using var window = new GameWindow { MaxFrames = renderTest ? 3 : 0, Scene = scene };
+    using var window = new GameWindow
+    {
+        MaxFrames = renderTest ? 3 : 0,
+        Scene = scene,
+        ScreenshotPath = screenshotPath,
+    };
     Console.WriteLine(renderTest
         ? $"Render smoke test ({scene}): drawing {3} frames at {window.Width}x{window.Height}."
         : $"Starting OpenKO client window ({scene}, {window.Width}x{window.Height}). Press ESC to quit.");

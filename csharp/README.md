@@ -37,6 +37,7 @@ csharp/
 │   ├── OpenKO.IO/                 # File access, N3 base + .tbl tables     (port of FileIO/, N3Base file IO)
 │   ├── OpenKO.N3/                 # N3 resources (indexed meshes, …)       (port of N3Base resource types)
 │   ├── OpenKO.Net/                # TCP game/login client                 (port of CAPISocket)
+│   ├── OpenKO.Game/               # game-procedure state machine + UI model (port of CGameProcedure)
 │   └── OpenKO.Client/             # cross-platform entry point (Silk.NET)
 └── tests/
     └── OpenKO.Tests/              # xUnit tests for the ported layers
@@ -57,8 +58,12 @@ csharp/
 - [x] `OpenKO.N3` — UI tree loader (`.uif`): `N3UIBase`/`N3UIImage`/`N3UIArea`, recursive hierarchy
 - [x] `OpenKO.N3` — UI controls: button / string / edit / static / progress / scrollbar / trackbar / tooltip / list
       (the full set the engine-level `.uif` loader can instantiate; icon types are runtime-only, game-layer)
+- [x] `OpenKO.Game` — game-procedure state machine (`GameProcedure`/`GameProcedureManager`/`GameContext`)
+- [x] `OpenKO.Game` + `OpenKO.Client` — 2D UI render path (`IUiRenderer` + OpenGL `UiRenderer`) and a
+      working **login screen** (`LoginProcedure`); `OpenKO.Net` login handshake packets (`LoginProtocol`)
+- [ ] Login flow continued: server-select + character-select procedures, real `.uif`/texture assets
 - [ ] N3 skin / scene loaders (`CN3Skin`, `CN3Joint`, `CN3AnimControl`, `CN3Chr`, `CN3Scene`, terrain/sky)
-- [ ] Game procedures (login → character select → in-game)
+- [ ] Game procedures (character select → in-game)
 
 ## Building
 
@@ -67,12 +72,14 @@ cd csharp
 dotnet build
 dotnet test          # runs the headless unit tests
 
-# Open the demo window (textured, lit, rotating quad through the ported render path):
+# Open the client window (shows the login screen through the ported 2D UI render path):
 dotnet run --project src/OpenKO.Client
 
-# Headless modes:
+# Other scenes / modes:
+dotnet run --project src/OpenKO.Client -- --demo3d        # rotating textured demo mesh (3D path)
 dotnet run --project src/OpenKO.Client -- --selftest      # foundation checks, no GPU needed
 dotnet run --project src/OpenKO.Client -- --render-test   # render N frames then exit (needs a display/Xvfb)
+dotnet run --project src/OpenKO.Client -- --screenshot login.png   # save one frame to PNG/BMP then exit
 ```
 
 > **Note on wire compatibility:** the network and file-format code preserves the
