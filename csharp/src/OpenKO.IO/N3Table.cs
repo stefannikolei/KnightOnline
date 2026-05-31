@@ -67,15 +67,18 @@ public sealed class N3Table
     /// <summary>Loads a table from an already-decrypted stream (port of <c>CN3TableBase::Load</c>).</summary>
     public bool Load(IFile file)
     {
+        var reader = file as FileReader
+            ?? throw new ArgumentException("N3Table.Load requires a FileReader", nameof(file));
+
         Release();
 
-        int columnCount = file.Read<int>();
+        int columnCount = reader.Read<int>();
         if (columnCount <= 0)
             return false;
 
         var columns = new TblDataType[columnCount];
         for (int i = 0; i < columnCount; i++)
-            columns[i] = (TblDataType)file.Read<int>();
+            columns[i] = (TblDataType)reader.Read<int>();
 
         // The first column is always the unique id and must be a DWORD.
         if (columns[0] != TblDataType.Dword)
@@ -83,12 +86,12 @@ public sealed class N3Table
 
         Columns = columns;
 
-        int rowCount = file.Read<int>();
+        int rowCount = reader.Read<int>();
         for (int r = 0; r < rowCount; r++)
         {
             var values = new object[columnCount];
             for (int c = 0; c < columnCount; c++)
-                values[c] = ReadValue(file, columns[c]);
+                values[c] = ReadValue(reader, columns[c]);
 
             var row = new N3Row(values);
             _rows[row.Id] = row;
@@ -116,7 +119,7 @@ public sealed class N3Table
         return result;
     }
 
-    private static object ReadValue(IFile file, TblDataType type) => type switch
+    private static object ReadValue(FileReader file, TblDataType type) => type switch
     {
         TblDataType.Char => (sbyte)file.Read<byte>(),
         TblDataType.Byte => file.Read<byte>(),
@@ -130,7 +133,7 @@ public sealed class N3Table
         _ => throw new InvalidDataException($"Unsupported TBL data type: {type}"),
     };
 
-    private static string ReadString(IFile file)
+    private static string ReadString(FileReader file)
     {
         int len = file.Read<int>();
         if (len <= 0)
