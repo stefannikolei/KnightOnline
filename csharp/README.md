@@ -50,9 +50,10 @@ csharp/
 - [x] `OpenKO.IO` — file reader/writer, N3 base file access + version flags
 - [x] `OpenKO.IO` — `.tbl` data tables (typed rows + KO stream-cipher decryption)
 - [x] `OpenKO.N3` — indexed mesh loader (`N3IMesh`) with bounds computation
+- [x] `OpenKO.N3` — texture loader (`N3Texture`): NTF/.dxt header, DXT & 16/24/32-bit mip chains
 - [x] `OpenKO.Net` — cross-platform async TCP client with KO packet framing & encryption
 - [x] `OpenKO.Client` — Silk.NET windowed entry point (opens a window + GL clear)
-- [ ] N3 texture / skin / scene loaders
+- [ ] N3 skin / scene loaders
 - [ ] Renderer (OpenGL)
 - [ ] UI system (N3UI*)
 - [ ] Game procedures (login → character select → in-game)
