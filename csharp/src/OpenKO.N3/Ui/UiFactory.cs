@@ -13,9 +13,18 @@ public static class UiFactory
 {
     public static N3UIBase Create(UiType type) => type switch
     {
-        UiType.Base => new N3UIBase(),
-        UiType.Image => new N3UIImage(),
-        UiType.Area => new N3UIArea(),
+        UiType.Base       => new N3UIBase(),
+        UiType.Button     => new N3UIButton(),
+        UiType.Static     => new N3UIStatic(),
+        UiType.Progress   => new N3UIProgress(),
+        UiType.Image      => new N3UIImage(),
+        UiType.ScrollBar  => new N3UIScrollBar(),
+        UiType.String     => new N3UIString(),
+        UiType.TrackBar   => new N3UITrackBar(),
+        UiType.Edit       => new N3UIEdit(),
+        UiType.Area       => new N3UIArea(),
+        UiType.Tooltip    => new N3UITooltip(),
+        UiType.List       => new N3UIList(),
         _ => throw new NotSupportedException(
             $"UI control type '{type}' is not yet ported. Its Load() must be implemented before " +
             ".uif files containing it can be parsed (skipping it would desync the file stream)."),
