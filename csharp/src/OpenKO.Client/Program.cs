@@ -4,20 +4,23 @@ using OpenKO.Net;
 
 // Entry point for the cross-platform OpenKO client.
 //
-// Two modes:
-//   (default)     open a window with an OpenGL context (requires a display)
-//   --selftest    run headless checks of the ported foundation layers (for CI / no-display hosts)
+// Modes:
+//   (default)       open a window with an OpenGL context (requires a display)
+//   --selftest      run headless checks of the ported foundation layers (for CI / no-display hosts)
+//   --render-test   open the window, render a few frames, then exit (GL smoke test; needs a display,
+//                   e.g. via Xvfb on Linux). Exits non-zero if the render path throws.
 //
 // On Linux without a display we automatically fall back to the self-test so the app is still
 // runnable in a container.
 
 bool selftest = args.Contains("--selftest");
+bool renderTest = args.Contains("--render-test");
 bool hasDisplay = OperatingSystem.IsWindows()
     || OperatingSystem.IsMacOS()
     || !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DISPLAY"))
     || !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WAYLAND_DISPLAY"));
 
-if (selftest || !hasDisplay)
+if (selftest || (!renderTest && !hasDisplay))
 {
     if (!selftest)
         Console.WriteLine("No display detected; running headless self-test. Pass a display or use --selftest explicitly.");
@@ -27,9 +30,13 @@ if (selftest || !hasDisplay)
 
 try
 {
-    using var window = new GameWindow();
-    Console.WriteLine($"Starting OpenKO client window ({window.Width}x{window.Height}). Press ESC to quit.");
+    using var window = new GameWindow { MaxFrames = renderTest ? 3 : 0 };
+    Console.WriteLine(renderTest
+        ? $"Render smoke test: drawing {3} frames at {window.Width}x{window.Height}."
+        : $"Starting OpenKO client window ({window.Width}x{window.Height}). Press ESC to quit.");
     window.Run();
+    if (renderTest)
+        Console.WriteLine("Render smoke test completed successfully.");
     return 0;
 }
 catch (Exception ex)

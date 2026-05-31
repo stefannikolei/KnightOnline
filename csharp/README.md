@@ -49,12 +49,12 @@ csharp/
 - [x] `OpenKO.Numerics` — vectors, 4x4 matrix, quaternion
 - [x] `OpenKO.IO` — file reader/writer, N3 base file access + version flags
 - [x] `OpenKO.IO` — `.tbl` data tables (typed rows + KO stream-cipher decryption)
-- [x] `OpenKO.N3` — indexed mesh loader (`N3IMesh`) with bounds computation
+- [x] `OpenKO.N3` — indexed mesh loader (`N3IMesh`) with bounds computation + vertex-list expansion
 - [x] `OpenKO.N3` — texture loader (`N3Texture`): NTF/.dxt header, DXT & 16/24/32-bit mip chains
+- [x] `OpenKO.N3` — GPU upload mapping (`GpuTextureLayout`, backend-neutral, unit-tested)
 - [x] `OpenKO.Net` — cross-platform async TCP client with KO packet framing & encryption
-- [x] `OpenKO.Client` — Silk.NET windowed entry point (opens a window + GL clear)
+- [x] `OpenKO.Client` — OpenGL renderer (shader + VBO mesh + DXT/uncompressed texture upload)
 - [ ] N3 skin / scene loaders
-- [ ] Renderer (OpenGL)
 - [ ] UI system (N3UI*)
 - [ ] Game procedures (login → character select → in-game)
 
@@ -64,7 +64,13 @@ csharp/
 cd csharp
 dotnet build
 dotnet test          # runs the headless unit tests
+
+# Open the demo window (textured, lit, rotating quad through the ported render path):
 dotnet run --project src/OpenKO.Client
+
+# Headless modes:
+dotnet run --project src/OpenKO.Client -- --selftest      # foundation checks, no GPU needed
+dotnet run --project src/OpenKO.Client -- --render-test   # render N frames then exit (needs a display/Xvfb)
 ```
 
 > **Note on wire compatibility:** the network and file-format code preserves the

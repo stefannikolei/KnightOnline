@@ -46,3 +46,14 @@ jobs:
       - name: Headless self-test
         working-directory: csharp
         run: dotnet run --project src/OpenKO.Client --configuration Release --no-build -- --selftest
+
+      # Exercise the real OpenGL render path (shader compile, VBO/texture upload, draw) under a
+      # virtual framebuffer. Linux only; macOS/Windows runners would need a different headless GL setup.
+      - name: OpenGL render smoke test (Linux)
+        if: runner.os == 'Linux'
+        working-directory: csharp
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0
+          xvfb-run -a -s "-screen 0 1024x768x24" \
+            dotnet run --project src/OpenKO.Client --configuration Release --no-build -- --render-test
