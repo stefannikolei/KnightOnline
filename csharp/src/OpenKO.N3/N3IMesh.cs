@@ -140,4 +140,39 @@ public class N3IMesh : N3BaseFileAccess
         Min = min;
         Max = max;
     }
+
+    /// <summary>
+    /// Expands the indexed mesh into a flat, non-indexed triangle list of <see cref="VertexT1"/>
+    /// (port of <c>CN3IMesh::BuildVertexList</c>). The original used parallel vertex- and UV-index
+    /// lists (the UVs have their own indices), so this de-references both per triangle corner,
+    /// producing 3 * <see cref="FaceCount"/> vertices ready for a GPU vertex buffer.
+    ///
+    /// When the mesh has no UVs, U/V are emitted as 0 (matching the original's <c>m_nUVC &lt;= 0</c> path).
+    /// </summary>
+    public VertexT1[] BuildVertexList()
+    {
+        if (FaceCount <= 0)
+            return Array.Empty<VertexT1>();
+
+        var result = new VertexT1[FaceCount * 3];
+        bool hasUv = UvCount > 0;
+
+        for (int i = 0; i < FaceCount * 3; i++)
+        {
+            ushort vi = VertexIndices[i];
+            VertexXyzNormal v = Vertices[vi];
+
+            float u = 0f, vCoord = 0f;
+            if (hasUv)
+            {
+                ushort uvi = UvIndices[i];
+                u = Uvs[uvi * 2];
+                vCoord = Uvs[uvi * 2 + 1];
+            }
+
+            result[i] = new VertexT1(v.Position, v.Normal, u, vCoord);
+        }
+
+        return result;
+    }
 }
