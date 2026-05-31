@@ -1,4 +1,5 @@
 using OpenKO.Common;
+using OpenKO.Game.Rendering;
 using OpenKO.Net;
 
 namespace OpenKO.Game;
@@ -26,6 +27,9 @@ public sealed class GameContext
 
     /// <summary>Secondary connection used for side channels (port of <c>s_pSocketSub</c>).</summary>
     public ApiSocket? SubSocket { get; set; }
+
+    /// <summary>The 2D UI drawing surface (port of the role of <c>s_pUIMgr</c>'s renderer). Set by the host.</summary>
+    public IUiRenderer? UiRenderer { get; set; }
 
     // ---- session state (port of CGameProcedure::s_szAccount / s_szPassWord / s_szServer / ...) ----
 

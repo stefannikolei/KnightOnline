@@ -5,7 +5,8 @@ using OpenKO.Net;
 // Entry point for the cross-platform OpenKO client.
 //
 // Modes:
-//   (default)       open a window with an OpenGL context (requires a display)
+//   (default)       open a window with an OpenGL context showing the login screen (requires a display)
+//   --demo3d        show the rotating textured demo mesh instead of the login screen
 //   --selftest      run headless checks of the ported foundation layers (for CI / no-display hosts)
 //   --render-test   open the window, render a few frames, then exit (GL smoke test; needs a display,
 //                   e.g. via Xvfb on Linux). Exits non-zero if the render path throws.
@@ -15,6 +16,8 @@ using OpenKO.Net;
 
 bool selftest = args.Contains("--selftest");
 bool renderTest = args.Contains("--render-test");
+bool demo3d = args.Contains("--demo3d");
+WindowScene scene = demo3d ? WindowScene.Demo3D : WindowScene.Login;
 bool hasDisplay = OperatingSystem.IsWindows()
     || OperatingSystem.IsMacOS()
     || !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DISPLAY"))
@@ -30,10 +33,10 @@ if (selftest || (!renderTest && !hasDisplay))
 
 try
 {
-    using var window = new GameWindow { MaxFrames = renderTest ? 3 : 0 };
+    using var window = new GameWindow { MaxFrames = renderTest ? 3 : 0, Scene = scene };
     Console.WriteLine(renderTest
-        ? $"Render smoke test: drawing {3} frames at {window.Width}x{window.Height}."
-        : $"Starting OpenKO client window ({window.Width}x{window.Height}). Press ESC to quit.");
+        ? $"Render smoke test ({scene}): drawing {3} frames at {window.Width}x{window.Height}."
+        : $"Starting OpenKO client window ({scene}, {window.Width}x{window.Height}). Press ESC to quit.");
     window.Run();
     if (renderTest)
         Console.WriteLine("Render smoke test completed successfully.");
