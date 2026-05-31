@@ -11,7 +11,7 @@ public class N3TableTests
     {
         // Columns: DWORD id, INT, STRING, FLOAT
         var ms = new MemoryStream();
-        Span<byte> i32 = stackalloc byte[4];
+        var i32 = new byte[4];
 
         void WriteInt(int v)
         {
@@ -88,7 +88,7 @@ public class N3TableTests
     public void RejectsTableWhoseFirstColumnIsNotDword()
     {
         var ms = new MemoryStream();
-        Span<byte> i32 = stackalloc byte[4];
+        var i32 = new byte[4];
         void WriteInt(int v) { BinaryPrimitives.WriteInt32LittleEndian(i32, v); ms.Write(i32); }
 
         WriteInt(1);                       // column count
