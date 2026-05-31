@@ -54,8 +54,9 @@ csharp/
 - [x] `OpenKO.N3` — GPU upload mapping (`GpuTextureLayout`, backend-neutral, unit-tested)
 - [x] `OpenKO.Net` — cross-platform async TCP client with KO packet framing & encryption
 - [x] `OpenKO.Client` — OpenGL renderer (shader + VBO mesh + DXT/uncompressed texture upload)
+- [x] `OpenKO.N3` — UI tree loader (`.uif`): `N3UIBase`/`N3UIImage`/`N3UIArea`, recursive hierarchy
+- [ ] N3 UI controls: button / string / edit / static / progress / scrollbar / list
 - [ ] N3 skin / scene loaders
-- [ ] UI system (N3UI*)
 - [ ] Game procedures (login → character select → in-game)
 
 ## Building
