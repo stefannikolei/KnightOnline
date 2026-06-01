@@ -1,0 +1,117 @@
+cmake_minimum_required(VERSION 3.21)
+
+project(KnightOnlineVulkanPoC LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE Debug CACHE STRING "" FORCE)
+endif()
+
+# -----------------------------------------------------------------------------
+# Dependencies
+# -----------------------------------------------------------------------------
+# Vulkan. On macOS this resolves to the loader from the LunarG Vulkan SDK, which
+# routes to MoltenVK (Vulkan-on-Metal). Make sure the SDK is installed and the
+# VULKAN_SDK environment variable is set (`source setup-env.sh`).
+find_package(Vulkan REQUIRED)
+
+include(FetchContent)
+
+# GLFW (windowing + cross-platform Vulkan surface creation, incl. macOS/Metal).
+FetchContent_Declare(
+  glfw
+  GIT_REPOSITORY https://github.com/glfw/glfw.git
+  GIT_TAG        3.4
+)
+set(GLFW_BUILD_DOCS     OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(glfw)
+
+# GLM (header-only math).
+FetchContent_Declare(
+  glm
+  GIT_REPOSITORY https://github.com/g-truc/glm.git
+  GIT_TAG        1.0.1
+)
+FetchContent_MakeAvailable(glm)
+
+# -----------------------------------------------------------------------------
+# Shader compilation (GLSL -> SPIR-V)
+# -----------------------------------------------------------------------------
+set(SHADER_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/shaders")
+file(MAKE_DIRECTORY "${SHADER_OUTPUT_DIR}")
+
+# Prefer glslc (shipped with the Vulkan SDK); fall back to glslangValidator.
+if(Vulkan_GLSLC_EXECUTABLE)
+  set(_GLSL_COMPILER "${Vulkan_GLSLC_EXECUTABLE}")
+  set(_GLSL_MODE glslc)
+elseif(Vulkan_GLSLANG_VALIDATOR_EXECUTABLE)
+  set(_GLSL_COMPILER "${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE}")
+  set(_GLSL_MODE glslang)
+else()
+  message(FATAL_ERROR
+    "No GLSL->SPIR-V compiler found (glslc / glslangValidator). "
+    "Install the Vulkan SDK and ensure VULKAN_SDK is set.")
+endif()
+
+set(SHADER_SOURCES
+  "${CMAKE_CURRENT_SOURCE_DIR}/shaders/character.vert"
+  "${CMAKE_CURRENT_SOURCE_DIR}/shaders/character.frag"
+)
+
+set(SPIRV_OUTPUTS "")
+foreach(_shader ${SHADER_SOURCES})
+  get_filename_component(_name "${_shader}" NAME)
+  set(_spv "${SHADER_OUTPUT_DIR}/${_name}.spv")
+  if(_GLSL_MODE STREQUAL "glslc")
+    add_custom_command(
+      OUTPUT  "${_spv}"
+      COMMAND "${_GLSL_COMPILER}" "${_shader}" -o "${_spv}"
+      DEPENDS "${_shader}"
+      COMMENT "Compiling ${_name} -> SPIR-V (glslc)"
+      VERBATIM)
+  else()
+    add_custom_command(
+      OUTPUT  "${_spv}"
+      COMMAND "${_GLSL_COMPILER}" -V "${_shader}" -o "${_spv}"
+      DEPENDS "${_shader}"
+      COMMENT "Compiling ${_name} -> SPIR-V (glslangValidator)"
+      VERBATIM)
+  endif()
+  list(APPEND SPIRV_OUTPUTS "${_spv}")
+endforeach()
+
+add_custom_target(poc_shaders DEPENDS ${SPIRV_OUTPUTS})
+
+# -----------------------------------------------------------------------------
+# Executable
+# -----------------------------------------------------------------------------
+add_executable(vulkan_character_poc
+  src/main.cpp
+  src/vulkan_app.cpp
+  src/character.cpp
+)
+
+add_dependencies(vulkan_character_poc poc_shaders)
+
+target_link_libraries(vulkan_character_poc PRIVATE
+  Vulkan::Vulkan
+  glfw
+  glm::glm
+)
+
+target_compile_definitions(vulkan_character_poc PRIVATE
+  POC_SHADER_DIR="${SHADER_OUTPUT_DIR}"
+  GLFW_INCLUDE_VULKAN
+)
+
+if(APPLE)
+  # MoltenVK lives behind the Vulkan loader; nothing extra to link here, but make
+  # the dependency on a present Vulkan SDK explicit for the user.
+  message(STATUS "macOS build: Vulkan calls are translated to Metal by MoltenVK "
+                 "(ensure the Vulkan SDK is installed and VULKAN_SDK is set).")
+endif()
