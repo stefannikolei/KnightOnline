@@ -3,29 +3,37 @@
 // -----------------------------------------------------------------------------
 // Minimal Vulkan renderer for the character PoC.
 //
-// Deliberately kept to a single self-contained class. It is cross-platform and
-// works on macOS through MoltenVK: on Apple platforms the instance is created
-// with VK_KHR_portability_enumeration and the device enables
-// VK_KHR_portability_subset (see vulkan_app.cpp). GLFW provides the window and
-// the platform surface.
+// Cross-platform; works on macOS through MoltenVK (the instance enables
+// VK_KHR_portability_enumeration and the device enables VK_KHR_portability_subset
+// — see vulkan_app.cpp). GLFW provides the window/surface.
+//
+// Textures are decoded from the game's DXT/BC1 data to RGBA8 on the CPU
+// (n3_character.cpp) and uploaded as VK_FORMAT_R8G8B8A8 — Apple GPUs don't
+// support S3TC/BC compressed formats, so plain RGBA8 keeps it MoltenVK-friendly.
 // -----------------------------------------------------------------------------
 
-#define GLFW_INCLUDE_VULKAN
+// Include the Vulkan header ourselves and tell GLFW not to pull in any GL
+// headers (GLFW_INCLUDE_VULKAN alone would still include GL/gl.h, which need
+// not exist on a headless/Vulkan-only system). GLFW's Vulkan helpers are still
+// declared because vulkan.h is included first.
+#include <vulkan/vulkan.h>
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 
 #include <array>
 #include <cstdint>
+#include <string>
 #include <vector>
 
-#include "character.hpp"
+#include "n3_character.hpp"
 
 namespace poc {
 
 class VulkanApp {
 public:
-    VulkanApp();
+    VulkanApp(std::string dataRoot, std::string chrRel);
     ~VulkanApp();
 
     VulkanApp(const VulkanApp&)            = delete;
@@ -34,16 +42,21 @@ public:
     void run();
 
 private:
-    // Matches CameraUBO in the shaders (std140 layout).
     struct CameraUBO {
         glm::mat4 view;
         glm::mat4 proj;
         glm::vec4 lightDir;
         glm::vec4 camPos;
     };
-    // Matches BoneUBO in the shaders.
     struct BoneUBO {
         glm::mat4 bones[kMaxBones];
+    };
+
+    struct GpuTexture {
+        VkImage         image  = VK_NULL_HANDLE;
+        VkDeviceMemory  memory = VK_NULL_HANDLE;
+        VkImageView     view   = VK_NULL_HANDLE;
+        VkDescriptorSet set    = VK_NULL_HANDLE;
     };
 
     static constexpr int kFramesInFlight = 2;
@@ -62,12 +75,14 @@ private:
     void createSwapchain();
     void createImageViews();
     void createRenderPass();
-    void createDescriptorSetLayout();
+    void createDescriptorSetLayouts();
     void createGraphicsPipeline();
     void createDepthResources();
     void createFramebuffers();
     void createCommandPool();
     void createGeometryBuffers();
+    void createTextures();
+    void createSampler();
     void createUniformBuffers();
     void createDescriptorPool();
     void createDescriptorSets();
@@ -96,12 +111,18 @@ private:
                                 VkMemoryPropertyFlags props, VkBuffer& buffer,
                                 VkDeviceMemory& memory) const;
     void           copyBuffer(VkBuffer src, VkBuffer dst, VkDeviceSize size) const;
+    VkCommandBuffer beginOneTimeCommands() const;
+    void            endOneTimeCommands(VkCommandBuffer cmd) const;
+    GpuTexture      uploadTexture(const uint8_t* rgba, int w, int h);
     VkShaderModule createShaderModule(const std::vector<char>& code) const;
     VkFormat       findDepthFormat() const;
 
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
     // --- state -------------------------------------------------------------
+    std::string m_dataRoot;
+    std::string m_chrRel;
+
     GLFWwindow* m_window      = nullptr;
     uint32_t    m_width       = 1280;
     uint32_t    m_height      = 720;
@@ -128,17 +149,21 @@ private:
     VkImageView    m_depthImageView   = VK_NULL_HANDLE;
     VkFormat       m_depthFormat      = VK_FORMAT_UNDEFINED;
 
-    VkRenderPass          m_renderPass          = VK_NULL_HANDLE;
-    VkDescriptorSetLayout m_descriptorSetLayout = VK_NULL_HANDLE;
-    VkPipelineLayout      m_pipelineLayout      = VK_NULL_HANDLE;
-    VkPipeline            m_pipeline            = VK_NULL_HANDLE;
-    VkCommandPool         m_commandPool         = VK_NULL_HANDLE;
+    VkRenderPass          m_renderPass    = VK_NULL_HANDLE;
+    VkDescriptorSetLayout m_setLayoutFrame = VK_NULL_HANDLE; // set 0: camera + bones
+    VkDescriptorSetLayout m_setLayoutTex   = VK_NULL_HANDLE; // set 1: texture sampler
+    VkPipelineLayout      m_pipelineLayout = VK_NULL_HANDLE;
+    VkPipeline            m_pipeline       = VK_NULL_HANDLE;
+    VkCommandPool         m_commandPool    = VK_NULL_HANDLE;
 
     VkBuffer       m_vertexBuffer       = VK_NULL_HANDLE;
     VkDeviceMemory m_vertexBufferMemory = VK_NULL_HANDLE;
     VkBuffer       m_indexBuffer        = VK_NULL_HANDLE;
     VkDeviceMemory m_indexBufferMemory  = VK_NULL_HANDLE;
-    uint32_t       m_indexCount         = 0;
+
+    VkSampler                m_sampler = VK_NULL_HANDLE;
+    std::vector<GpuTexture>  m_gpuTextures;   // one per character texture
+    GpuTexture               m_whiteTexture;  // fallback for untextured parts
 
     std::array<VkBuffer, kFramesInFlight>       m_cameraUBO{};
     std::array<VkDeviceMemory, kFramesInFlight> m_cameraUBOMemory{};
@@ -147,16 +172,16 @@ private:
     std::array<VkDeviceMemory, kFramesInFlight> m_boneUBOMemory{};
     std::array<void*, kFramesInFlight>          m_boneUBOMapped{};
 
-    VkDescriptorPool                                 m_descriptorPool = VK_NULL_HANDLE;
-    std::array<VkDescriptorSet, kFramesInFlight>     m_descriptorSets{};
-    std::array<VkCommandBuffer, kFramesInFlight>     m_commandBuffers{};
-    std::array<VkSemaphore, kFramesInFlight>         m_imageAvailable{};
-    std::array<VkSemaphore, kFramesInFlight>         m_renderFinished{};
-    std::array<VkFence, kFramesInFlight>             m_inFlight{};
-    uint32_t                                         m_currentFrame = 0;
+    VkDescriptorPool                             m_descriptorPool = VK_NULL_HANDLE;
+    std::array<VkDescriptorSet, kFramesInFlight> m_frameSets{};
+    std::array<VkCommandBuffer, kFramesInFlight> m_commandBuffers{};
+    std::array<VkSemaphore, kFramesInFlight>     m_imageAvailable{};
+    std::array<VkSemaphore, kFramesInFlight>     m_renderFinished{};
+    std::array<VkFence, kFramesInFlight>         m_inFlight{};
+    uint32_t                                     m_currentFrame = 0;
 
-    Character m_character;
-    double    m_startTime = 0.0;
+    N3Character m_character;
+    double      m_startTime = 0.0;
 
     bool                     m_validation = false;
     std::vector<const char*> m_deviceExtensions;

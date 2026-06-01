@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.21)
 
 project(KnightOnlineVulkanPoC LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+# C++20 is required because the repo's MathUtils library (reused here for
+# engine-identical matrix/quaternion math) uses abbreviated function templates.
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -38,6 +40,11 @@ FetchContent_Declare(
   GIT_TAG        1.0.1
 )
 FetchContent_MakeAvailable(glm)
+
+# MathUtils: the engine's own cross-platform math library, reused so the
+# skinning math is byte-for-byte identical to CN3Chr::BuildMesh().
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../MathUtils"
+                 "${CMAKE_CURRENT_BINARY_DIR}/MathUtils")
 
 # -----------------------------------------------------------------------------
 # Shader compilation (GLSL -> SPIR-V)
@@ -93,7 +100,7 @@ add_custom_target(poc_shaders DEPENDS ${SPIRV_OUTPUTS})
 add_executable(vulkan_character_poc
   src/main.cpp
   src/vulkan_app.cpp
-  src/character.cpp
+  src/n3_character.cpp
 )
 
 add_dependencies(vulkan_character_poc poc_shaders)
@@ -102,12 +109,23 @@ target_link_libraries(vulkan_character_poc PRIVATE
   Vulkan::Vulkan
   glfw
   glm::glm
+  MathUtils
 )
+
+# Default location of the game assets (the Client/Data submodule). Can be
+# overridden at runtime: vulkan_character_poc <dataRoot> <Chr/xxx.n3chr>
+set(POC_DATA_DIR_DEFAULT "${CMAKE_CURRENT_SOURCE_DIR}/../Client/Data")
 
 target_compile_definitions(vulkan_character_poc PRIVATE
   POC_SHADER_DIR="${SHADER_OUTPUT_DIR}"
+  POC_DATA_DIR="${POC_DATA_DIR_DEFAULT}"
   GLFW_INCLUDE_VULKAN
 )
+
+# Some older GNU stdlibs need a separate library for std::filesystem.
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+  target_link_libraries(vulkan_character_poc PRIVATE stdc++fs)
+endif()
 
 if(APPLE)
   # MoltenVK lives behind the Vulkan loader; nothing extra to link here, but make
