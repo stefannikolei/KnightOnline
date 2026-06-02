@@ -28,13 +28,17 @@
 #include <vector>
 
 #include "n3_character.hpp"
+#include "login_screen.hpp"
 
 namespace poc {
 
 class VulkanApp {
 public:
-    VulkanApp(std::string dataRoot, std::string chrRel);
+    VulkanApp(std::string dataRoot, std::string chrRel, std::string loginUif);
     ~VulkanApp();
+
+    // Switchable render modes.
+    enum class Mode { Character, Login };
 
     VulkanApp(const VulkanApp&)            = delete;
     VulkanApp& operator=(const VulkanApp&) = delete;
@@ -77,11 +81,13 @@ private:
     void createRenderPass();
     void createDescriptorSetLayouts();
     void createGraphicsPipeline();
+    void createUIPipeline();
     void createDepthResources();
     void createFramebuffers();
     void createCommandPool();
     void createGeometryBuffers();
     void createTextures();
+    void createLoginResources();
     void createSampler();
     void createUniformBuffers();
     void createDescriptorPool();
@@ -96,6 +102,10 @@ private:
     void drawFrame();
     void updateUniforms(uint32_t frameIndex);
     void recordCommandBuffer(VkCommandBuffer cmd, uint32_t imageIndex, uint32_t frameIndex);
+    void recordCharacter(VkCommandBuffer cmd, uint32_t frameIndex);
+    void recordLogin(VkCommandBuffer cmd);
+
+    static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     // --- helpers -----------------------------------------------------------
     struct QueueFamilies {
@@ -151,9 +161,11 @@ private:
 
     VkRenderPass          m_renderPass    = VK_NULL_HANDLE;
     VkDescriptorSetLayout m_setLayoutFrame = VK_NULL_HANDLE; // set 0: camera + bones
-    VkDescriptorSetLayout m_setLayoutTex   = VK_NULL_HANDLE; // set 1: texture sampler
+    VkDescriptorSetLayout m_setLayoutTex   = VK_NULL_HANDLE; // texture sampler
     VkPipelineLayout      m_pipelineLayout = VK_NULL_HANDLE;
     VkPipeline            m_pipeline       = VK_NULL_HANDLE;
+    VkPipelineLayout      m_uiPipelineLayout = VK_NULL_HANDLE;
+    VkPipeline            m_uiPipeline       = VK_NULL_HANDLE;
     VkCommandPool         m_commandPool    = VK_NULL_HANDLE;
 
     VkBuffer       m_vertexBuffer       = VK_NULL_HANDLE;
@@ -164,6 +176,13 @@ private:
     VkSampler                m_sampler = VK_NULL_HANDLE;
     std::vector<GpuTexture>  m_gpuTextures;   // one per character texture
     GpuTexture               m_whiteTexture;  // fallback for untextured parts
+
+    // Login screen (2D) resources.
+    std::vector<GpuTexture>  m_loginTextures;
+    VkBuffer                 m_loginVertexBuffer       = VK_NULL_HANDLE;
+    VkDeviceMemory           m_loginVertexBufferMemory = VK_NULL_HANDLE;
+    VkBuffer                 m_loginIndexBuffer        = VK_NULL_HANDLE;
+    VkDeviceMemory           m_loginIndexBufferMemory  = VK_NULL_HANDLE;
 
     std::array<VkBuffer, kFramesInFlight>       m_cameraUBO{};
     std::array<VkDeviceMemory, kFramesInFlight> m_cameraUBOMemory{};
@@ -181,6 +200,10 @@ private:
     uint32_t                                     m_currentFrame = 0;
 
     N3Character m_character;
+    LoginScreen m_login;
+    std::string m_loginUif;
+    bool        m_loginAvailable = false;
+    Mode        m_mode = Mode::Character;
     double      m_startTime = 0.0;
 
     bool                     m_validation = false;

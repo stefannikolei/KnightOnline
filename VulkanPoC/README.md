@@ -4,9 +4,10 @@ A small, self-contained **proof of concept** for porting the N3 engine's
 renderer (currently DirectX 9, see `Client/N3Base`) to **Vulkan**, running on
 **macOS via MoltenVK**.
 
-It does one thing: load **one real Knight Online character** from the game
-assets and render it with GPU skinning and its real textures, in a
-cross-platform Vulkan window.
+It renders **one real Knight Online character** with GPU skinning and its real
+textures, and can **switch to the real 2D login screen** — both built from the
+actual game assets, in a cross-platform Vulkan window. Press **TAB** to toggle
+between the two.
 
 > ⚠️ This lives *next to* the existing engine; it does not replace it. It is a
 > throwaway prototype to validate the rendering path and the MoltenVK toolchain
@@ -24,9 +25,31 @@ cross-platform Vulkan window.
   the model so you can see it in 3D.
 * Runs on Windows/Linux (native Vulkan) and **macOS (MoltenVK)** from the same
   code.
+* Switchable **2D login screen**: parses a real `.uif` UI form
+  (e.g. `UI_US/el_login_intro_us.uif`) and renders its image elements as
+  textured quads, reproducing the original login layout (background tiles +
+  logo + UI art) on a virtual 1024×768 canvas. Press **TAB** / **L** to toggle,
+  or **1** (character) / **2** (login).
 
 The matrix/quaternion math is done with the repo's own **`MathUtils`** library,
 so the skinning is byte-for-byte identical to the original engine.
+
+### Code reuse
+
+The PoC reuses what is genuinely portable from the engine and avoids duplicating
+its own code:
+
+* **`MathUtils`** (the engine's own library) is linked directly, so the joint
+  matrices and skinning are identical to `CN3Chr::BuildMesh()`.
+* The binary parsing/decoding shared by the character and login loaders lives
+  once in **`n3_util`** (`Reader`, `resolvePath`, `loadNTFTexture`).
+
+The N3Base loader *classes* themselves (`CN3Chr`, `CN3Texture`, `CN3UIBase`, …)
+**cannot** be linked here: they are hard-wired to DirectX 9 / Windows
+(`LPDIRECT3DDEVICE9`, D3DX, the global render device, texture/sound managers) —
+which is exactly why the repo only builds the client on Windows. So the PoC
+re-implements the *parsing* of each binary format, faithfully matching the
+layouts in `Client/N3Base`, while the rendering is Vulkan instead of D3D9.
 
 ### Asset chain
 
@@ -35,8 +58,9 @@ so the skinning is byte-for-byte identical to the original engine.
 .n3joint   skeleton         -> joint hierarchy (TRS + animation keys)
 .n3cpart   part descriptor  -> diffuse texture name + skin-mesh name
 .n3cskins  skinned mesh      -> CN3Skin, 4 LODs (PoC uses LOD 0)
-.dxt       NTF texture       -> DXT1/BC1 blocks (decoded to RGBA8 on the CPU)
+.dxt       NTF texture       -> DXT1/BC1 or A4R4G4B4/… (decoded to RGBA8 on CPU)
 .n3anim    animation control -> named frame ranges
+.uif       UI form           -> recursive UI tree; image elements -> 2D quads
 ```
 
 ### How it maps to the engine
@@ -103,18 +127,21 @@ cd VulkanPoC
 cmake -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build -j
 
-# Defaults to Chr/npc_el_knight.n3chr using the Client/Data submodule.
+# Defaults to Chr/npc_el_knight.n3chr + UI_US/el_login_intro_us.uif.
 ./build/vulkan_character_poc
 
-# Or pick any character:
-./build/vulkan_character_poc ../Client/Data Chr/mob_zombie.n3chr
+# Or pick any character / login form:
+./build/vulkan_character_poc ../Client/Data Chr/mob_zombie.n3chr UI_US/ka_login_intro_us.uif
 ```
 
 You should get a window showing the character with its textures, playing its
-idle animation and slowly rotating.
+idle animation and slowly rotating. **Press TAB** to switch to the login screen
+and back.
 
-`vulkan_character_poc [dataRoot] [characterRelPath]` — both arguments are
-optional; the data root defaults to the in-tree `Client/Data`.
+`vulkan_character_poc [dataRoot] [characterRelPath] [loginUifPath]` — all
+arguments are optional; the data root defaults to the in-tree `Client/Data`.
+
+Controls: **TAB** / **L** toggle, **1** character, **2** login, **Esc** quit.
 
 Known-good characters include `Chr/npc_el_knight.n3chr`, `Chr/mob_zombie.n3chr`,
 `Chr/npc_el_shop.n3chr`, `Chr/mon_twohead.n3chr`. (A few assets in the submodule
@@ -129,11 +156,14 @@ VulkanPoC/
 ├── README.md
 ├── shaders/
 │   ├── character.vert      # GPU linear-blend skinning (the core of the port)
-│   └── character.frag      # textured Blinn-Phong lighting
+│   ├── character.frag      # textured Blinn-Phong lighting
+│   ├── ui.vert / ui.frag   # 2D login-screen quads
 └── src/
     ├── main.cpp            # entry point + CLI args
+    ├── n3_util.hpp/.cpp    # shared Reader / resolvePath / NTF texture decoding
     ├── n3_character.hpp/.cpp # real .n3chr/.n3joint/.n3cskins/.dxt loader + skinning
-    └── vulkan_app.hpp/.cpp # the Vulkan renderer (instance→device→swapchain→draw)
+    ├── login_screen.hpp/.cpp # real .uif loader -> 2D textured quads
+    └── vulkan_app.hpp/.cpp # the Vulkan renderer (both render modes + toggle)
 ```
 
 ## Next steps toward a real port

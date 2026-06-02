@@ -26,6 +26,8 @@
 
 #include <MathUtils/MathUtils.h>
 
+#include "n3_util.hpp" // Reader, resolvePath, TextureData, loadNTFTexture
+
 namespace poc {
 
 struct Vertex {
@@ -41,12 +43,6 @@ struct SubMesh {
     uint32_t firstIndex  = 0;
     uint32_t indexCount  = 0;
     int      textureIndex = -1; // index into textures(); -1 => untextured
-};
-
-struct TextureData {
-    int                  width  = 0;
-    int                  height = 0;
-    std::vector<uint8_t> rgba;  // width*height*4, R8G8B8A8
 };
 
 static constexpr int kMaxBones = 128;

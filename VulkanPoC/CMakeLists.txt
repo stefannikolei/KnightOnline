@@ -68,6 +68,8 @@ endif()
 set(SHADER_SOURCES
   "${CMAKE_CURRENT_SOURCE_DIR}/shaders/character.vert"
   "${CMAKE_CURRENT_SOURCE_DIR}/shaders/character.frag"
+  "${CMAKE_CURRENT_SOURCE_DIR}/shaders/ui.vert"
+  "${CMAKE_CURRENT_SOURCE_DIR}/shaders/ui.frag"
 )
 
 set(SPIRV_OUTPUTS "")
@@ -100,7 +102,9 @@ add_custom_target(poc_shaders DEPENDS ${SPIRV_OUTPUTS})
 add_executable(vulkan_character_poc
   src/main.cpp
   src/vulkan_app.cpp
+  src/n3_util.cpp
   src/n3_character.cpp
+  src/login_screen.cpp
 )
 
 add_dependencies(vulkan_character_poc poc_shaders)
