@@ -2,8 +2,18 @@ cmake_minimum_required(VERSION 3.21)
 
 project(KnightOnlineVulkanPoC LANGUAGES CXX)
 
+# Whether this is the top-level project (standalone) or included from the repo
+# root via add_subdirectory().
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  set(_POC_STANDALONE ON)
+else()
+  set(_POC_STANDALONE OFF)
+endif()
+
 # C++20 is required because the repo's MathUtils library (reused here for
 # engine-identical matrix/quaternion math) uses abbreviated function templates.
+# This is scoped to the PoC, so it doesn't affect the rest of the repo when
+# built as a subdirectory.
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -18,7 +28,17 @@ endif()
 # Vulkan. On macOS this resolves to the loader from the LunarG Vulkan SDK, which
 # routes to MoltenVK (Vulkan-on-Metal). Make sure the SDK is installed and the
 # VULKAN_SDK environment variable is set (`source setup-env.sh`).
-find_package(Vulkan REQUIRED)
+#
+# Not REQUIRED: when the PoC is part of the repo-root build we don't want a
+# missing Vulkan SDK to break the (server/tools) build for everyone else — we
+# just skip the PoC with a warning.
+find_package(Vulkan)
+if(NOT Vulkan_FOUND)
+  message(WARNING
+    "VulkanPoC: Vulkan SDK not found - skipping the Vulkan character/login PoC. "
+    "Install the LunarG Vulkan SDK (https://vulkan.lunarg.com/) and set VULKAN_SDK.")
+  return()
+endif()
 
 include(FetchContent)
 
@@ -42,9 +62,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glm)
 
 # MathUtils: the engine's own cross-platform math library, reused so the
-# skinning math is byte-for-byte identical to CN3Chr::BuildMesh().
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../MathUtils"
-                 "${CMAKE_CURRENT_BINARY_DIR}/MathUtils")
+# skinning math is byte-for-byte identical to CN3Chr::BuildMesh(). When built
+# from the repo root the target already exists, so only add it standalone.
+if(NOT TARGET MathUtils)
+  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../MathUtils"
+                   "${CMAKE_CURRENT_BINARY_DIR}/MathUtils")
+endif()
 
 # -----------------------------------------------------------------------------
 # Shader compilation (GLSL -> SPIR-V)
@@ -60,9 +83,10 @@ elseif(Vulkan_GLSLANG_VALIDATOR_EXECUTABLE)
   set(_GLSL_COMPILER "${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE}")
   set(_GLSL_MODE glslang)
 else()
-  message(FATAL_ERROR
-    "No GLSL->SPIR-V compiler found (glslc / glslangValidator). "
-    "Install the Vulkan SDK and ensure VULKAN_SDK is set.")
+  message(WARNING
+    "VulkanPoC: no GLSL->SPIR-V compiler found (glslc / glslangValidator) - "
+    "skipping the PoC. Install the Vulkan SDK and ensure VULKAN_SDK is set.")
+  return()
 endif()
 
 set(SHADER_SOURCES

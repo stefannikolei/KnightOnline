@@ -24,6 +24,7 @@ endif()
 option(OPENKO_BUILD_SERVERS "Build the server projects (default on)" ON)
 option(OPENKO_COMPILE_WARNINGS_AS_ERROR "Enable treating warnings as errors (default on)" ON)
 option(OPENKO_BUILD_TESTS "Build the test projects (default on)" ON)
+option(OPENKO_BUILD_VULKAN_POC "Build the Vulkan character/login PoC (default on; auto-skips if no Vulkan SDK)" ON)
 
 # Define the bin directory; defaults to repo/bin
 set(OPENKO_BIN_DIR "${CMAKE_BINARY_DIR}/bin" CACHE PATH "Directory for final binaries")
@@ -38,6 +39,7 @@ message(STATUS "OpenKO feature: OPENKO_BUILD_SERVERS - ${OPENKO_BUILD_SERVERS}")
 message(STATUS "OpenKO feature: OPENKO_COMPILE_WARNINGS_AS_ERROR - ${OPENKO_COMPILE_WARNINGS_AS_ERROR}")
 message(STATUS "OpenKO feature: OPENKO_BIN_DIR - ${OPENKO_BIN_DIR}")
 message(STATUS "OpenKO feature: OPENKO_BUILD_TESTS - ${OPENKO_BUILD_TESTS}")
+message(STATUS "OpenKO feature: OPENKO_BUILD_VULKAN_POC - ${OPENKO_BUILD_VULKAN_POC}")
 
 if(WIN32)
   message(STATUS "OpenKO feature: _WIN32_WINNT - ${_WIN32_WINNT}")
@@ -88,6 +90,16 @@ set(CMAKE_FOLDER) # reset so shared is placed in the root
 add_subdirectory(shared)
 add_subdirectory(FileIO)
 add_subdirectory(MathUtils)
+
+# Vulkan character/login PoC. Added after MathUtils so it reuses that target.
+# It auto-skips (with a warning) if the Vulkan SDK isn't installed, so it won't
+# break server/tools-only builds. Requires network access at configure time
+# (it fetches GLFW + GLM) and is C++20-scoped internally.
+if(OPENKO_BUILD_VULKAN_POC)
+  set(CMAKE_FOLDER "VulkanPoC")
+  add_subdirectory(VulkanPoC)
+  set(CMAKE_FOLDER)
+endif()
 
 if(OPENKO_BUILD_SERVERS)
   message(STATUS "OpenKO: Preparing to configure servers...")

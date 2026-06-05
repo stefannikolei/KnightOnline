@@ -122,11 +122,34 @@ source ~/VulkanSDK/<version>/setup-env.sh   # sets VULKAN_SDK, VK_ICD_FILENAMES�
 
 ## Build & run
 
+The PoC is wired into the repo-root CMake build (option
+`OPENKO_BUILD_VULKAN_POC`, **on by default**) *and* can be built standalone.
+It auto-skips with a warning if the Vulkan SDK isn't installed, so it never
+breaks a server/tools-only build.
+
+### Standalone (recommended for iterating on the PoC)
+
 ```sh
 cd VulkanPoC
-cmake -B build -DCMAKE_BUILD_TYPE=Debug
-cmake --build build -j
+cmake -S . -B build -G Ninja   # fetches GLFW + GLM, reuses ../MathUtils
+cmake --build build
+```
 
+### From the repo root
+
+```sh
+cmake -S . -B build -G Ninja
+cmake --build build --target vulkan_character_poc
+# disable with -DOPENKO_BUILD_VULKAN_POC=OFF
+```
+
+> Note: building the whole repo root also configures the server dependencies
+> (asio/llfio/boost/…). If those fail to fetch on your machine, build the PoC
+> standalone as shown above — it shares no dependencies with the servers.
+
+### Run
+
+```sh
 # Defaults to Chr/npc_el_knight.n3chr + UI_US/el_login_intro_us.uif.
 ./build/vulkan_character_poc
 
