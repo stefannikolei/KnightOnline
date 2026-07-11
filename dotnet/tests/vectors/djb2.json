@@ -1,0 +1,14 @@
+[
+  {"input": "", "hash": "5381"},
+  {"input": "a", "hash": "177670"},
+  {"input": "GIVE_ITEM", "hash": "249843277607108702"},
+  {"input": "ROB_ITEM", "hash": "7571484211364150"},
+  {"input": "SELECT_MSG", "hash": "8245379045946166283"},
+  {"input": "RUN_EVENT", "hash": "249859250178618747"},
+  {"input": "SAY", "hash": "193469618"},
+  {"input": "OPEN_DOOR", "hash": "249854805602233738"},
+  {"input": "LOG_COUPON_EVENT", "hash": "17189442020123294171"},
+  {"input": "ZONE_CHANGE", "hash": "13854279500315960518"},
+  {"input": "The quick brown fox", "hash": "9925230662628146424"},
+  {"input": "knight online 1298", "hash": "11158167574852577251"}
+]

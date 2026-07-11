@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\OpenKO.Core\OpenKO.Core.csproj" />
+    <ProjectReference Include="..\..\OpenKO.Network\OpenKO.Network.csproj" />
+    <ProjectReference Include="..\..\OpenKO.Data\OpenKO.Data.csproj" />
+    <ProjectReference Include="..\..\OpenKO.Hosting\OpenKO.Hosting.csproj" />
+  </ItemGroup>
+
+</Project>

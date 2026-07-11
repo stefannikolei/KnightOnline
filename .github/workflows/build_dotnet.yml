@@ -1,0 +1,48 @@
+name: "Build .NET (C# port)"
+
+on:
+  push:
+    branches:
+    - master
+
+    paths:
+      - '.github/workflows/build_dotnet.yml'
+      - 'dotnet/**'
+
+  pull_request:
+    branches:
+    - master
+
+    paths:
+      - '.github/workflows/build_dotnet.yml'
+      - 'dotnet/**'
+
+  workflow_dispatch:
+
+jobs:
+  build_test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore dotnet/OpenKO.slnx
+
+      - name: Build
+        run: dotnet build dotnet/OpenKO.slnx -c Release --no-restore
+
+      - name: Test
+        run: dotnet test dotnet/OpenKO.slnx -c Release --no-build --filter "Category!=Database"
+
+  # A db_integration job (MSSQL service container + --filter "Category=Database")
+  # will be added in stage 2 together with the first DB-backed tests (Aujard).

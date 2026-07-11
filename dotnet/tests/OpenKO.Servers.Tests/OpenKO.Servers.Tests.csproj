@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Servers\OpenKO.Servers.VersionManager\OpenKO.Servers.VersionManager.csproj" />
+    <ProjectReference Include="..\..\src\Servers\OpenKO.Servers.ItemManager\OpenKO.Servers.ItemManager.csproj" />
+    <ProjectReference Include="..\..\tools\OpenKO.TestClient\OpenKO.TestClient.csproj" />
+  </ItemGroup>
+
+</Project>
