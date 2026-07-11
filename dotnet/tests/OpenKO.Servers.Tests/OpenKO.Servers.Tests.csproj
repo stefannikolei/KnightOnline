@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Servers\OpenKO.Servers.VersionManager\OpenKO.Servers.VersionManager.csproj" />
     <ProjectReference Include="..\..\src\Servers\OpenKO.Servers.ItemManager\OpenKO.Servers.ItemManager.csproj" />
+    <ProjectReference Include="..\..\src\Servers\OpenKO.Servers.Aujard\OpenKO.Servers.Aujard.csproj" />
     <ProjectReference Include="..\..\tools\OpenKO.TestClient\OpenKO.TestClient.csproj" />
   </ItemGroup>
 

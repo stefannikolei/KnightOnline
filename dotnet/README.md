@@ -42,14 +42,28 @@ src/OpenKO.Core        shared/: ByteBuffer, Packet, opcodes, JvCryption, KoCrc32
                        Lzf, CP949 encoding, IniFile, djb2
 src/OpenKO.Network     framing (PullOutCore port incl. resync quirks),
                        PacketReader/Writer (utilities.cpp equivalents), TCP server
-src/OpenKO.Data        SqlClient connection factory + models (stage-1 subset)
+src/OpenKO.Data        SqlClient connection factory, game constants, models
+                       (UserData/_USER_DATA, warehouse, knights, version…)
 src/OpenKO.Hosting     generic-host glue (INI config resolution, logging)
-src/Servers/…          VersionManager, ItemManager (stage 1)
+src/Servers/…          VersionManager, ItemManager (stage 1),
+                       Aujard DB-agent library + thin host (stage 2)
 tests/…                unit + golden-vector + end-to-end tests
 tests/vectors/         checked-in golden vectors generated from the C++ reference
 tools/OpenKO.TestClient  scripted protocol client (verification / parity harness)
 tools/golden-gen/      C++ generator for the golden vectors (links shared/)
 ```
+
+### Aujard (stage 2)
+
+`OpenKO.Servers.Aujard` ports `CDBAgent` as an async library (`IDbAgent`): all
+stored-procedure calls (LOAD_USER_DATA, UPDATE_USER_DATA, ACCOUNT_LOGIN/LOGOUT,
+CREATE_NEW_CHAR, NATION_SELECT, the KNIGHTS procs, UPDATE_WAREHOUSE, …) with the
+exact blob layouts (items/serials/quests codecs in `UserDataBlobCodec`, pinned by
+round-trip tests) and the C++ validation quirks. The KNIGHT_SEND/RECV shared-memory
+packet loop is intentionally not ported — the stage-4 C# Ebenezer calls the library
+directly. DB-backed smoke tests are opt-in via the `OPENKO_TEST_DB` environment
+variable (they need a seeded KN_online database, see `docker-compose.yaml` and the
+OpenKO-db project) and are tagged `Category=Database`.
 
 ## Build & test
 
@@ -108,7 +122,7 @@ g++ -std=c++23 -O2 -I . -I shared -I deps/djb2 \
 | Stage | Scope | Status |
 |---|---|---|
 | 1 | Foundations (Core/Network/Data/Hosting) + VersionManager + ItemManager | **done** |
-| 2 | OpenKO.Data full build-out + Aujard as library/hosted service | open |
+| 2 | OpenKO.Data full build-out + Aujard as library/hosted service | **done** |
 | 3 | AIServer (+ OpenKO.GameData: .tbl loader, N3ShapeMgr MAP collision) | open |
 | 4 | Ebenezer (WIZ_CRYPTION handshake, LZF packets, game logic) | open |
 | 5 | Client foundations: N3 asset loaders + math | open |

@@ -8,6 +8,7 @@
   <Folder Name="/src/Servers/">
     <Project Path="src/Servers/OpenKO.Servers.VersionManager/OpenKO.Servers.VersionManager.csproj" />
     <Project Path="src/Servers/OpenKO.Servers.ItemManager/OpenKO.Servers.ItemManager.csproj" />
+    <Project Path="src/Servers/OpenKO.Servers.Aujard/OpenKO.Servers.Aujard.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/OpenKO.Core.Tests/OpenKO.Core.Tests.csproj" />
