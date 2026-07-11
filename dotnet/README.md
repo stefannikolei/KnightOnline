@@ -44,6 +44,9 @@ src/OpenKO.Network     framing (PullOutCore port incl. resync quirks),
                        PacketReader/Writer (utilities.cpp equivalents), TCP server
 src/OpenKO.Data        SqlClient connection factory, game constants, models
                        (UserData/_USER_DATA, warehouse, knights, version…)
+src/OpenKO.GameData    server-side map data: .smd reader (terrain heightmap,
+                       N3ShapeMgr collision cells, object/regene events, warps),
+                       height/collision queries, _IntersectTriangle port
 src/OpenKO.Hosting     generic-host glue (INI config resolution, logging)
 src/Servers/…          VersionManager, ItemManager (stage 1),
                        Aujard DB-agent library + thin host (stage 2)
@@ -123,7 +126,7 @@ g++ -std=c++23 -O2 -I . -I shared -I deps/djb2 \
 |---|---|---|
 | 1 | Foundations (Core/Network/Data/Hosting) + VersionManager + ItemManager | **done** |
 | 2 | OpenKO.Data full build-out + Aujard as library/hosted service | **done** |
-| 3 | AIServer (+ OpenKO.GameData: .tbl loader, N3ShapeMgr MAP collision) | open |
+| 3 | AIServer (+ OpenKO.GameData: .tbl loader, N3ShapeMgr MAP collision) | in progress — GameData map/collision foundation done |
 | 4 | Ebenezer (WIZ_CRYPTION handshake, LZF packets, game logic) | open |
 | 5 | Client foundations: N3 asset loaders + math | open |
 | 6 | Client engine core on MonoGame (fixed-function emulation, UI system) | open |

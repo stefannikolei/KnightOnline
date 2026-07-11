@@ -3,6 +3,7 @@
     <Project Path="src/OpenKO.Core/OpenKO.Core.csproj" />
     <Project Path="src/OpenKO.Network/OpenKO.Network.csproj" />
     <Project Path="src/OpenKO.Data/OpenKO.Data.csproj" />
+    <Project Path="src/OpenKO.GameData/OpenKO.GameData.csproj" />
     <Project Path="src/OpenKO.Hosting/OpenKO.Hosting.csproj" />
   </Folder>
   <Folder Name="/src/Servers/">
@@ -13,6 +14,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/OpenKO.Core.Tests/OpenKO.Core.Tests.csproj" />
     <Project Path="tests/OpenKO.Network.Tests/OpenKO.Network.Tests.csproj" />
+    <Project Path="tests/OpenKO.GameData.Tests/OpenKO.GameData.Tests.csproj" />
     <Project Path="tests/OpenKO.Servers.Tests/OpenKO.Servers.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">
