@@ -1030,11 +1030,160 @@ public partial class Npc
         return row.Item[slot];
     }
 
-    /// <summary>TODO(stage3.7-part2b): CNpc::FindFriend (0/1: aggro help, 2: healer scan).</summary>
+    private const byte NpcAttackShout = 0; // NPC_ATTACK_SHOUT
+
+    /// <summary>
+    /// CNpc::FindFriend — scans surrounding regions for allies.
+    /// type 0: same group+family aggro help, 1: everyone helps, 2: healer scan
+    /// (returns the NID of the friend most in need of healing).
+    /// </summary>
     public int FindFriend(int type = 0)
     {
-        _ = type;
+        AiZone? map = GetMapByIndex();
+        if (map is null)
+            return 0;
+
+        if (SearchRange == 0)
+            return 0;
+
+        if (type != 2 && Target.Id == -1)
+            return 0;
+
+        int maxXx = map.RegionsX;
+        int maxZz = map.RegionsZ;
+
+        int minX = (int)(CurX - SearchRange) / AiConstants.ViewDistance;
+        if (minX < 0)
+            minX = 0;
+
+        int minZ = (int)(CurZ - SearchRange) / AiConstants.ViewDistance;
+        if (minZ < 0)
+            minZ = 0;
+
+        int maxX = (int)(CurX + SearchRange) / AiConstants.ViewDistance;
+        if (maxX >= maxXx)
+            maxX = maxXx - 1;
+
+        int maxZ = (int)(CurZ + SearchRange) / AiConstants.ViewDistance;
+        // C++ quirk: clamps min_z against the Z region count instead of max_z.
+        if (minZ >= maxZz)
+            minZ = maxZz - 1;
+
+        int searchX = maxX - minX + 1;
+        int searchZ = maxZ - minZ + 1;
+
+        var healers = new (short Nid, short Value)[9];
+        for (int i = 0; i < healers.Length; i++)
+            healers[i] = (-1, 0);
+
+        int count = 0;
+        for (int i = 0; i < searchX; i++)
+        {
+            for (int j = 0; j < searchZ; j++)
+                FindFriendRegion(minX + i, minZ + j, map, ref healers[count], type);
+        }
+
+        int bestValue = 0, monsterNid = 0;
+        for (int i = 0; i < healers.Length; i++)
+        {
+            if (bestValue < healers[i].Value)
+            {
+                bestValue = healers[i].Value;
+                monsterNid = healers[i].Nid;
+            }
+        }
+
+        if (monsterNid != 0)
+        {
+            Target.Id = monsterNid;
+            return monsterNid;
+        }
+
         return 0;
+    }
+
+    /// <summary>CNpc::FindFriendRegion — one region of the friend scan.</summary>
+    private void FindFriendRegion(int x, int z, AiZone map, ref (short Nid, short Value) healer, int type)
+    {
+        if (!map.IsValidRegion(x, z))
+            return;
+
+        int[] npcIds = [.. map.Regions[x, z].Npcs];
+
+        // Attacked state: type 2 scans within attack range, others within tracing range.
+        float searchRange = type == 2 ? AttackRange : TracingRange;
+        var start = new Vector3(CurX, CurY, CurZ);
+        int bestValue = 0;
+
+        foreach (int nid in npcIds)
+        {
+            if (nid < NpcBand)
+                continue;
+
+            Npc? npc = World?.Npcs.GetValueOrDefault(nid - NpcBand);
+            if (npc is null || npc.State == NpcState.Dead || npc.Nid == Nid)
+                continue;
+
+            float distance = GetDistance(start, new Vector3(npc.CurX, npc.CurY, npc.CurZ));
+            if (distance > searchRange)
+                continue;
+
+            if (type == 1)
+            {
+                if (npc.Target.Id > -1 && npc.State == NpcState.Fighting)
+                    continue;
+
+                npc.Target.Id = Target.Id;
+                npc.Target.X = Target.X;
+                npc.Target.Y = Target.Y;
+                npc.Target.Z = Target.Z;
+                npc.Target.FailCount = 0;
+                npc.NpcStrategy(NpcAttackShout);
+            }
+            else if (type == 0)
+            {
+                if (npc.GroupType != 0 && npc.FamilyType == FamilyType)
+                {
+                    if (npc.Target.Id > -1 && npc.State == NpcState.Fighting)
+                        continue;
+
+                    npc.Target.Id = Target.Id;
+                    npc.Target.X = Target.X;
+                    npc.Target.Y = Target.Y;
+                    npc.Target.Z = Target.Z;
+                    npc.Target.FailCount = 0;
+                    npc.NpcStrategy(NpcAttackShout);
+                }
+            }
+            else if (type == 2)
+            {
+                // Healer scan: pick the friend missing the most HP (below 90%).
+                int threshold = (int)(npc.MaxHP * 0.9);
+                if (npc.HP <= threshold)
+                {
+                    int compValue = (int)((npc.MaxHP - npc.HP) / (npc.MaxHP * 0.01));
+                    if (bestValue < compValue)
+                    {
+                        bestValue = compValue;
+                        healer.Nid = (short)(npc.Nid + NpcBand);
+                        healer.Value = (short)bestValue;
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>CNpc::NpcStrategy — reaction to an ally's attack shout.</summary>
+    public void NpcStrategy(byte type)
+    {
+        switch (type)
+        {
+            case NpcAttackShout:
+                State = NpcState.Tracing;
+                Delay = Speed;
+                DelayTime = TimeGet();
+                break;
+        }
     }
 
     /// <summary>CNpc::IsUserInSight — refresh the InSight flags of the damage list (50m).</summary>

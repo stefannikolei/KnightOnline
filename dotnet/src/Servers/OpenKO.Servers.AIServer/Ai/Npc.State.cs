@@ -1128,11 +1128,7 @@ public partial class Npc
         }
     }
 
-    /// <summary>
-    /// CNpc::NpcHealing — only the non-healer fallback is ported here.
-    /// TODO(stage3.7-part2): healer logic (IsCloseTarget(range, 2), heal magic,
-    /// tracing transition); healers fall back to standing until then.
-    /// </summary>
+    /// <summary>CNpc::NpcHealing — healer behavior (heals the weakest friend in range).</summary>
     public void NpcHealing()
     {
         NpcTrace("NpcHealing()");
@@ -1146,10 +1142,125 @@ public partial class Npc
             return;
         }
 
-        // TODO(stage3.7-part2) — see summary above.
-        State = NpcState.Standing;
-        Delay = StandTime;
+        int targetId = Target.Id;
+
+        int ret = IsCloseTarget(AttackRange, 2);
+        if (ret == 0)
+        {
+            if (IsGateLikeNpc)
+            {
+                State = NpcState.Standing;
+                InitTarget();
+                Delay = 0;
+                DelayTime = TimeGet();
+                return;
+            }
+
+            StepCount = 0;
+            ActionFlag = AttackToTrace;
+            State = NpcState.Tracing;
+            Delay = 0;
+            DelayTime = TimeGet();
+            return;
+        }
+
+        if (ret == 2)
+        {
+            if (LongType == 2)
+            {
+                Delay = LongAndMagicAttack();
+                DelayTime = TimeGet();
+                return;
+            }
+
+            if (IsGateLikeNpc)
+            {
+                State = NpcState.Standing;
+                InitTarget();
+                Delay = 0;
+                DelayTime = TimeGet();
+                return;
+            }
+
+            StepCount = 0;
+            ActionFlag = AttackToTrace;
+            State = NpcState.Tracing;
+            Delay = 0;
+            DelayTime = TimeGet();
+            return;
+        }
+
+        if (ret == -1)
+        {
+            State = NpcState.Standing;
+            InitTarget();
+            Delay = 0;
+            DelayTime = TimeGet();
+            return;
+        }
+
+        if (targetId >= NpcBand && targetId < InvalidBand)
+        {
+            Npc? npc = World?.Npcs.GetValueOrDefault(targetId - NpcBand);
+
+            if (npc is null || npc.HP <= 0 || npc.State == NpcState.Dead)
+            {
+                InitTarget();
+                State = NpcState.Standing;
+                Delay = StandTime;
+                DelayTime = TimeGet();
+                return;
+            }
+
+            int healThreshold = (int)(npc.MaxHP * 0.9);
+
+            if (npc.HP >= healThreshold)
+            {
+                InitTarget();
+            }
+            else
+            {
+                SendHealMagicPacket(targetId);
+                Delay = AttackDelay;
+                DelayTime = TimeGet();
+                return;
+            }
+        }
+
+        // Find a new heal target.
+        int monsterNid = FindFriend(2);
+        if (monsterNid == 0)
+        {
+            InitTarget();
+            State = NpcState.Standing;
+            Delay = StandTime;
+            DelayTime = TimeGet();
+            return;
+        }
+
+        SendHealMagicPacket(monsterNid);
+        Delay = AttackDelay;
         DelayTime = TimeGet();
+    }
+
+    /// <summary>Builds the MAGIC_EFFECTING heal payload (magic 3) for NpcHealing.</summary>
+    private void SendHealMagicPacket(int targetNid)
+    {
+        var buffer = new byte[32];
+        var writer = new PacketWriter(buffer);
+        writer.SetByte(3); // MAGIC_EFFECTING
+        writer.SetDWord((uint)Magic3);
+        writer.SetShort(Nid + NpcBand);
+        writer.SetShort(targetNid);
+        writer.SetShort(0);
+        writer.SetShort(0);
+        writer.SetShort(0);
+        writer.SetShort(0);
+        writer.SetShort(0);
+        writer.SetShort(0);
+
+        // TODO(stage3.7): route through the ported NpcMagicProcess.
+        NpcMagicPacket?.Invoke(writer.Written.ToArray());
     }
 
     // ------------------------------------------------------------------
