@@ -421,13 +421,63 @@ public sealed partial class GameUser
 
         SetDetailData();
 
-        // Knights bookkeeping attaches with the KnightsManager slice; banished
-        // members already reset here.
-        if (user.Knights == -1)
+        // CUser::SelectCharacter knights bookkeeping.
+        if (init == 1)
         {
-            user.Knights = 0;
-            user.Fame = 0;
-            return;
+            if (user.Knights != 0)
+            {
+                if (world.Knights.ContainsKey(user.Knights))
+                {
+                    world.SetKnightsUser(user.Knights, user.CharId);
+                }
+                else
+                {
+                    // The C++ queues a KNIGHTS_LIST_REQ to Aujard and re-checks
+                    // the (not yet updated) map right away; only a battle
+                    // server ever stores the reply (RecvKnightsList).
+                    KnightsInfo? info = await dbAgent.LoadKnightsInfoAsync(user.Knights);
+                    if (info is not null && world.ServerNo == 3) // BATTLE
+                    {
+                        world.Knights[info.Id] = new KnightsClan
+                        {
+                            Index = info.Id,
+                            Nation = info.Nation,
+                            Name = info.Name,
+                            Members = info.Members,
+                            Points = (int)info.Points,
+                            Grade = EbenezerWorld.GetKnightsGrade((int)info.Points),
+                            Ranking = info.Ranking,
+                        };
+                    }
+
+                    if (world.Knights.ContainsKey(user.Knights))
+                        world.SetKnightsUser(user.Knights, user.CharId);
+                }
+            }
+        }
+        else
+        {
+            // Banished members reset here.
+            if (user.Knights == -1)
+            {
+                user.Knights = 0;
+                user.Fame = 0;
+                return;
+            }
+
+            if (user.Knights != 0)
+            {
+                if (world.Knights.ContainsKey(user.Knights))
+                {
+                    world.SetKnightsUser(user.Knights, user.CharId);
+                }
+                else
+                {
+                    // The clan was destroyed while the user was away.
+                    user.Knights = 0;
+                    user.Fame = 0;
+                }
+            }
         }
 
         // WIZ_DATASAVE login entry for the ItemManager log.

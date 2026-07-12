@@ -128,6 +128,107 @@ public sealed partial class EbenezerWorld
     /// <summary>m_PartyMap keyed by the party index.</summary>
     public readonly Dictionary<int, PartyGroup> Parties = [];
 
+    /// <summary>m_KnightsMap keyed by the clan index.</summary>
+    public readonly Dictionary<int, KnightsClan> Knights = [];
+
+    /// <summary>m_nServerGroup ([ZONE_INFO] GROUP_INFO; 2 blocks clan creation).</summary>
+    public int ServerGroup;
+
+    /// <summary>EbenezerApp::GetKnightsGrade — clan grade from the point total.</summary>
+    public static byte GetKnightsGrade(int points)
+    {
+        int clanPoints = points / 24;
+
+        return clanPoints switch
+        {
+            >= 20000 => 1,
+            >= 10000 => 2,
+            >= 5000 => 3,
+            >= 2000 => 4,
+            _ => 5,
+        };
+    }
+
+    /// <summary>EbenezerApp::Send_KnightsMember (zone 100 = every zone).</summary>
+    public void SendKnightsMember(int index, ReadOnlySpan<byte> buf, int zone = 100)
+    {
+        if (index <= 0 || !Knights.ContainsKey(index))
+            return;
+
+        foreach (GameUser? user in Users)
+        {
+            if (user?.UserData is not { } data || data.Knights != index)
+                continue;
+
+            if (zone != 100 && data.Zone != zone)
+                continue;
+
+            user.Send(buf);
+        }
+    }
+
+    /// <summary>CKnightsManager::AddKnightsUser — claim the first free member slot.</summary>
+    public bool AddKnightsUser(int knightsId, string charId)
+    {
+        KnightsClan? clan = Knights.GetValueOrDefault(knightsId);
+        if (clan is null)
+            return false;
+
+        for (int i = 0; i < KnightsClan.MaxClan; i++)
+        {
+            if (clan.Users[i].Used != 0)
+                continue;
+
+            clan.Users[i].Used = 1;
+            clan.Users[i].UserName = charId;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>CKnightsManager::RemoveKnightsUser.</summary>
+    public bool RemoveKnightsUser(int knightsId, string charId)
+    {
+        KnightsClan? clan = Knights.GetValueOrDefault(knightsId);
+        if (clan is null)
+            return false;
+
+        for (int i = 0; i < KnightsClan.MaxClan; i++)
+        {
+            if (clan.Users[i].Used == 0)
+                continue;
+
+            if (string.Equals(clan.Users[i].UserName, charId, StringComparison.Ordinal))
+            {
+                clan.Users[i].Used = 0;
+                clan.Users[i].UserName = string.Empty;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>CKnightsManager::SetKnightsUser — add unless already present.</summary>
+    public void SetKnightsUser(int knightsId, string charId)
+    {
+        KnightsClan? clan = Knights.GetValueOrDefault(knightsId);
+        if (clan is null)
+            return;
+
+        for (int i = 0; i < KnightsClan.MaxClan; i++)
+        {
+            if (clan.Users[i].Used == 0)
+                continue;
+
+            if (string.Equals(clan.Users[i].UserName, charId, StringComparison.Ordinal))
+                return;
+        }
+
+        AddKnightsUser(knightsId, charId);
+    }
+
     /// <summary>m_sPartyIndex — the next party id (wraps at 32767).</summary>
     public short NextPartyIndex;
 

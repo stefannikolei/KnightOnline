@@ -85,14 +85,25 @@ public sealed partial class GameUser
         writer.SetShort(user.Knights);
         writer.SetByte(user.Fame);
 
-        // Knights block: the KnightsManager lookup attaches with its slice; the
-        // null path matches the C++.
-        writer.SetShort(0);  // alliance knights
-        writer.SetByte(0);   // clan name (empty SetString1)
-        writer.SetByte(0);   // grade
-        writer.SetByte(0);   // ranking
-        writer.SetShort(0);  // mark version
-        writer.SetShort(-1); // cape
+        KnightsClan? clan = user.Knights != 0 ? world.Knights.GetValueOrDefault(user.Knights) : null;
+        if (clan is not null)
+        {
+            writer.SetShort(clan.AllianceKnights);
+            writer.SetString1(Encoding.Latin1.GetBytes(clan.Name));
+            writer.SetByte(clan.Grade);
+            writer.SetByte(clan.Ranking);
+            writer.SetShort(clan.MarkVersion);
+            writer.SetShort(clan.Cape);
+        }
+        else
+        {
+            writer.SetShort(0);  // alliance knights
+            writer.SetByte(0);   // clan name (empty SetString1)
+            writer.SetByte(0);   // grade
+            writer.SetByte(0);   // ranking
+            writer.SetShort(0);  // mark version
+            writer.SetShort(-1); // cape
+        }
 
         writer.SetByte(user.Level);
         writer.SetByte(user.Race);

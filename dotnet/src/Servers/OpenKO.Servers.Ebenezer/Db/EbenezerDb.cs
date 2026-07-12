@@ -359,6 +359,45 @@ public sealed class EbenezerDb(SqlConnectionFactory connectionFactory, ILogger l
             },
             cancellationToken);
 
+    /// <summary>EbenezerApp::LoadAllKnights (KNIGHTS).</summary>
+    public Task<List<KnightsRow>?> LoadKnightsTableAsync(CancellationToken cancellationToken = default) =>
+        LoadTableAsync(
+            "KNIGHTS",
+            "IDNum, Flag, Nation, Ranking, IDName, Members, Chief, ViceChief_1, ViceChief_2, ViceChief_3, " +
+            "Gold, Domination, Points, sMarkVersion, sAllianceKnights, sCape",
+            static reader => new KnightsRow
+            {
+                Id = reader.GetInt16(0),
+                Flag = reader.GetByte(1),
+                Nation = reader.GetByte(2),
+                Ranking = reader.GetByte(3),
+                Name = reader.IsDBNull(4) ? string.Empty : reader.GetString(4).TrimEnd(),
+                Members = reader.GetInt16(5),
+                Chief = reader.IsDBNull(6) ? string.Empty : reader.GetString(6).TrimEnd(),
+                ViceChief1 = reader.IsDBNull(7) ? string.Empty : reader.GetString(7).TrimEnd(),
+                ViceChief2 = reader.IsDBNull(8) ? string.Empty : reader.GetString(8).TrimEnd(),
+                ViceChief3 = reader.IsDBNull(9) ? string.Empty : reader.GetString(9).TrimEnd(),
+                Gold = reader.GetInt64(10),
+                Domination = reader.GetInt16(11),
+                Points = reader.GetInt32(12),
+                MarkVersion = reader.GetInt16(13),
+                AllianceKnights = reader.GetInt16(14),
+                Cape = reader.GetInt16(15),
+            },
+            cancellationToken);
+
+    /// <summary>EbenezerApp::LoadAllKnightsUserData (KNIGHTS_USER).</summary>
+    public Task<List<KnightsUserRow>?> LoadKnightsUserTableAsync(CancellationToken cancellationToken = default) =>
+        LoadTableAsync(
+            "KNIGHTS_USER",
+            "sIDNum, strUserID",
+            static reader => new KnightsUserRow
+            {
+                KnightsId = reader.GetInt16(0),
+                UserId = reader.IsDBNull(1) ? string.Empty : reader.GetString(1).TrimEnd(),
+            },
+            cancellationToken);
+
     private async Task<List<T>?> LoadTableAsync<T>(
         string tableName, string columns, Func<SqlDataReader, T> readRow, CancellationToken cancellationToken)
     {

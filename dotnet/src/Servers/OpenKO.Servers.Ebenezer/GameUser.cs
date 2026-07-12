@@ -284,6 +284,10 @@ public sealed partial class GameUser(short socketId, EbenezerWorld world, IDbAge
                 KickOut(packet.AsSpan(1));
                 break;
 
+            case GameOpcode.WIZ_KNIGHTS_PROCESS:
+                await KnightsProcessAsync(packet.AsMemory(1));
+                break;
+
             case GameOpcode.WIZ_VERSION_CHECK:
                 VersionCheck();
                 break;

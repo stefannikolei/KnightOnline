@@ -313,3 +313,65 @@ public sealed record StartPosition
     /// <summary>Column [bRangeZ].</summary>
     public required byte RangeZ { get; init; }
 }
+
+/// <summary>KNIGHTS table row (Ebenezer startup cache).</summary>
+public sealed record KnightsRow
+{
+    /// <summary>Column [IDNum].</summary>
+    public required short Id { get; init; }
+
+    /// <summary>Column [Flag]: 1 clan, 2 knights.</summary>
+    public required byte Flag { get; init; }
+
+    /// <summary>Column [Nation].</summary>
+    public required byte Nation { get; init; }
+
+    /// <summary>Column [Ranking].</summary>
+    public required byte Ranking { get; init; }
+
+    /// <summary>Column [IDName].</summary>
+    public required string Name { get; init; }
+
+    /// <summary>Column [Members].</summary>
+    public required short Members { get; init; }
+
+    /// <summary>Column [Chief].</summary>
+    public required string Chief { get; init; }
+
+    /// <summary>Column [ViceChief_1].</summary>
+    public required string ViceChief1 { get; init; }
+
+    /// <summary>Column [ViceChief_2].</summary>
+    public required string ViceChief2 { get; init; }
+
+    /// <summary>Column [ViceChief_3].</summary>
+    public required string ViceChief3 { get; init; }
+
+    /// <summary>Column [Gold].</summary>
+    public required long Gold { get; init; }
+
+    /// <summary>Column [Domination].</summary>
+    public required short Domination { get; init; }
+
+    /// <summary>Column [Points].</summary>
+    public required int Points { get; init; }
+
+    /// <summary>Column [sMarkVersion].</summary>
+    public required short MarkVersion { get; init; }
+
+    /// <summary>Column [sAllianceKnights].</summary>
+    public required short AllianceKnights { get; init; }
+
+    /// <summary>Column [sCape].</summary>
+    public required short Cape { get; init; }
+}
+
+/// <summary>KNIGHTS_USER table row.</summary>
+public sealed record KnightsUserRow
+{
+    /// <summary>Column [sIDNum].</summary>
+    public required short KnightsId { get; init; }
+
+    /// <summary>Column [strUserID].</summary>
+    public required string UserId { get; init; }
+}

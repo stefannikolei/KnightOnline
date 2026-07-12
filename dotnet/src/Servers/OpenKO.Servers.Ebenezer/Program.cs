@@ -142,10 +142,12 @@ public sealed class EbenezerService(
         List<OpenKO.Data.Models.MagicType8>? magicType8 = await db.LoadMagicType8TableAsync(stoppingToken);
         List<OpenKO.Data.Models.ServerResource>? resources = await db.LoadServerResourceTableAsync(stoppingToken);
         List<OpenKO.Data.Models.StartPosition>? startPositions = await db.LoadStartPositionTableAsync(stoppingToken);
+        List<OpenKO.Data.Models.KnightsRow>? knights = await db.LoadKnightsTableAsync(stoppingToken);
+        List<OpenKO.Data.Models.KnightsUserRow>? knightsUsers = await db.LoadKnightsUserTableAsync(stoppingToken);
         if (coefficients is null || zoneInfos is null || items is null || levels is null || homes is null
             || magics is null || magicType1 is null || magicType2 is null || magicType3 is null
             || magicType4 is null || magicType5 is null || magicType8 is null || resources is null
-            || startPositions is null)
+            || startPositions is null || knights is null || knightsUsers is null)
         {
             logger.LogError("Ebenezer startup table load failed, closing server");
             lifetime.StopApplication();
@@ -165,6 +167,34 @@ public sealed class EbenezerService(
         World.MagicType8Table = magicType8.ToDictionary(m => m.ID);
         World.ServerResources = resources.ToDictionary(r => r.ResourceId, r => r.Resource);
         World.StartPositionTable = startPositions.ToDictionary(sp => sp.ZoneId);
+
+        // EbenezerApp::LoadAllKnights + LoadAllKnightsUserData.
+        foreach (OpenKO.Data.Models.KnightsRow row in knights)
+        {
+            World.Knights[row.Id] = new KnightsClan
+            {
+                Index = row.Id,
+                Flag = row.Flag,
+                Nation = row.Nation,
+                Name = row.Name,
+                Chief = row.Chief,
+                ViceChief1 = row.ViceChief1,
+                ViceChief2 = row.ViceChief2,
+                ViceChief3 = row.ViceChief3,
+                Members = row.Members,
+                Money = row.Gold,
+                AllianceKnights = row.AllianceKnights,
+                MarkVersion = row.MarkVersion,
+                Cape = row.Cape,
+                Domination = row.Domination,
+                Points = row.Points,
+                Grade = EbenezerWorld.GetKnightsGrade(row.Points),
+                Ranking = row.Ranking,
+            };
+        }
+
+        foreach (OpenKO.Data.Models.KnightsUserRow row in knightsUsers)
+            World.AddKnightsUser(row.KnightsId, row.UserId);
 
         // EbenezerApp::MapFileLoad — read the .smd maps from MAP/<name> for the
         // real map extents and object events. Unlike the C++ (which aborts), a

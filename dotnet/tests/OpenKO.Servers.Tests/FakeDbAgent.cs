@@ -104,10 +104,29 @@ internal sealed class FakeDbAgent : IDbAgent
     public Task<bool> UpdateConcurrentUserCountAsync(int s, int z, int u, CancellationToken ct = default)
         => Task.FromResult(true);
 
-    public Task<short> CreateKnightsAsync(int k, int n, string na, string c, int f = 1, CancellationToken ct = default) => throw new NotImplementedException();
-    public Task<short> UpdateKnightsAsync(int t, string c, int k, int d, CancellationToken ct = default) => throw new NotImplementedException();
-    public Task<short> DeleteKnightsAsync(int k, CancellationToken ct = default) => throw new NotImplementedException();
-    public Task<KnightsInfo?> LoadKnightsInfoAsync(int k, CancellationToken ct = default) => throw new NotImplementedException();
+    public readonly List<(int KnightsId, int Nation, string Name, string Chief, int Flag)> CreateKnightsCalls = [];
+    public readonly List<(int Type, string CharId, int KnightsId)> UpdateKnightsCalls = [];
+    public readonly List<int> DeleteKnightsCalls = [];
+
+    public Task<short> CreateKnightsAsync(int k, int n, string na, string c, int f = 1, CancellationToken ct = default)
+    {
+        CreateKnightsCalls.Add((k, n, na, c, f));
+        return Task.FromResult((short)0);
+    }
+
+    public Task<short> UpdateKnightsAsync(int t, string c, int k, int d, CancellationToken ct = default)
+    {
+        UpdateKnightsCalls.Add((t, c, k));
+        return Task.FromResult((short)0);
+    }
+
+    public Task<short> DeleteKnightsAsync(int k, CancellationToken ct = default)
+    {
+        DeleteKnightsCalls.Add(k);
+        return Task.FromResult((short)0);
+    }
+
+    public Task<KnightsInfo?> LoadKnightsInfoAsync(int k, CancellationToken ct = default) => Task.FromResult<KnightsInfo?>(null);
     public Task<List<KnightsMember>> LoadKnightsMembersAsync(int k, CancellationToken ct = default) => throw new NotImplementedException();
     public Task<List<KnightsRankingEntry>> LoadKnightsRankingAsync(int n, CancellationToken ct = default) => throw new NotImplementedException();
     public Task<bool> UpdateBattleEventAsync(string c, int n, CancellationToken ct = default) => throw new NotImplementedException();
