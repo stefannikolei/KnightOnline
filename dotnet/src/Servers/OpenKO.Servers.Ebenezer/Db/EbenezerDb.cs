@@ -342,6 +342,23 @@ public sealed class EbenezerDb(SqlConnectionFactory connectionFactory, ILogger l
             },
             cancellationToken);
 
+    /// <summary>EbenezerApp::LoadStartPositionTable (START_POSITION).</summary>
+    public Task<List<StartPosition>?> LoadStartPositionTableAsync(CancellationToken cancellationToken = default) =>
+        LoadTableAsync(
+            "START_POSITION",
+            "ZoneID, sKarusX, sKarusZ, sElmoradX, sElmoradZ, bRangeX, bRangeZ",
+            static reader => new StartPosition
+            {
+                ZoneId = reader.GetInt16(0),
+                KarusX = reader.GetInt16(1),
+                KarusZ = reader.GetInt16(2),
+                ElmoX = reader.GetInt16(3),
+                ElmoZ = reader.GetInt16(4),
+                RangeX = reader.GetByte(5),
+                RangeZ = reader.GetByte(6),
+            },
+            cancellationToken);
+
     private async Task<List<T>?> LoadTableAsync<T>(
         string tableName, string columns, Func<SqlDataReader, T> readRow, CancellationToken cancellationToken)
     {

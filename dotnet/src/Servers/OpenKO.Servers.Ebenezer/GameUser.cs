@@ -206,6 +206,84 @@ public sealed partial class GameUser(short socketId, EbenezerWorld world, IDbAge
                 RequestNpcIn(packet.AsSpan(1));
                 break;
 
+            case GameOpcode.WIZ_TARGET_HP:
+            {
+                var reader = new PacketReader(packet.AsSpan(1));
+                short uid = reader.GetShort();
+                byte echo = reader.GetByte();
+                SendTargetHP(echo, uid, 0);
+                break;
+            }
+
+            case GameOpcode.WIZ_ZONE_CHANGE:
+                RecvZoneChange(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_POINT_CHANGE:
+                PointChange(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_EXCHANGE:
+                ExchangeProcess(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_SKILLPT_CHANGE:
+                SkillPointChange(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_OBJECT_EVENT:
+                ObjectEventProcess(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_WEATHER:
+            case GameOpcode.WIZ_TIME:
+                UpdateGameWeather(packet.AsSpan(1), opcode);
+                break;
+
+            case GameOpcode.WIZ_CLASS_CHANGE:
+                ClassChange(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_CONCURRENTUSER:
+                CountConcurrentUser();
+                break;
+
+            case GameOpcode.WIZ_DATASAVE:
+                UserDataSaveToAgent();
+                break;
+
+            case GameOpcode.WIZ_SPEEDHACK_CHECK:
+                SpeedHackTime(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_SERVER_CHECK:
+                ServerStatusCheck();
+                break;
+
+            case GameOpcode.WIZ_REPORT_BUG:
+                ReportBug(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_HOME:
+                Home();
+                break;
+
+            case GameOpcode.WIZ_WARP_LIST:
+                SelectWarpList(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_ZONE_CONCURRENT:
+                ZoneConCurrentUsers(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_VIRTUAL_SERVER:
+                ServerChangeOk(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_KICKOUT:
+                KickOut(packet.AsSpan(1));
+                break;
+
             case GameOpcode.WIZ_VERSION_CHECK:
                 VersionCheck();
                 break;
@@ -299,10 +377,18 @@ public sealed partial class GameUser(short socketId, EbenezerWorld world, IDbAge
     }
 
     /// <summary>
-    /// CUser::UserDataSaveToAgent — persists the character before a forced
-    /// logout. Becomes functional with the stage-4.2 character data.
+    /// CUser::UserDataSaveToAgent — the WIZ_DATASAVE pair: the Aujard save
+    /// trigger (via the world's SaveUserData hook, replacing the Logger queue)
+    /// and the character snapshot line for the ItemManager.
     /// </summary>
     public void UserDataSaveToAgent()
     {
+        if (UserData is not { } user || user.CharId.Length == 0 || user.AccountId.Length == 0)
+            return;
+
+        world.SaveUserData?.Invoke(this);
+
+        // The second C++ queue message ([0x02] flag) goes to the item logger.
+        SendItemLogDataSave(0x02);
     }
 }

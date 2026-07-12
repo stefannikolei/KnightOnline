@@ -500,15 +500,28 @@ public sealed partial class GameUser
             RemoteIp, init);
     }
 
-    /// <summary>
-    /// CUser::NativeZoneReturn — sends the character back to its home zone.
-    /// Needs the HOME table (stage 4.3); until then only the position reset is
-    /// skipped and the session still closes.
-    /// </summary>
+    /// <summary>CUser::NativeZoneReturn — resets the position into the HOME box.</summary>
     private void NativeZoneReturn()
     {
-        logger.LogDebug("NativeZoneReturn: HOME relocation not yet ported [charId={CharId}]",
-            UserData?.CharId);
+        if (UserData is not { } user)
+            return;
+
+        OpenKO.Data.Models.Home? home = world.HomeTable.GetValueOrDefault(user.Nation);
+        if (home is null)
+            return;
+
+        user.Zone = user.Nation;
+
+        if (user.Nation == 1) // KARUS
+        {
+            user.CurX = home.KarusZoneX + world.Rand(0, home.KarusZoneLX);
+            user.CurZ = home.KarusZoneZ + world.Rand(0, home.KarusZoneLZ);
+        }
+        else
+        {
+            user.CurX = home.ElmoZoneX + world.Rand(0, home.ElmoZoneLX);
+            user.CurZ = home.ElmoZoneZ + world.Rand(0, home.ElmoZoneLZ);
+        }
     }
 
     /// <summary>The WIZ_DATASAVE line CUser::SelectCharacter pushes to the ItemManager.</summary>

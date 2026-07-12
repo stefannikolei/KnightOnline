@@ -288,3 +288,28 @@ public sealed record ServerResource
     /// <summary>Column [strResource].</summary>
     public required string Resource { get; init; }
 }
+
+/// <summary>START_POSITION table: per-zone WIZ_HOME spawn boxes.</summary>
+public sealed record StartPosition
+{
+    /// <summary>Column [ZoneID].</summary>
+    public required short ZoneId { get; init; }
+
+    /// <summary>Column [sKarusX].</summary>
+    public required short KarusX { get; init; }
+
+    /// <summary>Column [sKarusZ].</summary>
+    public required short KarusZ { get; init; }
+
+    /// <summary>Column [sElmoradX].</summary>
+    public required short ElmoX { get; init; }
+
+    /// <summary>Column [sElmoradZ].</summary>
+    public required short ElmoZ { get; init; }
+
+    /// <summary>Column [bRangeX].</summary>
+    public required byte RangeX { get; init; }
+
+    /// <summary>Column [bRangeZ].</summary>
+    public required byte RangeZ { get; init; }
+}

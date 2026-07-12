@@ -141,9 +141,11 @@ public sealed class EbenezerService(
         List<OpenKO.Data.Models.MagicType5>? magicType5 = await db.LoadMagicType5TableAsync(stoppingToken);
         List<OpenKO.Data.Models.MagicType8>? magicType8 = await db.LoadMagicType8TableAsync(stoppingToken);
         List<OpenKO.Data.Models.ServerResource>? resources = await db.LoadServerResourceTableAsync(stoppingToken);
+        List<OpenKO.Data.Models.StartPosition>? startPositions = await db.LoadStartPositionTableAsync(stoppingToken);
         if (coefficients is null || zoneInfos is null || items is null || levels is null || homes is null
             || magics is null || magicType1 is null || magicType2 is null || magicType3 is null
-            || magicType4 is null || magicType5 is null || magicType8 is null || resources is null)
+            || magicType4 is null || magicType5 is null || magicType8 is null || resources is null
+            || startPositions is null)
         {
             logger.LogError("Ebenezer startup table load failed, closing server");
             lifetime.StopApplication();
@@ -162,6 +164,7 @@ public sealed class EbenezerService(
         World.MagicType5Table = magicType5.ToDictionary(m => m.ID);
         World.MagicType8Table = magicType8.ToDictionary(m => m.ID);
         World.ServerResources = resources.ToDictionary(r => r.ResourceId, r => r.Resource);
+        World.StartPositionTable = startPositions.ToDictionary(sp => sp.ZoneId);
 
         // EbenezerApp::MapFileLoad — read the .smd maps from MAP/<name> for the
         // real map extents and object events. Unlike the C++ (which aborts), a
@@ -185,11 +188,42 @@ public sealed class EbenezerService(
                     {
                         gameZone.ObjectEvents[objectEvent.Index] = new ObjectEvent
                         {
+                            Index = objectEvent.Index,
                             Type = objectEvent.Type,
+                            Belong = objectEvent.Belong,
+                            ControlNpcId = objectEvent.ControlNpcId,
                             Life = 1, // C3DMap::LoadObjectEvent marks every event alive
                             PosX = objectEvent.PosX,
                             PosZ = objectEvent.PosZ,
                         };
+                    }
+
+                    foreach (OpenKO.GameData.Maps.WarpInfo warp in map.Warps)
+                    {
+                        gameZone.Warps[warp.WarpId] = new WarpInfo
+                        {
+                            WarpId = warp.WarpId,
+                            WarpName = warp.WarpName,
+                            Announce = warp.Announce,
+                            Pay = warp.Pay,
+                            Zone = warp.Zone,
+                            X = warp.X,
+                            Y = warp.Y,
+                            Z = warp.Z,
+                            R = warp.R,
+                            Nation = warp.Nation,
+                        };
+                    }
+
+                    foreach (OpenKO.GameData.Maps.RegeneEvent regene in map.RegeneEvents)
+                    {
+                        gameZone.RegeneEvents.Add(new RegeneEvent
+                        {
+                            PosX = regene.PosX,
+                            PosZ = regene.PosZ,
+                            AreaX = regene.AreaX,
+                            AreaZ = regene.AreaZ,
+                        });
                     }
 
                     logger.LogInformation("zone {Zone}: loaded {Map} ({Size} regions, {Events} object events)",
@@ -208,6 +242,7 @@ public sealed class EbenezerService(
             // The C++ divides the ZONE_INFO spawn point by 100.
             gameZone.InitX = (float)(zone.InitX / 100.0);
             gameZone.InitZ = (float)(zone.InitZ / 100.0);
+            gameZone.Type = zone.Type;
             World.Zones.Add(gameZone);
         }
 
@@ -216,6 +251,17 @@ public sealed class EbenezerService(
 
         World.SendToAiServer = World.SendAiServer;
         World.UserAccept = () => _userAccept.TrySetResult();
+
+        // The Aujard-queue messages become direct DB-agent calls on the game loop.
+        World.SaveUserData = user => queue.Writer.TryWrite(async () =>
+        {
+            if (user.UserData is { } data && data.CharId.Length > 0)
+                await dbAgent.UpdateUserAsync(data.CharId, user.SocketId, UserUpdateType.PacketSave, stoppingToken);
+        });
+        World.KickOutRequested = accountId => queue.Writer.TryWrite(async () =>
+        {
+            await dbAgent.AccountLogoutAsync(accountId, cancellationToken: stoppingToken);
+        });
 
         // EbenezerApp::AIServerConnect — one link per socket index; a failure
         // aborts startup like the C++ OnStart.
@@ -369,9 +415,12 @@ public sealed class EbenezerService(
             // Close notification runs on the game loop too (CloseProcess ordering).
             queue.TryWrite(() =>
             {
-                // CUser::CloseProcess order: leave the party, then the world.
-                session.User.PartyRemoveMember(session.User.SocketId);
+                // CUser::CloseProcess order: leave the world, the party, the trade.
                 session.User.UserInOut(GameUser.UserOut);
+                if (session.User.PartyIndex != -1)
+                    session.User.PartyRemoveMember(session.User.SocketId);
+                if (session.User.ExchangeUser != -1)
+                    session.User.ExchangeCancel();
                 World.Unregister(session.User.SocketId);
                 logger.LogInformation("user {Id} disconnected", session.User.SocketId);
                 session.Dispose();

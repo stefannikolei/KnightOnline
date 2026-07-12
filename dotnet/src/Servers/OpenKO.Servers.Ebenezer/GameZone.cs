@@ -10,13 +10,40 @@ public sealed class ZoneRegion
     public readonly Dictionary<uint, ZoneItem> Items = [];
 }
 
-/// <summary>_OBJECT_EVENT slice the AISocket/respawn flows touch (sType, byLife, position).</summary>
+/// <summary>_OBJECT_EVENT slice the AISocket/respawn/object-event flows touch.</summary>
 public sealed class ObjectEvent
 {
+    public short Index;
     public short Type;
+    public int Belong;
+    public short ControlNpcId;
     public byte Life;
     public float PosX;
     public float PosZ;
+}
+
+/// <summary>The _WARP_INFO fields the WIZ_WARP_LIST flow reads.</summary>
+public sealed class WarpInfo
+{
+    public short WarpId;
+    public byte[] WarpName = [];  // char[32], CP949, NUL-terminated
+    public byte[] Announce = [];  // char[256]
+    public uint Pay;
+    public short Zone;
+    public float X;
+    public float Y;
+    public float Z;
+    public float R;
+    public short Nation;
+}
+
+/// <summary>The _REGENE_EVENT fields KickOutZoneUser reads.</summary>
+public sealed class RegeneEvent
+{
+    public float PosX;
+    public float PosZ;
+    public float AreaX;
+    public float AreaZ;
 }
 
 /// <summary>_ZONE_ITEM: one dropped loot bundle (up to 6 stacks).</summary>
@@ -51,6 +78,22 @@ public sealed class GameZone
 
     /// <summary>m_ObjectEventArray keyed by object index (filled by the SMD map loader).</summary>
     public readonly Dictionary<int, ObjectEvent> ObjectEvents = [];
+
+    /// <summary>m_WarpArray keyed by warp id (filled by the SMD map loader).</summary>
+    public readonly Dictionary<int, WarpInfo> Warps = [];
+
+    /// <summary>m_ObjectRegeneArray in file order (filled by the SMD map loader).</summary>
+    public readonly List<RegeneEvent> RegeneEvents = [];
+
+    /// <summary>m_bType (ZONE_INFO): 1 common, 2 battle, 3 24h battle.</summary>
+    public byte Type;
+
+    /// <summary>m_sMaxUser (battle-zone capacity, C3DMap default).</summary>
+    public short MaxUsers = 150;
+
+    /// <summary>C3DMap::GetRegeneEvent.</summary>
+    public RegeneEvent? GetRegeneEvent(int index)
+        => index >= 0 && index < RegeneEvents.Count ? RegeneEvents[index] : null;
 
     /// <summary>m_wBundle: the next loot-bundle id (starts at 1, wraps at ZONEITEM_MAX).</summary>
     public uint Bundle = 1;

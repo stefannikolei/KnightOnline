@@ -19,6 +19,7 @@ public sealed partial class GameUser
     public const byte PartyDelete = 0x05;
     public const byte PartyHpChange = 0x06;
     public const byte PartyLevelChange = 0x07;
+    public const byte PartyClassChange = 0x08;
     public const byte PartyStatusChange = 0x09;
 
     /// <summary>CUser::PartyProcess — the WIZ_PARTY dispatch.</summary>

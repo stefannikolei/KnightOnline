@@ -237,6 +237,145 @@ public sealed partial class EbenezerWorld
     /// <summary>m_HomeTableMap (HOME, keyed by nation).</summary>
     public Dictionary<byte, Home> HomeTable = [];
 
+    /// <summary>m_StartPositionTableMap (START_POSITION, keyed by zone).</summary>
+    public Dictionary<short, StartPosition> StartPositionTable = [];
+
+    /// <summary>g_serverdown_flag: blocks zone changes during shutdown.</summary>
+    public bool ServerDownFlag;
+
+    /// <summary>m_sDiscount: 1 = winner discount, 2 = everyone.</summary>
+    public short Discount;
+
+    /// <summary>m_bVictory: winning nation of the running battle event.</summary>
+    public byte Victory;
+
+    /// <summary>m_bKarusFlag / m_bElmoradFlag: captured battle-zone flags.</summary>
+    public byte KarusFlag;
+    public byte ElmoradFlag;
+
+    /// <summary>m_byKarusOpenFlag / m_byElmoradOpenFlag: invasion gates.</summary>
+    public byte KarusOpenFlag;
+    public byte ElmoradOpenFlag;
+
+    /// <summary>m_strKarusCaptain / m_strElmoradCaptain.</summary>
+    public string KarusCaptain = string.Empty;
+    public string ElmoradCaptain = string.Empty;
+
+    // Battlezone announcement types (Ebenezer Define.h).
+    public const byte BattlezoneOpen = 0x00;
+    public const byte BattlezoneClose = 0x01;
+    public const byte DeclareWinner = 0x02;
+    public const byte DeclareLoser = 0x03;
+    public const byte DeclareBan = 0x04;
+    public const byte KarusCaptainNotify = 0x05;
+    public const byte ElmoradCaptainNotify = 0x06;
+    public const byte KarusCaptainDepriveNotify = 0x07;
+    public const byte ElmoradCaptainDepriveNotify = 0x08;
+    public const byte SnowBattlezoneOpen = 0x09;
+
+    private const int NumFlagVictory = 4; // NUM_FLAG_VICTORY
+    private const int AwardGold = 5000;   // AWARD_GOLD
+
+    /// <summary>EbenezerApp::BattleZoneVictoryCheck — flags reach 4 → winner + gold.</summary>
+    public void BattleZoneVictoryCheck()
+    {
+        if (KarusFlag >= NumFlagVictory)
+            Victory = 1; // KARUS
+        else if (ElmoradFlag >= NumFlagVictory)
+            Victory = 2; // ELMORAD
+        else
+            return;
+
+        Announcement(DeclareWinner);
+
+        foreach (GameUser? user in Users)
+        {
+            if (user?.UserData is { } data
+                && data.Nation == Victory
+                && data.Zone == data.Nation)
+                data.Gold += AwardGold;
+        }
+    }
+
+    /// <summary>EbenezerApp::Announcement — resource-formatted WIZ_CHAT broadcast.</summary>
+    public void Announcement(byte type, int nation = 0, byte chatType = 8)
+    {
+        string chat;
+        switch (type)
+        {
+            case BattlezoneOpen:
+            case SnowBattlezoneOpen:
+                chat = FormatResource(105); // IDP_BATTLEZONE_OPEN
+                break;
+
+            case DeclareWinner:
+                if (Victory == 1)
+                    chat = FormatResource(106, ElmoradDead, KarusDead); // IDP_KARUS_VICTORY
+                else if (Victory == 2)
+                    chat = FormatResource(107, KarusDead, ElmoradDead); // IDP_ELMORAD_VICTORY
+                else
+                    return;
+                break;
+
+            case DeclareLoser:
+                if (Victory == 1)
+                    chat = FormatResource(130, KarusDead, ElmoradDead); // IDS_ELMORAD_LOSER
+                else if (Victory == 2)
+                    chat = FormatResource(131, ElmoradDead, KarusDead); // IDS_KARUS_LOSER
+                else
+                    return;
+                break;
+
+            case DeclareBan:
+                chat = FormatResource(132); // IDS_BANISH_USER
+                break;
+
+            case BattlezoneClose:
+                chat = FormatResource(133); // IDS_BATTLE_CLOSE
+                break;
+
+            case KarusCaptainNotify:
+                chat = FormatResource(140, KarusCaptain); // IDS_KARUS_CAPTAIN
+                break;
+
+            case ElmoradCaptainNotify:
+                chat = FormatResource(141, ElmoradCaptain); // IDS_ELMO_CAPTAIN
+                break;
+
+            case KarusCaptainDepriveNotify:
+                chat = FormatResource(142, KarusCaptain); // IDS_KARUS_CAPTAIN_DEPRIVE
+                break;
+
+            case ElmoradCaptainDepriveNotify:
+                chat = FormatResource(143, ElmoradCaptain); // IDS_ELMO_CAPTAIN_DEPRIVE
+                break;
+
+            default:
+                return;
+        }
+
+        chat = FormatResource(126, chat); // IDP_ANNOUNCEMENT
+
+        byte[] text = System.Text.Encoding.Latin1.GetBytes(chat);
+        var buffer = new byte[10 + text.Length];
+        var writer = new OpenKO.Network.PacketWriter(buffer);
+        writer.SetByte(0x10); // WIZ_CHAT
+        writer.SetByte(chatType);
+        writer.SetByte(1);
+        writer.SetShort(-1);
+        writer.SetByte(0); // sender name length
+        writer.SetString2(text);
+
+        foreach (GameUser? user in Users)
+        {
+            if (user is null || user.State != ConnectionState.GameStart)
+                continue;
+
+            if (nation == 0 || nation == user.UserData?.Nation)
+                user.Send(writer.Written);
+        }
+    }
+
     // ---- game time/weather ([TIMER] section + WIZ_TIME updates) ----
     public short Year = 1;
     public short Month = 1;
@@ -266,6 +405,18 @@ public sealed partial class EbenezerWorld
     /// ItemManager's ITEMLOG_SEND queue (wired to an IItemLogSource by the host).
     /// </summary>
     public Action<byte[]>? ItemLogSink;
+
+    /// <summary>
+    /// The WIZ_DATASAVE trigger the C++ pushed onto the Aujard queue: the host
+    /// wires this to IDbAgent.UpdateUserAsync(PacketSave) on the game loop.
+    /// </summary>
+    public Action<GameUser>? SaveUserData;
+
+    /// <summary>
+    /// The WIZ_KICKOUT forward for accounts not on this server (the C++ asked
+    /// Aujard to log the account out); wired to IDbAgent.AccountLogoutAsync.
+    /// </summary>
+    public Action<string>? KickOutRequested;
 
     /// <summary>EbenezerApp::GetUserPtr(name, NameType::Account) — case-insensitive.</summary>
     public GameUser? GetUserByAccount(string accountId)
