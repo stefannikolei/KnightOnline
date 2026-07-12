@@ -81,22 +81,23 @@ public class GameUserWorldTests
     {
         var world = MakeWorld();
         var db = new FakeDbAgent();
-        (GameUser mover, _) = MakeInGameUser(world, db, 100, 100, "Mover");
-        (GameUser observer, _) = MakeInGameUser(world, db, 110, 110, "Watcher"); // same region
+        (GameUser mover, List<byte[]> moverFrames) = MakeInGameUser(world, db, 100, 100, "Mover");
+        (GameUser observer, List<byte[]> observerFrames) = MakeInGameUser(world, db, 110, 110, "Watcher"); // same region
+        moverFrames.Clear();
+        observerFrames.Clear();
 
-        // Re-announce the mover: the observer must get USER_IN + info via the region buffer.
+        // Re-announce the mover: the C++ sends USER_IN + info directly (bDirect default).
         mover.UserInOut(GameUser.UserIn);
 
-        byte[]? packet = observer.RegionPacketClear();
-        Assert.NotNull(packet);
-        // Inner entry: [len i16][WIZ_USER_INOUT][type=IN][sid i16][info...].
-        Assert.Equal(0x07, packet![5]); // WIZ_USER_INOUT
-        Assert.Equal(0x01, packet[6]);  // USER_IN
-        Assert.Equal(mover.SocketId, BinaryPrimitives.ReadInt16LittleEndian(packet.AsSpan(7)));
-        Assert.Equal(5, packet[9]); // name length "Mover"
+        byte[] payload = Unframe(Assert.Single(observerFrames));
+        Assert.Equal(0x07, payload[0]); // WIZ_USER_INOUT
+        Assert.Equal(0x01, payload[1]); // USER_IN
+        Assert.Equal(mover.SocketId, BinaryPrimitives.ReadInt16LittleEndian(payload.AsSpan(2)));
+        Assert.Equal(5, payload[4]); // name length "Mover"
+        Assert.Null(observer.RegionPacketClear());
 
         // The mover itself is excluded.
-        Assert.Null(mover.RegionPacketClear());
+        Assert.Empty(moverFrames);
     }
 
     [Fact]

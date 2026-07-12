@@ -7,6 +7,13 @@ public sealed class ZoneRegion
     public readonly SortedSet<int> Npcs = [];
 }
 
+/// <summary>_OBJECT_EVENT slice the AISocket flow touches (sType + byLife).</summary>
+public sealed class ObjectEvent
+{
+    public short Type;
+    public byte Life;
+}
+
 /// <summary>
 /// Port of the C3DMap fields the game flow needs: zone/server numbers, the map
 /// extent and the VIEW_DISTANCE region grid. The terrain/collision data
@@ -24,6 +31,9 @@ public sealed class GameZone
     public float MapSize { get; }
 
     public ZoneRegion[,] Regions { get; }
+
+    /// <summary>m_ObjectEventArray keyed by object index (filled by the SMD map loader).</summary>
+    public readonly Dictionary<int, ObjectEvent> ObjectEvents = [];
 
     public GameZone(short serverNo, short zoneNumber, float mapSize = 0f)
     {
@@ -74,4 +84,8 @@ public sealed class GameZone
         if (IsValidRegion(rx, rz))
             Regions[rx, rz].Npcs.Remove(nid);
     }
+
+    /// <summary>C3DMap::GetObjectEvent.</summary>
+    public ObjectEvent? GetObjectEvent(int objectIndex)
+        => ObjectEvents.GetValueOrDefault(objectIndex);
 }

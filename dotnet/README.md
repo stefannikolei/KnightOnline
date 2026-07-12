@@ -153,7 +153,7 @@ g++ -std=c++23 -O2 -I . -I shared -I deps/djb2 \
 | 1 | Foundations (Core/Network/Data/Hosting) + VersionManager + ItemManager | **done** |
 | 2 | OpenKO.Data full build-out + Aujard as library/hosted service | **done** |
 | 3 | AIServer (+ OpenKO.GameData: .tbl loader, N3ShapeMgr MAP collision) | done — parity verification vs the C++ AIServer pending (needs seeded DB + MAP files) |
-| 4 | Ebenezer (WIZ_CRYPTION handshake, LZF packets, game logic) | open |
+| 4 | Ebenezer (WIZ_CRYPTION handshake, LZF packets, game logic) | in progress — socket layer, login/char flow, GAMESTART, region world (4.1–4.4) and the AISocket link/NPC mirror sync (4.5) done; combat/chat/items/magic and the remaining gameplay slices open |
 | 5 | Client foundations: N3 asset loaders + math | open |
 | 6 | Client engine core on MonoGame (fixed-function emulation, UI system) | open |
 | 7 | Client game (WarFare port: states, networking, ~80 UI dialogs) | open |

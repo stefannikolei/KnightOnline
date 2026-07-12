@@ -126,6 +126,28 @@ public sealed partial class GameUser
         }
     }
 
+    /// <summary>CUser::SendUserInfo — the per-user blob inside AG_USER_INFO_ALL.</summary>
+    public void SendUserInfo(ref PacketWriter writer)
+    {
+        if (UserData is not { } user)
+            return;
+
+        writer.SetShort(SocketId);
+        writer.SetString2(Encoding.Latin1.GetBytes(user.CharId));
+        writer.SetByte(user.Zone);
+        writer.SetShort((short)ZoneIndex);
+        writer.SetByte(user.Nation);
+        writer.SetByte(user.Level);
+        writer.SetShort(user.Hp);
+        writer.SetShort(user.Mp);
+        writer.SetShort((short)(TotalHit * AttackAmount / 100));
+        writer.SetShort((short)(TotalAc + AcAmount));
+        writer.SetFloat(TotalHitRate);
+        writer.SetFloat(TotalEvasionRate);
+        writer.SetShort(PartyIndex);
+        writer.SetByte(user.Authority);
+    }
+
     /// <summary>CUser::MoveProcess.</summary>
     public void MoveProcess(ReadOnlySpan<byte> body)
     {
@@ -188,7 +210,7 @@ public sealed partial class GameUser
         writer.SetByte(echo);
 
         RegisterRegion();
-        world.SendRegion(writer.Written, user.Zone, RegionX, RegionZ);
+        world.SendRegion(writer.Written, user.Zone, RegionX, RegionZ, except: null, direct: false);
 
         // C3DMap::CheckEvent (trap/teleport tiles) attaches with the event slice.
 
@@ -218,7 +240,7 @@ public sealed partial class GameUser
         writer.SetShort(SocketId);
         writer.SetShort(Direction);
 
-        world.SendRegion(writer.Written, user.Zone, RegionX, RegionZ);
+        world.SendRegion(writer.Written, user.Zone, RegionX, RegionZ, except: null, direct: false);
     }
 
     /// <summary>CUser::UserInOut — region membership + the in/out broadcast.</summary>

@@ -16,8 +16,8 @@ public sealed partial class EbenezerWorld
         (0, 0), (-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1),
     ];
 
-    /// <summary>EbenezerApp::Send_Region — the 3×3 region block around (x, z).</summary>
-    public void SendRegion(ReadOnlySpan<byte> buf, int zone, int x, int z, GameUser? except = null, bool direct = false)
+    /// <summary>EbenezerApp::Send_Region — the 3×3 region block around (x, z). Like the C++, bDirect defaults to true.</summary>
+    public void SendRegion(ReadOnlySpan<byte> buf, int zone, int x, int z, GameUser? except = null, bool direct = true)
     {
         GameZone? map = GetZoneById(zone);
         if (map is null)
@@ -28,7 +28,7 @@ public sealed partial class EbenezerWorld
     }
 
     /// <summary>EbenezerApp::Send_UnitRegion — every in-game user of one region.</summary>
-    public void SendUnitRegion(GameZone map, ReadOnlySpan<byte> buf, int x, int z, GameUser? except = null, bool direct = false)
+    public void SendUnitRegion(GameZone map, ReadOnlySpan<byte> buf, int x, int z, GameUser? except = null, bool direct = true)
     {
         if (!map.IsValidRegion(x, z))
             return;

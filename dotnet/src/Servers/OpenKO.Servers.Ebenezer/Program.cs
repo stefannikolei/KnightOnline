@@ -5,8 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenKO.Core.Config;
+using OpenKO.Core.Protocol;
 using OpenKO.Data;
 using OpenKO.Hosting;
+using OpenKO.Network.Tcp;
 using OpenKO.Servers.Aujard;
 using OpenKO.Servers.Ebenezer.Net;
 
@@ -35,6 +37,7 @@ public static class Program
         string uid = ini.GetString("ODBC", "GAME_UID", "knight");
         string pwd = ini.GetString("ODBC", "GAME_PWD", "knight");
         string server = ini.GetString("ODBC", "SERVER", "");
+        string aiServerIp = ini.GetString("AI_SERVER", "IP", "127.0.0.1");
 
         int listenPort = ListenPortBase + serverNo;
 
@@ -57,6 +60,7 @@ public static class Program
             listenPort,
             (short)serverNo,
             serverInfos,
+            aiServerIp,
             sp.GetRequiredService<SqlConnectionFactory>(),
             sp.GetRequiredService<IDbAgent>(),
             sp.GetRequiredService<IHostApplicationLifetime>(),
@@ -71,25 +75,42 @@ public static class Program
 
 /// <summary>
 /// Accepts game-client connections and runs the single-writer game loop: every
-/// received chunk is queued and de-framed/dispatched on one loop, preserving
-/// the serialization the C++ enforced with its recursive mutexes.
+/// received chunk (game clients and AI links alike) is queued and dispatched on
+/// one loop, preserving the serialization the C++ enforced with its recursive
+/// mutexes. Like the C++, game clients are only accepted after the AIServer has
+/// delivered the NPC data for every zone (UserAcceptThread).
 /// </summary>
 public sealed class EbenezerService(
     int listenPort,
     short serverNo,
     IReadOnlyList<ZoneServerInfo> serverInfos,
+    string aiServerIp,
     SqlConnectionFactory connectionFactory,
     IDbAgent dbAgent,
     IHostApplicationLifetime lifetime,
     ILogger<EbenezerService> logger) : BackgroundService
 {
-    private sealed record SessionWork(GameSession Session, byte[]? Data);
+    // AI_KARUS/ELMO/BATTLE_SOCKET_PORT by server number (KARUS=1, ELMORAD=2, BATTLE=3).
+    public const int AiKarusPort = 10020;
+    public const int AiElmoPort = 10030;
+    public const int AiBattlePort = 10040;
 
     private TcpListener? _listener;
+
+    private readonly TaskCompletionSource _userAccept =
+        new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     public EbenezerWorld World { get; } = new();
 
     public IPEndPoint? LocalEndPoint => (IPEndPoint?)_listener?.Server.LocalEndPoint;
+
+    private int GetAiServerPort() => serverNo switch
+    {
+        1 => AiKarusPort,
+        2 => AiElmoPort,
+        3 => AiBattlePort,
+        _ => -1,
+    };
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -126,21 +147,119 @@ public sealed class EbenezerService(
         foreach (OpenKO.Data.Models.ZoneInfo zone in zoneInfos)
             World.Zones.Add(new GameZone(zone.ServerId, zone.ZoneId));
 
-        Channel<SessionWork> queue = Channel.CreateUnbounded<SessionWork>(
+        Channel<Func<ValueTask>> queue = Channel.CreateUnbounded<Func<ValueTask>>(
             new UnboundedChannelOptions { SingleReader = true });
 
+        World.SendToAiServer = World.SendAiServer;
+        World.UserAccept = () => _userAccept.TrySetResult();
+
+        // EbenezerApp::AIServerConnect — one link per socket index; a failure
+        // aborts startup like the C++ OnStart.
+        for (int i = 0; i < EbenezerWorld.MaxAiSocket; i++)
+        {
+            if (!await AiSocketConnectAsync(i, reconnect: false, queue.Writer, stoppingToken))
+            {
+                logger.LogError("AI Server connection failed (zone {Zone}, {Ip}:{Port}), closing server",
+                    i, aiServerIp, GetAiServerPort());
+                lifetime.StopApplication();
+                return;
+            }
+        }
+
         _listener = new TcpListener(IPAddress.Any, listenPort);
-        _listener.Start(backlog: 512);
-        logger.LogInformation("Listening on 0.0.0.0:{Port}", ((IPEndPoint)_listener.Server.LocalEndPoint!).Port);
 
         Task acceptLoop = AcceptLoopAsync(queue.Writer, stoppingToken);
-        Task gameLoop = GameLoopAsync(queue.Reader, stoppingToken);
+        Task gameLoop = GameLoopAsync(queue, stoppingToken);
 
         await Task.WhenAll(acceptLoop, gameLoop);
     }
 
-    private async Task AcceptLoopAsync(ChannelWriter<SessionWork> queue, CancellationToken ct)
+    /// <summary>
+    /// EbenezerApp::AISocketConnect — connect one AI link and send the
+    /// AI_SERVER_CONNECT handshake. Registration into World.AiSockets happens
+    /// inline (startup runs before the game loop, reconnects enqueue).
+    /// </summary>
+    private async Task<bool> AiSocketConnectAsync(
+        int index, bool reconnect, ChannelWriter<Func<ValueTask>> queue, CancellationToken ct)
     {
+        int port = GetAiServerPort();
+        if (port < 0)
+        {
+            logger.LogError("AiSocketConnect: unsupported server number {ServerNo} (zone {Zone})", serverNo, index);
+            return false;
+        }
+
+        var client = new KoTcpClient(logger);
+        try
+        {
+            await client.ConnectAsync(new IPEndPoint(IPAddress.Parse(aiServerIp), port), ct);
+        }
+        catch (Exception ex) when (ex is SocketException or OperationCanceledException or FormatException)
+        {
+            logger.LogError("AiSocketConnect: failed to connect to AI server (zone {Zone}) ({Ip}:{Port}): {Error}",
+                index, aiServerIp, port, ex.Message);
+            await client.DisposeAsync();
+            return false;
+        }
+
+        var link = new AiLink(index, World, logger) { Transmit = payload => client.Send(payload) };
+        client.OnPacket = (_, packet) =>
+        {
+            queue.TryWrite(() =>
+            {
+                link.Parsing(packet);
+                return ValueTask.CompletedTask;
+            });
+            return ValueTask.CompletedTask;
+        };
+
+        link.Send([AiOpcode.AI_SERVER_CONNECT, (byte)index, reconnect ? (byte)1 : (byte)0]);
+        World.AiSockets[index] = link;
+
+        _ = RunAiLinkAsync(client, link, queue, ct);
+
+        logger.LogDebug("AiSocketConnect: connected to zone {Zone}", index);
+        return true;
+    }
+
+    private async Task RunAiLinkAsync(
+        KoTcpClient client, AiLink link, ChannelWriter<Func<ValueTask>> queue, CancellationToken ct)
+    {
+        try
+        {
+            await client.RunAsync(ct);
+        }
+        finally
+        {
+            await client.DisposeAsync();
+
+            // Deregister on the game loop; the 6s tick reconnects.
+            queue.TryWrite(() =>
+            {
+                if (World.AiSockets.TryGetValue(link.SocketIndex, out AiLink? current) && current == link)
+                    World.AiSockets.Remove(link.SocketIndex);
+
+                return ValueTask.CompletedTask;
+            });
+        }
+    }
+
+    private async Task AcceptLoopAsync(ChannelWriter<Func<ValueTask>> queue, CancellationToken ct)
+    {
+        // UserAcceptThread: accepting starts only after SERVER_INFO_END for all zones.
+        try
+        {
+            await _userAccept.Task.WaitAsync(ct);
+        }
+        catch (OperationCanceledException)
+        {
+            queue.TryComplete();
+            return;
+        }
+
+        _listener!.Start(backlog: 512);
+        logger.LogInformation("Listening on 0.0.0.0:{Port}", ((IPEndPoint)_listener.Server.LocalEndPoint!).Port);
+
         while (!ct.IsCancellationRequested)
         {
             Socket socket;
@@ -170,12 +289,12 @@ public sealed class EbenezerService(
         queue.TryComplete();
     }
 
-    private async Task RunSessionAsync(GameSession session, ChannelWriter<SessionWork> queue, CancellationToken ct)
+    private async Task RunSessionAsync(GameSession session, ChannelWriter<Func<ValueTask>> queue, CancellationToken ct)
     {
         try
         {
             await session.ReceiveLoopAsync(
-                data => queue.TryWrite(new SessionWork(session, data)), ct);
+                data => queue.TryWrite(() => session.ProcessReceivedAsync(data)), ct);
         }
         catch (Exception ex)
         {
@@ -184,37 +303,35 @@ public sealed class EbenezerService(
         finally
         {
             // Close notification runs on the game loop too (CloseProcess ordering).
-            queue.TryWrite(new SessionWork(session, null));
+            queue.TryWrite(() =>
+            {
+                session.User.UserInOut(GameUser.UserOut);
+                World.Unregister(session.User.SocketId);
+                logger.LogInformation("user {Id} disconnected", session.User.SocketId);
+                session.Dispose();
+                return ValueTask.CompletedTask;
+            });
         }
     }
 
-    private async Task GameLoopAsync(ChannelReader<SessionWork> queue, CancellationToken ct)
+    private async Task GameLoopAsync(Channel<Func<ValueTask>> queue, CancellationToken ct)
     {
         const double regionFlushInterval = 0.2; // SendWorkerThread's 200ms cadence
+        const double aiCheckInterval = 6.0;     // the C++ GameTimeTick TimerThread (6s)
         double lastRegionFlush = 0.0;
+        double lastAiCheck = 0.0;
 
         while (!ct.IsCancellationRequested)
         {
-            while (queue.TryRead(out SessionWork? work))
+            while (queue.Reader.TryRead(out Func<ValueTask>? work))
             {
                 try
                 {
-                    if (work.Data is null)
-                    {
-                        // CUser::CloseProcess ordering: leave the world, then free the slot.
-                        work.Session.User.UserInOut(GameUser.UserOut);
-                        World.Unregister(work.Session.User.SocketId);
-                        logger.LogInformation("user {Id} disconnected", work.Session.User.SocketId);
-                        work.Session.Dispose();
-                    }
-                    else
-                    {
-                        await work.Session.ProcessReceivedAsync(work.Data);
-                    }
+                    await work();
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "user {Id}: packet processing failed", work.Session.User.SocketId);
+                    logger.LogError(ex, "game loop: work item failed");
                 }
             }
 
@@ -223,6 +340,12 @@ public sealed class EbenezerService(
             {
                 lastRegionFlush = now;
                 FlushRegionBuffers();
+            }
+
+            if (now - lastAiCheck >= aiCheckInterval)
+            {
+                lastAiCheck = now;
+                AiSocketAliveCheck(queue.Writer, ct);
             }
 
             try
@@ -234,6 +357,29 @@ public sealed class EbenezerService(
                 break;
             }
         }
+    }
+
+    /// <summary>EbenezerApp::GameTimeTick's AI-socket alive/reconnect sweep.</summary>
+    private void AiSocketAliveCheck(ChannelWriter<Func<ValueTask>> queue, CancellationToken ct)
+    {
+        if (!World.FirstServerFlag)
+            return;
+
+        int count = 0;
+        for (int i = 0; i < EbenezerWorld.MaxAiSocket; i++)
+        {
+            if (World.AiSockets.ContainsKey(i))
+            {
+                count++;
+                continue;
+            }
+
+            int index = i;
+            _ = AiSocketConnectAsync(index, reconnect: true, queue, ct);
+        }
+
+        if (count <= 0)
+            World.DeleteAllNpcList();
     }
 
     /// <summary>SendWorkerThread::tick — drains every user's region buffer.</summary>
