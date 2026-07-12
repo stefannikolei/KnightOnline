@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\OpenKO.Core\OpenKO.Core.csproj" />
+    <ProjectReference Include="..\..\OpenKO.Data\OpenKO.Data.csproj" />
+    <ProjectReference Include="..\..\OpenKO.GameData\OpenKO.GameData.csproj" />
+    <ProjectReference Include="..\..\OpenKO.Network\OpenKO.Network.csproj" />
+    <ProjectReference Include="..\..\OpenKO.Hosting\OpenKO.Hosting.csproj" />
+    <ProjectReference Include="..\OpenKO.Servers.Aujard\OpenKO.Servers.Aujard.csproj" />
+  </ItemGroup>
+
+</Project>
