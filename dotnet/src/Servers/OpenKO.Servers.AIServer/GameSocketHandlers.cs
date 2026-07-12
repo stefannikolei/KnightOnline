@@ -639,9 +639,8 @@ public sealed class GameSocketHandlers(AiWorld world, ILogger logger)
             }
         }
 
-        // TODO: CMagicProcess::MagicPacket (the rest of the body) — magic system not yet ported.
-        logger.LogDebug("RecvMagicAttackReq: CMagicProcess::MagicPacket not yet ported [sid={Sid} bytes={Bytes}]",
-            sid, r.Remaining);
+        // pUser->m_MagicProcess.MagicPacket(pBuf + index): the payload after the user id.
+        user.MagicProcess.MagicPacket(body.AsSpan(r.Index));
     }
 
     private void RecvUserInfoAllData(byte[] body)

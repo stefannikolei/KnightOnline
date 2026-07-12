@@ -7,6 +7,11 @@ namespace OpenKO.Servers.AIServer.Ai;
 /// </summary>
 public partial class AiUser
 {
+    /// <summary>m_MagicProcess — the C++ ctor points it back at this user.</summary>
+    public readonly UserMagicProcessor MagicProcess;
+
+    public AiUser() => MagicProcess = new UserMagicProcessor(this);
+
     public string UserId = string.Empty;   // m_strUserID
     public int Uid;                        // m_iUserId
     public byte Live;                      // m_bLive

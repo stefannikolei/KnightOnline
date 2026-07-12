@@ -627,6 +627,11 @@ public partial class Npc
         return true;
     }
 
+    /// <summary>CNpc::ItemWoreOut — empty in the C++ (NPCs carry no durability).</summary>
+    public void ItemWoreOut(int type, int damage)
+    {
+    }
+
     /// <summary>CNpc::SendDead — after Dead(): item drop + respawn delay.</summary>
     public int SendDead(int type = 1)
     {
