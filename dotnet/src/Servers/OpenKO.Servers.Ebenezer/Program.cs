@@ -314,6 +314,17 @@ public sealed class EbenezerService(
         {
             await dbAgent.AccountLogoutAsync(accountId, cancellationToken: stoppingToken);
         });
+        World.SaveBattleResult = (charId, nation) => queue.Writer.TryWrite(async () =>
+        {
+            await dbAgent.UpdateBattleEventAsync(charId, nation, stoppingToken);
+        });
+        World.DailyKnightsRankRefresh = () => queue.Writer.TryWrite(async () =>
+        {
+            // AujardApp::AllKnightsList + CKnightsManager::RecvKnightsAllList.
+            List<OpenKO.Data.Models.KnightsRankingEntry> ranking =
+                await dbAgent.LoadKnightsRankingAsync(World.ServerNo, stoppingToken);
+            World.ApplyKnightsRankUpdates(ranking.Select(r => (r.Id, r.Points, r.Ranking)));
+        });
 
         // EbenezerApp::AIServerConnect — one link per socket index; a failure
         // aborts startup like the C++ OnStart.
@@ -512,6 +523,9 @@ public sealed class EbenezerService(
             if (now - lastAiCheck >= aiCheckInterval)
             {
                 lastAiCheck = now;
+                // EbenezerApp::GameTimeTick: one game minute + the battle timer,
+                // then the AI-socket alive check.
+                World.UpdateGameTime();
                 AiSocketAliveCheck(queue.Writer, ct);
             }
 

@@ -46,7 +46,12 @@ public sealed partial class GameUser
 
         ReadOnlySpan<byte> chat = reader.GetString(chatLength);
 
-        // The '+' operator commands (OperationMessage) attach with the GM slice.
+        // OperationMessage: the '+' GM commands intercept the chat line.
+        if (user.Authority == GameConstants.AuthorityManager && chat.Length > 0 && chat[0] == (byte)'+')
+        {
+            OperationMessage(Encoding.Latin1.GetString(chat));
+            return;
+        }
 
         byte[] finalText;
         if (type is PublicChat or AnnouncementChat)

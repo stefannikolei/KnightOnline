@@ -96,6 +96,9 @@ public sealed partial class AiLink(int socketIndex, EbenezerWorld world, ILogger
             case AiOpcode.AG_NPC_EVENT_ITEM:
                 RecvNpcEventItem(body);
                 break;
+            case AiOpcode.AG_BATTLE_EVENT:
+                RecvBattleEvent(body);
+                break;
             default:
                 if (_loggedUnknown.Add(opcode))
                     logger.LogDebug("AiLink {Index}: unhandled AI opcode 0x{Opcode:X2}", SocketIndex, opcode);

@@ -463,4 +463,125 @@ public sealed partial class AiLink
         GameUser? user = uid >= 0 && uid < world.Users.Length ? world.Users[uid] : null;
         user?.EventMoneyItemGet(itemNumber, count);
     }
+
+    // e_BattleEvent (shared/packets.h).
+    private const byte BattleEventOpen = 1;
+    private const byte BattleMapEventResult = 2;
+    private const byte BattleEventResult = 3;
+    private const byte BattleEventMaxUser = 4;
+
+    /// <summary>CAISocket::RecvBattleEvent — invasion gates, war result and kill fame.</summary>
+    private void RecvBattleEvent(ReadOnlySpan<byte> body)
+    {
+        var reader = new PacketReader(body);
+        byte type = reader.GetByte();
+        byte result = reader.GetByte();
+
+        byte[] udp = [];
+
+        if (type == BattleEventOpen)
+        {
+            // no-op upstream
+        }
+        else if (type == BattleMapEventResult)
+        {
+            if (world.BattleOpen == 0)
+            {
+                logger.LogError("RecvBattleEvent: No active battle [type={Type}]", type);
+                return;
+            }
+
+            if (result == 1)
+                world.KarusOpenFlag = 1;   // Karus land can be invaded
+            else if (result == 2)
+                world.ElmoradOpenFlag = 1; // El Morad land can be invaded
+
+            udp = [0xD1, type, result]; // UDP_BATTLE_EVENT_PACKET
+        }
+        else if (type == BattleEventResult)
+        {
+            if (world.BattleOpen == 0)
+            {
+                logger.LogError("RecvBattleEvent: No active battle [type={Type}]", type);
+                return;
+            }
+
+            int nameLen = reader.GetByte();
+            if (nameLen > 0 && nameLen <= MaxIdSizeChars)
+            {
+                string maxUser = Encoding.Latin1.GetString(reader.GetString(nameLen));
+                if (world.BattleSave == 0)
+                {
+                    // WIZ_BATTLE_EVENT save (UPDATE_BATTLE_EVENT proc via the host hook).
+                    world.SaveBattleResult?.Invoke(maxUser, result);
+                    world.BattleSave = 1;
+                }
+            }
+
+            world.Victory = result;
+            world.OldVictory = result;
+            world.KarusOpenFlag = 0;
+            world.ElmoradOpenFlag = 0;
+            world.BanishFlag = 1;
+
+            udp = [0xD1, type, result];
+        }
+        else if (type == BattleEventMaxUser)
+        {
+            int nameLen = reader.GetByte();
+            if (nameLen > 0 && nameLen <= MaxIdSizeChars)
+            {
+                string maxUser = Encoding.Latin1.GetString(reader.GetString(nameLen));
+
+                string knightsName = string.Empty;
+                GameUser? killer = world.GetUserByCharId(maxUser);
+                if (killer?.UserData is { } killerData
+                    && world.Knights.GetValueOrDefault(killerData.Knights) is { } clan)
+                    knightsName = clan.Name;
+
+                // result: 1 captain, 2 gatekeeper, 3..6 fortress sentries, 7/8 gatekeeper again.
+                string chat = result switch
+                {
+                    1 => world.FormatResource(135, knightsName, maxUser),      // IDS_KILL_CAPTAIN
+                    2 or 7 or 8 => world.FormatResource(134, knightsName, maxUser), // IDS_KILL_GATEKEEPER
+                    3 => world.FormatResource(136, knightsName, maxUser),      // IDS_KILL_KARUS_GUARD1
+                    4 => world.FormatResource(137, knightsName, maxUser),      // IDS_KILL_KARUS_GUARD2
+                    5 => world.FormatResource(138, knightsName, maxUser),      // IDS_KILL_ELMO_GUARD1
+                    6 => world.FormatResource(139, knightsName, maxUser),      // IDS_KILL_ELMO_GUARD2
+                    _ => string.Empty,
+                };
+
+                chat = world.FormatResource(126, chat); // IDP_ANNOUNCEMENT
+
+                SendBattleChat(8, chat); // WAR_SYSTEM_CHAT
+                SendBattleChat(1, chat); // PUBLIC_CHAT
+
+                byte[] nameBytes = Encoding.Latin1.GetBytes(maxUser);
+                udp = new byte[4 + nameBytes.Length];
+                udp[0] = 0xD1;
+                udp[1] = type;
+                udp[2] = result;
+                udp[3] = (byte)nameBytes.Length;
+                nameBytes.CopyTo(udp, 4);
+            }
+        }
+
+        world.SendUdpAll?.Invoke(udp);
+    }
+
+    private const int MaxIdSizeChars = 20; // MAX_ID_SIZE
+
+    private void SendBattleChat(byte chatType, string text)
+    {
+        byte[] chat = Encoding.Latin1.GetBytes(text);
+        var buffer = new byte[10 + chat.Length];
+        var writer = new PacketWriter(buffer);
+        writer.SetByte((byte)GameOpcode.WIZ_CHAT);
+        writer.SetByte(chatType);
+        writer.SetByte(1);
+        writer.SetShort(-1);
+        writer.SetByte(0); // sender name length
+        writer.SetString2(chat);
+        world.SendAll(writer.Written);
+    }
 }
