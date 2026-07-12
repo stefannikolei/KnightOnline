@@ -643,9 +643,391 @@ public partial class Npc
         return RegenTime;
     }
 
-    /// <summary>TODO(stage3.7-part2b): CNpc::GiveNpcHaveItem — item drop production.</summary>
+    private const int TypeMoneySid = 900000000; // TYPE_MONEY_SID (Packet.h)
+    private const int ArrowMin = 391010000;
+    private const int ArrowMax = 392010000;
+    private const byte ElmoradMan = 2; // ELMORAD_MAN (KarusMan lives in Npc.State.cs)
+
+    /// <summary>Item-drop log hook (spdlog AIServerItem logger in the C++).</summary>
+    public Action<int>? LogItemDrop;
+
+    /// <summary>CNpc::GiveNpcHaveItem — rolls drops and broadcasts AG_NPC_GIVE_ITEM.</summary>
     public void GiveNpcHaveItem()
     {
+        var giveItems = new (int Sid, short Count)[AiConstants.NpcHaveItemList];
+        int count = 1;
+
+        int random = MyRand(70, 100);
+        int money = Money * random / 100;
+
+        if (money <= 0)
+        {
+            count = 0;
+        }
+        else
+        {
+            if (money > 32767)
+                money = 32000; // int16 cap, as in the C++
+            giveItems[0] = (TypeMoneySid, (short)money);
+        }
+
+        if (World is not null)
+        {
+            foreach (Data.Models.MonsterItem row in World.MonsterItemTable)
+            {
+                if (row.MonsterId != Item)
+                    continue;
+
+                // Slots mirror the C++ matrix: pairs of (itemId, chance);
+                // pair index 0 corresponds to matrix column j == 1.
+                for (int pair = 0; pair < row.ItemId.Length && pair < row.DropChance.Length; pair++)
+                {
+                    int itemId = row.ItemId[pair];
+                    if (itemId == 0)
+                        continue;
+
+                    random = MyRand(1, 10000);
+                    int chance = row.DropChance[pair];
+                    if (chance == 0)
+                        continue;
+
+                    if (random > chance)
+                        continue;
+
+                    int makeItemCode;
+                    if (pair == 0) // j == 1
+                    {
+                        makeItemCode = itemId < 100 ? ItemProdution(itemId) : GetItemGroupNumber(itemId);
+                        if (makeItemCode == 0)
+                            continue;
+
+                        giveItems[count] = (makeItemCode, 1);
+                    }
+                    else if (pair == 1) // j == 3
+                    {
+                        makeItemCode = GetItemGroupNumber(itemId);
+                        if (makeItemCode == 0)
+                            continue;
+
+                        giveItems[count] = (makeItemCode, 1);
+                    }
+                    else
+                    {
+                        short itemCount = Compare(itemId, ArrowMin, ArrowMax) ? (short)20 : (short)1;
+                        giveItems[count] = (itemId, itemCount);
+                    }
+
+                    if (++count >= AiConstants.NpcHaveItemList)
+                        break;
+                }
+            }
+        }
+
+        if (MaxDamageUserId < 0 || MaxDamageUserId > AiConstants.MaxUser)
+            return;
+
+        var buffer = new byte[1024];
+        var writer = new PacketWriter(buffer);
+        writer.SetByte(OpenKO.Core.Protocol.AiOpcode.AG_NPC_GIVE_ITEM);
+        writer.SetShort(MaxDamageUserId);
+        writer.SetShort(Nid + NpcBand);
+        writer.SetShort(CurZone);
+        writer.SetShort(RegionX);
+        writer.SetShort(RegionZ);
+        writer.SetFloat(CurX);
+        writer.SetFloat(CurZ);
+        writer.SetFloat(CurY);
+        writer.SetByte((byte)count);
+        for (int i = 0; i < count; i++)
+        {
+            writer.SetInt(giveItems[i].Sid);
+            writer.SetShort(giveItems[i].Count);
+
+            if (giveItems[i].Sid != TypeMoneySid)
+                LogItemDrop?.Invoke(giveItems[i].Sid);
+        }
+
+        SendAll(writer.Written);
+    }
+
+    /// <summary>CNpc::ItemProdution — composes a random item id from the drop tables.</summary>
+    public int ItemProdution(int itemNumber)
+    {
+        int random = MyRand(1, 10000);
+
+        int itemGrade = GetItemGrade(itemNumber);
+        if (itemGrade == 0)
+            return 0;
+
+        int itemLevel = Level / 5;
+        int itemId;
+
+        // Weapons (40%).
+        if (Compare(random, 1, 4001))
+        {
+            const int baseCode = 100000000;
+
+            // Weapon kind (dagger, sword, axe, ...).
+            random = MyRand(1, 10000);
+            int kind = 0;
+            if (Compare(random, 1, 701)) kind = 10000000;
+            else if (Compare(random, 701, 1401)) kind = 20000000;
+            else if (Compare(random, 1401, 2101)) kind = 30000000;
+            else if (Compare(random, 2101, 2801)) kind = 40000000;
+            else if (Compare(random, 2801, 3501)) kind = 50000000;
+            else if (Compare(random, 3501, 5501)) kind = 60000000;
+            else if (Compare(random, 5501, 6501)) kind = 70000000;
+            else if (Compare(random, 6501, 8501)) kind = 80000000;
+            else if (Compare(random, 8501, 10001)) kind = 90000000;
+
+            int classCode = GetWeaponItemCodeNumber(1);
+            if (classCode == 0)
+                return 0;
+
+            int itemCode = classCode * 100000;
+
+            // Nation (elmorad/karus).
+            int nation = MyRand(1, 10000);
+            nation = Compare(nation, 1, 5000) ? 10000 : 50000;
+
+            // One- vs two-handed.
+            int handed = MyRand(1, 10000);
+            handed = Compare(handed, 1, 5000) ? 0 : 5000000;
+
+            int rareCode = GetItemCodeNumber(itemLevel, 1);
+            if (rareCode == -1)
+                return 0;
+
+            itemId = baseCode + itemCode + kind + nation + handed + rareCode * 10 + itemGrade;
+        }
+        // Armor (40%).
+        else if (Compare(random, 4001, 8001))
+        {
+            const int baseCode = 200000000;
+
+            int classCode = GetWeaponItemCodeNumber(2);
+            if (classCode == 0)
+                return 0;
+
+            int itemCode = classCode * 1000000;
+            int job = 0, race = 0;
+
+            if (MaxDamagedNation == KarusMan)
+            {
+                random = MyRand(0, 10000);
+                if (Compare(random, 0, 2000))
+                {
+                    job = 0;
+                    race = 10000;   // warrior armor: Arch Tuarek only
+                }
+                else if (Compare(random, 2000, 4000))
+                {
+                    job = 40000000;
+                    race = 20000;   // rogue armor: Tuarek only
+                }
+                else if (Compare(random, 4000, 6000))
+                {
+                    job = 60000000;
+                    race = 30000;   // mage armor: Wrinkle Tuarek only
+                }
+                else if (Compare(random, 6000, 10001))
+                {
+                    job = 80000000;
+                    random = MyRand(0, 10000);
+                    race = Compare(random, 0, 5000) ? 20000 : 40000; // priest: Tuarek/Purituarek
+                }
+            }
+            else if (MaxDamagedNation == ElmoradMan)
+            {
+                random = MyRand(0, 10000);
+                if (Compare(random, 0, 3300))
+                {
+                    job = 0;
+
+                    int key = MyRand(0, 10000);
+                    if (Compare(key, 0, 3333)) race = 110000;
+                    else if (Compare(key, 3333, 6666)) race = 120000;
+                    else if (Compare(key, 6666, 10001)) race = 130000;
+                }
+                else if (Compare(random, 3300, 5600))
+                {
+                    job = 40000000;
+                    race = Compare(MyRand(0, 10000), 0, 5000) ? 120000 : 130000;
+                }
+                else if (Compare(random, 5600, 7800))
+                {
+                    job = 60000000;
+                    race = Compare(MyRand(0, 10000), 0, 5000) ? 120000 : 130000;
+                }
+                else if (Compare(random, 7800, 10001))
+                {
+                    job = 80000000;
+                    race = Compare(MyRand(0, 10000), 0, 5000) ? 120000 : 130000;
+                }
+            }
+
+            // Body part.
+            int part = 0;
+            int temp = MyRand(0, 10000);
+            if (Compare(temp, 0, 2000)) part = 1000;
+            else if (Compare(temp, 2000, 4000)) part = 2000;
+            else if (Compare(temp, 4000, 6000)) part = 3000;
+            else if (Compare(temp, 6000, 8000)) part = 4000;
+            else if (Compare(temp, 8000, 10001)) part = 5000;
+
+            int rareCode = GetItemCodeNumber(itemLevel, 2);
+            if (rareCode == -1)
+                return 0;
+
+            itemId = baseCode + job + itemCode + race + part + rareCode * 10 + itemGrade;
+        }
+        // Accessories (20%).
+        else
+        {
+            const int baseCode = 300000000;
+
+            random = MyRand(0, 10000);
+            int kind = 0;
+            if (Compare(random, 0, 2500)) kind = 10000000;
+            else if (Compare(random, 2500, 5000)) kind = 20000000;
+            else if (Compare(random, 5000, 7500)) kind = 30000000;
+            else if (Compare(random, 7500, 10001)) kind = 40000000;
+
+            int nation = MyRand(1, 10000);
+            nation = Compare(nation, 1, 5000) ? 110000 : 150000;
+
+            int rareCode = GetItemCodeNumber(itemLevel, 3);
+            if (rareCode == -1)
+                return 0;
+
+            itemId = baseCode + kind + nation + rareCode * 10 + itemGrade;
+        }
+
+        return itemId;
+    }
+
+    /// <summary>CNpc::GetItemGrade — rolls the grade (1-9) from MAKE_ITEM_GRADECODE.</summary>
+    public int GetItemGrade(int itemGrade)
+    {
+        Data.Models.MakeItemGradeCode? row = World?.MakeGradeItemTable.GetValueOrDefault(itemGrade);
+        if (row is null)
+            return 0;
+
+        int random = MyRand(1, 1000);
+
+        int percent = 0;
+        for (int i = 0; i < row.Grade.Length; i++)
+        {
+            int grade = row.Grade[i];
+            if (grade == 0)
+                continue;
+
+            if (Compare(random, percent, percent + grade))
+                return i + 1;
+
+            percent += grade;
+        }
+
+        return 0;
+    }
+
+    /// <summary>CNpc::GetWeaponItemCodeNumber — class roll from MAKE_WEAPON/MAKE_DEFENSIVE.</summary>
+    public int GetWeaponItemCodeNumber(int itemType)
+    {
+        int itemLevel = Level / 10;
+        short[]? classes = null;
+
+        if (itemType == 1)
+        {
+            classes = World?.MakeWeaponTable.GetValueOrDefault(itemLevel)?.Class;
+        }
+        else if (itemType == 2)
+        {
+            Data.Models.MakeDefensive? row = World?.MakeDefensiveTable.GetValueOrDefault(itemLevel);
+            if (row is not null)
+                classes = [row.Class1, row.Class2, row.Class3, row.Class4, row.Class5, row.Class6, row.Class7];
+        }
+
+        if (classes is null)
+            return 0;
+
+        int random = MyRand(0, 1000);
+
+        int percent = 0;
+        for (int i = 0; i < classes.Length; i++)
+        {
+            if (classes[i] == 0)
+                continue;
+
+            if (Compare(random, percent, percent + classes[i]))
+                return i + 1;
+
+            percent += classes[i];
+        }
+
+        return 0;
+    }
+
+    /// <summary>CNpc::GetItemCodeNumber — rare/magic/general roll from MAKE_ITEM_LARECODE.</summary>
+    public int GetItemCodeNumber(int level, int itemType)
+    {
+        int random = MyRand(0, 1000);
+        Data.Models.MakeItemRareCode? row = World?.MakeRareItemTable.GetValueOrDefault(level);
+        if (row is null)
+            return -1;
+
+        int[] percentages = [row.RareItem, row.MagicItem, row.GeneralItem];
+
+        int kind = 0;
+        int percent = 0;
+        for (int i = 0; i < 3; i++)
+        {
+            if (Compare(random, percent, percent + percentages[i]))
+            {
+                kind = i + 1;
+                break;
+            }
+
+            percent += percentages[i];
+        }
+
+        int itemCode = 0;
+        switch (kind)
+        {
+            case 1: // rare
+                if (itemType == 1) itemCode = MyRand(16, 24);
+                else if (itemType == 2) itemCode = MyRand(12, 24);
+                else if (itemType == 3) itemCode = MyRand(0, 10);
+                break;
+
+            case 2: // magic
+                if (itemType == 1) itemCode = MyRand(6, 15);
+                else if (itemType == 2) itemCode = MyRand(6, 11);
+                else if (itemType == 3) itemCode = MyRand(0, 10);
+                break;
+
+            case 3: // general
+                if (itemType == 1) itemCode = 5;
+                else if (itemType == 2) itemCode = 5;
+                else if (itemType == 3) itemCode = MyRand(0, 10);
+                break;
+        }
+
+        return itemCode;
+    }
+
+    /// <summary>CNpc::GetItemGroupNumber — random slot from MAKE_ITEM_GROUP.</summary>
+    public int GetItemGroupNumber(int groupId)
+    {
+        Data.Models.MakeItemGroup? row = World?.MakeItemGroupTable.GetValueOrDefault(groupId);
+        if (row is null)
+            return 0;
+
+        int slot = MyRand(0, 10000) % row.Item.Length;
+        if (slot < 0 || slot >= row.Item.Length)
+            return 0;
+
+        return row.Item[slot];
     }
 
     /// <summary>TODO(stage3.7-part2b): CNpc::FindFriend (0/1: aggro help, 2: healer scan).</summary>
@@ -1225,6 +1607,193 @@ public partial class Npc
         }
 
         return AttackDelay;
+    }
+
+    private const byte MagicCasting = 1; // MAGIC_CASTING (e_MagicOpcode)
+
+    /// <summary>CNpc::LongAndMagicAttack — ranged/magic attack executor.</summary>
+    public int LongAndMagicAttack()
+    {
+        int standingTime = StandTime;
+        int ret = IsCloseTarget(AttackRange, 2);
+
+        if (ret == 0)
+        {
+            StepCount = 0;
+            ActionFlag = AttackToTrace;
+            State = NpcState.Tracing;
+            return 0;
+        }
+
+        if (ret == 2 && LongType == 1)
+        {
+            StepCount = 0;
+            ActionFlag = AttackToTrace;
+            State = NpcState.Tracing;
+            return 0;
+        }
+
+        if (ret == -1)
+        {
+            State = NpcState.Standing;
+            InitTarget();
+            return 0;
+        }
+
+        int targetId = Target.Id;
+
+        if (targetId is >= UserBand and < NpcBand)
+        {
+            AiUser? user = GetUserPtr(targetId - UserBand);
+
+            if (user is null)
+            {
+                InitTarget();
+                State = NpcState.Standing;
+                return standingTime;
+            }
+
+            if (user.Live == AiUser.UserDead)
+            {
+                SendAttackSuccess(AttackTargetDeadOk, user.Uid, 0, 0);
+                InitTarget();
+                State = NpcState.Standing;
+                return standingTime;
+            }
+
+            if (user.State == UserStateDisconnected)
+            {
+                InitTarget();
+                State = NpcState.Standing;
+                return standingTime;
+            }
+
+            if (user.IsOperator == 0) // AUTHORITY_MANAGER
+            {
+                InitTarget();
+                State = NpcState.Moving;
+                return standingTime;
+            }
+
+            // Cast magic 1 at the target (the C++ only ever uses magic 1 here).
+            var buffer = new byte[32];
+            var writer = new PacketWriter(buffer);
+            writer.SetByte(MagicCasting);
+            writer.SetDWord((uint)Magic1);
+            writer.SetShort(Nid + NpcBand);
+            writer.SetShort(user.Uid);
+            writer.SetShort(0);
+            writer.SetShort(0);
+            writer.SetShort(0);
+            writer.SetShort(0);
+            writer.SetShort(0);
+            writer.SetShort(0);
+
+            // TODO(stage3.7): route through the ported NpcMagicProcess.
+            NpcMagicPacket?.Invoke(writer.Written.ToArray());
+        }
+        else if (targetId >= NpcBand && Target.Id < InvalidBand)
+        {
+            Npc? npc = World?.Npcs.GetValueOrDefault(targetId - NpcBand);
+
+            if (npc is null)
+            {
+                InitTarget();
+                State = NpcState.Standing;
+                return standingTime;
+            }
+
+            if (npc.HP <= 0 || npc.State == NpcState.Dead)
+            {
+                SendAttackSuccess(AttackTargetDead, npc.Nid + NpcBand, 0, 0);
+                InitTarget();
+                State = NpcState.Standing;
+                return standingTime;
+            }
+
+            // NPC-vs-NPC long attack is commented out in the C++.
+        }
+
+        return AttackDelay;
+    }
+
+    /// <summary>CNpc::TracingAttack — opportunistic hit while chasing (0: fail, 1: success).</summary>
+    public int TracingAttack()
+    {
+        int targetId = Target.Id;
+
+        if (targetId is >= UserBand and < NpcBand)
+        {
+            AiUser? user = GetUserPtr(targetId - UserBand);
+
+            if (user is null)
+                return 0;
+
+            if (user.Live == AiUser.UserDead)
+            {
+                SendAttackSuccess(AttackTargetDeadOk, user.Uid, 0, 0);
+                return 0;
+            }
+
+            if (user.State == UserStateDisconnected)
+                return 0;
+
+            if (user.IsOperator == 0) // AUTHORITY_MANAGER
+                return 0;
+
+            int damage = GetFinalDamage(user);
+
+            if (World?.TestMode == true)
+                damage = 1;
+
+            if (damage > 0)
+            {
+                user.SetDamage(damage, Nid + NpcBand);
+
+                if (user.Live != AiUser.UserDead)
+                    SendAttackSuccess(AttackSuccess, user.Uid, (short)damage, user.HP);
+            }
+            else
+            {
+                SendAttackSuccess(AttackFail, user.Uid, (short)damage, user.HP);
+            }
+        }
+        else if (targetId >= NpcBand && Target.Id < InvalidBand)
+        {
+            Npc? npc = World?.Npcs.GetValueOrDefault(targetId - NpcBand);
+
+            if (npc is null)
+                return 0;
+
+            if (npc.HP <= 0 || npc.State == NpcState.Dead)
+            {
+                SendAttackSuccess(AttackTargetDead, npc.Nid + NpcBand, 0, 0);
+                return 0;
+            }
+
+            int damage = GetNFinalDamage(npc);
+
+            if (damage > 0)
+            {
+                if (npc.SetDamage(0, damage, Name, Nid + NpcBand))
+                {
+                    SendAttackSuccess(AttackSuccess, npc.Nid + NpcBand, (short)damage, npc.HP);
+                }
+                else
+                {
+                    // Target died from this hit: success + dead notification.
+                    SendAttackSuccess(AttackSuccess, npc.Nid + NpcBand, (short)damage, npc.HP);
+                    SendAttackSuccess(AttackTargetDead, npc.Nid + NpcBand, (short)damage, npc.HP);
+                    return 0;
+                }
+            }
+            else
+            {
+                SendAttackSuccess(AttackFail, npc.Nid + NpcBand, (short)damage, npc.HP);
+            }
+        }
+
+        return 1;
     }
 
     /// <summary>CNpc::FindEnemy — enemy acquisition scan over own + neighbor regions.</summary>

@@ -3300,10 +3300,4 @@ public partial class Npc
     //  values so the movement call sites above stay faithful.
     // ------------------------------------------------------------------
 
-    /// <summary>TODO(stage3.7-part2): CNpc::LongAndMagicAttack.</summary>
-    public int LongAndMagicAttack() => AttackDelay;
-
-    /// <summary>TODO(stage3.7-part2): CNpc::TracingAttack (0: target lost, 1: keep tracing).</summary>
-    public int TracingAttack() => 1;
-
 }
