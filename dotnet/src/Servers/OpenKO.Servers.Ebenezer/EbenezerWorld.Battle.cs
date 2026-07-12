@@ -9,6 +9,16 @@ namespace OpenKO.Servers.Ebenezer;
 /// </summary>
 public sealed partial class EbenezerWorld
 {
+    /// <summary>The buy/sell market board arrays (m_sBuyID/m_strBuyTitle/…).</summary>
+    public readonly MarketBbsBoard MarketBuy = new();
+    public readonly MarketBbsBoard MarketSell = new();
+
+    /// <summary>CUser::MarketBBSBuyPostFilter — compact the board left.</summary>
+    public void MarketBbsBuyPostFilter() => MarketBuy.Compact();
+
+    /// <summary>CUser::MarketBBSSellPostFilter.</summary>
+    public void MarketBbsSellPostFilter() => MarketSell.Compact();
+
     private const int ZoneIdBattleZone = 101;   // ZONE_BATTLE
     private const int ZoneIdFrontierZone = 201; // ZONE_FRONTIER
 

@@ -484,6 +484,7 @@ public sealed class EbenezerService(
                     session.User.PartyRemoveMember(session.User.SocketId);
                 if (session.User.ExchangeUser != -1)
                     session.User.ExchangeCancel();
+                session.User.MarketBbsUserDelete();
                 World.Unregister(session.User.SocketId);
                 logger.LogInformation("user {Id} disconnected", session.User.SocketId);
                 session.Dispose();

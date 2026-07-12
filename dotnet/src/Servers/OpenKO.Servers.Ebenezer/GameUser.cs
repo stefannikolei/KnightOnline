@@ -312,6 +312,14 @@ public sealed partial class GameUser(short socketId, EbenezerWorld world, IDbAge
                 // Disabled upstream (#if 0 "outdated") — a silent no-op.
                 break;
 
+            case GameOpcode.WIZ_PARTY_BBS:
+                PartyBbs(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_MARKET_BBS:
+                MarketBbs(packet.AsSpan(1));
+                break;
+
             case GameOpcode.WIZ_VERSION_CHECK:
                 VersionCheck();
                 break;
