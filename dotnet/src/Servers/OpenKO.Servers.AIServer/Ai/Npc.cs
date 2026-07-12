@@ -26,7 +26,7 @@ public partial class Npc
     public short MaxPathCount;
 
     public bool FirstLive = true;
-    public NpcState State = NpcState.Dead;
+    public NpcState State = NpcState.Live; // C++ ctor starts at NPC_LIVE
     public short ZoneIndex;
     public short Nid;
 
