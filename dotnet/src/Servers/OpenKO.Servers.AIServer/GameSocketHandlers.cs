@@ -388,7 +388,8 @@ public sealed class GameSocketHandlers(AiWorld world, ILogger logger)
             zone.RegionUserAdd(user.RegionX, user.RegionZ, id);
         }
 
-        // TODO: MAP::IsRoomCheck (dungeon room events) — room system not yet ported.
+        // dungeon work: room activation by user position.
+        zone.IsRoomCheck(x, z, world.Clock);
         return true;
     }
 
@@ -858,8 +859,7 @@ public sealed class GameSocketHandlers(AiWorld world, ILogger logger)
             BattleEventType = BattleZoneClose;
             logger.LogDebug("RecvBattleEvent: battle zone closed");
 
-            // TODO: AIServerApp::ResetBattleZone — waits on the map room/event port.
-            logger.LogDebug("RecvBattleEvent: ResetBattleZone not yet ported");
+            world.ResetBattleZone();
         }
 
         foreach (Npc npc in world.Npcs.Values)

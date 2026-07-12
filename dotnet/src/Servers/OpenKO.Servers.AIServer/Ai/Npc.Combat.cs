@@ -26,10 +26,6 @@ public partial class Npc
     {
         public int NpcsKilledByKarus;
         public int NpcsKilledByElmorad;
-
-        /// <summary>Room counts from the zone's RoomEvent data (0 until RoomEvent is ported).</summary>
-        public short KarusRooms;
-        public short ElmoradRooms;
     }
 
     /// <summary>Set by the host for battle zones; null elsewhere.</summary>
@@ -1565,11 +1561,15 @@ public partial class Npc
             writer.SetString1(System.Text.Encoding.Latin1.GetBytes(maxDamageUser));
             SendAll(writer.Written);
 
-            // Victory checks need the zone's RoomEvent room counts.
-            if (Battle.KarusRooms > 0 && Battle.NpcsKilledByKarus == Battle.KarusRooms)
-                SendBattleResult(2, maxDamageUser); // ELMORAD_ZONE loses → value 2
-            else if (Battle.ElmoradRooms > 0 && Battle.NpcsKilledByElmorad == Battle.ElmoradRooms)
-                SendBattleResult(1, maxDamageUser); // KARUS_ZONE
+            // Victory checks against the zone's fort counts (m_sKarusRoom/m_sElmoradRoom).
+            AiZone? battleZone = GetMapByIndex();
+            if (battleZone is not null)
+            {
+                if (Battle.NpcsKilledByKarus == battleZone.KarusRooms)
+                    SendBattleResult(2, maxDamageUser); // sends ELMORAD_ZONE, like the C++
+                else if (Battle.NpcsKilledByElmorad == battleZone.ElmoradRooms)
+                    SendBattleResult(1, maxDamageUser); // KARUS_ZONE
+            }
         }
     }
 

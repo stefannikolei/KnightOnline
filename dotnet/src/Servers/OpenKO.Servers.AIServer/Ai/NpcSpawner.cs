@@ -144,8 +144,23 @@ public sealed class NpcSpawner(AiWorld world, ILogger logger)
                 if (!world.Npcs.TryAdd(npc.Nid, npc))
                     logger.LogError("NpcSpawner: Npc PutData Fail [serial={Serial}]", npc.Nid);
 
-                // NOTE: the C++ additionally registers dungeon-family NPCs with the
-                // zone's RoomEvent — ported together with RoomEvent (stage 3.7).
+                // Register dungeon-family NPCs with their zone room (fatal when
+                // the .evt did not define the room, like the C++).
+                AiZone zone = world.Zones[zoneIndex];
+                if (zone.RoomEventFlag > 0 && npc.DungeonFamily > 0)
+                {
+                    RoomEvent? room = zone.Rooms.GetValueOrDefault(npc.DungeonFamily);
+                    if (room is null)
+                    {
+                        logger.LogError(
+                            "NpcSpawner: no RoomEvent for NPC dungeonFamily [serial={Serial} npcId={NpcId} npcName={Name} dungeonFamily={Family} zoneId={Zone}]",
+                            npc.Nid + 10000, npc.Sid, npc.Name, npc.DungeonFamily, npc.ZoneIndex);
+                        return false;
+                    }
+
+                    room.World ??= world;
+                    room.RoomNpcs.Add(npc.Nid);
+                }
             }
         }
 

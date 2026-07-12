@@ -956,8 +956,16 @@ public partial class Npc
         if (zone is null)
             return;
 
-        // TODO(stage3.7): RoomEvent (dungeon rooms) not ported yet — the C++ keeps
-        // standing while its room's m_byStatus == 1.
+        // dungeon work: while the NPC's room has not been activated (status 1),
+        // the monster keeps standing.
+        RoomEvent? room = zone.Rooms.GetValueOrDefault(DungeonFamily);
+        if (room is not null && room.Status == 1)
+        {
+            State = NpcState.Standing;
+            Delay = StandTime;
+            DelayTime = TimeGet();
+            return;
+        }
 
         if (RandomMove())
         {
@@ -3176,8 +3184,20 @@ public partial class Npc
 
         if (DungeonFamily > 0)
         {
-            // TODO(stage3.7): RoomEvent not ported — the C++ kills this NPC
-            // (RegenType 0 → 2, Dead(1)) when its dungeon room status becomes 3.
+            // Quirk kept: the C++ range check uses '> size + 1' and, on violation,
+            // only logs — the commented-out return means it still dereferences.
+            if (DungeonFamily <= zone.Rooms.Count + 1)
+            {
+                RoomEvent? room = zone.Rooms.GetValueOrDefault(DungeonFamily);
+
+                // Once the room is cleared (status 3), the monster dies for good.
+                if (room is not null && room.Status == 3 && State != NpcState.Dead && RegenType == 0)
+                {
+                    RegenType = 2; // never respawn
+                    Dead(1);
+                    return;
+                }
+            }
         }
 
         for (int i = 0; i < AiConstants.MaxMagicType4; i++)

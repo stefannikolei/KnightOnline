@@ -63,4 +63,43 @@ public sealed class AiWorld
 
     public AiUser? GetUser(int uid)
         => uid >= 0 && uid < Users.Length ? Users[uid] : null;
+
+    /// <summary>
+    /// ZoneEventThread::thread_loop body (one tick, called once per second by the
+    /// host): drives every dungeon zone's room events.
+    /// </summary>
+    public void TickRoomEvents(double currentTime)
+    {
+        foreach (AiZone zone in Zones)
+        {
+            if (zone.RoomEventFlag == 0)
+                continue;
+
+            if (zone.IsRoomStatusCheck())
+                continue;
+
+            foreach (int roomNumber in zone.Rooms.Keys.Order())
+            {
+                RoomEvent room = zone.Rooms[roomNumber];
+
+                // 1: init, 2: progress, 3: clear — only progress rooms tick.
+                if (room.Status is 1 or 3)
+                    continue;
+
+                room.MainRoom(currentTime);
+            }
+        }
+    }
+
+    /// <summary>AIServerApp::ResetBattleZone — hard reset of all dungeon zones' rooms.</summary>
+    public void ResetBattleZone()
+    {
+        foreach (AiZone zone in Zones)
+        {
+            if (zone.RoomEventFlag == 0)
+                continue;
+
+            zone.InitializeRooms();
+        }
+    }
 }
