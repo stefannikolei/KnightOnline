@@ -133,7 +133,15 @@ public sealed class EbenezerService(
         List<OpenKO.Data.Models.Item>? items = await db.LoadItemTableAsync(stoppingToken);
         List<OpenKO.Data.Models.LevelUp>? levels = await db.LoadLevelUpTableAsync(stoppingToken);
         List<OpenKO.Data.Models.Home>? homes = await db.LoadHomeTableAsync(stoppingToken);
-        if (coefficients is null || zoneInfos is null || items is null || levels is null || homes is null)
+        List<OpenKO.Data.Models.Magic>? magics = await db.LoadMagicTableAsync(stoppingToken);
+        List<OpenKO.Data.Models.MagicType1>? magicType1 = await db.LoadMagicType1TableAsync(stoppingToken);
+        List<OpenKO.Data.Models.MagicType2>? magicType2 = await db.LoadMagicType2TableAsync(stoppingToken);
+        List<OpenKO.Data.Models.MagicType3>? magicType3 = await db.LoadMagicType3TableAsync(stoppingToken);
+        List<OpenKO.Data.Models.MagicType4>? magicType4 = await db.LoadMagicType4TableAsync(stoppingToken);
+        List<OpenKO.Data.Models.MagicType5>? magicType5 = await db.LoadMagicType5TableAsync(stoppingToken);
+        if (coefficients is null || zoneInfos is null || items is null || levels is null || homes is null
+            || magics is null || magicType1 is null || magicType2 is null || magicType3 is null
+            || magicType4 is null || magicType5 is null)
         {
             logger.LogError("Ebenezer startup table load failed, closing server");
             lifetime.StopApplication();
@@ -144,6 +152,12 @@ public sealed class EbenezerService(
         World.ItemTable = items.ToDictionary(i => i.ID);
         World.LevelUpTable = levels.ToDictionary(l => (int)l.Level, l => l.RequiredExp);
         World.HomeTable = homes.ToDictionary(h => h.Nation);
+        World.MagicTable = magics.ToDictionary(m => m.ID);
+        World.MagicType1Table = magicType1.ToDictionary(m => m.ID);
+        World.MagicType2Table = magicType2.ToDictionary(m => m.ID);
+        World.MagicType3Table = magicType3.ToDictionary(m => m.ID);
+        World.MagicType4Table = magicType4.ToDictionary(m => m.ID);
+        World.MagicType5Table = magicType5.ToDictionary(m => m.ID);
         foreach (OpenKO.Data.Models.ZoneInfo zone in zoneInfos)
             World.Zones.Add(new GameZone(zone.ServerId, zone.ZoneId));
 

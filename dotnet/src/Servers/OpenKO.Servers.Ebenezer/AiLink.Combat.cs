@@ -11,6 +11,11 @@ namespace OpenKO.Servers.Ebenezer;
 /// </summary>
 public sealed partial class AiLink
 {
+    private MagicProcessor? _magicProcess;
+
+    /// <summary>The link's CMagicProcess (m_pSrcUser stays null — NPC-cast magic only).</summary>
+    public MagicProcessor MagicProcess => _magicProcess ??= new MagicProcessor(world, null, logger);
+
     private const byte MagicAttack = 2;    // MAGIC_ATTACK (attack type)
     private const byte DurationAttack = 3; // DURATION_ATTACK
 
@@ -127,8 +132,9 @@ public sealed partial class AiLink
                 if (user?.UserData is not { } userData)
                     return;
 
-                // The casting interruption (CMagicProcess::IsAvailable on
-                // MAGIC_STATE_CASTING) attaches with the magic slice.
+                // Being hit interrupts an ongoing cast.
+                if (user.Magic.MagicState == MagicProcessor.StateCasting)
+                    user.Magic.IsAvailable(0, -1, -1, MagicProcessor.MagicEffecting, 0, 0, 0);
 
                 user.HpChange(-damage, 1, attack: true);
                 user.ItemWoreOut(GameUser.DurabilityTypeDefence, damage);
@@ -285,10 +291,17 @@ public sealed partial class AiLink
                     return;
                 }
 
-                // NPC magic hitting a user runs through CMagicProcess::MagicPacket —
-                // it attaches with the magic slice.
-                logger.LogDebug("AiLink: npc magic effect on user deferred to the magic slice [magicId={MagicId} sid={Sid} tid={Tid}]",
-                    magicId, sid, tid);
+                // NPC magic hitting a user runs through CMagicProcess::MagicPacket.
+                var inner = new byte[32];
+                var innerWriter = new PacketWriter(inner);
+                innerWriter.SetByte(command);
+                innerWriter.SetDWord(magicId);
+                innerWriter.SetShort(sid);
+                innerWriter.SetShort(tid);
+                for (int i = 0; i < 6; i++)
+                    innerWriter.SetShort(data[i]);
+
+                MagicProcess.MagicPacket(innerWriter.Written);
             }
         }
     }

@@ -245,3 +245,19 @@ public sealed record Home
     public required byte BattleZone2LX { get; init; }
     public required byte BattleZone2LZ { get; init; }
 }
+
+/// <summary>MAGIC_TYPE5 table (cure/resurrection support skills).</summary>
+public sealed record MagicType5
+{
+    /// <summary>Column [iNum].</summary>
+    public required int ID { get; init; }
+
+    /// <summary>1 cure disease, 2 cure curse, 3 resurrection, 4 self resurrection, 5 remove bless.</summary>
+    public required byte Type { get; init; }
+
+    /// <summary>Column [ExpRecover]: percent of experience loss recovered.</summary>
+    public required byte ExpRecover { get; init; }
+
+    /// <summary>Column [NeedStone]: resurrection stones required.</summary>
+    public required short NeedStone { get; init; }
+}

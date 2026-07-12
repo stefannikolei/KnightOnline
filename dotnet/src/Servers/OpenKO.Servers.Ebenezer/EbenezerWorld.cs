@@ -50,8 +50,58 @@ public sealed partial class EbenezerWorld
     /// <summary>m_MagicType2TableMap (MAGIC_TYPE2).</summary>
     public Dictionary<int, MagicType2> MagicType2Table = [];
 
-    /// <summary>myrand(min, max) — inclusive; injectable for deterministic tests.</summary>
-    public Func<int, int, int> Rand = (min, max) => min >= max ? min : Random.Shared.Next(min, max + 1);
+    /// <summary>m_MagicType3TableMap (MAGIC_TYPE3).</summary>
+    public Dictionary<int, MagicType3> MagicType3Table = [];
+
+    /// <summary>m_MagicType4TableMap (MAGIC_TYPE4).</summary>
+    public Dictionary<int, MagicType4> MagicType4Table = [];
+
+    /// <summary>m_MagicType5TableMap (MAGIC_TYPE5).</summary>
+    public Dictionary<int, MagicType5> MagicType5Table = [];
+
+    /// <summary>myrand_generic(min, max) — inclusive, swaps a reversed range; injectable for deterministic tests.</summary>
+    public Func<int, int, int> Rand = (min, max) =>
+    {
+        if (min == max)
+            return min;
+
+        if (min > max)
+            (min, max) = (max, min);
+
+        return Random.Shared.Next(min, max + 1);
+    };
+
+    /// <summary>
+    /// CUser::GetHitRate — the banded 1..10000 hit roll. Lives on the world so
+    /// the NPC-cast magic path (whose CMagicProcess has no source user) can use
+    /// it too, exactly like the C++ calling through a null CUser pointer.
+    /// </summary>
+    public byte GetHitRate(float rate)
+    {
+        int random = Rand(1, 10000);
+
+        (int great, int success, int normal) = rate switch
+        {
+            >= 5.0f => (3500, 7500, 9800),
+            >= 3.0f => (2500, 6000, 9600),
+            >= 2.0f => (2000, 5000, 9400),
+            >= 1.25f => (1500, 4000, 9200),
+            >= 0.8f => (1000, 3000, 9000),
+            >= 0.5f => (800, 2500, 8000),
+            >= 0.33f => (600, 2000, 7000),
+            >= 0.2f => (400, 1500, 6000),
+            _ => (200, 1000, 5000),
+        };
+
+        if (random <= great)
+            return 1; // GREAT_SUCCESS
+        if (random <= success)
+            return 2; // SUCCESS
+        if (random <= normal)
+            return 3; // NORMAL
+
+        return 4; // FAIL
+    }
 
     /// <summary>m_sKarusDead / m_sElmoradDead (Wednesday battle-event counters).</summary>
     public short KarusDead;

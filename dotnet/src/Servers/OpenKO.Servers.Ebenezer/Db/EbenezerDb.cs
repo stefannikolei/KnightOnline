@@ -173,6 +173,148 @@ public sealed class EbenezerDb(SqlConnectionFactory connectionFactory, ILogger l
             },
             cancellationToken);
 
+    /// <summary>EbenezerApp::LoadMagicTable (MAGIC).</summary>
+    public Task<List<Magic>?> LoadMagicTableAsync(CancellationToken cancellationToken = default) =>
+        LoadTableAsync(
+            "MAGIC",
+            "MagicNum, BeforeAction, TargetAction, SelfEffect, FlyingEffect, TargetEffect, Moral, SkillLevel, Skill, Msp, " +
+            "HP, ItemGroup, UseItem, CastTime, ReCastTime, SuccessRate, Type1, Type2, Range, Etc, Event",
+            static reader => new Magic
+            {
+                ID = reader.GetInt32(0),
+                BeforeAction = reader.GetByte(1),
+                TargetAction = reader.GetByte(2),
+                SelfEffect = reader.GetByte(3),
+                FlyingEffect = reader.GetByte(4),
+                TargetEffect = reader.GetInt16(5),
+                Moral = reader.GetByte(6),
+                SkillLevel = reader.GetInt16(7),
+                Skill = reader.GetInt16(8),
+                ManaCost = reader.GetInt16(9),
+                HpCost = reader.GetInt16(10),
+                ItemGroup = reader.GetByte(11),
+                UseItem = reader.GetInt32(12),
+                CastTime = reader.GetByte(13),
+                RecastTime = reader.GetByte(14),
+                SuccessRate = reader.GetByte(15),
+                Type1 = reader.GetByte(16),
+                Type2 = reader.GetByte(17),
+                Range = reader.GetInt16(18),
+                Etc = reader.GetByte(19),
+                Event = reader.GetInt32(20),
+            },
+            cancellationToken);
+
+    /// <summary>EbenezerApp::LoadMagicType1 (MAGIC_TYPE1).</summary>
+    public Task<List<MagicType1>?> LoadMagicType1TableAsync(CancellationToken cancellationToken = default) =>
+        LoadTableAsync(
+            "MAGIC_TYPE1",
+            "iNum, Type, HitRate, Hit, AddDamage, Delay, ComboType, ComboCount, ComboDamage, Range",
+            static reader => new MagicType1
+            {
+                ID = reader.GetInt32(0),
+                Type = reader.GetByte(1),
+                HitRateMod = reader.GetInt16(2),
+                DamageMod = reader.GetInt16(3),
+                AddDamage = reader.GetInt16(4),
+                Delay = reader.GetByte(5),
+                ComboType = reader.GetByte(6),
+                ComboCount = reader.GetByte(7),
+                ComboDamage = reader.GetInt16(8),
+                Range = reader.GetInt16(9),
+            },
+            cancellationToken);
+
+    /// <summary>EbenezerApp::LoadMagicType2 (MAGIC_TYPE2).</summary>
+    public Task<List<MagicType2>?> LoadMagicType2TableAsync(CancellationToken cancellationToken = default) =>
+        LoadTableAsync(
+            "MAGIC_TYPE2",
+            "iNum, HitType, HitRate, AddDamage, AddRange, NeedArrow, AddDamagePlus",
+            static reader => new MagicType2
+            {
+                ID = reader.GetInt32(0),
+                HitType = reader.GetByte(1),
+                HitRateMod = reader.GetInt16(2),
+                DamageMod = reader.GetInt16(3),
+                RangeMod = reader.GetInt16(4),
+                NeedArrow = reader.GetByte(5),
+                AddDamagePlus = reader.GetInt16(6),
+            },
+            cancellationToken);
+
+    /// <summary>EbenezerApp::LoadMagicType3 (MAGIC_TYPE3).</summary>
+    public Task<List<MagicType3>?> LoadMagicType3TableAsync(CancellationToken cancellationToken = default) =>
+        LoadTableAsync(
+            "MAGIC_TYPE3",
+            "iNum, Radius, Angle, DirectType, FirstDamage, EndDamage, TimeDamage, Duration, Attribute",
+            static reader => new MagicType3
+            {
+                ID = reader.GetInt32(0),
+                Radius = reader.GetByte(1),
+                Angle = reader.GetInt16(2),
+                DirectType = reader.GetByte(3),
+                FirstDamage = reader.GetInt16(4),
+                EndDamage = reader.GetInt16(5),
+                TimeDamage = reader.GetInt16(6),
+                Duration = reader.GetByte(7),
+                Attribute = reader.GetByte(8),
+            },
+            cancellationToken);
+
+    /// <summary>EbenezerApp::LoadMagicType4 (MAGIC_TYPE4).</summary>
+    public Task<List<MagicType4>?> LoadMagicType4TableAsync(CancellationToken cancellationToken = default) =>
+        LoadTableAsync(
+            "MAGIC_TYPE4",
+            "iNum, BuffType, Radius, Duration, AttackSpeed, Speed, AC, ACPct, Attack, MagicAttack, " +
+            "MaxHP, MaxHpPct, MaxMP, MaxMpPct, HitRate, AvoidRate, Str, Sta, Dex, Intel, " +
+            "Cha, FireR, ColdR, LightningR, MagicR, DiseaseR, PoisonR, ExpPct",
+            static reader => new MagicType4
+            {
+                ID = reader.GetInt32(0),
+                BuffType = reader.GetByte(1),
+                Radius = reader.GetByte(2),
+                Duration = reader.GetInt16(3),
+                AttackSpeed = reader.GetByte(4),
+                Speed = reader.GetByte(5),
+                Armor = reader.GetInt16(6),
+                ArmorPercent = reader.GetInt16(7),
+                AttackPower = reader.GetByte(8),
+                MagicPower = reader.GetByte(9),
+                MaxHp = reader.GetInt16(10),
+                MaxHpPercent = reader.GetInt16(11),
+                MaxMp = reader.GetInt16(12),
+                MaxMpPercent = reader.GetInt16(13),
+                HitRate = reader.GetByte(14),
+                AvoidRate = reader.GetInt16(15),
+                Strength = reader.GetInt16(16),
+                Stamina = reader.GetInt16(17),
+                Dexterity = reader.GetInt16(18),
+                Intelligence = reader.GetInt16(19),
+                Charisma = reader.GetInt16(20),
+                FireResist = reader.GetByte(21),
+                ColdResist = reader.GetByte(22),
+                LightningResist = reader.GetByte(23),
+                MagicResist = reader.GetByte(24),
+                DiseaseResist = reader.GetByte(25),
+                PoisonResist = reader.GetByte(26),
+                ExpPercent = reader.GetByte(27),
+            },
+            cancellationToken);
+
+    /// <summary>EbenezerApp::LoadMagicType5 (MAGIC_TYPE5).</summary>
+    public Task<List<MagicType5>?> LoadMagicType5TableAsync(CancellationToken cancellationToken = default) =>
+        LoadTableAsync(
+            "MAGIC_TYPE5",
+            "iNum, Type, ExpRecover, NeedStone",
+            static reader => new MagicType5
+            {
+                ID = reader.GetInt32(0),
+                Type = reader.GetByte(1),
+                ExpRecover = reader.GetByte(2),
+                NeedStone = reader.GetInt16(3),
+            },
+            cancellationToken);
+
     private async Task<List<T>?> LoadTableAsync<T>(
         string tableName, string columns, Func<SqlDataReader, T> readRow, CancellationToken cancellationToken)
     {

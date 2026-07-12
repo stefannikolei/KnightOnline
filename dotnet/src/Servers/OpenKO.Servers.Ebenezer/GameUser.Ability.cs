@@ -112,8 +112,8 @@ public sealed partial class GameUser
     public readonly double[] HpLastTime = new double[MaxType3Repeat];
     public readonly short[] HpAmount = new short[MaxType3Repeat];
     public readonly byte[] HpDuration = new byte[MaxType3Repeat];
-    public readonly byte[] HpInterval = new byte[MaxType3Repeat];
-    public readonly short[] SourceId = new short[MaxType3Repeat];
+    public readonly byte[] HpInterval = [5, 5, 5, 5, 5, 5, 5, 5, 5, 5]; // free slots read 5 (InitType3)
+    public readonly short[] SourceId = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
     public bool Type3Flag;
 
     /// <summary>CUser::InitType3.</summary>

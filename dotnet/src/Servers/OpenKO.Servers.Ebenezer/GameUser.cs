@@ -134,6 +134,14 @@ public sealed partial class GameUser(short socketId, EbenezerWorld world, IDbAge
                 Attack(packet.AsSpan(1));
                 break;
 
+            case GameOpcode.WIZ_MAGIC_PROCESS:
+                Magic.MagicPacket(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_STATE_CHANGE:
+                StateChange(packet.AsSpan(1));
+                break;
+
             case GameOpcode.WIZ_ROTATE:
                 Rotate(packet.AsSpan(1));
                 break;
@@ -157,8 +165,9 @@ public sealed partial class GameUser(short socketId, EbenezerWorld world, IDbAge
                 break;
         }
 
-        // The post-dispatch HP/type-3/type-4/blink timers attach here once the
-        // character data (stage 4.2+) is in place.
+        // Like the C++, the HP-regeneration and type-3/type-4 duration timers
+        // run at the end of every packet dispatch.
+        PacketTimerTail((byte)opcode);
     }
 
     /// <summary>

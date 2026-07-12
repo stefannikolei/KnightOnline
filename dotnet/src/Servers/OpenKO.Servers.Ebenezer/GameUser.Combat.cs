@@ -411,32 +411,7 @@ public sealed partial class GameUser
     }
 
     /// <summary>CUser::GetHitRate — the banded 1..10000 hit roll.</summary>
-    public byte GetHitRate(float rate)
-    {
-        int random = world.Rand(1, 10000);
-
-        (int great, int success, int normal) = rate switch
-        {
-            >= 5.0f => (3500, 7500, 9800),
-            >= 3.0f => (2500, 6000, 9600),
-            >= 2.0f => (2000, 5000, 9400),
-            >= 1.25f => (1500, 4000, 9200),
-            >= 0.8f => (1000, 3000, 9000),
-            >= 0.5f => (800, 2500, 8000),
-            >= 0.33f => (600, 2000, 7000),
-            >= 0.2f => (400, 1500, 6000),
-            _ => (200, 1000, 5000),
-        };
-
-        if (random <= great)
-            return HitGreatSuccess;
-        if (random <= success)
-            return HitSuccess;
-        if (random <= normal)
-            return HitNormal;
-
-        return HitFail;
-    }
+    public byte GetHitRate(float rate) => world.GetHitRate(rate);
 
     /// <summary>CUser::SendTargetHP — the WIZ_TARGET_HP reply to the attacker.</summary>
     public void SendTargetHP(byte echo, int tid, int damage)

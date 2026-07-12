@@ -32,6 +32,7 @@ public static class GameConstants
     public const int SlotFoot = 13;
 
     // e_Authority (subset)
+    public const byte AuthorityManager = 0;
     public const byte AuthorityUser = 1;
 }
 
