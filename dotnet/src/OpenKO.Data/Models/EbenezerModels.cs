@@ -42,3 +42,206 @@ public sealed record Coefficient
     /// <summary>Column [Evasionrate].</summary>
     public required double EvasionRate { get; init; }
 }
+
+/// <summary>ITEM table (deps/db-models Full/model Item).</summary>
+public sealed record Item
+{
+    /// <summary>Column [Num].</summary>
+    public required int ID { get; init; }
+
+    /// <summary>Column [strName].</summary>
+    public required string Name { get; init; }
+
+    public required byte Kind { get; init; }
+
+    public required byte Slot { get; init; }
+
+    public required byte Race { get; init; }
+
+    /// <summary>Column [Class].</summary>
+    public required byte ClassId { get; init; }
+
+    public required short Damage { get; init; }
+
+    public required short Delay { get; init; }
+
+    public required short Range { get; init; }
+
+    public required short Weight { get; init; }
+
+    /// <summary>Column [Duration].</summary>
+    public required short Durability { get; init; }
+
+    public required int BuyPrice { get; init; }
+
+    public required int SellPrice { get; init; }
+
+    /// <summary>Column [Ac].</summary>
+    public required short Armor { get; init; }
+
+    public required byte Countable { get; init; }
+
+    /// <summary>Column [Effect1].</summary>
+    public required int MagicEffect { get; init; }
+
+    /// <summary>Column [Effect2].</summary>
+    public required int SpecialEffect { get; init; }
+
+    /// <summary>Column [ReqLevel].</summary>
+    public required byte MinLevel { get; init; }
+
+    /// <summary>Column [ReqLevelMax].</summary>
+    public required byte MaxLevel { get; init; }
+
+    /// <summary>Column [ReqRank].</summary>
+    public required byte RequiredRank { get; init; }
+
+    /// <summary>Column [ReqTitle].</summary>
+    public required byte RequiredTitle { get; init; }
+
+    /// <summary>Column [ReqStr].</summary>
+    public required byte RequiredStrength { get; init; }
+
+    /// <summary>Column [ReqSta].</summary>
+    public required byte RequiredStamina { get; init; }
+
+    /// <summary>Column [ReqDex].</summary>
+    public required byte RequiredDexterity { get; init; }
+
+    /// <summary>Column [ReqIntel].</summary>
+    public required byte RequiredIntelligence { get; init; }
+
+    /// <summary>Column [ReqCha].</summary>
+    public required byte RequiredCharisma { get; init; }
+
+    public required byte SellingGroup { get; init; }
+
+    /// <summary>Column [ItemType].</summary>
+    public required byte Type { get; init; }
+
+    /// <summary>Column [Hitrate].</summary>
+    public required short HitRate { get; init; }
+
+    /// <summary>Column [Evasionrate].</summary>
+    public required short EvasionRate { get; init; }
+
+    /// <summary>Column [DaggerAc].</summary>
+    public required short DaggerArmor { get; init; }
+
+    /// <summary>Column [SwordAc].</summary>
+    public required short SwordArmor { get; init; }
+
+    /// <summary>Column [MaceAc].</summary>
+    public required short MaceArmor { get; init; }
+
+    /// <summary>Column [AxeAc].</summary>
+    public required short AxeArmor { get; init; }
+
+    /// <summary>Column [SpearAc].</summary>
+    public required short SpearArmor { get; init; }
+
+    /// <summary>Column [BowAc].</summary>
+    public required short BowArmor { get; init; }
+
+    public required byte FireDamage { get; init; }
+
+    public required byte IceDamage { get; init; }
+
+    public required byte LightningDamage { get; init; }
+
+    public required byte PoisonDamage { get; init; }
+
+    /// <summary>Column [HPDrain].</summary>
+    public required byte HpDrain { get; init; }
+
+    /// <summary>Column [MPDamage].</summary>
+    public required byte MpDamage { get; init; }
+
+    /// <summary>Column [MPDrain].</summary>
+    public required byte MpDrain { get; init; }
+
+    public required byte MirrorDamage { get; init; }
+
+    /// <summary>Column [Droprate].</summary>
+    public required byte DropRate { get; init; }
+
+    /// <summary>Column [StrB].</summary>
+    public required short StrengthBonus { get; init; }
+
+    /// <summary>Column [StaB].</summary>
+    public required short StaminaBonus { get; init; }
+
+    /// <summary>Column [DexB].</summary>
+    public required short DexterityBonus { get; init; }
+
+    /// <summary>Column [IntelB].</summary>
+    public required short IntelligenceBonus { get; init; }
+
+    /// <summary>Column [ChaB].</summary>
+    public required short CharismaBonus { get; init; }
+
+    /// <summary>Column [MaxHpB].</summary>
+    public required short MaxHpBonus { get; init; }
+
+    /// <summary>Column [MaxMpB].</summary>
+    public required short MaxMpBonus { get; init; }
+
+    /// <summary>Column [FireR].</summary>
+    public required short FireResist { get; init; }
+
+    /// <summary>Column [ColdR].</summary>
+    public required short ColdResist { get; init; }
+
+    /// <summary>Column [LightningR].</summary>
+    public required short LightningResist { get; init; }
+
+    /// <summary>Column [MagicR].</summary>
+    public required short MagicResist { get; init; }
+
+    /// <summary>Column [PoisonR].</summary>
+    public required short PoisonResist { get; init; }
+
+    /// <summary>Column [CurseR].</summary>
+    public required short CurseResist { get; init; }
+}
+
+/// <summary>LEVEL_UP table.</summary>
+public sealed record LevelUp
+{
+    /// <summary>Column [level].</summary>
+    public required byte Level { get; init; }
+
+    /// <summary>Column [Exp].</summary>
+    public required int RequiredExp { get; init; }
+}
+
+/// <summary>HOME table: respawn rectangles per nation.</summary>
+public sealed record Home
+{
+    public required byte Nation { get; init; }
+
+    public required int ElmoZoneX { get; init; }
+    public required int ElmoZoneZ { get; init; }
+    public required byte ElmoZoneLX { get; init; }
+    public required byte ElmoZoneLZ { get; init; }
+
+    public required int KarusZoneX { get; init; }
+    public required int KarusZoneZ { get; init; }
+    public required byte KarusZoneLX { get; init; }
+    public required byte KarusZoneLZ { get; init; }
+
+    public required int FreeZoneX { get; init; }
+    public required int FreeZoneZ { get; init; }
+    public required byte FreeZoneLX { get; init; }
+    public required byte FreeZoneLZ { get; init; }
+
+    public required int BattleZoneX { get; init; }
+    public required int BattleZoneZ { get; init; }
+    public required byte BattleZoneLX { get; init; }
+    public required byte BattleZoneLZ { get; init; }
+
+    public required int BattleZone2X { get; init; }
+    public required int BattleZone2Z { get; init; }
+    public required byte BattleZone2LX { get; init; }
+    public required byte BattleZone2LZ { get; init; }
+}

@@ -109,7 +109,10 @@ public sealed class EbenezerService(
 
         List<OpenKO.Data.Models.Coefficient>? coefficients = await db.LoadCoefficientTableAsync(stoppingToken);
         List<OpenKO.Data.Models.ZoneInfo>? zoneInfos = await db.LoadZoneInfoTableAsync(stoppingToken);
-        if (coefficients is null || zoneInfos is null)
+        List<OpenKO.Data.Models.Item>? items = await db.LoadItemTableAsync(stoppingToken);
+        List<OpenKO.Data.Models.LevelUp>? levels = await db.LoadLevelUpTableAsync(stoppingToken);
+        List<OpenKO.Data.Models.Home>? homes = await db.LoadHomeTableAsync(stoppingToken);
+        if (coefficients is null || zoneInfos is null || items is null || levels is null || homes is null)
         {
             logger.LogError("Ebenezer startup table load failed, closing server");
             lifetime.StopApplication();
@@ -117,6 +120,9 @@ public sealed class EbenezerService(
         }
 
         World.CoefficientTable = coefficients.ToDictionary(c => c.ClassId);
+        World.ItemTable = items.ToDictionary(i => i.ID);
+        World.LevelUpTable = levels.ToDictionary(l => (int)l.Level, l => l.RequiredExp);
+        World.HomeTable = homes.ToDictionary(h => h.Nation);
         foreach (OpenKO.Data.Models.ZoneInfo zone in zoneInfos)
             World.Zones.Add(new ZoneMeta(zone.ServerId, zone.ZoneId));
 

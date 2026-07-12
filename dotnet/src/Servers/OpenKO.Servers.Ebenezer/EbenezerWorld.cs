@@ -6,7 +6,13 @@ namespace OpenKO.Servers.Ebenezer;
 public sealed record ZoneServerInfo(short ServerNo, string ServerIp, short Port);
 
 /// <summary>Zone metadata of one loaded map (the C3DMap fields the pre-game flow needs).</summary>
-public sealed record ZoneMeta(short ServerNo, short ZoneNumber);
+/// <param name="MapSize">Walkable map extent in meters ((mapSize-1)*unitDist); 0 skips position checks.</param>
+public sealed record ZoneMeta(short ServerNo, short ZoneNumber, float MapSize = 0f)
+{
+    /// <summary>C3DMap::IsValidPosition (x/z inside the map square).</summary>
+    public bool IsValidPosition(float x, float z)
+        => MapSize <= 0f || (x >= 0f && x < MapSize && z >= 0f && z < MapSize);
+}
 
 /// <summary>
 /// EbenezerApp world/user bookkeeping (stage-4 slices): the user slots by socket
@@ -31,6 +37,30 @@ public sealed class EbenezerWorld
 
     /// <summary>m_CoefficientTableMap (COEFFICIENT, keyed by class).</summary>
     public Dictionary<short, Coefficient> CoefficientTable = [];
+
+    /// <summary>m_ItemTableMap (ITEM, keyed by item number).</summary>
+    public Dictionary<int, Item> ItemTable = [];
+
+    /// <summary>m_LevelUpTableArray (LEVEL_UP): required exp keyed by level.</summary>
+    public Dictionary<int, int> LevelUpTable = [];
+
+    /// <summary>m_HomeTableMap (HOME, keyed by nation).</summary>
+    public Dictionary<byte, Home> HomeTable = [];
+
+    // ---- game time/weather ([TIMER] section + WIZ_TIME updates) ----
+    public short Year = 1;
+    public short Month = 1;
+    public short Date = 1;
+    public short Hour = 1;
+    public short Minute;
+    public short Weather = 1;
+    public short WeatherAmount;
+
+    /// <summary>m_ppNotice[20] (Notice.txt lines).</summary>
+    public readonly string[] Notices = new string[20];
+
+    /// <summary>Send_AIServer(zone, buf, len) — wired once the AISocket lands (stage 4.4).</summary>
+    public Action<int, byte[]>? SendToAiServer;
 
     /// <summary>m_byOldVictory: winner of the last national war.</summary>
     public byte OldVictory;
@@ -79,6 +109,18 @@ public sealed class EbenezerWorld
     /// <summary>EbenezerApp::GetMapByID.</summary>
     public ZoneMeta? GetZoneById(int zoneId)
         => Zones.FirstOrDefault(z => z.ZoneNumber == zoneId);
+
+    /// <summary>EbenezerApp::GetZoneIndex (-1 when the zone is not on this server).</summary>
+    public int GetZoneIndex(int zoneId)
+    {
+        for (int i = 0; i < Zones.Count; i++)
+        {
+            if (Zones[i].ZoneNumber == zoneId)
+                return i;
+        }
+
+        return -1;
+    }
 
     /// <summary>Claims the smallest free socket slot, -1 when the server is full.</summary>
     public short Register(Func<short, GameUser> factory)

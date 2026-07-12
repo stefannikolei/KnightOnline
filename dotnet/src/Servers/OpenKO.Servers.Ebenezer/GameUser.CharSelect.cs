@@ -419,8 +419,10 @@ public sealed partial class GameUser
         writer.SetByte(world.OldVictory);
         Send(writer.Written);
 
-        // SetDetailData (item stats) and the knights bookkeeping attach with the
-        // stage-4.3 world/item slices; banished members already reset here.
+        SetDetailData();
+
+        // Knights bookkeeping attaches with the KnightsManager slice; banished
+        // members already reset here.
         if (user.Knights == -1)
         {
             user.Knights = 0;

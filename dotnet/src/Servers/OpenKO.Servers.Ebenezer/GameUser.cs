@@ -121,6 +121,11 @@ public sealed partial class GameUser(short socketId, EbenezerWorld world, IDbAge
                 await AllCharInfoToAgentAsync();
                 break;
 
+            case GameOpcode.WIZ_GAMESTART:
+                if (State != ConnectionState.GameStart)
+                    GameStart(packet.AsSpan(1));
+                break;
+
             case GameOpcode.WIZ_VERSION_CHECK:
                 VersionCheck();
                 break;
