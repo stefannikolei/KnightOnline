@@ -38,6 +38,9 @@ public sealed class AiWorld
     public Dictionary<short, ZoneInfo> ZoneInfoTable = [];
     public List<MonsterItem> MonsterItemTable = [];
 
+    /// <summary>NOW_TEST_MODE (Define.h): 0 in the shipped build.</summary>
+    public bool TestMode { get; init; }
+
     /// <summary>myrand(min, max): inclusive random like the C++ helper.</summary>
     public Func<int, int, int> Rand { get; init; } = (min, max) => Random.Shared.Next(min, max + 1);
 

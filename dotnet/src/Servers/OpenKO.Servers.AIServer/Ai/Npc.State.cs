@@ -3325,25 +3325,4 @@ public partial class Npc
         return 0;
     }
 
-    /// <summary>TODO(stage3.7-part2): CNpc::SetDamage (false = the NPC died).</summary>
-    public bool SetDamage(int attackType, int damage, string sourceName, int uid)
-    {
-        _ = attackType;
-        _ = damage;
-        _ = sourceName;
-        _ = uid;
-        return true;
-    }
-
-    /// <summary>TODO(stage3.7-part2): CNpc::SendDead.</summary>
-    public int SendDead(int type = 1)
-    {
-        _ = type;
-        return 0;
-    }
-
-    /// <summary>TODO(stage3.7-part2): CNpc::SendExpToUserList — exp distribution.</summary>
-    public void SendExpToUserList()
-    {
-    }
 }
