@@ -59,6 +59,9 @@ public sealed partial class EbenezerWorld
     /// <summary>m_MagicType5TableMap (MAGIC_TYPE5).</summary>
     public Dictionary<int, MagicType5> MagicType5Table = [];
 
+    /// <summary>m_MagicType8TableMap (MAGIC_TYPE8).</summary>
+    public Dictionary<int, MagicType8> MagicType8Table = [];
+
     /// <summary>myrand_generic(min, max) — inclusive, swaps a reversed range; injectable for deterministic tests.</summary>
     public Func<int, int, int> Rand = (min, max) =>
     {

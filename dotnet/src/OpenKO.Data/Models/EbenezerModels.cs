@@ -261,3 +261,20 @@ public sealed record MagicType5
     /// <summary>Column [NeedStone]: resurrection stones required.</summary>
     public required short NeedStone { get; init; }
 }
+
+/// <summary>MAGIC_TYPE8 table (warp, resurrection and summon spells).</summary>
+public sealed record MagicType8
+{
+    /// <summary>Column [iNum].</summary>
+    public required int ID { get; init; }
+
+    public required byte Target { get; init; }
+
+    public required short Radius { get; init; }
+
+    /// <summary>1 gate warp, 11 resurrect, 12 summon in zone, 13 summon across zones, 20 random teleport.</summary>
+    public required byte WarpType { get; init; }
+
+    /// <summary>Column [ExpRecover].</summary>
+    public required short ExpRecover { get; init; }
+}

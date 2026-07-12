@@ -10,11 +10,13 @@ public sealed class ZoneRegion
     public readonly Dictionary<uint, ZoneItem> Items = [];
 }
 
-/// <summary>_OBJECT_EVENT slice the AISocket flow touches (sType + byLife).</summary>
+/// <summary>_OBJECT_EVENT slice the AISocket/respawn flows touch (sType, byLife, position).</summary>
 public sealed class ObjectEvent
 {
     public short Type;
     public byte Life;
+    public float PosX;
+    public float PosZ;
 }
 
 /// <summary>_ZONE_ITEM: one dropped loot bundle (up to 6 stacks).</summary>
@@ -52,6 +54,10 @@ public sealed class GameZone
 
     /// <summary>m_wBundle: the next loot-bundle id (starts at 1, wraps at ZONEITEM_MAX).</summary>
     public uint Bundle = 1;
+
+    /// <summary>m_fInitX / m_fInitZ (ZONE_INFO spawn point, warp fallback).</summary>
+    public float InitX;
+    public float InitZ;
 
     public GameZone(short serverNo, short zoneNumber, float mapSize = 0f)
     {

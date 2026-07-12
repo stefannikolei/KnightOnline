@@ -301,6 +301,21 @@ public sealed class EbenezerDb(SqlConnectionFactory connectionFactory, ILogger l
             },
             cancellationToken);
 
+    /// <summary>EbenezerApp::LoadMagicType8 (MAGIC_TYPE8).</summary>
+    public Task<List<MagicType8>?> LoadMagicType8TableAsync(CancellationToken cancellationToken = default) =>
+        LoadTableAsync(
+            "MAGIC_TYPE8",
+            "iNum, Target, Radius, WarpType, ExpRecover",
+            static reader => new MagicType8
+            {
+                ID = reader.GetInt32(0),
+                Target = reader.GetByte(1),
+                Radius = reader.GetInt16(2),
+                WarpType = reader.GetByte(3),
+                ExpRecover = reader.GetInt16(4),
+            },
+            cancellationToken);
+
     /// <summary>EbenezerApp::LoadMagicType5 (MAGIC_TYPE5).</summary>
     public Task<List<MagicType5>?> LoadMagicType5TableAsync(CancellationToken cancellationToken = default) =>
         LoadTableAsync(

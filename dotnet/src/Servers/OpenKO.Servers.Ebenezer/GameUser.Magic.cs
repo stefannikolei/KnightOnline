@@ -75,7 +75,9 @@ public sealed partial class GameUser
         if (Type4Flag)
             Type4DurationTick(currentTime);
 
-        // BlinkTimeCheck attaches with the regene/blink slice.
+        // Should you stop blinking?
+        if (AbnormalType == AbnormalBlinking)
+            BlinkTimeCheck(currentTime);
     }
 
     /// <summary>CUser::HPTimeChange — passive HP/MP regeneration.</summary>

@@ -126,8 +126,46 @@ public class MagicProcessorTests
         world.MagicTable[BuffSpellId] = MakeMagic(BuffSpellId, type1: 4, moral: 1, manaCost: 20); // MORAL_SELF
         world.MagicType4Table[BuffSpellId] = MakeType4(BuffSpellId, buffType: 2, armor: 50, duration: 60);
 
+        world.MagicTable[SummonSpellId] = MakeMagic(SummonSpellId, type1: 8, moral: 2, manaCost: 20); // MORAL_FRIEND_WITHME
+        world.MagicType8Table[SummonSpellId] = new MagicType8
+        {
+            ID = SummonSpellId, Target = 0, Radius = 0, WarpType = 12, ExpRecover = 0,
+        };
+
+        world.MagicType8Table[ResurrectType8Id] = new MagicType8
+        {
+            ID = ResurrectType8Id, Target = 0, Radius = 0, WarpType = 11, ExpRecover = 300,
+        };
+
+        world.MagicTable[CureSpellId] = MakeMagic(CureSpellId, type1: 5, moral: 2, manaCost: 10);
+        world.MagicType5Table[CureSpellId] = new MagicType5
+        {
+            ID = CureSpellId, Type = 3, ExpRecover = 50, NeedStone = 0, // resurrection
+        };
+        world.MagicType5Table[490041] = new MagicType5
+        {
+            ID = 490041, Type = 3, ExpRecover = 0, NeedStone = 3, // stone of resurrection
+        };
+
+        world.HomeTable[1] = MakeHome(1);
+        world.HomeTable[2] = MakeHome(2);
+
         return world;
     }
+
+    private const int SummonSpellId = 800001;    // type 8 warp type 12
+    private const int ResurrectType8Id = 800002; // type 8 warp type 11
+    private const int CureSpellId = 903001;      // type 5 resurrection
+
+    private static Home MakeHome(byte nation) => new()
+    {
+        Nation = nation,
+        ElmoZoneX = 100, ElmoZoneZ = 100, ElmoZoneLX = 10, ElmoZoneLZ = 10,
+        KarusZoneX = 200, KarusZoneZ = 200, KarusZoneLX = 10, KarusZoneLZ = 10,
+        FreeZoneX = 300, FreeZoneZ = 300, FreeZoneLX = 10, FreeZoneLZ = 10,
+        BattleZoneX = 400, BattleZoneZ = 400, BattleZoneLX = 10, BattleZoneLZ = 10,
+        BattleZone2X = 0, BattleZone2Z = 0, BattleZone2LX = 0, BattleZone2LZ = 0,
+    };
 
     private static (GameUser User, List<byte[]> Frames) MakeFighter(
         EbenezerWorld world, FakeDbAgent db, string charId, byte nation, float x = 100, float z = 100)
@@ -367,6 +405,150 @@ public class MagicProcessorTests
 
         // The NPC hit lands via GetMagicDamage (low rolls → GREAT_SUCCESS).
         Assert.True(victim.UserData!.Hp < 100);
+    }
+
+    [Fact]
+    public async Task Regene_RespawnAtBindPoint_SetsBlinking()
+    {
+        var world = MakeWorld();
+        var db = new FakeDbAgent();
+        (GameUser user, List<byte[]> frames) = MakeFighter(world, db, "Hero", nation: 1);
+        user.UserData!.Bind = 5;
+        world.Zones[0].ObjectEvents[5] = new ObjectEvent { Type = 0, Life = 1, PosX = 200f, PosZ = 300f };
+        user.ResHpType = 3; // USER_DEAD
+        user.LostExp = 100;
+        user.WhoKilledMe = 7;
+        frames.Clear();
+
+        await user.ParsingAsync([0x12, 0x01]); // WIZ_REGENE, normal respawn
+
+        // Deterministic min rolls: offset 0/100 < 2.5 → +1.5.
+        Assert.Equal(201.5f, user.UserData.CurX);
+        Assert.Equal(301.5f, user.UserData.CurZ);
+        Assert.Equal(3, user.AbnormalType); // ABNORMAL_BLINKING
+        Assert.Equal(1, user.ResHpType);    // USER_STANDING
+        Assert.Equal(0, user.LostExp);
+        Assert.Equal(-1, user.WhoKilledMe);
+        Assert.Equal(4, user.RegionX); // 201.5 / 48
+
+        byte[] regene = frames.Select(Unframe).First(p => p[0] == 0x12);
+        Assert.Equal(2010, BinaryPrimitives.ReadUInt16LittleEndian(regene.AsSpan(1))); // (ushort)201.5 * 10
+    }
+
+    [Fact]
+    public async Task Blink_EndsAfterTenSecondsAndNotifiesTheAi()
+    {
+        var world = MakeWorld();
+        var db = new FakeDbAgent();
+        var aiPackets = new List<(int Zone, byte[] Data)>();
+        world.SendToAiServer = (zone, data) => aiPackets.Add((zone, data));
+        (GameUser user, _) = MakeFighter(world, db, "Hero", nation: 1);
+        user.UserData!.Bind = 5;
+        world.Zones[0].ObjectEvents[5] = new ObjectEvent { Life = 1, PosX = 200f, PosZ = 300f };
+        user.ResHpType = 3;
+
+        await user.ParsingAsync([0x12, 0x01]);
+        Assert.Equal(3, user.AbnormalType);
+        aiPackets.Clear();
+
+        _now += 11;
+        await user.ParsingAsync([0xFF]); // any packet runs the timer tail
+
+        Assert.Equal(1, user.AbnormalType); // ABNORMAL_NORMAL
+        Assert.Equal(user.MaxHp, user.UserData.Hp); // normal regene: full refill
+        Assert.Contains(aiPackets, p => p.Data[0] == AiOpcode.AG_USER_REGENE);
+        Assert.Contains(aiPackets, p => p.Data[0] == AiOpcode.AG_USER_INOUT && p.Data[1] == 0x03); // USER_REGENE
+    }
+
+    [Fact]
+    public async Task WarpProcess_JumpsWithinTheZone()
+    {
+        var world = MakeWorld();
+        var db = new FakeDbAgent();
+        (GameUser user, List<byte[]> frames) = MakeFighter(world, db, "Hero", nation: 1);
+        frames.Clear();
+
+        var packet = new byte[5];
+        packet[0] = 0x1E; // WIZ_WARP
+        BinaryPrimitives.WriteUInt16LittleEndian(packet.AsSpan(1), 1500);
+        BinaryPrimitives.WriteUInt16LittleEndian(packet.AsSpan(3), 1400);
+        await user.ParsingAsync(packet);
+
+        Assert.Equal(150f, user.UserData!.CurX);
+        Assert.Equal(140f, user.UserData.CurZ);
+        Assert.Equal(3, user.RegionX); // 150 / 48
+        Assert.Contains(user.SocketId, world.Zones[0].Regions[3, 2].Users);
+
+        byte[][] payloads = [.. frames.Select(Unframe)];
+        Assert.Contains(payloads, p => p[0] == 0x1E
+            && BinaryPrimitives.ReadUInt16LittleEndian(p.AsSpan(1)) == 1500);
+    }
+
+    [Fact]
+    public void Type8_SummonPullsTheTargetToTheCaster()
+    {
+        var world = MakeWorld();
+        var db = new FakeDbAgent();
+        (GameUser caster, _) = MakeFighter(world, db, "Mage", nation: 1);
+        (GameUser friend, List<byte[]> friendFrames) = MakeFighter(world, db, "Friend", nation: 1, x: 300, z: 300);
+        friendFrames.Clear();
+
+        caster.Magic.MagicPacket(MagicPacketBody(MagicProcessor.MagicEffecting, SummonSpellId, caster.SocketId, friend.SocketId));
+
+        Assert.Equal(100f, friend.UserData!.CurX); // pulled to the caster
+        Assert.Equal(100f, friend.UserData.CurZ);
+        Assert.Equal(80, caster.UserData!.Mp); // mana cost 20
+
+        byte[][] payloads = [.. friendFrames.Select(Unframe)];
+        Assert.Contains(payloads, p => p[0] == 0x1E); // WIZ_WARP
+    }
+
+    [Fact]
+    public void Type8_ResurrectionRevivesADeadTarget()
+    {
+        var world = MakeWorld();
+        var db = new FakeDbAgent();
+        var aiPackets = new List<(int Zone, byte[] Data)>();
+        world.SendToAiServer = (zone, data) => aiPackets.Add((zone, data));
+        (GameUser caster, _) = MakeFighter(world, db, "Cleric", nation: 1);
+        (GameUser dead, _) = MakeFighter(world, db, "Fallen", nation: 1, x: 110, z: 110);
+        dead.UserData!.Hp = 0;
+        dead.ResHpType = 3;
+        dead.UserData.Exp = 100;
+
+        caster.Magic.ExecuteType8(ResurrectType8Id, caster.SocketId, dead.SocketId, 0, 0, 0);
+
+        Assert.Equal(1, dead.ResHpType); // USER_STANDING
+        Assert.Equal(dead.MaxHp, dead.UserData.Hp);
+        Assert.Equal(103, dead.UserData.Exp); // + ExpRecover 300/100
+        Assert.Contains(aiPackets, p => p.Data[0] == AiOpcode.AG_USER_REGENE);
+    }
+
+    [Fact]
+    public void Type5_Resurrection_RunsRegene()
+    {
+        var world = MakeWorld();
+        var db = new FakeDbAgent();
+        (GameUser caster, _) = MakeFighter(world, db, "Cleric", nation: 1);
+        (GameUser dead, List<byte[]> deadFrames) = MakeFighter(world, db, "Fallen", nation: 1, x: 110, z: 110);
+        dead.UserData!.Bind = 5;
+        world.Zones[0].ObjectEvents[5] = new ObjectEvent { Life = 1, PosX = 200f, PosZ = 300f };
+        dead.UserData.Hp = 0;
+        dead.ResHpType = 3;
+        dead.LostExp = 100;
+        dead.UserData.Exp = 500;
+        deadFrames.Clear();
+
+        caster.Magic.MagicPacket(MagicPacketBody(MagicProcessor.MagicEffecting, CureSpellId, caster.SocketId, dead.SocketId));
+
+        Assert.Equal(3, dead.AbnormalType);        // blinking
+        Assert.Equal(1, dead.ResHpType);           // standing
+        Assert.Equal(1, dead.RegeneType);          // REGENE_MAGIC
+        Assert.Equal(0, dead.UserData.Mp);         // MP emptied
+        Assert.Equal(550, dead.UserData.Exp);      // + LostExp 100 * ExpRecover 50 / 100
+
+        byte[][] payloads = [.. deadFrames.Select(Unframe)];
+        Assert.Contains(payloads, p => p[0] == 0x12); // WIZ_REGENE
     }
 
     [Fact]

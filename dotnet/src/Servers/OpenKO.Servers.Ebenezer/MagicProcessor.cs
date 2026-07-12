@@ -322,8 +322,7 @@ public sealed class MagicProcessor(EbenezerWorld world, GameUser? srcUser, ILogg
                 ExecuteType5(magicId, sid, tid, data1, data2, data3);
                 break;
             case 8:
-                // Warp/resurrection/summon spells attach with the respawn slice.
-                logger.LogDebug("MagicProcessor: type 8 (warp/summon) deferred [magicId={MagicId}]", magicId);
+                ExecuteType8(magicId, sid, tid, data1, data2, data3);
                 break;
         }
 
@@ -1367,9 +1366,7 @@ public sealed class MagicProcessor(EbenezerWorld world, GameUser? srcUser, ILogg
                 break;
 
             case Resurrection:
-                // CUser::Regene attaches with the respawn slice.
-                logger.LogDebug("MagicProcessor: resurrection deferred to the respawn slice [magicId={MagicId} tid={Tid}]",
-                    magicId, tid);
+                target.Regene([1], magicId);
                 break;
 
             case RemoveBless:
@@ -1469,6 +1466,252 @@ public sealed class MagicProcessor(EbenezerWorld world, GameUser? srcUser, ILogg
                 target.AvoidRateAmount = 100;
                 break;
         }
+    }
+
+    /// <summary>CMagicProcess::ExecuteType8 — warp, resurrection and summon spells.</summary>
+    public void ExecuteType8(int magicId, int sid, int tid, int data1, int data2, int data3)
+    {
+        _ = data2;
+
+        MagicType8? type8 = world.MagicType8Table.GetValueOrDefault(magicId);
+        if (type8 is null)
+            return;
+
+        var castedMembers = new List<int>();
+
+        if (tid == -1)
+        {
+            // Unlike types 3/4, the C++ scan skips neither dead nor blinking users here.
+            for (int i = 0; i < world.Users.Length; i++)
+            {
+                if (world.Users[i] is null)
+                    continue;
+
+                if (UserRegionCheck(sid, i, magicId, type8.Radius, (short)data1, (short)data3))
+                    castedMembers.Add(i);
+            }
+
+            if (castedMembers.Count == 0)
+                return;
+        }
+        else
+        {
+            if (GetUser(tid) is null)
+                return;
+
+            castedMembers.Add(tid);
+        }
+
+        foreach (int userId in castedMembers)
+        {
+            int result = 1;
+
+            float x = world.Rand(0, 400) / 100.0f;
+            float z = world.Rand(0, 400) / 100.0f;
+
+            if (x < 2.5f)
+                x += 1.5f;
+
+            if (z < 2.5f)
+                z += 1.5f;
+
+            GameUser? target = GetUser(userId);
+            if (target?.UserData is not { } targetData)
+                continue;
+
+            GameZone? targetMap = world.GetZoneByIndex(target.ZoneIndex);
+            if (targetMap is null)
+                continue;
+
+            Home? home = world.HomeTable.GetValueOrDefault(targetData.Nation);
+            if (home is null)
+                return;
+
+            // Warp/summon needs a living target; resurrection (11) a dead one.
+            if (type8.WarpType != 11)
+            {
+                if (target.ResHpType == UserDead)
+                    result = 0;
+            }
+            else if (target.ResHpType != UserDead)
+            {
+                result = 0;
+            }
+
+            if (result != 0 && target.Warp != 0)
+                result = 0;
+
+            if (result != 0)
+            {
+                var warpBuffer = new byte[8];
+
+                switch (type8.WarpType)
+                {
+                    // Send the target to its resurrection point.
+                    case 1:
+                    {
+                        SendType8Effect(magicId, sid, userId, data1, result, data3, target, targetData);
+
+                        ObjectEvent? bindEvent = targetMap.GetObjectEvent(targetData.Bind);
+                        var writer = new PacketWriter(warpBuffer);
+
+                        if (bindEvent is not null)
+                        {
+                            // C++ quirk kept as-is: the small offset is added
+                            // AFTER the decimeter scaling.
+                            writer.SetShort((short)(ushort)((bindEvent.PosX * 10) + x));
+                            writer.SetShort((short)(ushort)((bindEvent.PosZ * 10) + z));
+                        }
+                        else if (targetData.Nation != targetData.Zone && targetData.Zone < 3)
+                        {
+                            // C++ quirk kept as-is: these coordinates are raw
+                            // meters — Warp divides them by 10 again.
+                            if (targetData.Nation == 1)
+                            {
+                                writer.SetShort((short)(852 + x));
+                                writer.SetShort((short)(164 + z));
+                            }
+                            else
+                            {
+                                writer.SetShort((short)(177 + x));
+                                writer.SetShort((short)(923 + z));
+                            }
+                        }
+                        else if (targetData.Zone == ZoneBattle)
+                        {
+                            writer.SetShort((short)(ushort)((home.BattleZoneX * 10) + x));
+                            writer.SetShort((short)(ushort)((home.BattleZoneZ * 10) + z));
+                        }
+                        else if (targetData.Zone == 201) // ZONE_FRONTIER
+                        {
+                            writer.SetShort((short)(ushort)((home.FreeZoneX * 10) + x));
+                            writer.SetShort((short)(ushort)((home.FreeZoneZ * 10) + z));
+                        }
+                        else
+                        {
+                            writer.SetShort((short)(ushort)((targetMap.InitX * 10) + x));
+                            writer.SetShort((short)(ushort)((targetMap.InitZ * 10) + z));
+                        }
+
+                        target.WarpProcess(warpBuffer.AsSpan(0, writer.Index));
+                        break;
+                    }
+
+                    // Teleport points (2/3/5) are unimplemented upstream.
+                    case 2:
+                    case 3:
+                    case 5:
+                        break;
+
+                    // Resurrect a dead player.
+                    case 11:
+                    {
+                        SendType8Effect(magicId, sid, userId, data1, result, data3, target, targetData);
+
+                        target.ResHpType = 1; // USER_STANDING
+                        target.HpChange(target.MaxHp);
+                        target.ExpChange(type8.ExpRecover / 100); // integer division, like the C++
+
+                        var aiBuffer = new byte[8];
+                        var aiWriter = new PacketWriter(aiBuffer);
+                        aiWriter.SetByte(AiOpcode.AG_USER_REGENE);
+                        aiWriter.SetShort(userId);
+                        aiWriter.SetShort(targetData.Zone);
+                        world.SendToAiServer?.Invoke(targetData.Zone, aiWriter.Written.ToArray());
+                        break;
+                    }
+
+                    // Summon a target within the zone.
+                    case 12:
+                    {
+                        if (srcUser?.UserData is not { } srcData || srcData.Zone != targetData.Zone)
+                        {
+                            result = 0;
+                            break;
+                        }
+
+                        SendType8Effect(magicId, sid, userId, data1, result, data3, target, targetData);
+
+                        var writer = new PacketWriter(warpBuffer);
+                        writer.SetShort((short)(ushort)(srcData.CurX * 10));
+                        writer.SetShort((short)(ushort)(srcData.CurZ * 10));
+                        target.WarpProcess(warpBuffer.AsSpan(0, writer.Index));
+                        break;
+                    }
+
+                    // Summon a target across zones (needs CUser::ZoneChange).
+                    case 13:
+                        logger.LogDebug("MagicProcessor: cross-zone summon deferred to the zone-change slice [magicId={MagicId}]",
+                            magicId);
+                        result = 0;
+                        break;
+
+                    // Randomly teleport the target (within 20 meters).
+                    case 20:
+                    {
+                        SendType8Effect(magicId, sid, userId, data1, result, data3, target, targetData);
+
+                        float warpX = targetData.CurX;
+                        float warpZ = targetData.CurZ;
+
+                        float tempX = world.Rand(0, 20);
+                        float tempZ = world.Rand(0, 20);
+
+                        warpX = tempX > 10 ? warpX + (tempX - 10) : warpX - tempX;
+                        warpZ = tempZ > 10 ? warpZ + (tempZ - 10) : warpZ - tempZ;
+
+                        warpX = Math.Clamp(warpX, 0f, 4096f);
+                        warpZ = Math.Clamp(warpZ, 0f, 4096f);
+
+                        // C++ quirk kept as-is: raw meters, Warp divides by 10.
+                        var writer = new PacketWriter(warpBuffer);
+                        writer.SetShort((short)(ushort)warpX);
+                        writer.SetShort((short)(ushort)warpZ);
+                        target.WarpProcess(warpBuffer.AsSpan(0, writer.Index));
+                        break;
+                    }
+
+                    case 21:
+                        break; // monster summon, unimplemented upstream
+
+                    default:
+                        result = 0;
+                        break;
+                }
+            }
+
+            // The packet_send tail always echoes from the SOURCE user's region.
+            if (srcUser?.UserData is { } echoSrc)
+            {
+                var buffer = new byte[32];
+                var writer = new PacketWriter(buffer);
+                writer.SetByte((byte)GameOpcode.WIZ_MAGIC_PROCESS);
+                writer.SetByte(MagicEffecting);
+                writer.SetDWord((uint)magicId);
+                writer.SetShort(sid);
+                writer.SetShort(userId);
+                writer.SetShort(data1);
+                writer.SetShort(result);
+                writer.SetShort(data3);
+                world.SendRegion(writer.Written, echoSrc.Zone, srcUser.RegionX, srcUser.RegionZ, except: null, direct: false);
+            }
+        }
+    }
+
+    private void SendType8Effect(int magicId, int sid, int userId, int data1, int result, int data3,
+        GameUser target, UserData targetData)
+    {
+        var buffer = new byte[32];
+        var writer = new PacketWriter(buffer);
+        writer.SetByte((byte)GameOpcode.WIZ_MAGIC_PROCESS);
+        writer.SetByte(MagicEffecting);
+        writer.SetDWord((uint)magicId);
+        writer.SetShort(sid);
+        writer.SetShort(userId);
+        writer.SetShort(data1);
+        writer.SetShort(result);
+        writer.SetShort(data3);
+        world.SendRegion(writer.Written, targetData.Zone, target.RegionX, target.RegionZ, except: null, direct: false);
     }
 
     /// <summary>CMagicProcess::GetMagicDamage — resist/staff-adjusted magic damage.</summary>
