@@ -1259,8 +1259,11 @@ public partial class Npc
         writer.SetShort(0);
         writer.SetShort(0);
 
-        // TODO(stage3.7): route through the ported NpcMagicProcess.
-        NpcMagicPacket?.Invoke(writer.Written.ToArray());
+        byte[] healPayload = writer.Written.ToArray();
+        if (NpcMagicPacket is { } healHook)
+            healHook(healPayload);
+        else
+            MagicProcess.MagicPacket(healPayload);
     }
 
     // ------------------------------------------------------------------

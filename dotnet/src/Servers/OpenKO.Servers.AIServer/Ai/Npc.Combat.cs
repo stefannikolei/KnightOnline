@@ -1594,8 +1594,8 @@ public partial class Npc
     private const byte MagicEffecting = 3;           // MAGIC_EFFECTING (e_MagicOpcode)
 
     /// <summary>
-    /// Hook for CNpcMagicProcess::MagicPacket (area magic) until the magic
-    /// processor is ported. Receives the MAGIC_EFFECTING payload the C++ builds.
+    /// Test override for CNpcMagicProcess::MagicPacket. When null (the default),
+    /// magic payloads route through <see cref="Npc.MagicProcess"/> like the C++.
     /// </summary>
     public Action<byte[]>? NpcMagicPacket;
 
@@ -1733,8 +1733,11 @@ public partial class Npc
                     writer.SetShort(0);
                     writer.SetShort(0);
 
-                    // TODO(stage3.7): route through the ported NpcMagicProcess.
-                    NpcMagicPacket?.Invoke(writer.Written.ToArray());
+                    byte[] areaPayload = writer.Written.ToArray();
+                    if (NpcMagicPacket is { } areaHook)
+                        areaHook(areaPayload);
+                    else
+                        MagicProcess.MagicPacket(areaPayload);
                     return AttackDelay + 1000;
                 }
             }
@@ -1900,8 +1903,11 @@ public partial class Npc
             writer.SetShort(0);
             writer.SetShort(0);
 
-            // TODO(stage3.7): route through the ported NpcMagicProcess.
-            NpcMagicPacket?.Invoke(writer.Written.ToArray());
+            byte[] castPayload = writer.Written.ToArray();
+            if (NpcMagicPacket is { } castHook)
+                castHook(castPayload);
+            else
+                MagicProcess.MagicPacket(castPayload);
         }
         else if (targetId >= NpcBand && Target.Id < InvalidBand)
         {

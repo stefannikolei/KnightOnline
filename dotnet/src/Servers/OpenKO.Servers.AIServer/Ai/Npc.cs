@@ -9,6 +9,11 @@ namespace OpenKO.Servers.AIServer.Ai;
 /// </summary>
 public partial class Npc
 {
+    /// <summary>m_MagicProcess — the C++ ctor points it back at this NPC.</summary>
+    public readonly NpcMagicProcessor MagicProcess;
+
+    public Npc() => MagicProcess = new NpcMagicProcessor(this);
+
     // ---- runtime combat/target state ----
     public NpcTarget Target;
     public short ItemUserLevel;
