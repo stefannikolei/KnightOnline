@@ -550,7 +550,16 @@ public sealed partial class GameUser
         writer.SetShort(GetCurrentWeightForClient());
         world.SendRegion(writer.Written, user.Zone, RegionX, RegionZ);
 
-        // WIZ_PARTY/PARTY_LEVELCHANGE attaches with the party slice.
+        if (PartyIndex != -1)
+        {
+            var partyBuffer = new byte[8];
+            var partyWriter = new PacketWriter(partyBuffer);
+            partyWriter.SetByte((byte)GameOpcode.WIZ_PARTY);
+            partyWriter.SetByte(PartyLevelChange);
+            partyWriter.SetShort(SocketId);
+            partyWriter.SetByte(user.Level);
+            world.SendPartyMember(PartyIndex, partyWriter.Written);
+        }
     }
 
     /// <summary>CUser::Send2AI_UserUpdateInfo.</summary>
@@ -662,15 +671,128 @@ public sealed partial class GameUser
         }
     }
 
-    /// <summary>CUser::LoyaltyDivide — the party variant (full port with the party slice).</summary>
+    /// <summary>CUser::LoyaltyDivide — split the kill's national points across the party.</summary>
     public void LoyaltyDivide(int tid)
     {
-        _ = tid;
+        if (UserData is not { } user)
+            return;
 
-        // The C++ needs the _PARTY_GROUP for the level average; PartyIndex is
-        // always -1 until the party slice lands, matching the early return.
         if (PartyIndex < 0)
             return;
+
+        PartyGroup? party = world.Parties.GetValueOrDefault(PartyIndex);
+        if (party is null)
+            return;
+
+        GameUser? target = tid >= 0 && tid < world.Users.Length ? world.Users[tid] : null;
+        if (target?.UserData is not { } targetData)
+            return;
+
+        int levelSum = 0;
+        int totalMembers = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            if (party.Uid[i] != -1)
+            {
+                levelSum += party.Level[i];
+                totalMembers++;
+            }
+        }
+
+        if (levelSum <= 0 || totalMembers <= 0)
+            return;
+
+        int averageLevel = levelSum / totalMembers;
+
+        // Wednesday battle-event kill counters.
+        if (world.BattleOpen != NoBattle && user.Zone == ZoneBattle)
+        {
+            if (targetData.Nation == Karus)
+                ++world.KarusDead;
+            else if (targetData.Nation == Elmorad)
+                ++world.ElmoradDead;
+        }
+
+        short loyaltySource, loyaltyTarget;
+
+        if (targetData.Nation != user.Nation)
+        {
+            int levelDifference = targetData.Level - averageLevel;
+
+            if (targetData.Loyalty <= 0)
+            {
+                loyaltySource = 0;
+                loyaltyTarget = 0;
+            }
+            else if (levelDifference > 5)
+            {
+                loyaltySource = 50;
+                loyaltyTarget = -25;
+            }
+            else if (levelDifference < -5)
+            {
+                loyaltySource = 10;
+                loyaltyTarget = -5;
+            }
+            else
+            {
+                loyaltySource = 30;
+                loyaltyTarget = -15;
+            }
+        }
+        else
+        {
+            // Same-nation kill: everyone in the party loses 1000.
+            for (int j = 0; j < 8; j++)
+            {
+                GameUser? member = party.Uid[j] >= 0 && party.Uid[j] < world.Users.Length
+                    ? world.Users[party.Uid[j]]
+                    : null;
+                if (member?.UserData is not { } memberData)
+                    continue;
+
+                memberData.Loyalty -= 1000;
+                if (memberData.Loyalty < 0)
+                    memberData.Loyalty = 0;
+
+                SendLoyaltyChange(member, memberData.Loyalty);
+            }
+
+            return;
+        }
+
+        if (user.Zone != user.Nation && user.Zone < 3)
+            loyaltySource *= 2;
+
+        for (int j = 0; j < 8; j++)
+        {
+            GameUser? member = party.Uid[j] >= 0 && party.Uid[j] < world.Users.Length
+                ? world.Users[party.Uid[j]]
+                : null;
+            if (member?.UserData is not { } memberData)
+                continue;
+
+            memberData.Loyalty += memberData.Level * loyaltySource / levelSum;
+            if (memberData.Loyalty < 0)
+                memberData.Loyalty = 0;
+
+            SendLoyaltyChange(member, memberData.Loyalty);
+        }
+
+        targetData.Loyalty += loyaltyTarget;
+        if (targetData.Loyalty < 0)
+            targetData.Loyalty = 0;
+
+        SendLoyaltyChange(target, targetData.Loyalty);
+    }
+
+    private static void SendLoyaltyChange(GameUser user, int loyalty)
+    {
+        var buffer = new byte[8];
+        var writer = new PacketWriter(buffer);
+        writer.SetByte((byte)GameOpcode.WIZ_LOYALTY_CHANGE);
+        writer.SetDWord((uint)loyalty);
+        user.Send(writer.Written);
     }
 
     /// <summary>CUser::GoldChange — battle/frontier-zone money transfer on a kill.</summary>
@@ -700,7 +822,59 @@ public sealed partial class GameUser
         {
             if (PartyIndex != -1)
             {
-                // The party loot-share path attaches with the party slice.
+                // Party loot share: the victim loses half, the party splits 40%
+                // weighted by level.
+                PartyGroup? party = world.Parties.GetValueOrDefault(PartyIndex);
+                if (party is null)
+                    return;
+
+                sourceGold = targetData.Gold * 4 / 10;
+                targetGold = targetData.Gold / 2;
+
+                targetData.Gold -= targetGold;
+
+                var victimBuffer = new byte[16];
+                var victimWriter = new PacketWriter(victimBuffer);
+                victimWriter.SetByte((byte)GameOpcode.WIZ_GOLD_CHANGE);
+                victimWriter.SetByte(GoldChangeLose);
+                victimWriter.SetDWord((uint)targetGold);
+                victimWriter.SetDWord((uint)targetData.Gold);
+                target.Send(victimWriter.Written);
+
+                int levelSum = 0;
+                int userCount = 0;
+                for (int i = 0; i < 8; i++)
+                {
+                    if (party.Uid[i] != -1)
+                    {
+                        userCount++;
+                        levelSum += party.Level[i];
+                    }
+                }
+
+                if (userCount == 0)
+                    return;
+
+                for (int i = 0; i < 8; i++)
+                {
+                    GameUser? member = party.Uid[i] >= 0 && party.Uid[i] < world.Users.Length
+                        ? world.Users[party.Uid[i]]
+                        : null;
+                    if (member?.UserData is not { } memberData)
+                        continue;
+
+                    var money = (int)(sourceGold * (float)(memberData.Level / (float)levelSum));
+                    memberData.Gold += money;
+
+                    var memberBuffer = new byte[16];
+                    var memberWriter = new PacketWriter(memberBuffer);
+                    memberWriter.SetByte((byte)GameOpcode.WIZ_GOLD_CHANGE);
+                    memberWriter.SetByte(GoldChangeGain);
+                    memberWriter.SetDWord((uint)money);
+                    memberWriter.SetDWord((uint)memberData.Gold);
+                    member.Send(memberWriter.Written);
+                }
+
                 return;
             }
 

@@ -986,7 +986,8 @@ public sealed class MagicProcessor(EbenezerWorld world, GameUser? srcUser, ILogg
                     target.Type3Flag = true;
                 }
 
-                // WIZ_PARTY/PARTY_STATUSCHANGE attaches with the party slice.
+                if (target.PartyIndex != -1 && type3.TimeDamage < 0)
+                    world.SendPartyStatusChange(target.PartyIndex, (short)userId, 1, 0x01);
             }
 
             if (magic.Type2 is 0 or 3)
@@ -1232,7 +1233,10 @@ public sealed class MagicProcessor(EbenezerWorld world, GameUser? srcUser, ILogg
                 target.SetSlotItemValue();
                 target.SetUserAbility();
 
-                // WIZ_PARTY/PARTY_STATUSCHANGE attaches with the party slice.
+                // C++ quirk kept as-is: the packet carries tid, which is -1 for
+                // area buffs.
+                if (target.PartyIndex != -1 && target.Type4Buff[type4.BuffType - 1] == 1)
+                    world.SendPartyStatusChange(target.PartyIndex, (short)tid, 2, 0x01);
 
                 target.SendAiUserUpdate();
 
@@ -1338,7 +1342,9 @@ public sealed class MagicProcessor(EbenezerWorld world, GameUser? srcUser, ILogg
                 if (SumType3Durations(target) == 0)
                     target.Type3Flag = false;
 
-                // WIZ_PARTY/PARTY_STATUSCHANGE attaches with the party slice.
+                if (target.PartyIndex != -1 && !HasNegativeDot(target))
+                    world.SendPartyStatusChange(target.PartyIndex, (short)tid, 1, 0x00);
+
                 break;
 
             case RemoveType4:
@@ -1362,7 +1368,9 @@ public sealed class MagicProcessor(EbenezerWorld world, GameUser? srcUser, ILogg
                 if (SumType4Buffs(target) == 0)
                     target.Type4Flag = false;
 
-                // WIZ_PARTY/PARTY_STATUSCHANGE attaches with the party slice.
+                if (target.PartyIndex != -1 && !HasHostileType4(target))
+                    world.SendPartyStatusChange(target.PartyIndex, (short)tid, 2, 0x00);
+
                 break;
 
             case Resurrection:
@@ -1384,7 +1392,8 @@ public sealed class MagicProcessor(EbenezerWorld world, GameUser? srcUser, ILogg
                     if (SumType4Buffs(target) == 0)
                         target.Type4Flag = false;
 
-                    // WIZ_PARTY/PARTY_STATUSCHANGE attaches with the party slice.
+                    if (target.PartyIndex != -1 && !HasHostileType4(target))
+                        world.SendPartyStatusChange(target.PartyIndex, (short)tid, 2, 0x00);
                 }
 
                 break;
@@ -1412,6 +1421,30 @@ public sealed class MagicProcessor(EbenezerWorld world, GameUser? srcUser, ILogg
                 world.SendRegion(writer.Written, targetData.Zone, target.RegionX, target.RegionZ, except: null, direct: false);
             }
         }
+    }
+
+    /// <summary>True while any curse (negative DoT) slot remains.</summary>
+    private static bool HasNegativeDot(GameUser user)
+    {
+        foreach (short amount in user.HpAmount)
+        {
+            if (amount < 0)
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>True while any hostile (state 1) type-4 buff remains.</summary>
+    private static bool HasHostileType4(GameUser user)
+    {
+        foreach (byte buff in user.Type4Buff)
+        {
+            if (buff == 1)
+                return true;
+        }
+
+        return false;
     }
 
     private static int SumType3Durations(GameUser user)
@@ -1963,7 +1996,8 @@ public sealed class MagicProcessor(EbenezerWorld world, GameUser? srcUser, ILogg
         if (SumType4Buffs(target) == 0)
             target.Type4Flag = false;
 
-        // WIZ_PARTY/PARTY_STATUSCHANGE attaches with the party slice.
+        if (target.PartyIndex != -1 && !target.Type4Flag)
+            world.SendPartyStatusChange(target.PartyIndex, (short)tid, 2, 0x00);
     }
 
     /// <summary>CMagicProcess::Type3Cancel — remove one positive DoT/HoT slot.</summary>
@@ -2001,7 +2035,8 @@ public sealed class MagicProcessor(EbenezerWorld world, GameUser? srcUser, ILogg
         if (SumType3Durations(target) == 0)
             target.Type3Flag = false;
 
-        // WIZ_PARTY/PARTY_STATUSCHANGE attaches with the party slice.
+        if (target.PartyIndex != -1 && !target.Type3Flag)
+            world.SendPartyStatusChange(target.PartyIndex, (short)tid, 1, 0x00);
     }
 
     /// <summary>CMagicProcess::SendType4BuffRemove.</summary>

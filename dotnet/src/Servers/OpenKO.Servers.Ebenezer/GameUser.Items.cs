@@ -684,8 +684,17 @@ public sealed partial class GameUser
             return;
         }
 
-        // GetItemRoutingUser attaches with the party slice; solo pickup only.
-        GameUser getUser = this;
+        GameUser? routed = PartyIndex != -1 && itemId != ItemGold
+            ? GetItemRoutingUser(itemId, count)
+            : this;
+
+        if (routed is null)
+        {
+            SendItemGetFail();
+            return;
+        }
+
+        GameUser getUser = routed;
 
         int pos = getUser.GetEmptySlot(itemId, table.Countable);
 
@@ -738,14 +747,32 @@ public sealed partial class GameUser
             var buffer = new byte[24];
             var writer = new PacketWriter(buffer);
             writer.SetByte((byte)GameOpcode.WIZ_ITEM_GET);
-            writer.SetByte(0x01); // solo pickup (0x05 = routed to a party member)
+            writer.SetByte(getUser == this ? (byte)0x01 : (byte)0x05);
             writer.SetByte((byte)pos);
             writer.SetDWord((uint)itemId);
             writer.SetShort(getUser.UserData.Items[GameConstants.SlotMax + pos].Count);
             writer.SetDWord((uint)getUser.UserData.Gold);
             getUser.Send(writer.Written);
 
-            // The WIZ_ITEM_GET 0x03 party notification attaches with the party slice.
+            if (PartyIndex != -1)
+            {
+                var partyBuffer = new byte[48];
+                var partyWriter = new PacketWriter(partyBuffer);
+                partyWriter.SetByte((byte)GameOpcode.WIZ_ITEM_GET);
+                partyWriter.SetByte(0x03);
+                partyWriter.SetDWord((uint)itemId);
+                partyWriter.SetString2(Encoding.Latin1.GetBytes(getUser.UserData.CharId));
+                world.SendPartyMember(PartyIndex, partyWriter.Written);
+
+                if (getUser != this)
+                {
+                    var pickerBuffer = new byte[4];
+                    var pickerWriter = new PacketWriter(pickerBuffer);
+                    pickerWriter.SetByte((byte)GameOpcode.WIZ_ITEM_GET);
+                    pickerWriter.SetByte(0x04);
+                    Send(pickerWriter.Written);
+                }
+            }
         }
         else
         {
@@ -758,18 +785,68 @@ public sealed partial class GameUser
                 return;
             }
 
-            // The party gold split attaches with the party slice.
-            user.Gold += count;
+            if (PartyIndex == -1)
+            {
+                user.Gold += count;
 
-            var buffer = new byte[24];
-            var writer = new PacketWriter(buffer);
-            writer.SetByte((byte)GameOpcode.WIZ_ITEM_GET);
-            writer.SetByte(0x01);
-            writer.SetByte((byte)pos);
-            writer.SetDWord((uint)itemId);
-            writer.SetShort(count);
-            writer.SetDWord((uint)user.Gold);
-            Send(writer.Written);
+                var buffer = new byte[24];
+                var writer = new PacketWriter(buffer);
+                writer.SetByte((byte)GameOpcode.WIZ_ITEM_GET);
+                writer.SetByte(0x01);
+                writer.SetByte((byte)pos);
+                writer.SetDWord((uint)itemId);
+                writer.SetShort(count);
+                writer.SetDWord((uint)user.Gold);
+                Send(writer.Written);
+            }
+            else
+            {
+                // Party gold split, weighted by level.
+                PartyGroup? party = world.Parties.GetValueOrDefault(PartyIndex);
+                if (party is null)
+                {
+                    SendItemGetFail();
+                    return;
+                }
+
+                int levelSum = 0;
+                int userCount = 0;
+                for (int i = 0; i < 8; i++)
+                {
+                    if (party.Uid[i] != -1)
+                    {
+                        userCount++;
+                        levelSum += party.Level[i];
+                    }
+                }
+
+                if (userCount == 0)
+                {
+                    SendItemGetFail();
+                    return;
+                }
+
+                for (int i = 0; i < 8; i++)
+                {
+                    GameUser? member = party.Uid[i] >= 0 && party.Uid[i] < world.Users.Length
+                        ? world.Users[party.Uid[i]]
+                        : null;
+                    if (member?.UserData is not { } memberData)
+                        continue;
+
+                    var money = (int)(count * (float)(memberData.Level / (float)levelSum));
+                    memberData.Gold += money;
+
+                    var buffer = new byte[24];
+                    var writer = new PacketWriter(buffer);
+                    writer.SetByte((byte)GameOpcode.WIZ_ITEM_GET);
+                    writer.SetByte(0x02);
+                    writer.SetByte(0xFF); // gold -> pos 0xff
+                    writer.SetDWord((uint)itemId);
+                    writer.SetDWord((uint)memberData.Gold);
+                    member.Send(writer.Written);
+                }
+            }
         }
     }
 

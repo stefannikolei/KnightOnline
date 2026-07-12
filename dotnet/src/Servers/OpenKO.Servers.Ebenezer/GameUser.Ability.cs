@@ -480,8 +480,7 @@ public sealed partial class GameUser
             world.SendToAiServer?.Invoke(user.Zone, aiWriter.Written.ToArray());
         }
 
-        // Party broadcast attaches with the stage-4 party slice (PartyIndex is
-        // still always -1 here).
+        SendPartyHpChange();
 
         // Death by direct hits sends no dead packet from here.
         if (user.Hp == 0 && !attack)
@@ -507,7 +506,25 @@ public sealed partial class GameUser
         writer.SetShort(user.Mp);
         Send(writer.Written);
 
-        // Party broadcast attaches with the stage-4 party slice.
+        SendPartyHpChange();
+    }
+
+    /// <summary>The WIZ_PARTY/PARTY_HPCHANGE broadcast both HP and MP changes emit.</summary>
+    private void SendPartyHpChange()
+    {
+        if (PartyIndex == -1 || UserData is not { } user)
+            return;
+
+        var buffer = new byte[16];
+        var writer = new PacketWriter(buffer);
+        writer.SetByte((byte)GameOpcode.WIZ_PARTY);
+        writer.SetByte(PartyHpChange);
+        writer.SetShort(SocketId);
+        writer.SetShort(MaxHp);
+        writer.SetShort(user.Hp);
+        writer.SetShort(MaxMp);
+        writer.SetShort(user.Mp);
+        world.SendPartyMember(PartyIndex, writer.Written);
     }
 
     /// <summary>CUser::Dead — the WIZ_DEAD broadcast + command-authority deprivation.</summary>

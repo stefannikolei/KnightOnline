@@ -5,6 +5,18 @@ namespace OpenKO.Servers.Ebenezer;
 /// <summary>One [ZONE_INFO] SERVER_XX entry (_ZONE_SERVERINFO).</summary>
 public sealed record ZoneServerInfo(short ServerNo, string ServerIp, short Port);
 
+/// <summary>_PARTY_GROUP (GameDefine.h): up to eight members per party.</summary>
+public sealed class PartyGroup
+{
+    public ushort Index;
+    public readonly short[] Uid = [-1, -1, -1, -1, -1, -1, -1, -1];
+    public readonly short[] MaxHp = new short[8];
+    public readonly short[] Hp = new short[8];
+    public readonly byte[] Level = new byte[8];
+    public readonly short[] Class = new short[8];
+    public byte ItemRouting;
+}
+
 /// <summary>
 /// EbenezerApp world/user bookkeeping (stage-4 slices): the user slots by socket
 /// id, account/character lookups, the zone/server topology and the startup
@@ -112,6 +124,45 @@ public sealed partial class EbenezerWorld
 
     /// <summary>m_ServerResourceTableMap (SERVER_RESOURCE message templates).</summary>
     public Dictionary<int, string> ServerResources = [];
+
+    /// <summary>m_PartyMap keyed by the party index.</summary>
+    public readonly Dictionary<int, PartyGroup> Parties = [];
+
+    /// <summary>m_sPartyIndex — the next party id (wraps at 32767).</summary>
+    public short NextPartyIndex;
+
+    /// <summary>The recurring WIZ_PARTY/PARTY_STATUSCHANGE broadcast (type 1 = DoT, 2 = buff).</summary>
+    public void SendPartyStatusChange(int party, short uid, byte type, byte flag)
+    {
+        if (party == -1)
+            return;
+
+        var buffer = new byte[8];
+        var writer = new OpenKO.Network.PacketWriter(buffer);
+        writer.SetByte(0x2F); // WIZ_PARTY
+        writer.SetByte(0x09); // PARTY_STATUSCHANGE
+        writer.SetShort(uid);
+        writer.SetByte(type);
+        writer.SetByte(flag);
+        SendPartyMember(party, writer.Written);
+    }
+
+    /// <summary>EbenezerApp::Send_PartyMember.</summary>
+    public void SendPartyMember(int party, ReadOnlySpan<byte> buf)
+    {
+        if (party < 0)
+            return;
+
+        PartyGroup? group = Parties.GetValueOrDefault(party);
+        if (group is null)
+            return;
+
+        for (int i = 0; i < 8; i++)
+        {
+            GameUser? user = group.Uid[i] >= 0 && group.Uid[i] < Users.Length ? Users[group.Uid[i]] : null;
+            user?.Send(buf);
+        }
+    }
 
     private ushort _serialCounter;
 

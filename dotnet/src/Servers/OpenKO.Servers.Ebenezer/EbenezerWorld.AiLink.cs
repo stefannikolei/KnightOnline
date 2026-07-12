@@ -131,8 +131,18 @@ public sealed partial class EbenezerWorld
             SendAiServer(1000, buffer.AsSpan(0, writer.Index).ToArray());
         }
 
-        // AG_PARTY_INFO_ALL per party group follows with the party slice
-        // (m_PartyMap is empty until then).
+        // Re-announce the party groups.
+        foreach (PartyGroup party in Parties.Values)
+        {
+            var partyBuffer = new byte[24];
+            var partyWriter = new PacketWriter(partyBuffer);
+            partyWriter.SetByte(AiOpcode.AG_PARTY_INFO_ALL);
+            partyWriter.SetShort((short)party.Index);
+            for (int j = 0; j < 8; j++)
+                partyWriter.SetShort(party.Uid[j]);
+
+            SendAiServer(1000, partyBuffer.AsSpan(0, partyWriter.Index).ToArray());
+        }
 
         var end = new byte[] { AiOpcode.AG_SERVER_INFO, ServerInfoEnd };
         SendAiServer(1000, end);

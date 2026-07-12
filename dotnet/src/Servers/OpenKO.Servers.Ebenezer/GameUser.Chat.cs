@@ -94,7 +94,7 @@ public sealed partial class GameUser
             }
 
             case PartyChat:
-                // Send_PartyMember attaches with the party slice.
+                world.SendPartyMember(PartyIndex, writer.Written);
                 break;
 
             case ForceChat:

@@ -162,8 +162,54 @@ public sealed class EbenezerService(
         World.MagicType5Table = magicType5.ToDictionary(m => m.ID);
         World.MagicType8Table = magicType8.ToDictionary(m => m.ID);
         World.ServerResources = resources.ToDictionary(r => r.ResourceId, r => r.Resource);
+
+        // EbenezerApp::MapFileLoad — read the .smd maps from MAP/<name> for the
+        // real map extents and object events. Unlike the C++ (which aborts), a
+        // missing map file degrades to a 1x1-region stub zone so the server
+        // stays usable without the game assets checked out.
+        string mapDir = KoHost.ResolveConfigPath("MAP");
         foreach (OpenKO.Data.Models.ZoneInfo zone in zoneInfos)
-            World.Zones.Add(new GameZone(zone.ServerId, zone.ZoneId) { InitX = zone.InitX, InitZ = zone.InitZ });
+        {
+            var gameZone = new GameZone(zone.ServerId, zone.ZoneId);
+
+            string mapPath = Path.Combine(mapDir, zone.Name);
+            if (File.Exists(mapPath))
+            {
+                try
+                {
+                    var map = OpenKO.GameData.Maps.GameMap.Load(mapPath);
+                    gameZone = new GameZone(zone.ServerId, zone.ZoneId,
+                        (map.MapSize - 1) * map.UnitDistance);
+
+                    foreach (OpenKO.GameData.Maps.ObjectEvent objectEvent in map.ObjectEvents)
+                    {
+                        gameZone.ObjectEvents[objectEvent.Index] = new ObjectEvent
+                        {
+                            Type = objectEvent.Type,
+                            Life = 1, // C3DMap::LoadObjectEvent marks every event alive
+                            PosX = objectEvent.PosX,
+                            PosZ = objectEvent.PosZ,
+                        };
+                    }
+
+                    logger.LogInformation("zone {Zone}: loaded {Map} ({Size} regions, {Events} object events)",
+                        zone.ZoneId, zone.Name, gameZone.XRegionMax + 1, gameZone.ObjectEvents.Count);
+                }
+                catch (Exception ex) when (ex is IOException or EndOfStreamException or InvalidDataException)
+                {
+                    logger.LogError(ex, "zone {Zone}: map load failed for {Map}, using a stub zone", zone.ZoneId, zone.Name);
+                }
+            }
+            else
+            {
+                logger.LogWarning("zone {Zone}: map file {Map} not found, using a stub zone", zone.ZoneId, zone.Name);
+            }
+
+            // The C++ divides the ZONE_INFO spawn point by 100.
+            gameZone.InitX = (float)(zone.InitX / 100.0);
+            gameZone.InitZ = (float)(zone.InitZ / 100.0);
+            World.Zones.Add(gameZone);
+        }
 
         Channel<Func<ValueTask>> queue = Channel.CreateUnbounded<Func<ValueTask>>(
             new UnboundedChannelOptions { SingleReader = true });
@@ -323,6 +369,8 @@ public sealed class EbenezerService(
             // Close notification runs on the game loop too (CloseProcess ordering).
             queue.TryWrite(() =>
             {
+                // CUser::CloseProcess order: leave the party, then the world.
+                session.User.PartyRemoveMember(session.User.SocketId);
                 session.User.UserInOut(GameUser.UserOut);
                 World.Unregister(session.User.SocketId);
                 logger.LogInformation("user {Id} disconnected", session.User.SocketId);

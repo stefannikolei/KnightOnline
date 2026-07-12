@@ -213,7 +213,18 @@ public sealed partial class GameUser
         if (remaining == 0)
             Type3Flag = false;
 
-        // WIZ_PARTY/PARTY_STATUSCHANGE attaches with the party slice.
+        bool cursesGone = true;
+        foreach (short amount in HpAmount)
+        {
+            if (amount < 0)
+            {
+                cursesGone = false;
+                break;
+            }
+        }
+
+        if (PartyIndex != -1 && cursesGone)
+            world.SendPartyStatusChange(PartyIndex, SocketId, 1, 0x00);
     }
 
     /// <summary>CUser::Type4Duration — expire at most one buff per tick.</summary>
@@ -288,7 +299,18 @@ public sealed partial class GameUser
         if (remaining == 0)
             Type4Flag = false;
 
-        // WIZ_PARTY/PARTY_STATUSCHANGE attaches with the party slice.
+        bool hostileGone = true;
+        foreach (byte buff in Type4Buff)
+        {
+            if (buff == 1)
+            {
+                hostileGone = false;
+                break;
+            }
+        }
+
+        if (PartyIndex != -1 && hostileGone)
+            world.SendPartyStatusChange(PartyIndex, SocketId, 2, 0x00);
     }
 
     /// <summary>CUser::StateChange — sit/stand, party flag, abnormal type.</summary>

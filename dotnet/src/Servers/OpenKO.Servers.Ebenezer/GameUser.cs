@@ -186,6 +186,10 @@ public sealed partial class GameUser(short socketId, EbenezerWorld world, IDbAge
                 NpcEvent(packet.AsSpan(1));
                 break;
 
+            case GameOpcode.WIZ_PARTY:
+                PartyProcess(packet.AsSpan(1));
+                break;
+
             case GameOpcode.WIZ_ROTATE:
                 Rotate(packet.AsSpan(1));
                 break;

@@ -206,7 +206,11 @@ public sealed partial class GameUser
 
         StateChange([3, AbnormalType]);
 
-        // WIZ_PARTY/PARTY_STATUSCHANGE attaches with the party slice.
+        if (PartyIndex != -1 && !Type3Flag)
+            world.SendPartyStatusChange(PartyIndex, SocketId, 1, 0x00);
+
+        if (PartyIndex != -1 && !Type4Flag)
+            world.SendPartyStatusChange(PartyIndex, SocketId, 2, 0x00);
     }
 
     /// <summary>CUser::BlinkTimeCheck — end the invulnerability, refill and notify the AI.</summary>
