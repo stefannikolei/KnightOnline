@@ -190,6 +190,10 @@ public sealed partial class GameUser(short socketId, EbenezerWorld world, IDbAge
                 PartyProcess(packet.AsSpan(1));
                 break;
 
+            case GameOpcode.WIZ_WAREHOUSE:
+                WarehouseProcess(packet.AsSpan(1));
+                break;
+
             case GameOpcode.WIZ_ROTATE:
                 Rotate(packet.AsSpan(1));
                 break;

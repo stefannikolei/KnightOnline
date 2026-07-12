@@ -1060,8 +1060,18 @@ public sealed partial class GameUser
                 break;
             }
 
-            // Warehouse/officer/rental and the quest NPCs (ClientEvent) attach
-            // with their slices.
+            case 31: // NPC_WAREHOUSE
+            {
+                var buffer = new byte[4];
+                var writer = new PacketWriter(buffer);
+                writer.SetByte((byte)GameOpcode.WIZ_WAREHOUSE);
+                writer.SetByte(WarehouseReq);
+                Send(writer.Written);
+                break;
+            }
+
+            // Officer/rental and the quest NPCs (ClientEvent) attach with
+            // their slices.
         }
     }
 

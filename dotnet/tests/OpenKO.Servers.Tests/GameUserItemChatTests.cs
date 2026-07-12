@@ -472,6 +472,98 @@ public class GameUserItemChatTests
     }
 
     [Fact]
+    public async Task Warehouse_OpenSendsTheCompressedInventory()
+    {
+        var world = MakeWorld();
+        var db = new FakeDbAgent();
+        (GameUser user, List<byte[]> frames) = MakeInGameUser(world, db, "Hero");
+        user.UserData!.Bank = 12345;
+        frames.Clear();
+
+        await user.ParsingAsync([0x45, GameUser.WarehouseOpen]); // WIZ_WAREHOUSE
+
+        byte[] payload = Unframe(Assert.Single(frames));
+        Assert.Equal(0x42, payload[0]); // WIZ_COMPRESS_PACKET envelope
+    }
+
+    [Fact]
+    public async Task Warehouse_DepositsAndWithdrawsGold()
+    {
+        var world = MakeWorld();
+        var db = new FakeDbAgent();
+        (GameUser user, List<byte[]> frames) = MakeInGameUser(world, db, "Hero");
+        frames.Clear();
+
+        var deposit = new byte[13];
+        deposit[0] = 0x45;
+        deposit[1] = GameUser.WarehouseInput;
+        BinaryPrimitives.WriteUInt32LittleEndian(deposit.AsSpan(2), 900000000);
+        // page/src/dest all 0
+        BinaryPrimitives.WriteUInt32LittleEndian(deposit.AsSpan(9), 40000);
+        await user.ParsingAsync(deposit);
+
+        Assert.Equal(40000, user.UserData!.Bank);
+        Assert.Equal(60000, user.UserData.Gold);
+        Assert.Equal(1, user.UserData.WarehouseFlag);
+        Assert.Contains(frames.Select(Unframe), p => p[0] == 0x45 && p[1] == GameUser.WarehouseInput && p[2] == 0x01);
+
+        var withdraw = new byte[13];
+        withdraw[0] = 0x45;
+        withdraw[1] = GameUser.WarehouseOutput;
+        BinaryPrimitives.WriteUInt32LittleEndian(withdraw.AsSpan(2), 900000000);
+        BinaryPrimitives.WriteUInt32LittleEndian(withdraw.AsSpan(9), 15000);
+        await user.ParsingAsync(withdraw);
+
+        Assert.Equal(25000, user.UserData.Bank);
+        Assert.Equal(75000, user.UserData.Gold);
+    }
+
+    [Fact]
+    public async Task Warehouse_StoresAndRetrievesAnItem()
+    {
+        var world = MakeWorld();
+        var itemLogs = new List<byte[]>();
+        world.ItemLogSink = itemLogs.Add;
+        var db = new FakeDbAgent();
+        (GameUser user, _) = MakeInGameUser(world, db, "Hero");
+        user.UserData!.Items[GameConstants.SlotMax + 2].Num = SwordId;
+        user.UserData.Items[GameConstants.SlotMax + 2].Count = 1;
+        user.UserData.Items[GameConstants.SlotMax + 2].Duration = 4321;
+
+        // Deposit into warehouse page 1, slot 3 (absolute 27).
+        var deposit = new byte[13];
+        deposit[0] = 0x45;
+        deposit[1] = GameUser.WarehouseInput;
+        BinaryPrimitives.WriteUInt32LittleEndian(deposit.AsSpan(2), SwordId);
+        deposit[6] = 1; // page
+        deposit[7] = 2; // src inventory pos
+        deposit[8] = 3; // dest warehouse pos
+        BinaryPrimitives.WriteUInt32LittleEndian(deposit.AsSpan(9), 1);
+        await user.ParsingAsync(deposit);
+
+        Assert.Equal(SwordId, user.UserData.Warehouse[27].Num);
+        Assert.Equal(4321, user.UserData.Warehouse[27].Duration);
+        Assert.NotEqual(0L, user.UserData.Warehouse[27].SerialNum);
+        Assert.Equal(0, user.UserData.Items[GameConstants.SlotMax + 2].Num);
+
+        // And take it back out into inventory slot 5.
+        var withdraw = new byte[13];
+        withdraw[0] = 0x45;
+        withdraw[1] = GameUser.WarehouseOutput;
+        BinaryPrimitives.WriteUInt32LittleEndian(withdraw.AsSpan(2), SwordId);
+        withdraw[6] = 1; // page
+        withdraw[7] = 3; // src warehouse pos
+        withdraw[8] = 5; // dest inventory pos
+        BinaryPrimitives.WriteUInt32LittleEndian(withdraw.AsSpan(9), 1);
+        await user.ParsingAsync(withdraw);
+
+        Assert.Equal(0, user.UserData.Warehouse[27].Num);
+        Assert.Equal(SwordId, user.UserData.Items[GameConstants.SlotMax + 5].Num);
+        Assert.Equal(4321, user.UserData.Items[GameConstants.SlotMax + 5].Duration);
+        Assert.Equal(2, itemLogs.Count); // PUT + GET
+    }
+
+    [Fact]
     public async Task NpcEvent_MerchantOpensTheTradeWindow()
     {
         var world = MakeWorld();
