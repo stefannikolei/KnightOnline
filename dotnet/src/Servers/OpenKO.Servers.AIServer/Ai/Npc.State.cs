@@ -3300,9 +3300,6 @@ public partial class Npc
     //  values so the movement call sites above stay faithful.
     // ------------------------------------------------------------------
 
-    /// <summary>TODO(stage3.7-part2): CNpc::FindEnemy — enemy acquisition scan.</summary>
-    public bool FindEnemy() => false;
-
     /// <summary>
     /// TODO(stage3.7-part2): CNpc::Attack — returns the next attack delay.
     /// (Renamed: the <see cref="Attack"/> stat field already claims the name.)

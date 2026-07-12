@@ -990,4 +990,290 @@ public partial class Npc
         writer.SetString1(System.Text.Encoding.Latin1.GetBytes(maxDamageUser));
         SendAll(writer.Written);
     }
+
+    /// <summary>CNpc::FindEnemy — enemy acquisition scan over own + neighbor regions.</summary>
+    public bool FindEnemy()
+    {
+        if (IsGateLikeNpc)
+            return false;
+
+        AiZone? map = GetMapByIndex();
+        if (map is null)
+            return false;
+
+        // Healer NPCs first look for a friend to heal.
+        if (NpcType == NpcTypeHealer)
+        {
+            if (FindFriend(2) != 0)
+                return true;
+        }
+
+        float compareDis = 0.0f;
+        float searchRange = SearchRange;
+
+        FindEnemyRegion();
+
+        if (RegionX > map.RegionsX - 1 || RegionZ > map.RegionsZ - 1
+            || RegionX < 0 || RegionZ < 0)
+            return false;
+
+        bool isHostileToPlayers = true;
+
+        if (CurZone == 31 /* ZONE_BIFROST */ || CurZone == 21 /* ZONE_MORADON */
+            || CurZone / 10 == 5)
+        {
+            if (Group != 0)
+                isHostileToPlayers = false;
+        }
+
+        // Guards in Moradon are not hostile (the C++ checks this per loop; upfront here
+        // as the upstream NOTE describes).
+        if (NpcType is NpcTypeGuard or NpcTypePatrolGuard or NpcTypeStoreGuard
+            && CurZone == 21)
+        {
+            isHostileToPlayers = false;
+        }
+
+        if (isHostileToPlayers)
+        {
+            compareDis = FindEnemyExpand(RegionX, RegionZ, compareDis, 1);
+
+            for (int l = 0; l < 4; l++)
+            {
+                if (FindX[l] == 0 && FindY[l] == 0)
+                    continue;
+
+                int x = RegionX + FindX[l];
+                int y = RegionZ + FindY[l];
+
+                if (x < 0 || y < 0 || x > map.RegionsX - 1 || y > map.RegionsZ - 1)
+                    continue;
+
+                compareDis = FindEnemyExpand(x, y, compareDis, 1);
+            }
+
+            if (Target.Id >= 0 && compareDis <= searchRange)
+                return true;
+        }
+
+        compareDis = 0.0f;
+
+        // Guards additionally target foreign monsters.
+        if (NpcType is NpcTypeGuard or NpcTypePatrolGuard or NpcTypeStoreGuard)
+        {
+            compareDis = FindEnemyExpand(RegionX, RegionZ, compareDis, 2);
+
+            for (int l = 0; l < 4; l++)
+            {
+                if (FindX[l] == 0 && FindY[l] == 0)
+                    continue;
+
+                int x = RegionX + FindX[l];
+                int y = RegionZ + FindY[l];
+
+                if (x < 0 || y < 0 || x > map.RegionsX - 1 || y > map.RegionsZ - 1)
+                    continue;
+
+                compareDis = FindEnemyExpand(x, y, compareDis, 2);
+            }
+        }
+
+        if (Target.Id >= 0 && compareDis <= searchRange)
+            return true;
+
+        // Nobody around: reset bookkeeping.
+        InitUserList();
+        InitTarget();
+        return false;
+    }
+
+    /// <summary>
+    /// CNpc::FindEnemyRegion — determines which neighbor regions the search radius
+    /// spills into. C++ quirk kept: all four iCur* values derive from m_fCurX
+    /// (the Z coordinate is never used).
+    /// </summary>
+    public int FindEnemyRegion()
+    {
+        int sx = RegionX * AiConstants.ViewDistance;
+        int sz = RegionZ * AiConstants.ViewDistance;
+        int ex = (RegionX + 1) * AiConstants.ViewDistance;
+        int ez = (RegionZ + 1) * AiConstants.ViewDistance;
+        int curSX = (int)CurX - SearchRange;
+        int curSY = (int)CurX - SearchRange;
+        int curEX = (int)CurX + SearchRange;
+        int curEY = (int)CurX + SearchRange;
+
+        int myPos = GetMyField();
+        int ret = 0;
+
+        switch (myPos)
+        {
+            case 1:
+                if (curSX < sx && curSY < sz) ret = 1;
+                else if (curSX > sx && curSY < sz) ret = 2;
+                else if (curSX < sx && curSY > sz) ret = 4;
+                else if (curSX >= sx && curSY >= sz) ret = 0;
+                break;
+
+            case 2:
+                if (curEX < ex && curSY < sz) ret = 2;
+                else if (curEX > ex && curSY < sz) ret = 3;
+                else if (curEX <= ex && curSY >= sz) ret = 0;
+                else if (curEX > ex && curSY > sz) ret = 5;
+                break;
+
+            case 3:
+                if (curSX < sx && curEY < ez) ret = 4;
+                else if (curSX >= sx && curEY <= ez) ret = 0;
+                else if (curSX < sx && curEY > ez) ret = 6;
+                else if (curSX > sx && curEY > ez) ret = 7;
+                break;
+
+            case 4:
+                if (curEX <= ex && curEY <= ez) ret = 0;
+                else if (curEX > ex && curEY < ez) ret = 5;
+                else if (curEX < ex && curEY > ez) ret = 7;
+                else if (curEX > ex && curEY > ez) ret = 8;
+                break;
+        }
+
+        if (ret <= 0)
+            ret = 0;
+
+        (short X, short Y)[] offsets = ret switch
+        {
+            1 => [(-1, -1), (0, -1), (-1, 0), (0, 0)],
+            2 => [(0, -1), (0, 0), (0, 0), (0, 0)],
+            3 => [(0, 0), (1, 0), (0, 1), (1, 1)],
+            4 => [(-1, 0), (0, 0), (0, 0), (0, 0)],
+            5 => [(0, 0), (1, 0), (0, 0), (0, 0)],
+            6 => [(-1, 0), (0, 0), (-1, 1), (0, 1)],
+            7 => [(0, 0), (0, 0), (0, 1), (0, 0)],
+            8 => [(0, 0), (1, 0), (0, 1), (1, 1)],
+            _ => [(0, 0), (0, 0), (0, 0), (0, 0)],
+        };
+
+        for (int i = 0; i < 4; i++)
+        {
+            FindX[i] = offsets[i].X;
+            FindY[i] = offsets[i].Y;
+        }
+
+        return ret;
+    }
+
+    /// <summary>
+    /// CNpc::FindEnemyExpand — scans one region for the target candidate.
+    /// nType 1: users (passive NPCs only lock onto attackers), nType 2: foreign NPCs
+    /// (guards). C++ quirk kept: the comparison is fDis &gt;= fComp, i.e. the
+    /// FARTHEST candidate within search range wins.
+    /// </summary>
+    public float FindEnemyExpand(int rx, int rz, float compDis, int type)
+    {
+        AiZone? map = GetMapByIndex();
+        if (map is null)
+            return 0.0f;
+
+        float comp = compDis;
+        float searchRange = SearchRange;
+        var npcPos = new Vector3(CurX, CurY, CurZ);
+
+        if (!map.IsValidRegion(rx, rz))
+            return 0.0f;
+
+        if (type == 1)
+        {
+            int[] ids = [.. map.Regions[rx, rz].Users];
+            if (ids.Length == 0)
+                return 0.0f;
+
+            foreach (int userId in ids)
+            {
+                if (userId < 0)
+                    continue;
+
+                AiUser? user = GetUserPtr(userId);
+                if (user is null || user.Live != AiUser.UserLive)
+                    continue;
+
+                if (Group == user.Nation)
+                    continue;
+
+                if (user.IsOperator == 0) // AUTHORITY_MANAGER
+                    continue;
+
+                float distance = GetDistance(new Vector3(user.CurX, user.CurY, user.CurZ), npcPos);
+                if (distance > searchRange)
+                    continue;
+
+                if (distance >= comp)
+                {
+                    int targetUid = user.Uid;
+                    comp = distance;
+
+                    if (AttType == 0)
+                    {
+                        // Passive: only lock onto users who damaged us (or group aggro).
+                        if (IsDamagedUserList(user) || (GroupType != 0 && Target.Id == targetUid))
+                        {
+                            Target.Id = targetUid;
+                            Target.FailCount = 0;
+                            Target.X = user.CurX;
+                            Target.Y = user.CurY;
+                            Target.Z = user.CurZ;
+                        }
+                    }
+                    else
+                    {
+                        Target.Id = targetUid;
+                        Target.FailCount = 0;
+                        Target.X = user.CurX;
+                        Target.Y = user.CurY;
+                        Target.Z = user.CurZ;
+                    }
+                }
+            }
+        }
+        else if (type == 2)
+        {
+            int[] ids = [.. map.Regions[rx, rz].Npcs];
+            if (ids.Length == 0)
+                return 0.0f;
+
+            foreach (int npcId in ids)
+            {
+                if (npcId < NpcBand)
+                    continue;
+
+                Npc? npc = World?.Npcs.GetValueOrDefault(npcId - NpcBand);
+                if (npc is null || npc.State == NpcState.Dead || npc.Nid == Nid)
+                    continue;
+
+                if (CurZone == 31 || CurZone == 21 || CurZone / 10 == 5)
+                {
+                    if (npc.Group != 0)
+                        continue;
+                }
+
+                if (Group == npc.Group)
+                    continue;
+
+                float distance = GetDistance(new Vector3(npc.CurX, npc.CurY, npc.CurZ), npcPos);
+                if (distance > searchRange)
+                    continue;
+
+                if (distance >= comp)
+                {
+                    comp = distance;
+                    Target.Id = npcId;
+                    Target.FailCount = 0;
+                    Target.X = npc.CurX;
+                    Target.Y = npc.CurY;
+                    Target.Z = npc.CurZ;
+                }
+            }
+        }
+
+        return comp;
+    }
 }
