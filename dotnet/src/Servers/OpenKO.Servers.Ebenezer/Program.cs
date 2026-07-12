@@ -144,10 +144,11 @@ public sealed class EbenezerService(
         List<OpenKO.Data.Models.StartPosition>? startPositions = await db.LoadStartPositionTableAsync(stoppingToken);
         List<OpenKO.Data.Models.KnightsRow>? knights = await db.LoadKnightsTableAsync(stoppingToken);
         List<OpenKO.Data.Models.KnightsUserRow>? knightsUsers = await db.LoadKnightsUserTableAsync(stoppingToken);
+        List<OpenKO.Data.Models.EventTriggerRow>? eventTriggers = await db.LoadEventTriggerTableAsync(stoppingToken);
         if (coefficients is null || zoneInfos is null || items is null || levels is null || homes is null
             || magics is null || magicType1 is null || magicType2 is null || magicType3 is null
             || magicType4 is null || magicType5 is null || magicType8 is null || resources is null
-            || startPositions is null || knights is null || knightsUsers is null)
+            || startPositions is null || knights is null || knightsUsers is null || eventTriggers is null)
         {
             logger.LogError("Ebenezer startup table load failed, closing server");
             lifetime.StopApplication();
@@ -195,6 +196,14 @@ public sealed class EbenezerService(
 
         foreach (OpenKO.Data.Models.KnightsUserRow row in knightsUsers)
             World.AddKnightsUser(row.KnightsId, row.UserId);
+
+        // EbenezerApp::LoadEventTriggerTable.
+        foreach (OpenKO.Data.Models.EventTriggerRow row in eventTriggers)
+        {
+            uint key = ((uint)row.NpcType << 16) | (ushort)row.NpcId;
+            if (!World.EventTriggers.TryAdd(key, row.TriggerNumber))
+                logger.LogError("EVENT_TRIGGER: duplicate entry [NpcType={NpcType} NpcId={NpcId}]", row.NpcType, row.NpcId);
+        }
 
         // EbenezerApp::MapFileLoad — read the .smd maps from MAP/<name> for the
         // real map extents and object events. Unlike the C++ (which aborts), a
@@ -274,6 +283,19 @@ public sealed class EbenezerService(
             gameZone.InitZ = (float)(zone.InitZ / 100.0);
             gameZone.Type = zone.Type;
             World.Zones.Add(gameZone);
+
+            // EbenezerApp::MapFileLoad also reads QUESTS/<zone>.evt per zone.
+            string questPath = Path.Combine(KoHost.ResolveConfigPath("QUESTS"), $"{zone.ZoneId}.evt");
+            if (File.Exists(questPath))
+            {
+                Dictionary<int, QuestEventData>? questEvents =
+                    QuestEventFile.Load(questPath, zone.ZoneId, logger);
+                if (questEvents is not null)
+                {
+                    World.QuestEvents[zone.ZoneId] = questEvents;
+                    logger.LogInformation("zone {Zone}: loaded {Count} quest events", zone.ZoneId, questEvents.Count);
+                }
+            }
         }
 
         Channel<Func<ValueTask>> queue = Channel.CreateUnbounded<Func<ValueTask>>(

@@ -398,6 +398,19 @@ public sealed class EbenezerDb(SqlConnectionFactory connectionFactory, ILogger l
             },
             cancellationToken);
 
+    /// <summary>EbenezerApp::LoadEventTriggerTable (EVENT_TRIGGER).</summary>
+    public Task<List<EventTriggerRow>?> LoadEventTriggerTableAsync(CancellationToken cancellationToken = default) =>
+        LoadTableAsync(
+            "EVENT_TRIGGER",
+            "bNpcType, sNpcID, nTriggerNum",
+            static reader => new EventTriggerRow
+            {
+                NpcType = reader.GetByte(0),
+                NpcId = reader.GetInt16(1),
+                TriggerNumber = reader.GetInt32(2),
+            },
+            cancellationToken);
+
     private async Task<List<T>?> LoadTableAsync<T>(
         string tableName, string columns, Func<SqlDataReader, T> readRow, CancellationToken cancellationToken)
     {

@@ -375,3 +375,16 @@ public sealed record KnightsUserRow
     /// <summary>Column [strUserID].</summary>
     public required string UserId { get; init; }
 }
+
+/// <summary>EVENT_TRIGGER table row (NPC-type/trap → quest event).</summary>
+public sealed record EventTriggerRow
+{
+    /// <summary>Column [bNpcType].</summary>
+    public required byte NpcType { get; init; }
+
+    /// <summary>Column [sNpcID].</summary>
+    public required short NpcId { get; init; }
+
+    /// <summary>Column [nTriggerNum].</summary>
+    public required int TriggerNumber { get; init; }
+}

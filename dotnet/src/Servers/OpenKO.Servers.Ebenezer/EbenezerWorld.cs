@@ -131,6 +131,25 @@ public sealed partial class EbenezerWorld
     /// <summary>m_KnightsMap keyed by the clan index.</summary>
     public readonly Dictionary<int, KnightsClan> Knights = [];
 
+    /// <summary>m_EventMap — quest events keyed by zone, then event id.</summary>
+    public readonly Dictionary<int, Dictionary<int, QuestEventData>> QuestEvents = [];
+
+    /// <summary>m_EventTriggerMap keyed by (npcType &lt;&lt; 16 | trapNumber).</summary>
+    public readonly Dictionary<uint, int> EventTriggers = [];
+
+    /// <summary>EbenezerApp::GetEventTrigger.</summary>
+    public int GetEventTrigger(byte npcType, ushort trapNumber)
+        => EventTriggers.TryGetValue(((uint)npcType << 16) | trapNumber, out int trigger) ? trigger : -1;
+
+    // ---- battle/siege state read by the quest logic ----
+    public int MonsterChallengeActiveType;
+    public int MonsterChallengeState;
+    public int MonsterChallengePlayerCount;
+    public byte BeefRoastVictoryType;
+    public short SiegeMasterKnights; // m_KnightsSiegeWar._masterKnights
+    public byte KarusMonumentDodaNation;   // _karusInvasionMonumentLastCapturedNation[DODA]
+    public byte ElmoradMonumentDodaNation; // _elmoradInvasionMonumentLastCapturedNation[DODA]
+
     /// <summary>m_nServerGroup ([ZONE_INFO] GROUP_INFO; 2 blocks clan creation).</summary>
     public int ServerGroup;
 
