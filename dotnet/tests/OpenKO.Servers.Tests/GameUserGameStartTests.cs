@@ -76,7 +76,7 @@ public class GameUserGameStartTests
     private static EbenezerWorld MakeWorld()
     {
         var world = new EbenezerWorld { ServerNo = 1 };
-        world.Zones.Add(new ZoneMeta(1, 21));
+        world.Zones.Add(new GameZone(1, 21));
         world.CoefficientTable[105] = new Coefficient
         {
             ClassId = 105,
@@ -206,8 +206,8 @@ public class GameUserGameStartTests
 
         byte[][] payloads = [.. frames.Select(Unframe)];
         Assert.Equal(
-            new byte[] { 0x0E, 0x5E, 0x2E, 0x13, 0x14, 0x0D },
-            payloads.Select(p => p[0]).ToArray()); // MYINFO, ZONEABILITY, NOTICE, TIME, WEATHER, GAMESTART
+            new byte[] { 0x0E, 0x5E, 0x42, 0x42, 0x2E, 0x13, 0x14, 0x0D },
+            payloads.Select(p => p[0]).ToArray()); // MYINFO, ZONEABILITY, user+npc downloads (compressed), NOTICE, TIME, WEATHER, GAMESTART
 
         // WIZ_MYINFO header: [sid i16][len1 "Hero"][x*10][z*10]...
         byte[] myInfo = payloads[0];
@@ -216,7 +216,7 @@ public class GameUserGameStartTests
         Assert.Equal((ushort)5000, BinaryPrimitives.ReadUInt16LittleEndian(myInfo.AsSpan(8))); // x*10
 
         // Notice count 1 + text.
-        Assert.Equal(1, payloads[2][1]);
+        Assert.Equal(1, payloads[4][1]);
 
         // AG_USER_INFO went to the AI server for zone 21.
         (int aiZone, byte[] aiData) = Assert.Single(aiPackets);

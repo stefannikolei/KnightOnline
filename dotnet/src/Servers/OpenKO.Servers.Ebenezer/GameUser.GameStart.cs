@@ -42,8 +42,8 @@ public sealed partial class GameUser
         if (opcode == 1)
         {
             SendMyInfo(0);
-            // UserInOutForMe/NpcInOutForMe (region population) attach with the
-            // stage-4.4 world slice.
+            world.UserInOutForMe(this);
+            world.NpcInOutForMe(this);
             SendNotice();
             SendTimeStatus();
 
@@ -57,7 +57,7 @@ public sealed partial class GameUser
 
             logger.LogDebug("GameStart: in game [charId={CharId} socketId={SocketId}]", user.CharId, SocketId);
 
-            // UserInOut(USER_REGENE) broadcast attaches with the region slice.
+            UserInOut(UserRegene);
 
             if (user.City == 0 && user.Hp <= 0)
                 user.City = 0xFF;
@@ -104,7 +104,7 @@ public sealed partial class GameUser
         if (UserData is not { } user)
             return;
 
-        ZoneMeta? zone = ZoneIndex >= 0 && ZoneIndex < world.Zones.Count ? world.Zones[ZoneIndex] : null;
+        GameZone? zone = ZoneIndex >= 0 && ZoneIndex < world.Zones.Count ? world.Zones[ZoneIndex] : null;
         if (zone is null)
             return;
 

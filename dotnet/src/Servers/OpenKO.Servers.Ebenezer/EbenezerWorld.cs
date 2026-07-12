@@ -5,21 +5,12 @@ namespace OpenKO.Servers.Ebenezer;
 /// <summary>One [ZONE_INFO] SERVER_XX entry (_ZONE_SERVERINFO).</summary>
 public sealed record ZoneServerInfo(short ServerNo, string ServerIp, short Port);
 
-/// <summary>Zone metadata of one loaded map (the C3DMap fields the pre-game flow needs).</summary>
-/// <param name="MapSize">Walkable map extent in meters ((mapSize-1)*unitDist); 0 skips position checks.</param>
-public sealed record ZoneMeta(short ServerNo, short ZoneNumber, float MapSize = 0f)
-{
-    /// <summary>C3DMap::IsValidPosition (x/z inside the map square).</summary>
-    public bool IsValidPosition(float x, float z)
-        => MapSize <= 0f || (x >= 0f && x < MapSize && z >= 0f && z < MapSize);
-}
-
 /// <summary>
 /// EbenezerApp world/user bookkeeping (stage-4 slices): the user slots by socket
 /// id, account/character lookups, the zone/server topology and the startup
 /// table caches.
 /// </summary>
-public sealed class EbenezerWorld
+public sealed partial class EbenezerWorld
 {
     public const int MaxUser = 3000; // MAX_USER (Ebenezer Define.h)
 
@@ -32,8 +23,14 @@ public sealed class EbenezerWorld
     /// <summary>m_ServerArray ([ZONE_INFO] SERVER_XX, port = 15000 + no).</summary>
     public readonly Dictionary<short, ZoneServerInfo> ServerInfos = [];
 
-    /// <summary>Loaded zones (m_ZoneArray metadata subset).</summary>
-    public readonly List<ZoneMeta> Zones = [];
+    /// <summary>Loaded zones (m_ZoneArray).</summary>
+    public readonly List<GameZone> Zones = [];
+
+    /// <summary>m_NpcMap: the NPC mirror filled from the AI server.</summary>
+    public readonly Dictionary<int, GameNpc> Npcs = [];
+
+    /// <summary>m_bPointCheckFlag: NPC pointers valid (set after the AI sync).</summary>
+    public bool PointCheckFlag;
 
     /// <summary>m_CoefficientTableMap (COEFFICIENT, keyed by class).</summary>
     public Dictionary<short, Coefficient> CoefficientTable = [];
@@ -107,8 +104,12 @@ public sealed class EbenezerWorld
     }
 
     /// <summary>EbenezerApp::GetMapByID.</summary>
-    public ZoneMeta? GetZoneById(int zoneId)
+    public GameZone? GetZoneById(int zoneId)
         => Zones.FirstOrDefault(z => z.ZoneNumber == zoneId);
+
+    /// <summary>EbenezerApp::GetMapByIndex.</summary>
+    public GameZone? GetZoneByIndex(int zoneIndex)
+        => zoneIndex >= 0 && zoneIndex < Zones.Count ? Zones[zoneIndex] : null;
 
     /// <summary>EbenezerApp::GetZoneIndex (-1 when the zone is not on this server).</summary>
     public int GetZoneIndex(int zoneId)

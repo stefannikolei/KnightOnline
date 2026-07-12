@@ -288,7 +288,7 @@ public sealed partial class GameUser
             return;
         }
 
-        ZoneMeta? zone = world.GetZoneById(zoneId);
+        GameZone? zone = world.GetZoneById(zoneId);
         if (zone is null)
         {
             logger.LogError("SelCharToAgent: no map found for zoneId={ZoneId}", zoneId);
@@ -355,7 +355,7 @@ public sealed partial class GameUser
             return;
         }
 
-        ZoneMeta? zone = world.GetZoneById(user.Zone);
+        GameZone? zone = world.GetZoneById(user.Zone);
         if (zone is null)
         {
             SendSelCharFail();

@@ -124,7 +124,7 @@ public sealed class EbenezerService(
         World.LevelUpTable = levels.ToDictionary(l => (int)l.Level, l => l.RequiredExp);
         World.HomeTable = homes.ToDictionary(h => h.Nation);
         foreach (OpenKO.Data.Models.ZoneInfo zone in zoneInfos)
-            World.Zones.Add(new ZoneMeta(zone.ServerId, zone.ZoneId));
+            World.Zones.Add(new GameZone(zone.ServerId, zone.ZoneId));
 
         Channel<SessionWork> queue = Channel.CreateUnbounded<SessionWork>(
             new UnboundedChannelOptions { SingleReader = true });
@@ -190,28 +190,68 @@ public sealed class EbenezerService(
 
     private async Task GameLoopAsync(ChannelReader<SessionWork> queue, CancellationToken ct)
     {
-        await foreach (SessionWork work in queue.ReadAllAsync(CancellationToken.None))
+        const double regionFlushInterval = 0.2; // SendWorkerThread's 200ms cadence
+        double lastRegionFlush = 0.0;
+
+        while (!ct.IsCancellationRequested)
         {
-            if (ct.IsCancellationRequested)
-                break;
+            while (queue.TryRead(out SessionWork? work))
+            {
+                try
+                {
+                    if (work.Data is null)
+                    {
+                        // CUser::CloseProcess ordering: leave the world, then free the slot.
+                        work.Session.User.UserInOut(GameUser.UserOut);
+                        World.Unregister(work.Session.User.SocketId);
+                        logger.LogInformation("user {Id} disconnected", work.Session.User.SocketId);
+                        work.Session.Dispose();
+                    }
+                    else
+                    {
+                        await work.Session.ProcessReceivedAsync(work.Data);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "user {Id}: packet processing failed", work.Session.User.SocketId);
+                }
+            }
+
+            double now = Environment.TickCount64 / 1000.0;
+            if (now - lastRegionFlush >= regionFlushInterval)
+            {
+                lastRegionFlush = now;
+                FlushRegionBuffers();
+            }
 
             try
             {
-                if (work.Data is null)
-                {
-                    World.Unregister(work.Session.User.SocketId);
-                    logger.LogInformation("user {Id} disconnected", work.Session.User.SocketId);
-                    work.Session.Dispose();
-                }
-                else
-                {
-                    await work.Session.ProcessReceivedAsync(work.Data);
-                }
+                await Task.Delay(10, ct);
             }
-            catch (Exception ex)
+            catch (OperationCanceledException)
             {
-                logger.LogError(ex, "user {Id}: packet processing failed", work.Session.User.SocketId);
+                break;
             }
+        }
+    }
+
+    /// <summary>SendWorkerThread::tick — drains every user's region buffer.</summary>
+    private void FlushRegionBuffers()
+    {
+        foreach (GameUser? user in World.Users)
+        {
+            if (user is null)
+                continue;
+
+            byte[]? packet = user.RegionPacketClear();
+            if (packet is null)
+                continue;
+
+            if (packet.Length < 500)
+                user.Send(packet);
+            else
+                user.SendCompressingPacket(packet);
         }
     }
 

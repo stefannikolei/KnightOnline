@@ -36,8 +36,8 @@ public class GameUserCharFlowTests
     private static EbenezerWorld MakeWorld()
     {
         var world = new EbenezerWorld { ServerNo = 1 };
-        world.Zones.Add(new ZoneMeta(ServerNo: 1, ZoneNumber: 21));
-        world.Zones.Add(new ZoneMeta(ServerNo: 2, ZoneNumber: 22));
+        world.Zones.Add(new GameZone(serverNo: 1, zoneNumber: 21));
+        world.Zones.Add(new GameZone(serverNo: 2, zoneNumber: 22));
         world.ServerInfos[1] = new ZoneServerInfo(1, "10.0.0.1", 15001);
         world.ServerInfos[2] = new ZoneServerInfo(2, "10.0.0.2", 15002);
         world.CoefficientTable[105] = MakeCoefficient(105);
