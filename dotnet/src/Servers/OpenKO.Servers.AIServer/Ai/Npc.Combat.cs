@@ -1186,6 +1186,68 @@ public partial class Npc
         }
     }
 
+    /// <summary>
+    /// CNpc::ChangeAbility — battle-event stat swing (0: nerf, 1: restore).
+    /// C++ quirk kept: only ActType>=100 NPCs (m_byInitMoveType) qualify — the
+    /// first branch rejects every regular monster with an error log.
+    /// </summary>
+    public void ChangeAbility(int changeType)
+    {
+        if (changeType > 2)
+            return;
+
+        Data.Models.Npc? table;
+        if (InitMoveType < 100)
+        {
+            // C++ logs an "invalid initMoveType" error here for 0..99.
+            return;
+        }
+
+        table = World?.NpcTable.GetValueOrDefault(Sid);
+        if (table is null)
+            return;
+
+        if (changeType == BattlezoneOpen)
+        {
+            int hp = (int)(table.HitPoints * 0.5);
+
+            MaxHP = hp;
+
+            if (HP > hp)
+                HpChange();
+
+            Defense = (short)(table.Armor * 0.2);
+            Damage = (short)(table.Damage * 0.3);
+            FireResist = (short)(table.FireResist * 0.5);
+            ColdResist = (short)(table.ColdResist * 0.5);
+            LightningResist = (short)(table.LightningResist * 0.5);
+            MagicResist = (short)(table.MagicResist * 0.5);
+            DiseaseResist = (short)(table.DiseaseResist * 0.5);
+            PoisonResist = (short)(table.PoisonResist * 0.5);
+            LightResist = (short)(table.LightResist * 0.5);
+        }
+        else if (changeType == BattlezoneClose)
+        {
+            MaxHP = table.HitPoints;
+
+            if (MaxHP > HP)
+            {
+                HP = MaxHP - 50;
+                HpChange();
+            }
+
+            Damage = table.Damage;
+            Defense = table.Armor;
+            FireResist = table.FireResist;
+            ColdResist = table.ColdResist;
+            LightningResist = table.LightningResist;
+            MagicResist = table.MagicResist;
+            DiseaseResist = table.DiseaseResist;
+            PoisonResist = table.PoisonResist;
+            LightResist = table.LightResist;
+        }
+    }
+
     /// <summary>CNpc::IsUserInSight — refresh the InSight flags of the damage list (50m).</summary>
     public void IsUserInSight()
     {

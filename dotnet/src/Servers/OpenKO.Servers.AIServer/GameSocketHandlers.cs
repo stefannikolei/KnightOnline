@@ -862,18 +862,12 @@ public sealed class GameSocketHandlers(AiWorld world, ILogger logger)
             logger.LogDebug("RecvBattleEvent: ResetBattleZone not yet ported");
         }
 
-        int affected = 0;
         foreach (Npc npc in world.Npcs.Values)
         {
             // nation-owned NPCs only (npcType > 10)
             if (npc.NpcType > 10 && (npc.Group == KarusZone || npc.Group == ElmoradZone))
-                affected++;
+                npc.ChangeAbility(nEvent);
         }
-
-        // TODO: CNpc::ChangeAbility(BATTLEZONE_OPEN/CLOSE) per matching NPC — waits on the CNpc combat/HP port.
-        if (affected > 0)
-            logger.LogDebug("RecvBattleEvent: CNpc::ChangeAbility not yet ported [npcs={Count} event={Event}]",
-                affected, nEvent);
     }
 
     private void RecvNpcHpRequest(byte[] body)
