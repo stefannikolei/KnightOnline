@@ -45,12 +45,23 @@ public sealed class GameSocketHandlers(AiWorld world, ILogger logger)
     public byte NightMode;
     public int AliveSocketCount;
     public byte BattleEventType;
-    public short BattleNpcsKilledByKarus;
-    public short BattleNpcsKilledByElmorad;
+
+    /// <summary>Shared battle bookkeeping (each NPC's <c>Battle</c> points here).</summary>
+    public readonly Npc.BattleZoneState Battle = new();
+
+    /// <summary>AIServerApp::Send(buf, len, zone) — wired by the host.</summary>
+    public Func<int, byte[], ValueTask>? SendToZone;
 
     public void Attach(EbenezerLink link)
     {
         link.PacketReceived += HandleAsync;
+    }
+
+    /// <summary>Wires a freshly created user into the world (m_pMain replacements).</summary>
+    private void WireUser(AiUser user)
+    {
+        user.World = world;
+        user.SendToZone = payload => SendToZone?.Invoke(user.CurZone, payload) ?? ValueTask.CompletedTask;
     }
 
     /// <summary>Dispatch mirroring the CGameSocket::Parsing switch (game opcodes only).</summary>
@@ -195,6 +206,7 @@ public sealed class GameSocketHandlers(AiWorld world, ILogger logger)
         user.MagicAmountLeftHand = amountLeft;
         user.MagicAmountRightHand = amountRight;
         user.IsOperator = authority;
+        WireUser(user);
 
         logger.LogDebug("RecvUserInfo: userId={Uid} charId={CharId}", uid, name);
 
@@ -697,6 +709,7 @@ public sealed class GameSocketHandlers(AiWorld world, ILogger logger)
             user.AC = ac;
             user.IsOperator = authority;
             user.Live = AiUser.UserLive;
+            WireUser(user);
 
             if (partyIndex != -1)
             {
@@ -842,15 +855,15 @@ public sealed class GameSocketHandlers(AiWorld world, ILogger logger)
 
         if (nEvent == BattleZoneOpen)
         {
-            BattleNpcsKilledByKarus = 0;
-            BattleNpcsKilledByElmorad = 0;
+            Battle.NpcsKilledByKarus = 0;
+            Battle.NpcsKilledByElmorad = 0;
             BattleEventType = BattleZoneOpen;
             logger.LogDebug("RecvBattleEvent: battle zone open");
         }
         else if (nEvent == BattleZoneClose)
         {
-            BattleNpcsKilledByKarus = 0;
-            BattleNpcsKilledByElmorad = 0;
+            Battle.NpcsKilledByKarus = 0;
+            Battle.NpcsKilledByElmorad = 0;
             BattleEventType = BattleZoneClose;
             logger.LogDebug("RecvBattleEvent: battle zone closed");
 

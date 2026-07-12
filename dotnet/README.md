@@ -56,15 +56,26 @@ tools/OpenKO.TestClient  scripted protocol client (verification / parity harness
 tools/golden-gen/      C++ generator for the golden vectors (links shared/)
 ```
 
-### AIServer (stage 3, in progress)
+### AIServer (stage 3)
 
-`OpenKO.Servers.AIServer` currently contains the ported infrastructure:
-`PathFinder` (the NPC A* incl. its original quirks), the `EbenezerLink`
-session handler (AI_SERVER_CONNECT handshake, AG_COMPRESSED_DATA envelope —
-LZF + KO-CRC32, see `AgCompressedCodec`), the zone-type listen ports
-(10020/10030/10040) and the DB loaders for the startup tables. The NPC/user
-game logic (Npc.cpp, MagicProcess, Party, RoomEvent) is the remaining stage-3
-work and attaches to `EbenezerLink.PacketReceived`.
+`OpenKO.Servers.AIServer` is a full port of the C++ AIServer: `PathFinder`
+(the NPC A* incl. its original quirks), the `EbenezerLink` session handler
+(AI_SERVER_CONNECT handshake, AG_COMPRESSED_DATA envelope — LZF + KO-CRC32,
+see `AgCompressedCodec`) on the zone-type listen ports (10020/10030/10040),
+the DB loaders for the startup tables, the complete NPC AI (`Npc.*` — state
+machine, combat, exp/loot, battle events), both magic processors
+(`NpcMagicProcessor` = CNpcMagicProcess, `UserMagicProcessor` = CMagicProcess),
+the dungeon room events (`RoomEvent` + the `.evt` parser on `AiZone`,
+including the upstream `CheckMonsterCount` variable-shadowing no-op, kept
+verbatim), parties and all `AG_*` game handlers (`GameSocketHandlers`).
+
+`AiServerApp` ports the AIServerApp startup (tables → maps/rooms/object-event
+NPCs → spawn → wiring), the Ebenezer connect bookkeeping with the
+`AllNpcInfo` push and the 10s `CheckAliveTest`. Instead of the C++
+NpcThread/ZoneEventThread/timer + mutex model, the host (`AiServerService`)
+runs ONE single-writer game loop: inbound packets are queued and drained
+between the 100ms NPC ticks, 1s room ticks and 10s alive checks — the same
+serialization the C++ enforced with its recursive mutexes, without the locks.
 
 ### Aujard (stage 2)
 
@@ -96,6 +107,11 @@ cd <dir with Version.ini> && dotnet run --project dotnet/src/Servers/OpenKO.Serv
 
 # ItemManager: reads ItemManager.ini (optional), listens on 127.0.0.1:15200.
 dotnet run --project dotnet/src/Servers/OpenKO.Servers.ItemManager
+
+# AIServer: reads server.ini ([SERVER] ZONE, [ODBC] GAME_DSN/UID/PWD) and the
+# MAP/ directory (SMDs + <n>.evt room events) next to it; listens on the
+# zone-type port (10020 karus/unify, 10030 elmorad, 10040 battle) for Ebenezer.
+cd <dir with server.ini + MAP/> && dotnet run --project dotnet/src/Servers/OpenKO.Servers.AIServer
 
 # Scripted protocol client (also used by the parity harness):
 dotnet run --project dotnet/tools/OpenKO.TestClient -- 127.0.0.1:15100 version
@@ -136,7 +152,7 @@ g++ -std=c++23 -O2 -I . -I shared -I deps/djb2 \
 |---|---|---|
 | 1 | Foundations (Core/Network/Data/Hosting) + VersionManager + ItemManager | **done** |
 | 2 | OpenKO.Data full build-out + Aujard as library/hosted service | **done** |
-| 3 | AIServer (+ OpenKO.GameData: .tbl loader, N3ShapeMgr MAP collision) | in progress — GameData map/collision foundation done |
+| 3 | AIServer (+ OpenKO.GameData: .tbl loader, N3ShapeMgr MAP collision) | done — parity verification vs the C++ AIServer pending (needs seeded DB + MAP files) |
 | 4 | Ebenezer (WIZ_CRYPTION handshake, LZF packets, game logic) | open |
 | 5 | Client foundations: N3 asset loaders + math | open |
 | 6 | Client engine core on MonoGame (fixed-function emulation, UI system) | open |
