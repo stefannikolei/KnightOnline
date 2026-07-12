@@ -38,6 +38,16 @@ public static class Program
 
         int listenPort = ListenPortBase + serverNo;
 
+        // [ZONE_INFO] SERVER_XX / SERVER_IP_XX entries (port = 15000 + server no).
+        var serverInfos = new List<ZoneServerInfo>();
+        int serverCount = ini.GetInt("ZONE_INFO", "SERVER_COUNT", 1);
+        for (int i = 0; i < serverCount; i++)
+        {
+            short no = (short)ini.GetInt("ZONE_INFO", $"SERVER_{i:00}", 1);
+            string ip = ini.GetString("ZONE_INFO", $"SERVER_IP_{i:00}", "127.0.0.1");
+            serverInfos.Add(new ZoneServerInfo(no, ip, (short)(ListenPortBase + no)));
+        }
+
         builder.Services.AddSingleton(SqlConnectionFactory.FromOdbcConfig(
             dsn, uid, pwd, server.Length > 0 ? server : null));
         builder.Services.AddSingleton<IDbAgent, DbAgent>(sp => new DbAgent(
@@ -45,6 +55,9 @@ public static class Program
             sp.GetRequiredService<ILogger<DbAgent>>()));
         builder.Services.AddSingleton(sp => new EbenezerService(
             listenPort,
+            (short)serverNo,
+            serverInfos,
+            sp.GetRequiredService<SqlConnectionFactory>(),
             sp.GetRequiredService<IDbAgent>(),
             sp.GetRequiredService<IHostApplicationLifetime>(),
             sp.GetRequiredService<ILogger<EbenezerService>>()));
@@ -63,6 +76,9 @@ public static class Program
 /// </summary>
 public sealed class EbenezerService(
     int listenPort,
+    short serverNo,
+    IReadOnlyList<ZoneServerInfo> serverInfos,
+    SqlConnectionFactory connectionFactory,
     IDbAgent dbAgent,
     IHostApplicationLifetime lifetime,
     ILogger<EbenezerService> logger) : BackgroundService
@@ -83,6 +99,26 @@ public sealed class EbenezerService(
             lifetime.StopApplication();
             return;
         }
+
+        World.ServerNo = serverNo;
+        foreach (ZoneServerInfo info in serverInfos)
+            World.ServerInfos[info.ServerNo] = info;
+
+        // Startup tables (EbenezerApp::OnStart slice for the pre-game flow).
+        var db = new Db.EbenezerDb(connectionFactory, logger);
+
+        List<OpenKO.Data.Models.Coefficient>? coefficients = await db.LoadCoefficientTableAsync(stoppingToken);
+        List<OpenKO.Data.Models.ZoneInfo>? zoneInfos = await db.LoadZoneInfoTableAsync(stoppingToken);
+        if (coefficients is null || zoneInfos is null)
+        {
+            logger.LogError("Ebenezer startup table load failed, closing server");
+            lifetime.StopApplication();
+            return;
+        }
+
+        World.CoefficientTable = coefficients.ToDictionary(c => c.ClassId);
+        foreach (OpenKO.Data.Models.ZoneInfo zone in zoneInfos)
+            World.Zones.Add(new ZoneMeta(zone.ServerId, zone.ZoneId));
 
         Channel<SessionWork> queue = Channel.CreateUnbounded<SessionWork>(
             new UnboundedChannelOptions { SingleReader = true });
@@ -200,6 +236,9 @@ public sealed class GameSession : IDisposable
         _socket = socket;
         _logger = logger;
         User = user;
+
+        if (socket.RemoteEndPoint is System.Net.IPEndPoint remote)
+            user.RemoteIp = remote.Address.ToString();
 
         user.Transmit = frame => _sendQueue.Writer.TryWrite(frame);
         user.Close = () => _cts.Cancel();

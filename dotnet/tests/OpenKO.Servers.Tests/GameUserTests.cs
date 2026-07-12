@@ -12,43 +12,6 @@ namespace OpenKO.Servers.Tests;
 /// <summary>Tests for the Ebenezer GameUser pre-game flow (version check + login).</summary>
 public class GameUserTests
 {
-    private sealed class FakeDbAgent : IDbAgent
-    {
-        public Func<string, string, int> AccountLogin = (_, _) => -1;
-        public List<(string Account, string Password)> LoginCalls = [];
-
-        public UserDataStore Users { get; } = new();
-
-        public Task<int> AccountLoginAsync(string accountId, string password, CancellationToken ct = default)
-        {
-            LoginCalls.Add((accountId, password));
-            return Task.FromResult(AccountLogin(accountId, password));
-        }
-
-        public Task<bool> InitAsync(CancellationToken ct = default) => Task.FromResult(true);
-
-        // Everything below is unused by the stage-4.1 flow.
-        public Task<bool> NationSelectAsync(string a, int n, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<NewCharResult> CreateNewCharAsync(string a, int i, string c, int r, int cl, int h, int f, int st, int sa, int d, int inte, int ch, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<AllCharIds?> GetAllCharIdsAsync(string a, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<CharInfo?> LoadCharInfoAsync(string c, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<bool> LoadUserDataAsync(string a, string c, int u, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<bool> UpdateUserAsync(string c, int u, UserUpdateType t, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<bool> LoadWarehouseAsync(string a, int u, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<bool> UpdateWarehouseAsync(string a, int u, UserUpdateType t, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<bool> SetLoginInfoAsync(string a, string c, string sIp, int sId, string ip, byte init, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<bool> AccountLogoutAsync(string a, int l = 0, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<bool> CheckUserDataAsync(string a, string c, int t, int updateTime, int compare, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<bool> UpdateConcurrentUserCountAsync(int s, int z, int u, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<short> CreateKnightsAsync(int k, int n, string na, string c, int f = 1, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<short> UpdateKnightsAsync(int t, string c, int k, int d, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<short> DeleteKnightsAsync(int k, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<KnightsInfo?> LoadKnightsInfoAsync(int k, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<List<KnightsMember>> LoadKnightsMembersAsync(int k, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<List<KnightsRankingEntry>> LoadKnightsRankingAsync(int n, CancellationToken ct = default) => throw new NotImplementedException();
-        public Task<bool> UpdateBattleEventAsync(string c, int n, CancellationToken ct = default) => throw new NotImplementedException();
-    }
-
     private static (GameUser User, List<byte[]> Frames) MakeUser(
         EbenezerWorld world, FakeDbAgent db, short socketId = 0)
     {

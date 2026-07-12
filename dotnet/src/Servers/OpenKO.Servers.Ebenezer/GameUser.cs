@@ -22,7 +22,7 @@ public enum ConnectionState : byte
 /// pre-game account flow routed directly through the Aujard library instead of
 /// the KNIGHT_SEND/RECV shared-memory queues.
 /// </summary>
-public sealed class GameUser(short socketId, EbenezerWorld world, IDbAgent dbAgent, ILogger logger)
+public sealed partial class GameUser(short socketId, EbenezerWorld world, IDbAgent dbAgent, ILogger logger)
 {
     private const int MaxIdSize = 20;  // MAX_ID_SIZE
     private const int MaxPwSize = 12;  // MAX_PW_SIZE
@@ -36,6 +36,9 @@ public sealed class GameUser(short socketId, EbenezerWorld world, IDbAgent dbAge
 
     /// <summary>m_strAccountID — only meaningful between login and character select.</summary>
     public string AccountId = string.Empty;
+
+    /// <summary>Client IP for the CURRENTUSER login record.</summary>
+    public string RemoteIp = "127.0.0.1";
 
     public ConnectionState State = ConnectionState.Connected;
 
@@ -96,6 +99,26 @@ public sealed class GameUser(short socketId, EbenezerWorld world, IDbAgent dbAge
         {
             case GameOpcode.WIZ_LOGIN:
                 await LoginProcessAsync(packet.AsMemory(1));
+                break;
+
+            case GameOpcode.WIZ_SEL_NATION:
+                await SelNationToAgentAsync(packet.AsMemory(1));
+                break;
+
+            case GameOpcode.WIZ_NEW_CHAR:
+                await NewCharToAgentAsync(packet.AsMemory(1));
+                break;
+
+            case GameOpcode.WIZ_DEL_CHAR:
+                await DelCharToAgentAsync(packet.AsMemory(1));
+                break;
+
+            case GameOpcode.WIZ_SEL_CHAR:
+                await SelCharToAgentAsync(packet.AsMemory(1));
+                break;
+
+            case GameOpcode.WIZ_ALLCHAR_INFO_REQ:
+                await AllCharInfoToAgentAsync();
                 break;
 
             case GameOpcode.WIZ_VERSION_CHECK:
