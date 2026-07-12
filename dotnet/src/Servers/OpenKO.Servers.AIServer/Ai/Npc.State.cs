@@ -3300,26 +3300,10 @@ public partial class Npc
     //  values so the movement call sites above stay faithful.
     // ------------------------------------------------------------------
 
-    /// <summary>
-    /// TODO(stage3.7-part2): CNpc::Attack — returns the next attack delay.
-    /// (Renamed: the <see cref="Attack"/> stat field already claims the name.)
-    /// </summary>
-    public int DoAttack() => AttackDelay;
-
     /// <summary>TODO(stage3.7-part2): CNpc::LongAndMagicAttack.</summary>
     public int LongAndMagicAttack() => AttackDelay;
 
     /// <summary>TODO(stage3.7-part2): CNpc::TracingAttack (0: target lost, 1: keep tracing).</summary>
     public int TracingAttack() => 1;
-
-    /// <summary>
-    /// TODO(stage3.7-part2): CNpc::IsSurround — claims an 8-direction attack slot via
-    /// CUser::IsSurroundCheck. 0 keeps AttackPos unset (CalcAdaptivePosition branch).
-    /// </summary>
-    public int IsSurround(AiUser user)
-    {
-        _ = user;
-        return 0;
-    }
 
 }

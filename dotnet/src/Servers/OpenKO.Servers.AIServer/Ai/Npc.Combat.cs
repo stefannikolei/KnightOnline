@@ -991,6 +991,242 @@ public partial class Npc
         SendAll(writer.Written);
     }
 
+    // Attack results (shared/globals.h).
+    private const byte AttackFail = 0;
+    private const byte AttackSuccess = 1;
+    private const byte AttackTargetDead = 2;
+    private const byte AttackTargetDeadOk = 3;
+
+    private const byte UserStateDisconnected = 0x03; // STATE_DISCONNECTED
+    private const byte MagicEffecting = 3;           // MAGIC_EFFECTING (e_MagicOpcode)
+
+    /// <summary>
+    /// Hook for CNpcMagicProcess::MagicPacket (area magic) until the magic
+    /// processor is ported. Receives the MAGIC_EFFECTING payload the C++ builds.
+    /// </summary>
+    public Action<byte[]>? NpcMagicPacket;
+
+    /// <summary>
+    /// CNpc::IsSurround(CUser*): claims an 8-direction attack slot around the target.
+    /// 0: ranged NPC (skip), -2: no user, -1: target fully surrounded, else the slot.
+    /// </summary>
+    public int IsSurround(AiUser? user)
+    {
+        if (LongType != 0)
+            return 0;
+
+        if (user is null)
+            return -2;
+
+        int dir = user.IsSurroundCheck(CurX, 0.0f, CurZ, Nid + NpcBand);
+        if (dir != 0)
+        {
+            AttackPos = (byte)dir;
+            return dir;
+        }
+
+        return -1;
+    }
+
+    /// <summary>CNpc::Attack — melee/magic attack executor; returns the next delay.</summary>
+    public int DoAttack()
+    {
+        const int percent = 1000;
+
+        // Pure long-range NPCs always use the magic path.
+        if (LongType == 1)
+        {
+            Delay = LongAndMagicAttack();
+            return Delay;
+        }
+
+        int standingTime = StandTime;
+        int ret = IsCloseTarget(AttackRange, 2);
+
+        if (ret == 0)
+        {
+            // Stationary gate NPCs never chase.
+            if (IsGateLikeNpc)
+            {
+                State = NpcState.Standing;
+                InitTarget();
+                return 0;
+            }
+
+            StepCount = 0;
+            ActionFlag = AttackToTrace;
+            State = NpcState.Tracing;
+            return 0;
+        }
+
+        if (ret == 2)
+        {
+            if (LongType == 2)
+            {
+                Delay = LongAndMagicAttack();
+                return Delay;
+            }
+
+            if (IsGateLikeNpc)
+            {
+                State = NpcState.Standing;
+                InitTarget();
+                return 0;
+            }
+
+            StepCount = 0;
+            ActionFlag = AttackToTrace;
+            State = NpcState.Tracing;
+            return 0;
+        }
+
+        if (ret == -1)
+        {
+            State = NpcState.Standing;
+            InitTarget();
+            return 0;
+        }
+
+        int targetId = Target.Id;
+
+        if (targetId is >= UserBand and < NpcBand)
+        {
+            AiUser? user = GetUserPtr(targetId - UserBand);
+
+            if (user is null)
+            {
+                InitTarget();
+                State = NpcState.Standing;
+                return standingTime;
+            }
+
+            if (user.Live == AiUser.UserDead)
+            {
+                SendAttackSuccess(AttackTargetDeadOk, user.Uid, 0, 0);
+                InitTarget();
+                State = NpcState.Standing;
+                return standingTime;
+            }
+
+            if (user.State == UserStateDisconnected)
+            {
+                InitTarget();
+                State = NpcState.Standing;
+                return standingTime;
+            }
+
+            if (user.IsOperator == 0) // AUTHORITY_MANAGER
+            {
+                InitTarget();
+                State = NpcState.Moving;
+                return standingTime;
+            }
+
+            // Area-magic monsters (attack types 4/5): 10% roll for an area cast.
+            if (WhatAttackType is 4 or 5)
+            {
+                if (MyRand(1, 10000) < percent)
+                {
+                    var buffer = new byte[32];
+                    var writer = new PacketWriter(buffer);
+                    writer.SetByte(MagicEffecting);
+                    writer.SetDWord((uint)Magic2);
+                    writer.SetShort(Nid + NpcBand);
+                    writer.SetShort(-1);
+                    writer.SetShort((short)CurX);
+                    writer.SetShort((short)CurY);
+                    writer.SetShort((short)CurZ);
+                    writer.SetShort(0);
+                    writer.SetShort(0);
+                    writer.SetShort(0);
+
+                    // TODO(stage3.7): route through the ported NpcMagicProcess.
+                    NpcMagicPacket?.Invoke(writer.Written.ToArray());
+                    return AttackDelay + 1000;
+                }
+            }
+            else if (WhatAttackType == 2)
+            {
+                // Poison attackers: 10% roll for the poison proc.
+                if (MyRand(1, 10000) < percent)
+                {
+                    var buffer = new byte[32];
+                    var writer = new PacketWriter(buffer);
+                    writer.SetByte(OpenKO.Core.Protocol.AiOpcode.AG_MAGIC_ATTACK_RESULT);
+                    writer.SetByte(MagicEffecting);
+                    writer.SetDWord((uint)Magic1);
+                    writer.SetShort(Nid + NpcBand);
+                    writer.SetShort(user.Uid);
+                    writer.SetShort(0);
+                    writer.SetShort(0);
+                    writer.SetShort(0);
+                    writer.SetShort(0);
+                    writer.SetShort(0);
+                    writer.SetShort(0);
+                    SendAll(writer.Written);
+
+                    return AttackDelay;
+                }
+            }
+
+            int damage = GetFinalDamage(user);
+
+            if (World?.TestMode == true)
+                damage = 10;
+
+            if (damage > 0)
+            {
+                user.SetDamage(damage, Nid + NpcBand);
+                if (user.Live != AiUser.UserDead)
+                    SendAttackSuccess(AttackSuccess, user.Uid, (short)damage, user.HP);
+            }
+            else
+            {
+                SendAttackSuccess(AttackFail, user.Uid, (short)damage, user.HP);
+            }
+        }
+        else if (targetId >= NpcBand && Target.Id < InvalidBand)
+        {
+            Npc? npc = World?.Npcs.GetValueOrDefault(targetId - NpcBand);
+
+            if (npc is null)
+            {
+                InitTarget();
+                State = NpcState.Standing;
+                return standingTime;
+            }
+
+            // Healers heal friendly NPCs instead of attacking.
+            if (NpcType == NpcTypeHealer && npc.Group == Group)
+            {
+                State = NpcState.Healing;
+                return 0;
+            }
+
+            if (npc.HP <= 0 || npc.State == NpcState.Dead)
+            {
+                SendAttackSuccess(AttackTargetDead, npc.Nid + NpcBand, 0, 0);
+                InitTarget();
+                State = NpcState.Standing;
+                return standingTime;
+            }
+
+            int damage = GetNFinalDamage(npc);
+
+            if (damage > 0)
+            {
+                npc.SetDamage(0, damage, Name, Nid + NpcBand);
+                SendAttackSuccess(AttackSuccess, npc.Nid + NpcBand, (short)damage, npc.HP);
+            }
+            else
+            {
+                SendAttackSuccess(AttackFail, npc.Nid + NpcBand, (short)damage, npc.HP);
+            }
+        }
+
+        return AttackDelay;
+    }
+
     /// <summary>CNpc::FindEnemy — enemy acquisition scan over own + neighbor regions.</summary>
     public bool FindEnemy()
     {
