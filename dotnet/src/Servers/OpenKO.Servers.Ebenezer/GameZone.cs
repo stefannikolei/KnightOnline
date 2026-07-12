@@ -5,6 +5,9 @@ public sealed class ZoneRegion
 {
     public readonly SortedSet<int> Users = [];
     public readonly SortedSet<int> Npcs = [];
+
+    /// <summary>m_RegionItemArray: loot bundles keyed by bundle id.</summary>
+    public readonly Dictionary<uint, ZoneItem> Items = [];
 }
 
 /// <summary>_OBJECT_EVENT slice the AISocket flow touches (sType + byLife).</summary>
@@ -12,6 +15,18 @@ public sealed class ObjectEvent
 {
     public short Type;
     public byte Life;
+}
+
+/// <summary>_ZONE_ITEM: one dropped loot bundle (up to 6 stacks).</summary>
+public sealed class ZoneItem
+{
+    public uint BundleIndex;
+    public readonly int[] ItemId = new int[6];
+    public readonly short[] Count = new short[6];
+    public float X;
+    public float Z;
+    public float Y;
+    public double Time;
 }
 
 /// <summary>
@@ -34,6 +49,9 @@ public sealed class GameZone
 
     /// <summary>m_ObjectEventArray keyed by object index (filled by the SMD map loader).</summary>
     public readonly Dictionary<int, ObjectEvent> ObjectEvents = [];
+
+    /// <summary>m_wBundle: the next loot-bundle id (starts at 1, wraps at ZONEITEM_MAX).</summary>
+    public uint Bundle = 1;
 
     public GameZone(short serverNo, short zoneNumber, float mapSize = 0f)
     {
@@ -88,4 +106,19 @@ public sealed class GameZone
     /// <summary>C3DMap::GetObjectEvent.</summary>
     public ObjectEvent? GetObjectEvent(int objectIndex)
         => ObjectEvents.GetValueOrDefault(objectIndex);
+
+    /// <summary>C3DMap::RegionItemAdd — stores a loot bundle and advances the bundle counter.</summary>
+    public bool RegionItemAdd(int rx, int rz, ZoneItem item)
+    {
+        if (!IsValidRegion(rx, rz))
+            return false;
+
+        Regions[rx, rz].Items[item.BundleIndex] = item;
+
+        Bundle++;
+        if (Bundle > 2_100_000_000) // ZONEITEM_MAX
+            Bundle = 1;
+
+        return true;
+    }
 }

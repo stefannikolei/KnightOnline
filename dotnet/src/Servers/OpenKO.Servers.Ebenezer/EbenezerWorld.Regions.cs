@@ -16,6 +16,22 @@ public sealed partial class EbenezerWorld
         (0, 0), (-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1),
     ];
 
+    /// <summary>EbenezerApp::Send_All — every in-game user (nation 0 = everyone).</summary>
+    public void SendAll(ReadOnlySpan<byte> buf, GameUser? except = null, int nation = 0)
+    {
+        foreach (GameUser? user in Users)
+        {
+            if (user is null || user == except)
+                continue;
+
+            if (user.State != ConnectionState.GameStart)
+                continue;
+
+            if (nation == 0 || nation == user.UserData?.Nation)
+                user.Send(buf);
+        }
+    }
+
     /// <summary>EbenezerApp::Send_Region — the 3×3 region block around (x, z). Like the C++, bDirect defaults to true.</summary>
     public void SendRegion(ReadOnlySpan<byte> buf, int zone, int x, int z, GameUser? except = null, bool direct = true)
     {

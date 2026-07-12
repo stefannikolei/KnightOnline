@@ -130,6 +130,10 @@ public sealed partial class GameUser(short socketId, EbenezerWorld world, IDbAge
                 MoveProcess(packet.AsSpan(1));
                 break;
 
+            case GameOpcode.WIZ_ATTACK:
+                Attack(packet.AsSpan(1));
+                break;
+
             case GameOpcode.WIZ_ROTATE:
                 Rotate(packet.AsSpan(1));
                 break;

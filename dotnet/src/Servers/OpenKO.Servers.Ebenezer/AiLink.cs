@@ -14,7 +14,7 @@ namespace OpenKO.Servers.Ebenezer;
 /// Combat results (AG_ATTACK_RESULT, AG_USER_EXP, item drops …) attach with the
 /// stage-4.6 combat slice.
 /// </summary>
-public sealed class AiLink(int socketIndex, EbenezerWorld world, ILogger logger)
+public sealed partial class AiLink(int socketIndex, EbenezerWorld world, ILogger logger)
 {
     private const int MaxNpcNameSize = 30; // MAX_NPC_NAME_SIZE
 
@@ -74,6 +74,27 @@ public sealed class AiLink(int socketIndex, EbenezerWorld world, ILogger logger)
                 break;
             case AiOpcode.AG_NPC_GATE_OPEN:
                 RecvGateOpen(body);
+                break;
+            case AiOpcode.AG_ATTACK_RESULT:
+                RecvNpcAttack(body);
+                break;
+            case AiOpcode.AG_MAGIC_ATTACK_RESULT:
+                RecvMagicAttackResult(body);
+                break;
+            case AiOpcode.AG_USER_EXP:
+                RecvUserExp(body);
+                break;
+            case AiOpcode.AG_SYSTEM_MSG:
+                RecvSystemMsg(body);
+                break;
+            case AiOpcode.AG_NPC_GIVE_ITEM:
+                RecvNpcGiveItem(body);
+                break;
+            case AiOpcode.AG_USER_FAIL:
+                RecvUserFail(body);
+                break;
+            case AiOpcode.AG_NPC_EVENT_ITEM:
+                RecvNpcEventItem(body);
                 break;
             default:
                 if (_loggedUnknown.Add(opcode))

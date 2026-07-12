@@ -41,6 +41,22 @@ public sealed partial class EbenezerWorld
     /// <summary>m_LevelUpTableArray (LEVEL_UP): required exp keyed by level.</summary>
     public Dictionary<int, int> LevelUpTable = [];
 
+    /// <summary>m_MagicTableMap (MAGIC) — loaded with the magic slice.</summary>
+    public Dictionary<int, Magic> MagicTable = [];
+
+    /// <summary>m_MagicType1TableMap (MAGIC_TYPE1).</summary>
+    public Dictionary<int, MagicType1> MagicType1Table = [];
+
+    /// <summary>m_MagicType2TableMap (MAGIC_TYPE2).</summary>
+    public Dictionary<int, MagicType2> MagicType2Table = [];
+
+    /// <summary>myrand(min, max) — inclusive; injectable for deterministic tests.</summary>
+    public Func<int, int, int> Rand = (min, max) => min >= max ? min : Random.Shared.Next(min, max + 1);
+
+    /// <summary>m_sKarusDead / m_sElmoradDead (Wednesday battle-event counters).</summary>
+    public short KarusDead;
+    public short ElmoradDead;
+
     /// <summary>m_HomeTableMap (HOME, keyed by nation).</summary>
     public Dictionary<byte, Home> HomeTable = [];
 

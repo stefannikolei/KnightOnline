@@ -98,6 +98,12 @@ public sealed partial class GameUser
     public short DexAmount;
     public short IntelAmount;
     public short ChaAmount;
+    public byte FireRAmount;
+    public byte ColdRAmount;
+    public byte LightningRAmount;
+    public byte MagicRAmount;
+    public byte DiseaseRAmount;
+    public byte PoisonRAmount;
     public readonly byte[] Type4Buff = new byte[MaxType4Buff];
     public bool Type4Flag;
 
@@ -141,6 +147,12 @@ public sealed partial class GameUser
         DexAmount = 0;
         IntelAmount = 0;
         ChaAmount = 0;
+        FireRAmount = 0;
+        ColdRAmount = 0;
+        LightningRAmount = 0;
+        MagicRAmount = 0;
+        DiseaseRAmount = 0;
+        PoisonRAmount = 0;
         AbnormalType = 1;
 
         Array.Clear(Type4Buff);
@@ -498,10 +510,40 @@ public sealed partial class GameUser
         // Party broadcast attaches with the stage-4 party slice.
     }
 
-    /// <summary>CUser::Dead — ported with the stage-4 combat slice.</summary>
+    /// <summary>CUser::Dead — the WIZ_DEAD broadcast + command-authority deprivation.</summary>
     public void Dead()
     {
-        logger.LogDebug("Dead: not yet ported [charId={CharId}]", UserData?.CharId);
+        if (UserData is not { } user)
+            return;
+
+        var buffer = new byte[8];
+        var writer = new PacketWriter(buffer);
+        writer.SetByte((byte)GameOpcode.WIZ_DEAD);
+        writer.SetShort(SocketId);
+        world.SendRegion(writer.Written, user.Zone, RegionX, RegionZ);
+
+        ResHpType = UserDeadResHpType;
+
+        // The user gets the dead packet immediately once more (ghost fix).
+        Send(writer.Written);
+
+        // A dying commander loses the command authority.
+        if (user.Fame == FameCommandCaptain)
+        {
+            user.Fame = FameChief;
+
+            var authBuffer = new byte[8];
+            var authWriter = new PacketWriter(authBuffer);
+            authWriter.SetByte((byte)GameOpcode.WIZ_AUTHORITY_CHANGE);
+            authWriter.SetByte(0x01); // COMMAND_AUTHORITY
+            authWriter.SetShort(SocketId);
+            authWriter.SetByte(user.Fame);
+            world.SendRegion(authWriter.Written, user.Zone, RegionX, RegionZ);
+            Send(authWriter.Written);
+
+            // The WAR_SYSTEM_CHAT deprivation announcement attaches with the
+            // chat slice (it needs the DB string resources).
+        }
     }
 
     /// <summary>CUser::GetCurrentWeightForClient.</summary>
