@@ -56,6 +56,16 @@ tools/OpenKO.TestClient  scripted protocol client (verification / parity harness
 tools/golden-gen/      C++ generator for the golden vectors (links shared/)
 ```
 
+### AIServer (stage 3, in progress)
+
+`OpenKO.Servers.AIServer` currently contains the ported infrastructure:
+`PathFinder` (the NPC A* incl. its original quirks), the `EbenezerLink`
+session handler (AI_SERVER_CONNECT handshake, AG_COMPRESSED_DATA envelope —
+LZF + KO-CRC32, see `AgCompressedCodec`), the zone-type listen ports
+(10020/10030/10040) and the DB loaders for the startup tables. The NPC/user
+game logic (Npc.cpp, MagicProcess, Party, RoomEvent) is the remaining stage-3
+work and attaches to `EbenezerLink.PacketReceived`.
+
 ### Aujard (stage 2)
 
 `OpenKO.Servers.Aujard` ports `CDBAgent` as an async library (`IDbAgent`): all
