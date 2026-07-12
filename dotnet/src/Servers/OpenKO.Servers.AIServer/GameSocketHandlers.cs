@@ -10,9 +10,7 @@ namespace OpenKO.Servers.AIServer;
 /// Port of the AG_* game-opcode handlers of <c>CGameSocket::Parsing</c>
 /// (Server/AIServer/GameSocket.cpp) plus <c>CParty::PartyProcess</c> (Party.cpp).
 /// AI_SERVER_CONNECT, AG_COMPRESSED_DATA and AG_CHECK_ALIVE_REQ are handled by
-/// <see cref="EbenezerLink"/> before packets reach this class. Handlers whose
-/// logic sits on the not-yet-ported CNpc combat/magic systems parse their
-/// packets and stop at a TODO.
+/// <see cref="EbenezerLink"/> before packets reach this class.
 /// </summary>
 public sealed class GameSocketHandlers(AiWorld world, ILogger logger)
 {
@@ -441,8 +439,7 @@ public sealed class GameSocketHandlers(AiWorld world, ILogger logger)
         user.MagicAmountLeftHand = amountLeft;
         user.MagicAmountRightHand = amountRight;
 
-        // TODO: CUser::Attack (User.cpp) — waits on the CNpc combat/exp port.
-        logger.LogDebug("RecvAttackReq: CUser::Attack not yet ported [sid={Sid} tid={Tid}]", sid, tid);
+        user.Attack(sid, tid);
     }
 
     private void RecvUserLogOut(byte[] body)
@@ -797,8 +794,7 @@ public sealed class GameSocketHandlers(AiWorld world, ILogger logger)
             }
         }
 
-        // TODO: CUser::HealMagic (region scan + CNpc::ChangeTarget) — waits on the CNpc AI port.
-        logger.LogDebug("RecvHealMagic: CUser::HealMagic not yet ported [sid={Sid}]", sid);
+        user.HealMagic();
     }
 
     private void RecvTimeAndWeather(byte[] body)
