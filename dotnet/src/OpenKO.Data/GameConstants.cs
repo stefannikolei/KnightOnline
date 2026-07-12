@@ -22,7 +22,13 @@ public static class GameConstants
     public const int MaxSkills = 9;
 
     // Equipment slot indices (shared/globals.h)
+    public const int SlotRightEar = 0;
     public const int SlotHead = 1;
+    public const int SlotLeftEar = 2;
+    public const int SlotNeck = 3;
+    public const int SlotWaist = 7;
+    public const int SlotRightRing = 9;
+    public const int SlotLeftRing = 11;
     public const int SlotBreast = 4;
     public const int SlotShoulder = 5;
     public const int SlotRightHand = 6;

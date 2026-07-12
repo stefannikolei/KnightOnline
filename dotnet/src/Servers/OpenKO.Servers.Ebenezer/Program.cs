@@ -140,9 +140,10 @@ public sealed class EbenezerService(
         List<OpenKO.Data.Models.MagicType4>? magicType4 = await db.LoadMagicType4TableAsync(stoppingToken);
         List<OpenKO.Data.Models.MagicType5>? magicType5 = await db.LoadMagicType5TableAsync(stoppingToken);
         List<OpenKO.Data.Models.MagicType8>? magicType8 = await db.LoadMagicType8TableAsync(stoppingToken);
+        List<OpenKO.Data.Models.ServerResource>? resources = await db.LoadServerResourceTableAsync(stoppingToken);
         if (coefficients is null || zoneInfos is null || items is null || levels is null || homes is null
             || magics is null || magicType1 is null || magicType2 is null || magicType3 is null
-            || magicType4 is null || magicType5 is null || magicType8 is null)
+            || magicType4 is null || magicType5 is null || magicType8 is null || resources is null)
         {
             logger.LogError("Ebenezer startup table load failed, closing server");
             lifetime.StopApplication();
@@ -160,6 +161,7 @@ public sealed class EbenezerService(
         World.MagicType4Table = magicType4.ToDictionary(m => m.ID);
         World.MagicType5Table = magicType5.ToDictionary(m => m.ID);
         World.MagicType8Table = magicType8.ToDictionary(m => m.ID);
+        World.ServerResources = resources.ToDictionary(r => r.ResourceId, r => r.Resource);
         foreach (OpenKO.Data.Models.ZoneInfo zone in zoneInfos)
             World.Zones.Add(new GameZone(zone.ServerId, zone.ZoneId) { InitX = zone.InitX, InitZ = zone.InitZ });
 

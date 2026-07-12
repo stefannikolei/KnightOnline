@@ -110,6 +110,79 @@ public sealed partial class EbenezerWorld
     public short KarusDead;
     public short ElmoradDead;
 
+    /// <summary>m_ServerResourceTableMap (SERVER_RESOURCE message templates).</summary>
+    public Dictionary<int, string> ServerResources = [];
+
+    private ushort _serialCounter;
+
+    /// <summary>
+    /// fmt::format_db_resource — resolves the sprintf template and substitutes
+    /// %s/%d style placeholders; falls back to the resource id like the C++.
+    /// </summary>
+    public string FormatResource(int resourceId, params object?[] args)
+    {
+        if (!ServerResources.TryGetValue(resourceId, out string? template))
+            return resourceId.ToString();
+
+        var result = new System.Text.StringBuilder(template.Length + 32);
+        int argIndex = 0;
+
+        for (int i = 0; i < template.Length; i++)
+        {
+            if (template[i] != '%' || i + 1 >= template.Length)
+            {
+                result.Append(template[i]);
+                continue;
+            }
+
+            char spec = template[++i];
+            if (spec == '%')
+            {
+                result.Append('%');
+            }
+            else if (spec is 's' or 'd' or 'i' or 'u' or 'c' or 'f')
+            {
+                if (argIndex >= args.Length)
+                    return resourceId.ToString(); // invalid args, like the fmt catch
+
+                result.Append(args[argIndex++]);
+            }
+            else
+            {
+                result.Append('%').Append(spec);
+            }
+        }
+
+        return result.ToString();
+    }
+
+    /// <summary>
+    /// EbenezerApp::GenerateItemSerial — server number + timestamp + counter
+    /// packed into the 8 bytes. Injectable for deterministic tests.
+    /// </summary>
+    public Func<long> GenerateItemSerial;
+
+    public EbenezerWorld()
+    {
+        GenerateItemSerial = () =>
+        {
+            DateTime now = DateTime.Now;
+            ushort increase = _serialCounter++;
+
+            Span<byte> bytes = stackalloc byte[8];
+            bytes[7] = (byte)ServerNo;
+            bytes[6] = (byte)(now.Year % 100);
+            bytes[5] = (byte)now.Month;
+            bytes[4] = (byte)now.Day;
+            bytes[3] = (byte)now.Hour;
+            bytes[2] = (byte)now.Minute;
+            bytes[1] = (byte)(increase >> 8);
+            bytes[0] = (byte)increase;
+
+            return BitConverter.ToInt64(bytes);
+        };
+    }
+
     /// <summary>m_HomeTableMap (HOME, keyed by nation).</summary>
     public Dictionary<byte, Home> HomeTable = [];
 

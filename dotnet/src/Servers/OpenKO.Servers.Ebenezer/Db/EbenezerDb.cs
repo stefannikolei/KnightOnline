@@ -301,6 +301,18 @@ public sealed class EbenezerDb(SqlConnectionFactory connectionFactory, ILogger l
             },
             cancellationToken);
 
+    /// <summary>EbenezerApp::LoadServerResourceTable (SERVER_RESOURCE).</summary>
+    public Task<List<ServerResource>?> LoadServerResourceTableAsync(CancellationToken cancellationToken = default) =>
+        LoadTableAsync(
+            "SERVER_RESOURCE",
+            "nResourceID, strResource",
+            static reader => new ServerResource
+            {
+                ResourceId = reader.GetInt32(0),
+                Resource = reader.IsDBNull(1) ? string.Empty : reader.GetString(1).TrimEnd(),
+            },
+            cancellationToken);
+
     /// <summary>EbenezerApp::LoadMagicType8 (MAGIC_TYPE8).</summary>
     public Task<List<MagicType8>?> LoadMagicType8TableAsync(CancellationToken cancellationToken = default) =>
         LoadTableAsync(

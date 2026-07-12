@@ -150,6 +150,42 @@ public sealed partial class GameUser(short socketId, EbenezerWorld world, IDbAge
                 WarpProcess(packet.AsSpan(1));
                 break;
 
+            case GameOpcode.WIZ_CHAT:
+                Chat(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_CHAT_TARGET:
+                ChatTargetSelect(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_ITEM_MOVE:
+                ItemMove(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_ITEM_TRADE:
+                ItemTrade(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_ITEM_GET:
+                ItemGet(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_BUNDLE_OPEN_REQ:
+                BundleOpenReq(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_ITEM_REMOVE:
+                ItemRemove(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_ITEM_REPAIR:
+                ItemRepair(packet.AsSpan(1));
+                break;
+
+            case GameOpcode.WIZ_NPC_EVENT:
+                NpcEvent(packet.AsSpan(1));
+                break;
+
             case GameOpcode.WIZ_ROTATE:
                 Rotate(packet.AsSpan(1));
                 break;

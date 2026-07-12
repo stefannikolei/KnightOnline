@@ -32,6 +32,53 @@ public sealed partial class EbenezerWorld
         }
     }
 
+    /// <summary>
+    /// EbenezerApp::Send_NearRegion — the local-chat broadcast: the own region
+    /// plus the three neighbours on the side the speaker stands on, filtered to
+    /// 32 meters and always via the region buffer.
+    /// </summary>
+    public void SendNearRegion(ReadOnlySpan<byte> buf, int zone, int regionX, int regionZ,
+        float curX, float curZ, GameUser? except = null)
+    {
+        GameZone? map = GetZoneById(zone);
+        if (map is null)
+            return;
+
+        float leftBorder = regionX * GameZone.ViewDistance;
+        float topBorder = regionZ * GameZone.ViewDistance;
+
+        SendFilterUnitRegion(map, buf, regionX, regionZ, curX, curZ, except);
+
+        int dx = curX - leftBorder > GameZone.ViewDistance / 2.0f ? 1 : -1;
+        int dz = curZ - topBorder > GameZone.ViewDistance / 2.0f ? 1 : -1;
+
+        SendFilterUnitRegion(map, buf, regionX + dx, regionZ, curX, curZ, except);
+        SendFilterUnitRegion(map, buf, regionX, regionZ + dz, curX, curZ, except);
+        SendFilterUnitRegion(map, buf, regionX + dx, regionZ + dz, curX, curZ, except);
+    }
+
+    /// <summary>EbenezerApp::Send_FilterUnitRegion — 32m distance filter, buffered.</summary>
+    private void SendFilterUnitRegion(GameZone map, ReadOnlySpan<byte> buf, int x, int z,
+        float refX, float refZ, GameUser? except)
+    {
+        if (!map.IsValidRegion(x, z))
+            return;
+
+        foreach (int uid in map.Regions[x, z].Users)
+        {
+            GameUser? user = uid >= 0 && uid < Users.Length ? Users[uid] : null;
+            if (user is null || user == except)
+                continue;
+
+            if (user.State != ConnectionState.GameStart || user.UserData is not { } data)
+                continue;
+
+            double dist = Math.Sqrt(Math.Pow(data.CurX - refX, 2) + Math.Pow(data.CurZ - refZ, 2));
+            if (dist < 32)
+                user.RegionPacketAdd(buf);
+        }
+    }
+
     /// <summary>EbenezerApp::Send_Region — the 3×3 region block around (x, z). Like the C++, bDirect defaults to true.</summary>
     public void SendRegion(ReadOnlySpan<byte> buf, int zone, int x, int z, GameUser? except = null, bool direct = true)
     {

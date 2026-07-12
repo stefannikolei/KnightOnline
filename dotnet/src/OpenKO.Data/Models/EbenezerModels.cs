@@ -278,3 +278,13 @@ public sealed record MagicType8
     /// <summary>Column [ExpRecover].</summary>
     public required short ExpRecover { get; init; }
 }
+
+/// <summary>SERVER_RESOURCE table: sprintf-style message templates.</summary>
+public sealed record ServerResource
+{
+    /// <summary>Column [nResourceID].</summary>
+    public required int ResourceId { get; init; }
+
+    /// <summary>Column [strResource].</summary>
+    public required string Resource { get; init; }
+}

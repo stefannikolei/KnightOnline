@@ -113,6 +113,34 @@ public sealed class GameZone
     public ObjectEvent? GetObjectEvent(int objectIndex)
         => ObjectEvents.GetValueOrDefault(objectIndex);
 
+    /// <summary>C3DMap::RegionItemRemove — take one stack out of a bundle; drops empty bundles.</summary>
+    public bool RegionItemRemove(int rx, int rz, uint bundleIndex, int itemId, int count)
+    {
+        if (!IsValidRegion(rx, rz))
+            return false;
+
+        ZoneItem? item = Regions[rx, rz].Items.GetValueOrDefault(bundleIndex);
+        if (item is null)
+            return false;
+
+        bool found = false;
+        for (int j = 0; j < 6; j++)
+        {
+            if (item.ItemId[j] == itemId && item.Count[j] == count)
+            {
+                item.ItemId[j] = 0;
+                item.Count[j] = 0;
+                found = true;
+                break;
+            }
+        }
+
+        if (found && item.ItemId.All(id => id == 0))
+            Regions[rx, rz].Items.Remove(bundleIndex);
+
+        return found;
+    }
+
     /// <summary>C3DMap::RegionItemAdd — stores a loot bundle and advances the bundle counter.</summary>
     public bool RegionItemAdd(int rx, int rz, ZoneItem item)
     {
