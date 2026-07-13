@@ -52,6 +52,13 @@ public sealed class RemotePlayer
     public float Y { get; set; }
 
     public float Z { get; set; }
+
+    /// <summary>
+    /// The eight visible-equipment item ids in CPlayerOther::Init slot order
+    /// (upper, lower, head, hands, feet, cloak, right hand, left hand) — enough
+    /// to assemble the character's appearance.
+    /// </summary>
+    public uint[] Items { get; } = new uint[8];
 }
 
 /// <summary>

@@ -114,13 +114,27 @@ public static class WorldProtocol
         r.GetByte();           // party leader
         r.GetByte();           // invisibility
         short direction = r.GetShort();
-        // Remaining (chicken flag, ranks, 8 visible items) is not needed here.
+        r.GetByte();           // chicken flag
+        r.GetByte();           // rank
+        r.GetByte();           // knights rank
+        r.GetByte();           // personal rank
 
-        return new RemotePlayer
+        var player = new RemotePlayer
         {
             Id = id, Name = name, Nation = nation, Level = level, Race = race,
             Class = cls, Face = face, Hair = hair, Direction = direction, X = x, Y = y, Z = z,
         };
+
+        // Eight visible-equipment slots (CUser::GetUserInfo): [dword id][short
+        // duration][byte flag] each, in CPlayerOther::Init slot order.
+        for (int i = 0; i < player.Items.Length; i++)
+        {
+            player.Items[i] = r.GetDWord();
+            r.GetShort(); // durability
+            r.GetByte();  // flag
+        }
+
+        return player;
     }
 
     public static ChatMessage ParseChat(ReadOnlySpan<byte> payload)

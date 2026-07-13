@@ -114,6 +114,17 @@ public class InGameWorldTests
     }
 
     [Fact]
+    public void UserIn_CapturesVisibleEquipmentIds()
+    {
+        (GameContext ctx, _) = EnterGame();
+        uint[] worn = [379001000, 379002000, 0, 379003000, 379004000, 0, 200100100, 600100000];
+        ctx.Machine.DispatchPacket(UserInPacket(42, "Rival", 6000, 5000, 100, 0, worn));
+
+        Assert.True(ctx.InGame.World.TryGet(42, out RemotePlayer rival));
+        Assert.Equal(worn, rival.Items); // upper, lower, head, hands, feet, cloak, RH, LH
+    }
+
+    [Fact]
     public void Move_UpdatesRemoteAndLocalPositions()
     {
         (GameContext ctx, _) = EnterGame();
@@ -174,7 +185,7 @@ public class InGameWorldTests
         return w.Written.ToArray();
     }
 
-    private static byte[] UserInPacket(short id, string name, int x, int z, int y, short direction)
+    private static byte[] UserInPacket(short id, string name, int x, int z, int y, short direction, uint[]? items = null)
     {
         var buffer = new byte[256];
         var w = new PacketWriter(buffer);
@@ -213,7 +224,7 @@ public class InGameWorldTests
         w.SetByte(0);    // personal rank
         for (int i = 0; i < 8; i++)
         {
-            w.SetDWord(0);
+            w.SetDWord(items != null && i < items.Length ? items[i] : 0);
             w.SetShort(0);
             w.SetByte(0);
         }
