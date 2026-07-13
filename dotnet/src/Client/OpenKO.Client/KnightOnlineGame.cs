@@ -45,6 +45,8 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     private OpenKO.Client.Engine.Objects.ChrRenderer? _character;
     private BasicEffect? _characterEffect;
     private OpenKO.Client.Engine.Objects.ChrAssetCaches? _caches;
+    private OpenKO.Client.Engine.Objects.CharacterFactory? _characterFactory;
+    private RemotePlayerRenderer? _remotePlayers;
     private readonly OpenKO.Client.Engine.Scene.FrameTimer _timer = new();
     private readonly OpenKO.Client.Game.World.GameCamera _gameCamera = new();
     private OpenKO.Client.Game.World.PlayerController? _player;
@@ -327,6 +329,17 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             _character.Tick(camera, _timer);
             _character.Render(GraphicsDevice, _characterEffect);
         }
+
+        // Region-visible remote players (CPlayerOtherMgr::Tick/Render) — assembled
+        // on demand from the WIZ_USER_INOUT roster and glided to their move targets.
+        if (_remotePlayers != null && _characterEffect != null && _context != null)
+        {
+            _characterEffect.View = camera.View.ToXna();
+            _characterEffect.Projection = camera.Projection.ToXna();
+            _remotePlayers.SyncAndRender(
+                GraphicsDevice, _characterEffect, camera, _timer,
+                _context.InGame.World, _timer.SecPerFrame);
+        }
     }
 
     private void LoadDemoCharacter(KoPathResolver resolver)
@@ -340,6 +353,9 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         // Faithful path: assemble the character at runtime from the looks + item
         // tables (CPlayerOther::Init), exactly like the live client.
         CharacterFactory? factory = CharacterFactory.TryLoad(resolver, _caches);
+        _characterFactory = factory;
+        if (factory != null)
+            _remotePlayers = new RemotePlayerRenderer(factory);
         if (factory != null)
         {
             ChrRenderer? assembled = factory.CreatePlayer(
