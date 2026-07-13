@@ -34,6 +34,24 @@ public static class WorldProtocol
         return new MoveUpdate(id, x, y, z, speed, echo);
     }
 
+    /// <summary>
+    /// CUser::MoveProcess request (client→server): [WIZ_MOVE][x*10][z*10][y*10]
+    /// [speed][echo] — no id (the server uses the session). Coordinates are the
+    /// ×10 fixed-point wire form.
+    /// </summary>
+    public static byte[] BuildMove(float x, float y, float z, short speed, byte echo)
+    {
+        var buffer = new byte[12];
+        var w = new PacketWriter(buffer);
+        w.SetByte((byte)GameOpcode.WIZ_MOVE);
+        w.SetShort((short)(ushort)(x * 10f));
+        w.SetShort((short)(ushort)(z * 10f));
+        w.SetShort((short)(y * 10f));
+        w.SetShort(speed);
+        w.SetByte(echo);
+        return w.Written.ToArray();
+    }
+
     /// <summary>WIZ_USER_INOUT type byte (in vs out).</summary>
     public static byte ParseInOutType(ReadOnlySpan<byte> payload) => payload[1];
 

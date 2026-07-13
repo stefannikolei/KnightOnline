@@ -47,9 +47,12 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     private OpenKO.Client.Engine.Objects.ChrAssetCaches? _caches;
     private readonly OpenKO.Client.Engine.Scene.FrameTimer _timer = new();
     private readonly OpenKO.Client.Game.World.GameCamera _gameCamera = new();
+    private OpenKO.Client.Game.World.PlayerController? _player;
     private System.Numerics.Vector3 _playerPos;
     private float _mapWorldSize;
-    private float _orbit;
+    private float _cameraYaw;
+    private float _moveThrottle;
+    private bool _wasMoving;
 
     private readonly List<string> _log = [];
     private int _framesDrawn;
@@ -108,6 +111,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             if (cy <= OpenKO.Client.Game.World.TerrainCollision.OutOfRange + 1f)
                 cy = 0f;
             _playerPos = new System.Numerics.Vector3(cx, cy, cz);
+            _player = new PlayerController { Position = _playerPos };
 
             LoadDemoCharacter(resolver);
 
@@ -218,7 +222,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         _timer.Tick(gameTime.ElapsedGameTime.TotalSeconds);
         _network?.Pump(_context.Machine);
         _context?.Machine.TickActive();
-        _orbit += (float)gameTime.ElapsedGameTime.TotalSeconds * 0.15f;
+        HandleInput((float)gameTime.ElapsedGameTime.TotalSeconds);
 
         base.Update(gameTime);
     }
@@ -242,11 +246,51 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         }
     }
 
+    /// <summary>WASD movement (camera-relative) + Left/Right camera orbit + wheel zoom.</summary>
+    private void HandleInput(float dt)
+    {
+        if (_player == null || _terrainData == null)
+            return;
+
+        KeyboardState kb = Keyboard.GetState();
+        if (kb.IsKeyDown(Keys.Left))
+            _cameraYaw -= dt * 1.6f;
+        if (kb.IsKeyDown(Keys.Right))
+            _cameraYaw += dt * 1.6f;
+
+        float forwardInput = (kb.IsKeyDown(Keys.W) ? 1f : 0f) - (kb.IsKeyDown(Keys.S) ? 1f : 0f);
+        float strafeInput = (kb.IsKeyDown(Keys.D) ? 1f : 0f) - (kb.IsKeyDown(Keys.A) ? 1f : 0f);
+
+        // Camera-relative basis (forward points away from the camera).
+        var forward = new System.Numerics.Vector3(-MathF.Sin(_cameraYaw), 0f, -MathF.Cos(_cameraYaw));
+        var right = new System.Numerics.Vector3(-MathF.Cos(_cameraYaw), 0f, MathF.Sin(_cameraYaw));
+        System.Numerics.Vector3 dir = forward * forwardInput + right * strafeInput;
+
+        bool moved = _player.MoveBy(dir, dt, _terrainData);
+        _playerPos = _player.Position;
+
+        // Stream movement to the server (online), throttled; send a stop on release.
+        _moveThrottle -= dt;
+        if (_network != null && _context.Machine.Active == _context.InGame)
+        {
+            if (moved && _moveThrottle <= 0f)
+            {
+                _context.InGame.SendMove(_playerPos.X, _playerPos.Y, _playerPos.Z, 40);
+                _moveThrottle = 0.2f;
+            }
+            else if (!moved && _wasMoving)
+            {
+                _context.InGame.SendMove(_playerPos.X, _playerPos.Y, _playerPos.Z, 0);
+            }
+        }
+
+        _wasMoving = moved;
+    }
+
     private void RenderWorld()
     {
-        // Third-person follow camera orbiting the player (auto-rotate for the demo).
         _gameCamera.Target = _playerPos + new System.Numerics.Vector3(0f, 1.6f, 0f);
-        _gameCamera.Yaw = _orbit;
+        _gameCamera.Yaw = _cameraYaw;
         var camera = new N3EngineCamera
         {
             Eye = _gameCamera.Eye,
@@ -267,6 +311,11 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
         if (_character != null && _characterEffect != null)
         {
+            // Place + face the character from the controller state.
+            _character.Chr.Position = _playerPos;
+            _character.Chr.Rotation = System.Numerics.Quaternion.CreateFromAxisAngle(
+                System.Numerics.Vector3.UnitY, _player?.Facing ?? 0f);
+
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
@@ -357,6 +406,12 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
         string state = _context?.Machine.Active?.Name ?? "—";
         _spriteBatch.DrawString(body, $"State: {state}", new Vector2(16, 44), new Color(180, 210, 255));
+
+        if (_terrainData != null)
+        {
+            _spriteBatch.DrawString(body, "WASD move · ←→ camera · Esc quit",
+                new Vector2(GraphicsDevice.Viewport.Width - 260, 44), new Color(150, 160, 180));
+        }
 
         if (_context?.Machine.Active == _context?.InGame && _context != null)
         {

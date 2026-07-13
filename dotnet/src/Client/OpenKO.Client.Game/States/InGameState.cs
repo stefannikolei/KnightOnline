@@ -81,6 +81,15 @@ public sealed class InGameState(GameContext context) : GameState
     /// <summary>Sends a pre-built group packet (party/exchange/warehouse/knights).</summary>
     public void SendRaw(ReadOnlySpan<byte> payload) => context.Client.Send(payload);
 
+    /// <summary>CUser::MoveProcess request — update the local position and tell the server.</summary>
+    public void SendMove(float x, float y, float z, short speed)
+    {
+        World.Local.X = x;
+        World.Local.Y = y;
+        World.Local.Z = z;
+        context.Client.Send(WorldProtocol.BuildMove(x, y, z, speed, echo: 0));
+    }
+
     public override bool ProcessPacket(ReadOnlySpan<byte> payload)
     {
         if (context.ProcessSharedPacket(payload))
