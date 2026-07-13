@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using OpenKO.Client.Assets;
+using OpenKO.Client.Engine.Audio;
 using OpenKO.Client.Engine.Interop;
 using OpenKO.Client.Engine.IO;
 using OpenKO.Client.Engine.Scene;
@@ -28,6 +29,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
     private SpriteBatch _spriteBatch = null!;
     private FontService _fonts = null!;
+    private SoundManager _sound = null!;
     private GameContext _context = null!;
     private NetworkGameClient? _network;
     private KoClientConnection? _connection;
@@ -62,6 +64,8 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _fonts = FontService.FromBaseDirectory(AppContext.BaseDirectory);
+        _sound = new SoundManager(new MonoGameAudioBackend());
+        Log(_sound.Backend.IsAvailable ? "Audio: OpenAL device ready." : "Audio: no device (silent).");
 
         if (_options.OfflineZone != null && _options.DataPath != null)
             StartOfflineZone();
@@ -229,6 +233,11 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             FarPlane = MathF.Max(_mapWorldSize * 2f, 1024f),
         };
         camera.Update();
+
+        // 3D audio listener follows the camera (CN3SndObj::SetListener*).
+        System.Numerics.Vector3 forward = System.Numerics.Vector3.Normalize(camera.At - camera.Eye);
+        _sound.SetListener(camera.Eye, forward, System.Numerics.Vector3.UnitY);
+
         _sky?.Render(GraphicsDevice, camera);
         _terrain!.Render(GraphicsDevice, camera);
     }
