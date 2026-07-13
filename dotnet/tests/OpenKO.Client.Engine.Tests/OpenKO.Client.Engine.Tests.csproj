@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Client\OpenKO.Client.Engine\OpenKO.Client.Engine.csproj" />
+    <ProjectReference Include="..\..\src\Client\OpenKO.Client.Viewer\OpenKO.Client.Viewer.csproj" />
   </ItemGroup>
 
 </Project>

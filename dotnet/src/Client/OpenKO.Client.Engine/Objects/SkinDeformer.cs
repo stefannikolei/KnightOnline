@@ -57,7 +57,11 @@ public static class SkinDeformer
         for (int j = 0; j < skinVertices.Length; j++)
         {
             N3SkinVertex src = skinVertices[j];
-            if (src.Joints.Length == 1)
+
+            // Legacy ChrSelect models pair root-only misparsed skeletons with
+            // skins indexing dozens of joints — out-of-bounds reads (UB) in
+            // the C++. Such vertices keep their bind pose here.
+            if (src.Joints.Length == 1 && (uint)src.Joints[0] < joints.Length)
             {
                 int index = src.Joints[0];
                 destPositions[j] = Vector3.Transform(
@@ -66,14 +70,21 @@ public static class SkinDeformer
             else if (src.Joints.Length > 1)
             {
                 var final = Vector3.Zero;
+                bool valid = true;
                 for (int k = 0; k < src.Joints.Length; k++)
                 {
                     int index = src.Joints[k];
+                    if ((uint)index >= joints.Length)
+                    {
+                        valid = false;
+                        break;
+                    }
+
                     final += Vector3.Transform(
                         Vector3.Transform(src.Origin, inverseBind[index]), joints[index]) * src.Weights[k];
                 }
 
-                destPositions[j] = final;
+                destPositions[j] = valid ? final : bindVertices[j].Position;
             }
             else
             {

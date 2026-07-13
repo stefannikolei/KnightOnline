@@ -20,14 +20,17 @@ public sealed class ViewerGame : Game
     private readonly bool[] _dikDown = new bool[InputState.NumKeys];
     private readonly string? _dataPath;
     private readonly string? _startScene;
+    private readonly string? _screenshotPath;
     private ViewerContext? _context;
     private int _sceneIndex;
     private bool _sceneLoaded;
+    private int _framesDrawn;
 
-    public ViewerGame(string? dataPath, string? startScene)
+    public ViewerGame(string? dataPath, string? startScene, string? screenshotPath = null)
     {
         _dataPath = dataPath;
         _startScene = startScene;
+        _screenshotPath = screenshotPath;
         _graphics = new GraphicsDeviceManager(this)
         {
             PreferredBackBufferWidth = 1024,
@@ -114,6 +117,14 @@ public sealed class ViewerGame : Game
         }
 
         base.Draw(gameTime);
+
+        // --screenshot: let animations tick for a moment, dump, exit.
+        if (_screenshotPath != null && ++_framesDrawn == 30)
+        {
+            Screenshot.SaveBackBuffer(GraphicsDevice, _screenshotPath);
+            Console.WriteLine($"Screenshot: {_screenshotPath}");
+            Exit();
+        }
     }
 
     private IScene? CurrentScene => _sceneIndex < _scenes.Count ? _scenes[_sceneIndex] : null;
