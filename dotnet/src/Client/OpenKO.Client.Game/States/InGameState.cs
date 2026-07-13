@@ -37,6 +37,15 @@ public sealed class InGameState(GameContext context) : GameState
 
     public Action<MagicPacket>? MagicReceived { get; set; }
 
+    /// <summary>Group packets surfaced as (sub-command, full payload) for the dialogs.</summary>
+    public Action<byte, byte[]>? PartyReceived { get; set; }
+
+    public Action<byte, byte[]>? ExchangeReceived { get; set; }
+
+    public Action<byte, byte[]>? WarehouseReceived { get; set; }
+
+    public Action<byte, byte[]>? KnightsReceived { get; set; }
+
     public override void Init()
     {
         Entered = true;
@@ -68,6 +77,9 @@ public sealed class InGameState(GameContext context) : GameState
 
     /// <summary>Sends a magic-process step (CMagicProcess flow).</summary>
     public void SendMagic(MagicPacket packet) => context.Client.Send(MagicProtocol.Build(packet));
+
+    /// <summary>Sends a pre-built group packet (party/exchange/warehouse/knights).</summary>
+    public void SendRaw(ReadOnlySpan<byte> payload) => context.Client.Send(payload);
 
     public override bool ProcessPacket(ReadOnlySpan<byte> payload)
     {
@@ -124,6 +136,22 @@ public sealed class InGameState(GameContext context) : GameState
 
             case GameOpcode.WIZ_MAGIC_PROCESS:
                 MagicReceived?.Invoke(MagicProtocol.Parse(payload));
+                return true;
+
+            case GameOpcode.WIZ_PARTY:
+                PartyReceived?.Invoke(PartyProtocol.Subcommand(payload), payload.ToArray());
+                return true;
+
+            case GameOpcode.WIZ_EXCHANGE:
+                ExchangeReceived?.Invoke(ExchangeProtocol.Subcommand(payload), payload.ToArray());
+                return true;
+
+            case GameOpcode.WIZ_WAREHOUSE:
+                WarehouseReceived?.Invoke(WarehouseProtocol.Subcommand(payload), payload.ToArray());
+                return true;
+
+            case GameOpcode.WIZ_KNIGHTS_PROCESS:
+                KnightsReceived?.Invoke(KnightsProtocol.Subcommand(payload), payload.ToArray());
                 return true;
         }
 
