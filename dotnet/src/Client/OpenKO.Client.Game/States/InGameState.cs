@@ -20,6 +20,9 @@ public sealed class InGameState(GameContext context) : GameState
     /// <summary>The client-side world roster (local + visible remote players).</summary>
     public WorldEntities World { get; } = new();
 
+    /// <summary>The local player's inventory (filled from MyInfo in a later slice).</summary>
+    public Inventory Inventory { get; } = new();
+
     /// <summary>The spawn zone/position carried over from char select.</summary>
     public SelectCharResult Spawn => context.Spawn;
 
@@ -29,6 +32,10 @@ public sealed class InGameState(GameContext context) : GameState
     public Action<RemotePlayer>? PlayerEntered { get; set; }
 
     public Action<short>? PlayerLeft { get; set; }
+
+    public Action<bool>? ItemMoveResult { get; set; }
+
+    public Action<MagicPacket>? MagicReceived { get; set; }
 
     public override void Init()
     {
@@ -51,6 +58,16 @@ public sealed class InGameState(GameContext context) : GameState
 
     /// <summary>Sends a chat line (CUser::Chat request).</summary>
     public void SendChat(byte type, string text) => context.Client.Send(WorldProtocol.BuildChat(type, text));
+
+    /// <summary>Requests an item move; the local inventory updates optimistically.</summary>
+    public void SendItemMove(ItemMoveDirection dir, int itemId, byte srcPos, byte destPos)
+    {
+        Inventory.MoveItem(srcPos, destPos);
+        context.Client.Send(ItemProtocol.BuildItemMove(dir, itemId, srcPos, destPos));
+    }
+
+    /// <summary>Sends a magic-process step (CMagicProcess flow).</summary>
+    public void SendMagic(MagicPacket packet) => context.Client.Send(MagicProtocol.Build(packet));
 
     public override bool ProcessPacket(ReadOnlySpan<byte> payload)
     {
@@ -100,6 +117,14 @@ public sealed class InGameState(GameContext context) : GameState
                 ChatReceived?.Invoke(chat);
                 return true;
             }
+
+            case GameOpcode.WIZ_ITEM_MOVE:
+                ItemMoveResult?.Invoke(ItemProtocol.ParseItemMoveSucceeded(payload));
+                return true;
+
+            case GameOpcode.WIZ_MAGIC_PROCESS:
+                MagicReceived?.Invoke(MagicProtocol.Parse(payload));
+                return true;
         }
 
         return false;
