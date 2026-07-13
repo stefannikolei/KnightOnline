@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Headless: the client network codecs + state machine, no GPU/display. -->
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Client\OpenKO.Client.Game\OpenKO.Client.Game.csproj" />
+    <!-- Cross-check the client crypto/framing against the real server core. -->
+    <ProjectReference Include="..\..\src\Servers\OpenKO.Servers.Ebenezer\OpenKO.Servers.Ebenezer.csproj" />
+  </ItemGroup>
+
+</Project>

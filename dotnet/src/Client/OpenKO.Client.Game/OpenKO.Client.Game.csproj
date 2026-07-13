@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The WarFare game client port (stage 7): the game-state machine (the
+    CGameProcedure states), the client network layer (login + Ebenezer over the
+    shared bit-exact codecs) and the game UI dialogs on the stage-6 engine.
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\OpenKO.Core\OpenKO.Core.csproj" />
+    <ProjectReference Include="..\..\OpenKO.Network\OpenKO.Network.csproj" />
+    <ProjectReference Include="..\OpenKO.Client.Engine\OpenKO.Client.Engine.csproj" />
+  </ItemGroup>
+
+</Project>
