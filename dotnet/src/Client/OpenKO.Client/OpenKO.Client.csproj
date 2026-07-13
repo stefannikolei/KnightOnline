@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The runnable Knight Online client (stage 7): a MonoGame host that wires the
+    game-state machine, the client network layer and the stage-6 engine into a
+    real window + game loop. Connects to a server, or runs an offline zone demo.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKO.Client.Game\OpenKO.Client.Game.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reuse the bundled Noto fonts from the viewer (SIL OFL). -->
+    <Content Include="..\OpenKO.Client.Viewer\Assets\Fonts\*">
+      <Link>Assets\Fonts\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

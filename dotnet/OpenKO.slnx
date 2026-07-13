@@ -10,6 +10,7 @@
     <Project Path="src/Client/OpenKO.Client.Assets/OpenKO.Client.Assets.csproj" />
     <Project Path="src/Client/OpenKO.Client.Engine/OpenKO.Client.Engine.csproj" />
     <Project Path="src/Client/OpenKO.Client.Game/OpenKO.Client.Game.csproj" />
+    <Project Path="src/Client/OpenKO.Client/OpenKO.Client.csproj" />
     <Project Path="src/Client/OpenKO.Client.Viewer/OpenKO.Client.Viewer.csproj" />
   </Folder>
   <Folder Name="/src/Servers/">
