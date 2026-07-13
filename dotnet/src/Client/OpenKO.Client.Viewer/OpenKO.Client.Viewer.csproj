@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Debug viewer: renders real Client/Data assets scene by scene (stage 6). -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKO.Client.Engine\OpenKO.Client.Engine.csproj" />
+  </ItemGroup>
+
+</Project>

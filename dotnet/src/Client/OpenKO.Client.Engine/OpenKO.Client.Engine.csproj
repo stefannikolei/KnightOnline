@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The MonoGame engine layer (stage 6). Split into a pure layer (data
+    preparation without a GraphicsDevice — unit-testable headless) and a thin
+    device layer that hands finished arrays/states to MonoGame.
+  -->
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" />
+    <PackageReference Include="FontStashSharp.MonoGame" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKO.Client.Assets\OpenKO.Client.Assets.csproj" />
+  </ItemGroup>
+
+</Project>

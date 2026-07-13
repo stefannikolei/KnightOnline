@@ -8,6 +8,8 @@
   </Folder>
   <Folder Name="/src/Client/">
     <Project Path="src/Client/OpenKO.Client.Assets/OpenKO.Client.Assets.csproj" />
+    <Project Path="src/Client/OpenKO.Client.Engine/OpenKO.Client.Engine.csproj" />
+    <Project Path="src/Client/OpenKO.Client.Viewer/OpenKO.Client.Viewer.csproj" />
   </Folder>
   <Folder Name="/src/Servers/">
     <Project Path="src/Servers/OpenKO.Servers.VersionManager/OpenKO.Servers.VersionManager.csproj" />
@@ -21,6 +23,7 @@
     <Project Path="tests/OpenKO.Network.Tests/OpenKO.Network.Tests.csproj" />
     <Project Path="tests/OpenKO.GameData.Tests/OpenKO.GameData.Tests.csproj" />
     <Project Path="tests/OpenKO.Client.Assets.Tests/OpenKO.Client.Assets.Tests.csproj" />
+    <Project Path="tests/OpenKO.Client.Engine.Tests/OpenKO.Client.Engine.Tests.csproj" />
     <Project Path="tests/OpenKO.Servers.Tests/OpenKO.Servers.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">

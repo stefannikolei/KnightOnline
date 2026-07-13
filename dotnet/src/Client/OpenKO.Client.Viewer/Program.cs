@@ -1,0 +1,41 @@
+using OpenKO.Client.Viewer;
+
+string? dataPath = null;
+string? startScene = null;
+
+for (int i = 0; i < args.Length; i++)
+{
+    switch (args[i])
+    {
+        case "--data" when i + 1 < args.Length:
+            dataPath = args[++i];
+            break;
+        case "--scene" when i + 1 < args.Length:
+            startScene = args[++i];
+            break;
+        case "--help":
+            Console.WriteLine("usage: OpenKO.Client.Viewer [--data <Client/Data>] [--scene <name>]");
+            return 0;
+    }
+}
+
+dataPath ??= FindDataPath();
+
+using var game = new ViewerGame(dataPath, startScene);
+game.AddScene(new EmptyScene());
+game.Run();
+return 0;
+
+// Walk up from the working directory looking for Client/Data (same
+// convention as the test corpus lookup).
+static string? FindDataPath()
+{
+    for (var dir = new DirectoryInfo(Environment.CurrentDirectory); dir != null; dir = dir.Parent)
+    {
+        string candidate = Path.Combine(dir.FullName, "Client", "Data");
+        if (Directory.Exists(candidate))
+            return candidate;
+    }
+
+    return null;
+}
