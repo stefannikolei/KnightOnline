@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Runtime.InteropServices;
 using OpenKO.Core.Text;
 
 namespace OpenKO.Client.Assets;
@@ -71,4 +72,21 @@ public static class N3BinaryIo
         writer.Write(m.M31); writer.Write(m.M32); writer.Write(m.M33); writer.Write(m.M34);
         writer.Write(m.M41); writer.Write(m.M42); writer.Write(m.M43); writer.Write(m.M44);
     }
+
+    /// <summary>
+    /// Bulk-reads a packed struct array the way File::Read blits C++ arrays.
+    /// Little-endian only, like the original x86 client.
+    /// </summary>
+    public static T[] ReadStructs<T>(this BinaryReader reader, int count) where T : unmanaged
+    {
+        if (count <= 0)
+            return [];
+
+        var result = new T[count];
+        reader.BaseStream.ReadExactly(MemoryMarshal.AsBytes(result.AsSpan()));
+        return result;
+    }
+
+    public static void WriteStructs<T>(this BinaryWriter writer, ReadOnlySpan<T> values) where T : unmanaged
+        => writer.Write(MemoryMarshal.AsBytes(values));
 }
