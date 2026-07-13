@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Deliberately framework-free: raw N3 asset readers on System.Numerics.
+       MonoGame enters only in OpenKO.Client.Engine (stage 6). -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\OpenKO.GameData\OpenKO.GameData.csproj" />
+  </ItemGroup>
+
+</Project>
