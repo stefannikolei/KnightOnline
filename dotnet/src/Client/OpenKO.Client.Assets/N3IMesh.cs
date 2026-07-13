@@ -7,7 +7,7 @@ namespace OpenKO.Client.Assets;
 /// used by character parts: positions+normals with separate vertex and UV
 /// index lists per face corner.
 /// </summary>
-public sealed class N3IMesh : N3BaseFile
+public class N3IMesh : N3BaseFile
 {
     public int FaceCount { get; private set; }
 
