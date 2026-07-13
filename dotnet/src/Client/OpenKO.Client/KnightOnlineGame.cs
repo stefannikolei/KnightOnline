@@ -337,6 +337,23 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         _characterEffect = new BasicEffect(GraphicsDevice);
         _characterEffect.EnableDefaultLighting();
 
+        // Faithful path: assemble the character at runtime from the looks + item
+        // tables (CPlayerOther::Init), exactly like the live client.
+        CharacterFactory? factory = CharacterFactory.TryLoad(resolver, _caches);
+        if (factory != null)
+        {
+            ChrRenderer? assembled = factory.CreatePlayer(
+                OpenKO.Client.Assets.Player.KoRace.Man, face: 1, hair: 1, new uint[8]);
+            if (assembled is { HasSkeleton: true })
+            {
+                assembled.Chr.Position = _playerPos;
+                _character = assembled;
+                Log("Player model: runtime-assembled El Morad (looks/item tables)");
+                return;
+            }
+        }
+
+        // Fallback: a baked corpus .n3chr when the tables are unavailable.
         string? chrPath = FindRenderableCharacter(resolver);
         if (chrPath == null)
         {
@@ -350,7 +367,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             chr.LoadFromFile(chrPath);
             chr.Position = _playerPos;
             _character = new ChrRenderer(chr, _caches);
-            Log($"Player model: {Path.GetFileName(chrPath)}");
+            Log($"Player model: {Path.GetFileName(chrPath)} (baked)");
         }
         catch (Exception ex)
         {

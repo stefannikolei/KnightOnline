@@ -61,6 +61,11 @@ public sealed class ChrRenderer
         public Texture2D? Texture { get; init; }
 
         public NumMatrix Local { get; init; }
+
+        /// <summary>Runtime joint anchor from the looks table (−1 = use the plug's own).</summary>
+        public int JointOverride { get; init; } = -1;
+
+        public int JointIndex => JointOverride >= 0 ? JointOverride : Plug.JointIndex;
     }
 
     private readonly N3Chr _chr;
@@ -75,11 +80,14 @@ public sealed class ChrRenderer
 
     public N3Chr Chr => _chr;
 
+    /// <summary>True when the skeleton loaded — a renderable, animatable character.</summary>
+    public bool HasSkeleton => _rootJoint != null;
+
     public N3AnimControl? AnimControl { get; }
 
     public int Lod { get; private set; }
 
-    public ChrRenderer(N3Chr chr, ChrAssetCaches caches)
+    public ChrRenderer(N3Chr chr, ChrAssetCaches caches, IReadOnlyList<int>? plugJointAnchors = null)
     {
         _chr = chr;
         chr.ReCalcMatrix();
@@ -115,8 +123,10 @@ public sealed class ChrRenderer
             });
         }
 
-        foreach (string plugFile in chr.PlugFileNames)
+        for (int slot = 0; slot < chr.PlugFileNames.Count; slot++)
         {
+            string plugFile = chr.PlugFileNames[slot];
+
             // Type dispatch by extension (CN3CPlugBase::GetPlugTypeByFileName).
             N3CPlugBase? plug = N3CPlugBase.GetPlugTypeByFileName(plugFile) == N3PlugType.Cloak
                 ? new AssetCache<N3CPlugCloak>(caches.Resolver).Load(plugFile)
@@ -132,12 +142,19 @@ public sealed class ChrRenderer
             NumMatrix local = NumMatrix.CreateScale(plug.Scale) * plug.RotationMatrix;
             local.Translation = plug.Position * plug.Scale;
 
+            // CPlayerBase::PlugSet writes the hand/forearm joint from the looks
+            // table onto the loaded plug — the runtime-assembly anchor override.
+            int jointOverride = plugJointAnchors != null && slot < plugJointAnchors.Count
+                ? plugJointAnchors[slot]
+                : -1;
+
             _plugs.Add(new PlugState
             {
                 Plug = plug,
                 Renderer = new PMeshInstanceRenderer(mesh),
                 Texture = caches.Textures.Get(plug.TexFileName),
                 Local = local,
+                JointOverride = jointOverride,
             });
         }
 
@@ -243,10 +260,10 @@ public sealed class ChrRenderer
         // Plugs: world = plugLocal · joint · chrMatrix (CN3CPlugBase::Render).
         foreach (PlugState plug in _plugs)
         {
-            if (plug.Plug.JointIndex < 0 || plug.Plug.JointIndex >= _mtxJoints.Length)
+            if (plug.JointIndex < 0 || plug.JointIndex >= _mtxJoints.Length)
                 continue;
 
-            NumMatrix world = plug.Local * _mtxJoints[plug.Plug.JointIndex] * _chr.Matrix;
+            NumMatrix world = plug.Local * _mtxJoints[plug.JointIndex] * _chr.Matrix;
             effect.World = world.ToXna();
             effect.Texture = plug.Texture;
             effect.TextureEnabled = plug.Texture != null;
