@@ -10,4 +10,11 @@
     <ProjectReference Include="..\OpenKO.Client.Engine\OpenKO.Client.Engine.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Bundled UI fonts (Noto Sans / Noto Sans KR, SIL OFL — see OFL.txt). -->
+    <Content Include="Assets\Fonts\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
