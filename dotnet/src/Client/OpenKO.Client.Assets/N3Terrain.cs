@@ -24,6 +24,17 @@ public struct N3MapData
     public readonly int Tex1Idx => (int)((Attr >> 11) & 0x3FF);
 
     public readonly int Tex2Idx => (int)((Attr >> 21) & 0x3FF);
+
+    /// <summary>
+    /// The C++ <c>__MapData()</c> default: bIsTileFull=1, Tex1Idx=Tex2Idx=1023
+    /// (both directions 0), fHeight=FLT_MIN. <c>CN3Terrain::GetMapData</c>
+    /// returns this for out-of-range cells (used at patch edges).
+    /// </summary>
+    public static N3MapData Default => new()
+    {
+        Height = 1.17549435E-38f, // FLT_MIN (smallest positive normalized)
+        Attr = 0x1u | (1023u << 11) | (1023u << 21),
+    };
 }
 
 /// <summary>__VertexRiver (N3River.h): position, normal, color, two UV sets — 44 bytes.</summary>

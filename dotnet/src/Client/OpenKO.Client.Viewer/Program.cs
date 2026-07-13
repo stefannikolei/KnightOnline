@@ -27,6 +27,7 @@ dataPath ??= FindDataPath();
 
 using var game = new ViewerGame(dataPath, startScene, screenshotPath);
 game.AddScene(new CharSelectScene());
+game.AddScene(new TerrainScene());
 game.AddScene(new CharacterScene());
 game.AddScene(new UiBrowserScene());
 game.AddScene(new MeshBrowserScene());
