@@ -23,6 +23,7 @@ dataPath ??= FindDataPath();
 
 using var game = new ViewerGame(dataPath, startScene);
 game.AddScene(new MeshBrowserScene());
+game.AddScene(new ShapeBrowserScene());
 game.AddScene(new EmptyScene());
 game.Run();
 return 0;
