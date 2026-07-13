@@ -34,21 +34,39 @@ public static class WorldProtocol
         return new MoveUpdate(id, x, y, z, speed, echo);
     }
 
+    /// <summary>Move flags (CGameProcMain::MsgSend_Move byMoveFlag).</summary>
+    public const byte MoveFlagMoving = 0x01;
+
+    public const byte MoveFlagContinuous = 0x02;
+
     /// <summary>
-    /// CUser::MoveProcess request (client→server): [WIZ_MOVE][x*10][z*10][y*10]
-    /// [speed][echo] — no id (the server uses the session). Coordinates are the
-    /// ×10 fixed-point wire form.
+    /// CGameProcMain::MsgSend_Move request (client→server, verbatim):
+    /// [WIZ_MOVE][word x*10][word z*10][short y*10][word speed*10][byte moveFlag]
+    /// — no id (the server uses the session). x/z/speed are unsigned words, y is
+    /// a signed short; the move flag is 0x01 (moving) | 0x02 (continuous).
     /// </summary>
-    public static byte[] BuildMove(float x, float y, float z, short speed, byte echo)
+    public static byte[] BuildMove(float x, float y, float z, float speed, byte moveFlag)
     {
         var buffer = new byte[12];
         var w = new PacketWriter(buffer);
         w.SetByte((byte)GameOpcode.WIZ_MOVE);
-        w.SetShort((short)(ushort)(x * 10f));
-        w.SetShort((short)(ushort)(z * 10f));
-        w.SetShort((short)(y * 10f));
-        w.SetShort(speed);
-        w.SetByte(echo);
+        w.SetShort((short)(ushort)(x * 10f));     // MP_AddWord
+        w.SetShort((short)(ushort)(z * 10f));     // MP_AddWord
+        w.SetShort((short)(y * 10f));             // MP_AddShort (signed)
+        w.SetShort((short)(ushort)(speed * 10f)); // MP_AddWord speed*10
+        w.SetByte(moveFlag);
+        return w.Written.ToArray();
+    }
+
+    /// <summary>
+    /// CGameProcMain::MsgSend_Rotation request: [WIZ_ROTATE][short yaw*100].
+    /// </summary>
+    public static byte[] BuildRotate(float yaw)
+    {
+        var buffer = new byte[4];
+        var w = new PacketWriter(buffer);
+        w.SetByte((byte)GameOpcode.WIZ_ROTATE);
+        w.SetShort((short)(yaw * 100f));
         return w.Written.ToArray();
     }
 

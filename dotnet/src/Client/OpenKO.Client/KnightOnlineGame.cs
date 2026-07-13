@@ -275,12 +275,14 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         {
             if (moved && _moveThrottle <= 0f)
             {
-                _context.InGame.SendMove(_playerPos.X, _playerPos.Y, _playerPos.Z, 40);
+                byte flag = (byte)(WorldProtocol.MoveFlagMoving | WorldProtocol.MoveFlagContinuous);
+                _context.InGame.SendMove(_playerPos.X, _playerPos.Y, _playerPos.Z, _player.RunSpeed, flag);
+                _context.InGame.SendRotation(_player.Facing);
                 _moveThrottle = 0.2f;
             }
             else if (!moved && _wasMoving)
             {
-                _context.InGame.SendMove(_playerPos.X, _playerPos.Y, _playerPos.Z, 0);
+                _context.InGame.SendMove(_playerPos.X, _playerPos.Y, _playerPos.Z, 0f, 0);
             }
         }
 

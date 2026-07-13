@@ -73,7 +73,8 @@ public class PlayerControllerTests
         ctx.Machine.SetActive(ctx.InGame);
         ctx.Machine.TickActive();
 
-        ctx.InGame.SendMove(650f, 12f, 530f, speed: 40);
+        byte flag = (byte)(WorldProtocol.MoveFlagMoving | WorldProtocol.MoveFlagContinuous);
+        ctx.InGame.SendMove(650f, 12f, 530f, speed: 4f, flag);
 
         Assert.Equal(650f, ctx.InGame.World.Local.X, 3);
         var r = new PacketReader(client.Sent[^1]);
@@ -81,8 +82,23 @@ public class PlayerControllerTests
         Assert.Equal(6500, (ushort)r.GetShort()); // x*10
         Assert.Equal(5300, (ushort)r.GetShort()); // z*10
         Assert.Equal(120, r.GetShort());          // y*10
-        Assert.Equal(40, r.GetShort());           // speed
-        Assert.Equal(0, r.GetByte());             // echo
+        Assert.Equal(40, (ushort)r.GetShort());   // speed*10
+        Assert.Equal(0x03, r.GetByte());          // moveFlag: moving | continuous
+    }
+
+    [Fact]
+    public void SendRotation_BuildsRotateRequest()
+    {
+        var client = new CaptureClient();
+        var ctx = new GameContext(client);
+        ctx.Machine.SetActive(ctx.InGame);
+        ctx.Machine.TickActive();
+
+        ctx.InGame.SendRotation(MathF.PI / 2f);
+
+        var r = new PacketReader(client.Sent[^1]);
+        Assert.Equal((byte)GameOpcode.WIZ_ROTATE, r.GetByte());
+        Assert.Equal((short)(MathF.PI / 2f * 100f), r.GetShort()); // yaw*100
     }
 
     [Fact]

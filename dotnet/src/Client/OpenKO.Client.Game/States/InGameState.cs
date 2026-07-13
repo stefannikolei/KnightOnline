@@ -81,14 +81,20 @@ public sealed class InGameState(GameContext context) : GameState
     /// <summary>Sends a pre-built group packet (party/exchange/warehouse/knights).</summary>
     public void SendRaw(ReadOnlySpan<byte> payload) => context.Client.Send(payload);
 
-    /// <summary>CUser::MoveProcess request — update the local position and tell the server.</summary>
-    public void SendMove(float x, float y, float z, short speed)
+    /// <summary>
+    /// CGameProcMain::MsgSend_Move request — update the local position and tell the
+    /// server. moveFlag is 0x01 (moving) | 0x02 (continuous), 0 on stop.
+    /// </summary>
+    public void SendMove(float x, float y, float z, float speed, byte moveFlag)
     {
         World.Local.X = x;
         World.Local.Y = y;
         World.Local.Z = z;
-        context.Client.Send(WorldProtocol.BuildMove(x, y, z, speed, echo: 0));
+        context.Client.Send(WorldProtocol.BuildMove(x, y, z, speed, moveFlag));
     }
+
+    /// <summary>CGameProcMain::MsgSend_Rotation request — tell the server the new facing.</summary>
+    public void SendRotation(float yaw) => context.Client.Send(WorldProtocol.BuildRotate(yaw));
 
     public override bool ProcessPacket(ReadOnlySpan<byte> payload)
     {
