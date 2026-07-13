@@ -3,6 +3,8 @@ using OpenKO.Client.Viewer;
 string? dataPath = null;
 string? startScene = null;
 string? screenshotPath = null;
+bool vsync = true;
+bool fullscreen = false;
 
 for (int i = 0; i < args.Length; i++)
 {
@@ -17,15 +19,23 @@ for (int i = 0; i < args.Length; i++)
         case "--screenshot" when i + 1 < args.Length:
             screenshotPath = args[++i];
             break;
+        case "--novsync":
+            vsync = false;
+            break;
+        case "--fullscreen":
+            fullscreen = true;
+            break;
         case "--help":
-            Console.WriteLine("usage: OpenKO.Client.Viewer [--data <Client/Data>] [--scene <name>] [--screenshot <png>]");
+            Console.WriteLine(
+                "usage: OpenKO.Client.Viewer [--data <Client/Data>] [--scene <name>] " +
+                "[--screenshot <png>] [--novsync] [--fullscreen]  (F toggles fullscreen)");
             return 0;
     }
 }
 
 dataPath ??= FindDataPath();
 
-using var game = new ViewerGame(dataPath, startScene, screenshotPath);
+using var game = new ViewerGame(dataPath, startScene, screenshotPath, vsync, fullscreen);
 game.AddScene(new CharSelectScene());
 game.AddScene(new TerrainScene());
 game.AddScene(new CharacterScene());

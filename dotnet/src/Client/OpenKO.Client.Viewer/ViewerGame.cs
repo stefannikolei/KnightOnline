@@ -26,7 +26,9 @@ public sealed class ViewerGame : Game
     private bool _sceneLoaded;
     private int _framesDrawn;
 
-    public ViewerGame(string? dataPath, string? startScene, string? screenshotPath = null)
+    public ViewerGame(
+        string? dataPath, string? startScene, string? screenshotPath = null,
+        bool vsync = true, bool fullscreen = false)
     {
         _dataPath = dataPath;
         _startScene = startScene;
@@ -35,7 +37,8 @@ public sealed class ViewerGame : Game
         {
             PreferredBackBufferWidth = 1024,
             PreferredBackBufferHeight = 768,
-            SynchronizeWithVerticalRetrace = true, // bVSyncEnabled default
+            SynchronizeWithVerticalRetrace = vsync, // bVSyncEnabled
+            IsFullScreen = fullscreen,
         };
         IsMouseVisible = true;
         Window.AllowUserResizing = true;
@@ -89,6 +92,10 @@ public sealed class ViewerGame : Game
             _sceneLoaded = false;
             _sceneIndex = (_sceneIndex + 1) % _scenes.Count;
         }
+
+        // F toggles fullscreen (GameProcedure's windowed/fullscreen switch).
+        if (_input.IsKeyPress(KeyMap.DIK_F))
+            _graphics.ToggleFullScreen();
 
         if (_context != null && CurrentScene is { } scene)
         {

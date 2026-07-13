@@ -18,6 +18,7 @@ public sealed class TerrainScene : IScene
 {
     private readonly List<string> _zones = [];
     private TerrainRenderer? _terrain;
+    private RiverRenderer? _river;
     private SkyRenderer? _sky;
     private int _index;
     private float _orbit;
@@ -53,6 +54,8 @@ public sealed class TerrainScene : IScene
     {
         _terrain?.Dispose();
         _terrain = null;
+        _river?.Dispose();
+        _river = null;
         _sky?.Dispose();
         _sky = null;
 
@@ -65,6 +68,7 @@ public sealed class TerrainScene : IScene
             terrain.LoadFromFile(_zones[_index]);
             var resolver = new KoPathResolver(context.DataPath);
             _terrain = new TerrainRenderer(context.Device, terrain, resolver, _zones[_index]);
+            _river = new RiverRenderer(context.Device, terrain, resolver);
             _mapWorldSize = terrain.MapSize * TerrainVertexBuilder.TileSize;
             _sky = new SkyRenderer(context.Device);
         }
@@ -115,15 +119,22 @@ public sealed class TerrainScene : IScene
         };
         camera.Update();
 
-        // Sky first (Z off), then terrain over it.
+        // Sky first (Z off), then terrain, then water over it.
         _sky?.Render(device, camera);
         _terrain.Render(device, camera);
+        if (_river != null)
+        {
+            _river.Tick(camera, context.Timer.SecPerFrame);
+            _river.Render(device, camera);
+        }
     }
 
     public void Unload()
     {
         _terrain?.Dispose();
         _terrain = null;
+        _river?.Dispose();
+        _river = null;
         _sky?.Dispose();
         _sky = null;
         _zones.Clear();
