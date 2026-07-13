@@ -6,12 +6,15 @@ using OpenKO.Client.Assets;
 using OpenKO.Client.Engine.Audio;
 using OpenKO.Client.Engine.Interop;
 using OpenKO.Client.Engine.IO;
+using OpenKO.Client.Engine.Objects;
+using OpenKO.Client.Engine.Rendering;
 using OpenKO.Client.Engine.Scene;
 using OpenKO.Client.Engine.Sky;
 using OpenKO.Client.Engine.Terrain;
 using OpenKO.Client.Engine.Ui;
 using OpenKO.Client.Game.Net;
 using OpenKO.Client.Game.States;
+using OpenKO.Client.Game.World;
 
 namespace OpenKO.Client;
 
@@ -37,7 +40,14 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
     // Offline / in-world rendering.
     private TerrainRenderer? _terrain;
+    private N3Terrain? _terrainData;
     private SkyRenderer? _sky;
+    private OpenKO.Client.Engine.Objects.ChrRenderer? _character;
+    private BasicEffect? _characterEffect;
+    private OpenKO.Client.Engine.Objects.ChrAssetCaches? _caches;
+    private readonly OpenKO.Client.Engine.Scene.FrameTimer _timer = new();
+    private readonly OpenKO.Client.Game.World.GameCamera _gameCamera = new();
+    private System.Numerics.Vector3 _playerPos;
     private float _mapWorldSize;
     private float _orbit;
 
@@ -87,10 +97,24 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             terrain.LoadFromFile(gtd);
             var resolver = new KoPathResolver(_options.DataPath!);
             _terrain = new TerrainRenderer(GraphicsDevice, terrain, resolver, gtd);
+            _terrainData = terrain;
             _sky = new SkyRenderer(GraphicsDevice);
             _mapWorldSize = terrain.MapSize * TerrainVertexBuilder.TileSize;
 
-            _context.Spawn = new SelectCharResult(1, 0, (ushort)(_mapWorldSize * 5f), (ushort)(_mapWorldSize * 5f), 0, 1);
+            // Place the player at the map centre, on the terrain surface.
+            float cx = _mapWorldSize * 0.5f;
+            float cz = _mapWorldSize * 0.5f;
+            float cy = OpenKO.Client.Game.World.TerrainCollision.GetHeight(terrain, cx, cz);
+            if (cy <= OpenKO.Client.Game.World.TerrainCollision.OutOfRange + 1f)
+                cy = 0f;
+            _playerPos = new System.Numerics.Vector3(cx, cy, cz);
+
+            LoadDemoCharacter(resolver);
+
+            _context.Spawn = new SelectCharResult(1, 0, (ushort)(cx * 10f), (ushort)(cz * 10f), (short)(cy * 10f), 1);
+            _context.InGame.World.Local.X = cx;
+            _context.InGame.World.Local.Y = cy;
+            _context.InGame.World.Local.Z = cz;
             _context.Machine.SetActive(_context.InGame);
             Log($"Offline zone '{_options.OfflineZone}' loaded ({terrain.MapSize} tiles).");
         }
@@ -191,6 +215,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
+        _timer.Tick(gameTime.ElapsedGameTime.TotalSeconds);
         _network?.Pump(_context.Machine);
         _context?.Machine.TickActive();
         _orbit += (float)gameTime.ElapsedGameTime.TotalSeconds * 0.15f;
@@ -219,17 +244,16 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
     private void RenderWorld()
     {
-        float half = _mapWorldSize * 0.5f;
-        var center = new System.Numerics.Vector3(half, 0f, half);
-        float radius = MathF.Max(_mapWorldSize * 0.35f, 60f);
+        // Third-person follow camera orbiting the player (auto-rotate for the demo).
+        _gameCamera.Target = _playerPos + new System.Numerics.Vector3(0f, 1.6f, 0f);
+        _gameCamera.Yaw = _orbit;
         var camera = new N3EngineCamera
         {
-            Eye = center + new System.Numerics.Vector3(
-                MathF.Sin(_orbit) * radius, MathF.Max(_mapWorldSize * 0.25f, 40f), MathF.Cos(_orbit) * radius),
-            At = center,
+            Eye = _gameCamera.Eye,
+            At = _gameCamera.At,
             Fov = N3EngineCamera.GameFov,
             Aspect = GraphicsDevice.Viewport.AspectRatio,
-            NearPlane = 1f,
+            NearPlane = 0.3f,
             FarPlane = MathF.Max(_mapWorldSize * 2f, 1024f),
         };
         camera.Update();
@@ -240,6 +264,87 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
         _sky?.Render(GraphicsDevice, camera);
         _terrain!.Render(GraphicsDevice, camera);
+
+        if (_character != null && _characterEffect != null)
+        {
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+            GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
+            _characterEffect.View = camera.View.ToXna();
+            _characterEffect.Projection = camera.Projection.ToXna();
+            _character.Tick(camera, _timer);
+            _character.Render(GraphicsDevice, _characterEffect);
+        }
+    }
+
+    private void LoadDemoCharacter(KoPathResolver resolver)
+    {
+        var textures = new TextureCache(GraphicsDevice, resolver);
+        var meshes = new PMeshCache(resolver);
+        _caches = new ChrAssetCaches(resolver, textures, meshes);
+        _characterEffect = new BasicEffect(GraphicsDevice);
+        _characterEffect.EnableDefaultLighting();
+
+        string? chrPath = FindRenderableCharacter(resolver);
+        if (chrPath == null)
+        {
+            Log("No renderable character found — terrain only.");
+            return;
+        }
+
+        try
+        {
+            var chr = new N3Chr();
+            chr.LoadFromFile(chrPath);
+            chr.Position = _playerPos;
+            _character = new ChrRenderer(chr, _caches);
+            Log($"Player model: {Path.GetFileName(chrPath)}");
+        }
+        catch (Exception ex)
+        {
+            Log($"Character load failed: {ex.Message}");
+        }
+    }
+
+    private string? FindRenderableCharacter(KoPathResolver resolver)
+    {
+        var opts = new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive };
+        foreach ((string dir, string pattern) in new[] { ("ChrSelect", "upc_*.n3chr"), ("Chr", "*.n3chr") })
+        {
+            string full = Path.Combine(_options.DataPath!, dir);
+            if (!Directory.Exists(full))
+                continue;
+            foreach (string path in Directory.EnumerateFiles(full, pattern, opts).Order(StringComparer.OrdinalIgnoreCase))
+            {
+                if (IsRenderableCharacter(path, resolver))
+                    return path;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool IsRenderableCharacter(string chrPath, KoPathResolver resolver)
+    {
+        try
+        {
+            var chr = new N3Chr();
+            chr.LoadFromFile(chrPath);
+            if (!chr.PartFileNames.Any(p => p.Length > 0))
+                return false;
+            string? jointPath = resolver.Resolve(chr.JointFileName);
+            if (jointPath == null)
+                return false;
+            using FileStream stream = File.OpenRead(jointPath);
+            var joint = new N3Joint();
+            joint.Load(new BinaryReader(stream));
+            return stream.Position == stream.Length && joint.NodeCount() >= 8;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
     private void DrawHud()
@@ -297,6 +402,8 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         _netCts?.Cancel();
         _terrain?.Dispose();
         _sky?.Dispose();
+        _caches?.Textures.Dispose();
+        _characterEffect?.Dispose();
         _fonts.Dispose();
         _spriteBatch.Dispose();
         base.UnloadContent();
