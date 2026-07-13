@@ -40,7 +40,7 @@ public class N3AnimCorpusTests
         var failures = new List<string>();
         int count = 0;
 
-        foreach (string path in Directory.EnumerateFiles(AssetCorpus.Root, "*.n3joint", SearchOption.AllDirectories))
+        foreach (string path in AssetCorpus.EnumerateFiles("*.n3joint"))
         {
             bool legacy = knownLegacy.Contains(Path.GetFileName(path));
             count++;
@@ -91,7 +91,7 @@ public class N3AnimCorpusTests
         var failures = new List<string>();
         int count = 0, clips = 0;
 
-        foreach (string path in Directory.EnumerateFiles(AssetCorpus.Root, "*.n3anim", SearchOption.AllDirectories))
+        foreach (string path in AssetCorpus.EnumerateFiles("*.n3anim"))
         {
             count++;
             try

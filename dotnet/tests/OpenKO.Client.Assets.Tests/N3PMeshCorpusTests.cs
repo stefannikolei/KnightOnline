@@ -19,7 +19,7 @@ public class N3PMeshCorpusTests
         var failures = new List<string>();
         int count = 0;
 
-        foreach (string path in Directory.EnumerateFiles(AssetCorpus.Root, "*.n3pmesh", SearchOption.AllDirectories))
+        foreach (string path in AssetCorpus.EnumerateFiles("*.n3pmesh"))
         {
             count++;
             try

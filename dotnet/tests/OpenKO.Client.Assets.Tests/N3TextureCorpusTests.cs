@@ -31,7 +31,7 @@ public class N3TextureCorpusTests
         var failures = new List<string>();
         int count = 0, decoded = 0;
 
-        foreach (string path in Directory.EnumerateFiles(AssetCorpus.Root!, "*.dxt", SearchOption.AllDirectories))
+        foreach (string path in AssetCorpus.EnumerateFiles("*.dxt"))
         {
             if (knownBad.Contains(Path.GetFileName(path)))
             {

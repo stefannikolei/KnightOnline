@@ -89,4 +89,39 @@ public static class N3BinaryIo
 
     public static void WriteStructs<T>(this BinaryWriter writer, ReadOnlySpan<T> values) where T : unmanaged
         => writer.Write(MemoryMarshal.AsBytes(values));
+
+    public static T ReadStruct<T>(this BinaryReader reader) where T : unmanaged
+    {
+        T value = default;
+        reader.BaseStream.ReadExactly(MemoryMarshal.AsBytes(new Span<T>(ref value)));
+        return value;
+    }
+
+    public static void WriteStruct<T>(this BinaryWriter writer, in T value) where T : unmanaged
+    {
+        T copy = value;
+        writer.Write(MemoryMarshal.AsBytes(new Span<T>(ref copy)));
+    }
+
+    /// <summary>
+    /// The C++ loaders' bare filename read: [int32 len][bytes], CP949, no
+    /// read at all when len &lt;= 0 (unlike ReadN3String this keeps a
+    /// prefilled value untouched in that case — matching char szFN[] reuse
+    /// is NOT wanted; the callers always treat len &lt;= 0 as "no name").
+    /// </summary>
+    public static string ReadN3FileName(this BinaryReader reader)
+    {
+        int length = reader.ReadInt32();
+        if (length <= 0)
+            return string.Empty;
+
+        byte[] bytes = reader.ReadBytes(length);
+        if (bytes.Length != length)
+            throw new EndOfStreamException("N3 filename is truncated");
+
+        return KoEncoding.Cp949.GetString(bytes);
+    }
+
+    public static void WriteN3FileName(this BinaryWriter writer, string value)
+        => writer.WriteN3String(value);
 }
