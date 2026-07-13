@@ -113,6 +113,35 @@ public sealed class N3Joint : N3Transform
             child.Tick(frame);
     }
 
+    /// <summary>
+    /// CN3Joint::ReCalcMatrixBlended — samples every channel at two frames
+    /// and blends (linear for pos/scale with weight0, slerp with weight1 for
+    /// the quaternions — the C++ passes fWeight1 to Slerp), then recomputes
+    /// the matrix. Channels without keys keep their current values.
+    /// </summary>
+    public void ReCalcMatrixBlended(float frame0, float frame1, float weight0)
+    {
+        float weight1 = 1f - weight0;
+
+        var v1 = Vector3.Zero;
+        var v2 = Vector3.Zero;
+        if (KeyPos.TryGetVector3(frame0, ref v1) && KeyPos.TryGetVector3(frame1, ref v2))
+            Position = v1 * weight0 + v2 * weight1;
+
+        var q1 = Quaternion.Identity;
+        var q2 = Quaternion.Identity;
+        if (KeyRot.TryGetQuaternion(frame0, ref q1) && KeyRot.TryGetQuaternion(frame1, ref q2))
+            Rotation = KoQuaternion.Slerp(q1, q2, weight1);
+
+        if (KeyScale.TryGetVector3(frame0, ref v1) && KeyScale.TryGetVector3(frame1, ref v2))
+            Scale = v1 * weight0 + v2 * weight1;
+
+        if (KeyOrient.TryGetQuaternion(frame0, ref q1) && KeyOrient.TryGetQuaternion(frame1, ref q2))
+            Orient = KoQuaternion.Slerp(q1, q2, weight1);
+
+        ReCalcMatrix();
+    }
+
     public override bool TickAnimationKey(float frame)
     {
         bool needReCalc = base.TickAnimationKey(frame);

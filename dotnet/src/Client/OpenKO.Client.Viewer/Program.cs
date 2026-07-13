@@ -22,6 +22,7 @@ for (int i = 0; i < args.Length; i++)
 dataPath ??= FindDataPath();
 
 using var game = new ViewerGame(dataPath, startScene);
+game.AddScene(new CharacterScene());
 game.AddScene(new MeshBrowserScene());
 game.AddScene(new ShapeBrowserScene());
 game.AddScene(new EmptyScene());
