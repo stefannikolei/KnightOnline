@@ -47,6 +47,7 @@ public class GroupProtocolTests
         Assert.Equal((byte)GameOpcode.WIZ_EXCHANGE, r.GetByte());
         Assert.Equal(ExchangeProtocol.Request, r.GetByte());
         Assert.Equal((short)55, r.GetShort());
+        Assert.Equal(ExchangeProtocol.TradeTypeNormal, r.GetByte()); // trailing trade-type byte
 
         var add = new PacketReader(ExchangeProtocol.BuildAdd(3, 379001000, 2));
         add.GetByte();

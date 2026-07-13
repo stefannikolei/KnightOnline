@@ -38,8 +38,14 @@ public static class PartyProtocol
         return w.Written.ToArray();
     }
 
-    /// <summary>Leave / disband the party.</summary>
+    /// <summary>Leader disbands the whole party (N3_SP_PARTY_OR_FORCE_DESTROY).</summary>
     public static byte[] BuildLeave() => [(byte)GameOpcode.WIZ_PARTY, Delete];
+
+    /// <summary>
+    /// CGameProcMain::MsgSend_PartyOrForceLeave — a non-leader member leaving sends
+    /// REMOVE with its own socket id (the leader-alone case disbands via BuildLeave).
+    /// </summary>
+    public static byte[] BuildLeaveAsMember(short ownId) => BuildRemove(ownId);
 
     public static byte Subcommand(ReadOnlySpan<byte> payload) => payload[1];
 

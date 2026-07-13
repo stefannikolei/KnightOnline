@@ -15,14 +15,23 @@ public static class ExchangeProtocol
     public const byte Done = 7;
     public const byte Cancel = 8;
 
-    /// <summary>Ask the target player (by socket id) to trade.</summary>
-    public static byte[] BuildRequest(short targetId)
+    /// <summary>Normal (near) player trade vs a trade-board trade (MsgSend_PerTradeReq).</summary>
+    public const byte TradeTypeNormal = 1;
+
+    public const byte TradeTypeBoard = 2;
+
+    /// <summary>
+    /// Ask the target player (by socket id) to trade — CGameProcMain::MsgSend_PerTradeReq:
+    /// [WIZ_EXCHANGE][0x01 REQ][short destId][byte tradeType] (1 near, 2 trade-board).
+    /// </summary>
+    public static byte[] BuildRequest(short targetId, byte tradeType = TradeTypeNormal)
     {
-        var buffer = new byte[4];
+        var buffer = new byte[5];
         var w = new PacketWriter(buffer);
         w.SetByte((byte)GameOpcode.WIZ_EXCHANGE);
         w.SetByte(Request);
         w.SetShort(targetId);
+        w.SetByte(tradeType);
         return w.Written.ToArray();
     }
 
