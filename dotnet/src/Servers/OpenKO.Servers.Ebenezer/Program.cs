@@ -4,7 +4,7 @@ using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OpenKO.Core.Config;
+using Microsoft.Extensions.Options;
 using OpenKO.Core.Protocol;
 using OpenKO.Data;
 using OpenKO.Hosting;
@@ -15,11 +15,11 @@ using OpenKO.Servers.Ebenezer.Net;
 namespace OpenKO.Servers.Ebenezer;
 
 /// <summary>
-/// Ebenezer host (stage-4.1 slice): reads the same server.ini as the C++
-/// ([ZONE_INFO] MY_INFO → listen port 15000+n, [ODBC] GAME_DSN/UID/PWD) and
-/// accepts game clients with the CUser socket layer (framing + WIZ_CRYPTION).
-/// The Aujard DB agent runs embedded as a library — the KNIGHT_SEND/RECV
-/// shared-memory queues of the C++ topology are replaced by direct calls.
+/// Ebenezer host: reads its zone number, peer servers and AI-server address from
+/// appsettings.json (Ebenezer section; listen port 15000+ServerNo) and accepts
+/// game clients with the CUser socket layer (framing + WIZ_CRYPTION). The Aujard
+/// DB agent runs embedded as a library — the KNIGHT_SEND/RECV shared-memory
+/// queues of the C++ topology are replaced by direct calls.
 /// </summary>
 public static class Program
 {
@@ -27,44 +27,34 @@ public static class Program
 
     public static async Task<int> Main(string[] args)
     {
-        var builder = KoHost.CreateBuilder(args);
+        HostApplicationBuilder builder = KoHost.CreateBuilder(args);
 
-        var ini = new IniFile();
-        ini.Load(KoHost.ResolveConfigPath("server.ini"));
+        builder.Services.AddOptions<EbenezerOptions>()
+            .Bind(builder.Configuration.GetSection(EbenezerOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
-        int serverNo = ini.GetInt("ZONE_INFO", "MY_INFO", 1);
-        string dsn = ini.GetString("ODBC", "GAME_DSN", "KN_online");
-        string uid = ini.GetString("ODBC", "GAME_UID", "knight");
-        string pwd = ini.GetString("ODBC", "GAME_PWD", "knight");
-        string server = ini.GetString("ODBC", "SERVER", "");
-        string aiServerIp = ini.GetString("AI_SERVER", "IP", "127.0.0.1");
-
-        int listenPort = ListenPortBase + serverNo;
-
-        // [ZONE_INFO] SERVER_XX / SERVER_IP_XX entries (port = 15000 + server no).
-        var serverInfos = new List<ZoneServerInfo>();
-        int serverCount = ini.GetInt("ZONE_INFO", "SERVER_COUNT", 1);
-        for (int i = 0; i < serverCount; i++)
-        {
-            short no = (short)ini.GetInt("ZONE_INFO", $"SERVER_{i:00}", 1);
-            string ip = ini.GetString("ZONE_INFO", $"SERVER_IP_{i:00}", "127.0.0.1");
-            serverInfos.Add(new ZoneServerInfo(no, ip, (short)(ListenPortBase + no)));
-        }
-
-        builder.Services.AddSingleton(SqlConnectionFactory.FromOdbcConfig(
-            dsn, uid, pwd, server.Length > 0 ? server : null));
+        builder.Services.AddGameDatabase(builder.Configuration);
         builder.Services.AddSingleton<IDbAgent, DbAgent>(sp => new DbAgent(
             sp.GetRequiredService<SqlConnectionFactory>(),
             sp.GetRequiredService<ILogger<DbAgent>>()));
-        builder.Services.AddSingleton(sp => new EbenezerService(
-            listenPort,
-            (short)serverNo,
-            serverInfos,
-            aiServerIp,
-            sp.GetRequiredService<SqlConnectionFactory>(),
-            sp.GetRequiredService<IDbAgent>(),
-            sp.GetRequiredService<IHostApplicationLifetime>(),
-            sp.GetRequiredService<ILogger<EbenezerService>>()));
+        builder.Services.AddSingleton(sp =>
+        {
+            EbenezerOptions options = sp.GetRequiredService<IOptions<EbenezerOptions>>().Value;
+            var serverInfos = options.Servers
+                .Select(s => new ZoneServerInfo(s.No, s.Ip, (short)(ListenPortBase + s.No)))
+                .ToList();
+
+            return new EbenezerService(
+                ListenPortBase + options.ServerNo,
+                (short)options.ServerNo,
+                serverInfos,
+                options.AiServerIp,
+                sp.GetRequiredService<SqlConnectionFactory>(),
+                sp.GetRequiredService<IDbAgent>(),
+                sp.GetRequiredService<IHostApplicationLifetime>(),
+                sp.GetRequiredService<ILogger<EbenezerService>>());
+        });
         builder.Services.AddHostedService(sp => sp.GetRequiredService<EbenezerService>());
 
         using IHost host = builder.Build();

@@ -3,7 +3,7 @@ using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OpenKO.Core.Config;
+using Microsoft.Extensions.Options;
 using OpenKO.Data;
 using OpenKO.Hosting;
 using OpenKO.Network.Tcp;
@@ -13,56 +13,46 @@ using OpenKO.Servers.AIServer.Db;
 namespace OpenKO.Servers.AIServer;
 
 /// <summary>
-/// AIServer host: reads the same server.ini as the C++ ([SERVER] ZONE, [ODBC]
-/// GAME_DSN/UID/PWD), loads the GAME-DB tables and maps, spawns the NPCs and
-/// listens on the zone-type port for Ebenezer's per-zone connections. All game
-/// state runs on one single-writer loop (replacing the C++ NpcThread/
-/// ZoneEventThread/timer + mutex model): inbound packets are queued and drained
-/// between NPC ticks.
+/// AIServer host: reads its zone type + database from appsettings.json, loads the
+/// GAME-DB tables and maps, spawns the NPCs and listens on the zone-type port for
+/// Ebenezer's per-zone connections. All game state runs on one single-writer loop
+/// (replacing the C++ NpcThread/ZoneEventThread/timer + mutex model): inbound
+/// packets are queued and drained between NPC ticks.
 /// </summary>
 public static class Program
 {
     public static async Task<int> Main(string[] args)
     {
-        var builder = KoHost.CreateBuilder(args);
+        HostApplicationBuilder builder = KoHost.CreateBuilder(args);
 
-        string configPath = KoHost.ResolveConfigPath("server.ini");
-        var ini = new IniFile();
-        ini.Load(configPath);
+        builder.Services.AddOptions<AiServerOptions>()
+            .Bind(builder.Configuration.GetSection(AiServerOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
-        int serverZoneType = ini.GetInt("SERVER", "ZONE", 1);
-        string dsn = ini.GetString("ODBC", "GAME_DSN", "KN_online");
-        string uid = ini.GetString("ODBC", "GAME_UID", "knight");
-        string pwd = ini.GetString("ODBC", "GAME_PWD", "knight");
-        string server = ini.GetString("ODBC", "SERVER", "");
-
-        int listenPort = serverZoneType switch
-        {
-            0 or 1 => AiServerPorts.Karus,   // UNIFY_ZONE / KARUS_ZONE
-            2 => AiServerPorts.Elmorad,      // ELMORAD_ZONE
-            3 => AiServerPorts.Battle,       // BATTLE_ZONE
-            _ => -1,
-        };
-
-        if (listenPort < 0)
-        {
-            Console.Error.WriteLine($"AIServer: invalid [SERVER] ZONE type: {serverZoneType}");
-            return 1;
-        }
-
-        // The C++ loads maps from GetProgPath()/MAP; resolve next to server.ini.
-        string mapDirectory = Path.Combine(
-            Path.GetDirectoryName(Path.GetFullPath(configPath)) ?? ".", "MAP");
-
-        builder.Services.AddSingleton(SqlConnectionFactory.FromOdbcConfig(
-            dsn, uid, pwd, server.Length > 0 ? server : null));
+        builder.Services.AddGameDatabase(builder.Configuration);
         builder.Services.AddSingleton<AiServerDb>();
-        builder.Services.AddSingleton(sp => new AiServerService(
-            listenPort,
-            serverZoneType,
-            mapDirectory,
-            sp.GetRequiredService<AiServerDb>(),
-            sp.GetRequiredService<ILogger<AiServerService>>()));
+        builder.Services.AddSingleton(sp =>
+        {
+            int zone = sp.GetRequiredService<IOptions<AiServerOptions>>().Value.Zone;
+            int listenPort = zone switch
+            {
+                0 or 1 => AiServerPorts.Karus,   // UNIFY_ZONE / KARUS_ZONE
+                2 => AiServerPorts.Elmorad,      // ELMORAD_ZONE
+                3 => AiServerPorts.Battle,       // BATTLE_ZONE
+                _ => -1,
+            };
+
+            // The C++ loads maps from GetProgPath()/MAP; resolve beside the binary.
+            string mapDirectory = KoHost.ResolveConfigPath("MAP");
+
+            return new AiServerService(
+                listenPort,
+                zone,
+                mapDirectory,
+                sp.GetRequiredService<AiServerDb>(),
+                sp.GetRequiredService<ILogger<AiServerService>>());
+        });
         builder.Services.AddHostedService(sp => sp.GetRequiredService<AiServerService>());
 
         using IHost host = builder.Build();
