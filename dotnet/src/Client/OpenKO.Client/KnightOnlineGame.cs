@@ -55,6 +55,10 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     private float _cameraYaw;
     private float _moveThrottle;
     private bool _wasMoving;
+    private System.Numerics.Matrix4x4 _lastView = System.Numerics.Matrix4x4.Identity;
+    private System.Numerics.Matrix4x4 _lastProj = System.Numerics.Matrix4x4.Identity;
+    private bool _prevMouseLeft;
+    private string _selection = "none";
 
     private readonly List<string> _log = [];
     private int _framesDrawn;
@@ -271,6 +275,8 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         bool moved = _player.MoveBy(dir, dt, _terrainData);
         _playerPos = _player.Position;
 
+        HandlePick();
+
         // Stream movement to the server (online), throttled; send a stop on release.
         _moveThrottle -= dt;
         if (_network != null && _context.Machine.Active == _context.InGame)
@@ -291,6 +297,35 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         _wasMoving = moved;
     }
 
+    /// <summary>Left-click ray picking against the region entities (CGameProcMain::PickUPC).</summary>
+    private void HandlePick()
+    {
+        MouseState mouse = Mouse.GetState();
+        bool left = mouse.LeftButton == ButtonState.Pressed;
+        if (left && !_prevMouseLeft && _context != null)
+        {
+            var ray = OpenKO.Client.Game.World.Picking.ScreenPointToRay(
+                _lastView, _lastProj, mouse.X, mouse.Y,
+                GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            OpenKO.Client.Game.World.WorldPicker.Pick? pick =
+                OpenKO.Client.Game.World.WorldPicker.PickNearest(ray, _context.InGame.World);
+
+            if (pick is { } p)
+            {
+                string name = p.IsNpc && _context.InGame.World.TryGetNpc(p.Id, out var npc) ? npc.Name
+                    : !p.IsNpc && _context.InGame.World.TryGet(p.Id, out var pl) ? pl.Name
+                    : $"#{p.Id}";
+                _selection = $"{(p.IsNpc ? "NPC" : "Player")} {name} (id {p.Id}, {p.Distance:F0}m)";
+            }
+            else
+            {
+                _selection = "none";
+            }
+        }
+
+        _prevMouseLeft = left;
+    }
+
     private void RenderWorld()
     {
         _gameCamera.Target = _playerPos + new System.Numerics.Vector3(0f, 1.6f, 0f);
@@ -305,6 +340,8 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             FarPlane = MathF.Max(_mapWorldSize * 2f, 1024f),
         };
         camera.Update();
+        _lastView = camera.View;
+        _lastProj = camera.Projection;
 
         // 3D audio listener follows the camera (CN3SndObj::SetListener*).
         System.Numerics.Vector3 forward = System.Numerics.Vector3.Normalize(camera.At - camera.Eye);
@@ -444,8 +481,10 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
         if (_terrainData != null)
         {
-            _spriteBatch.DrawString(body, "WASD move · ←→ camera · Esc quit",
-                new Vector2(GraphicsDevice.Viewport.Width - 260, 44), new Color(150, 160, 180));
+            _spriteBatch.DrawString(body, "WASD move · ←→ camera · click target · Esc quit",
+                new Vector2(GraphicsDevice.Viewport.Width - 330, 44), new Color(150, 160, 180));
+            _spriteBatch.DrawString(body, $"Target: {_selection}",
+                new Vector2(GraphicsDevice.Viewport.Width - 330, 62), new Color(255, 200, 160));
         }
 
         if (_context?.Machine.Active == _context?.InGame && _context != null)
