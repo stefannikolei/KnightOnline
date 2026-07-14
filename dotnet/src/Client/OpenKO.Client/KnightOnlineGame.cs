@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using OpenKO.Client.Assets;
+using OpenKO.Client.Assets.Zones;
 using OpenKO.Client.Engine.Audio;
 using OpenKO.Client.Engine.Interop;
 using OpenKO.Client.Engine.IO;
@@ -102,36 +103,52 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         try
         {
             string gtd = Path.Combine(_options.DataPath!, "Zones", _options.OfflineZone + ".gtd");
-            var terrain = new N3Terrain();
-            terrain.LoadFromFile(gtd);
             var resolver = new KoPathResolver(_options.DataPath!);
-            _terrain = new TerrainRenderer(GraphicsDevice, terrain, resolver, gtd);
-            _terrainData = terrain;
-            _sky = new SkyRenderer(GraphicsDevice);
-            _mapWorldSize = terrain.MapSize * TerrainVertexBuilder.TileSize;
 
             // Place the player at the map centre, on the terrain surface.
-            float cx = _mapWorldSize * 0.5f;
-            float cz = _mapWorldSize * 0.5f;
-            float cy = OpenKO.Client.Game.World.TerrainCollision.GetHeight(terrain, cx, cz);
-            if (cy <= OpenKO.Client.Game.World.TerrainCollision.OutOfRange + 1f)
-                cy = 0f;
-            _playerPos = new System.Numerics.Vector3(cx, cy, cz);
-            _player = new PlayerController { Position = _playerPos };
+            float centre = 0f;
+            BuildZoneScene(gtd, resolver, useCentreSpawn: true, spawn: default);
+            centre = _mapWorldSize * 0.5f;
 
-            LoadDemoCharacter(resolver);
-
-            _context.Spawn = new SelectCharResult(1, 0, (ushort)(cx * 10f), (ushort)(cz * 10f), (short)(cy * 10f), 1);
-            _context.InGame.World.Local.X = cx;
-            _context.InGame.World.Local.Y = cy;
-            _context.InGame.World.Local.Z = cz;
+            _context.Spawn = new SelectCharResult(
+                1, 0, (ushort)(centre * 10f), (ushort)(centre * 10f), (short)(_playerPos.Y * 10f), 1);
+            _context.InGame.World.Local.X = _playerPos.X;
+            _context.InGame.World.Local.Y = _playerPos.Y;
+            _context.InGame.World.Local.Z = _playerPos.Z;
             _context.Machine.SetActive(_context.InGame);
-            Log($"Offline zone '{_options.OfflineZone}' loaded ({terrain.MapSize} tiles).");
+            Log($"Offline zone '{_options.OfflineZone}' loaded ({_terrainData!.MapSize} tiles).");
         }
         catch (Exception ex)
         {
             Log($"Zone load failed: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Loads a zone's terrain/sky and the player character, then places the
+    /// player. Shared by the offline demo (centre spawn) and the online flow
+    /// (server spawn). Requires --data for the asset corpus.
+    /// </summary>
+    private void BuildZoneScene(
+        string gtdPath, KoPathResolver resolver, bool useCentreSpawn, System.Numerics.Vector3 spawn)
+    {
+        var terrain = new N3Terrain();
+        terrain.LoadFromFile(gtdPath);
+        _terrain = new TerrainRenderer(GraphicsDevice, terrain, resolver, gtdPath);
+        _terrainData = terrain;
+        _sky = new SkyRenderer(GraphicsDevice);
+        _mapWorldSize = terrain.MapSize * TerrainVertexBuilder.TileSize;
+
+        float x = useCentreSpawn ? _mapWorldSize * 0.5f : spawn.X;
+        float z = useCentreSpawn ? _mapWorldSize * 0.5f : spawn.Z;
+        float y = OpenKO.Client.Game.World.TerrainCollision.GetHeight(terrain, x, z);
+        if (y <= OpenKO.Client.Game.World.TerrainCollision.OutOfRange + 1f)
+            y = useCentreSpawn ? 0f : spawn.Y;
+
+        _playerPos = new System.Numerics.Vector3(x, y, z);
+        _player = new PlayerController { Position = _playerPos };
+
+        LoadDemoCharacter(resolver);
     }
 
     // ---- Online flow ---------------------------------------------------------
@@ -179,7 +196,46 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             if (slot >= 0)
                 _context.CharSelect.SelectCharacter(slot);
         };
-        _context.EnteredGame = spawn => Log($"Entered game — zone {spawn.Zone} at ({spawn.X / 10f}, {spawn.Z / 10f}).");
+        _context.EnteredGame = spawn =>
+        {
+            Log($"Entered game — zone {spawn.Zone} at ({spawn.X / 10f}, {spawn.Z / 10f}).");
+            LoadOnlineZone(spawn);
+        };
+    }
+
+    /// <summary>
+    /// Online zone entry: resolve the spawn's zone id through Zones.tbl to the
+    /// terrain .gtd and build the world scene at the server spawn position
+    /// (CGameProcMain zone load). Requires --data; degrades to protocol-only.
+    /// </summary>
+    private void LoadOnlineZone(SelectCharResult spawn)
+    {
+        if (_options.DataPath == null)
+        {
+            Log("Zone render skipped — no --data path (protocol only).");
+            return;
+        }
+
+        try
+        {
+            var resolver = new KoPathResolver(_options.DataPath);
+            string? tblPath = resolver.Resolve("Data\\Zones.tbl");
+            ZoneRow? zone = tblPath != null ? ZoneTable.LoadFromFile(tblPath).Find(spawn.Zone) : null;
+
+            // Resolve the .gtd from Zones.tbl, falling back to <zoneId>.gtd.
+            string gtd = zone != null && !string.IsNullOrEmpty(zone.TerrainFileName)
+                ? resolver.Resolve(zone.TerrainFileName) ?? resolver.Resolve($"Zones\\{zone.TerrainFileName}")
+                    ?? Path.Combine(_options.DataPath, "Zones", zone.TerrainFileName)
+                : Path.Combine(_options.DataPath, "Zones", $"{spawn.Zone}.gtd");
+
+            var spawnPos = new System.Numerics.Vector3(spawn.X / 10f, spawn.Y / 10f, spawn.Z / 10f);
+            BuildZoneScene(gtd, resolver, useCentreSpawn: false, spawn: spawnPos);
+            Log($"Zone '{zone?.Name ?? spawn.Zone.ToString()}' rendered at the spawn.");
+        }
+        catch (Exception ex)
+        {
+            Log($"Online zone load failed: {ex.Message}");
+        }
     }
 
     private async Task ConnectAndRunAsync(string host, int port)
