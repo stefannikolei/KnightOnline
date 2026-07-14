@@ -14,9 +14,13 @@ the reference and remains untouched; the port lives side by side with it.
   (`tools/golden-gen/` → `tests/vectors/`).
 - **The database schema and stored procedures are unchanged** — the port talks
   to the same dockerized `KN_online` MSSQL database via `Microsoft.Data.SqlClient`.
-- **Configuration files are unchanged** — the servers read the same INI files
-  (`Version.ini`, `ItemManager.ini`, …) with the same keys and defaults, so a C++
-  deployment can swap in the .NET binary without config changes.
+- **Configuration follows .NET conventions** — each server reads an
+  `appsettings.json` (copied next to its binary) bound to strongly-typed
+  `Options` classes with `IConfiguration` + DataAnnotations validation. Every
+  value can be overridden by environment variables (`Section__Key=…`,
+  e.g. `ConnectionStrings__GameDb=…`, `Ebenezer__ServerNo=2`) or command-line
+  args, per the standard configuration precedence. The legacy `.ini` reader was
+  removed.
 
 ## Deliberate deviations from the C++
 
@@ -31,15 +35,18 @@ the reference and remains untouched; the port lives side by side with it.
 - The ItemManager listens on a TCP loopback port (`[ITEMLOG] PORT`, default
   15200) instead of opening a shared-memory queue; the payloads are the same
   `[opcode][body]` messages, wrapped in standard KO frames.
-- SqlClient needs a server host, which ODBC DSNs carried out-of-band: the
-  optional `[ODBC] SERVER` key or `OPENKO_DB_SERVER` env var provides it
-  (default `localhost`, matching `docker-compose.yaml`).
+- The database connection uses a standard `ConnectionStrings:GameDb` connection
+  string (or the component `Database` section: `Dsn`/`Uid`/`Pwd`/`Server`,
+  resolved via `AddGameDatabase`). `appsettings.json` ships the docker-compose
+  dev defaults (`knight`/`knight`, `localhost`); override the connection string
+  per environment with `ConnectionStrings__GameDb=…` (or user-secrets /
+  `appsettings.Development.json`) for anything other than local dev.
 
 ## Layout
 
 ```
 src/OpenKO.Core        shared/: ByteBuffer, Packet, opcodes, JvCryption, KoCrc32,
-                       Lzf, CP949 encoding, IniFile, djb2
+                       Lzf, CP949 encoding, djb2
 src/OpenKO.Network     framing (PullOutCore port incl. resync quirks),
                        PacketReader/Writer (utilities.cpp equivalents), TCP server
 src/OpenKO.Data        SqlClient connection factory, game constants, models
@@ -101,17 +108,20 @@ dotnet test  dotnet/OpenKO.slnx -c Release
 ## Running
 
 ```bash
-# VersionManager: reads Version.ini from the working directory, listens on 15100.
-# Needs the MSSQL database (docker compose up) with the KN_online schema.
-cd <dir with Version.ini> && dotnet run --project dotnet/src/Servers/OpenKO.Servers.VersionManager
+# Every server reads its appsettings.json (copied next to the binary). Override
+# any value with env vars, e.g. ConnectionStrings__GameDb=... or Ebenezer__ServerNo=2.
 
-# ItemManager: reads ItemManager.ini (optional), listens on 127.0.0.1:15200.
+# VersionManager: listens on 15100. Needs the MSSQL database (docker compose up)
+# with the KN_online schema (ConnectionStrings:GameDb in appsettings.json).
+dotnet run --project dotnet/src/Servers/OpenKO.Servers.VersionManager
+
+# ItemManager: listens on 127.0.0.1:15200 (ItemManager:Port). No database.
 dotnet run --project dotnet/src/Servers/OpenKO.Servers.ItemManager
 
-# AIServer: reads server.ini ([SERVER] ZONE, [ODBC] GAME_DSN/UID/PWD) and the
-# MAP/ directory (SMDs + <n>.evt room events) next to it; listens on the
-# zone-type port (10020 karus/unify, 10030 elmorad, 10040 battle) for Ebenezer.
-cd <dir with server.ini + MAP/> && dotnet run --project dotnet/src/Servers/OpenKO.Servers.AIServer
+# AIServer: AiServer:Zone selects the listen port (10020 karus/unify, 10030
+# elmorad, 10040 battle) for Ebenezer; reads the MAP/ directory (SMDs + <n>.evt
+# room events) resolved beside the binary.
+dotnet run --project dotnet/src/Servers/OpenKO.Servers.AIServer
 
 # AssetDump: N3 client asset inspection — JSON metrics per file, textures to PNG.
 dotnet run --project dotnet/tools/OpenKO.AssetDump -- Client/Data/Item/1_1011_00_0.n3cplug
