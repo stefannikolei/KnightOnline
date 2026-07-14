@@ -14,4 +14,8 @@
     <ProjectReference Include="..\..\OpenKO.Hosting\OpenKO.Hosting.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
