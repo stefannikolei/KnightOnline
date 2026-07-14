@@ -48,6 +48,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     private OpenKO.Client.Engine.Objects.ChrAssetCaches? _caches;
     private OpenKO.Client.Engine.Objects.CharacterFactory? _characterFactory;
     private RemotePlayerRenderer? _remotePlayers;
+    private OpenKO.Client.Engine.Objects.ZoneObjectRenderer? _zoneObjects;
     private readonly OpenKO.Client.Engine.Scene.FrameTimer _timer = new();
     private readonly OpenKO.Client.Game.World.GameCamera _gameCamera = new();
     private OpenKO.Client.Game.World.PlayerController? _player;
@@ -152,6 +153,29 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         _player = new PlayerController { Position = _playerPos };
 
         LoadDemoCharacter(resolver);
+        LoadZoneObjects(gtdPath);
+    }
+
+    /// <summary>Loads and prepares the zone's static objects (the sibling .opd of the .gtd).</summary>
+    private void LoadZoneObjects(string gtdPath)
+    {
+        if (_caches == null)
+            return;
+        string opd = Path.ChangeExtension(gtdPath, ".opd");
+        if (!File.Exists(opd))
+            return;
+
+        try
+        {
+            var set = OpenKO.Client.Assets.Zones.ZoneObjectSet.LoadFromFile(opd);
+            _zoneObjects = new OpenKO.Client.Engine.Objects.ZoneObjectRenderer(
+                set, _caches.Meshes, _caches.Textures);
+            Log($"Zone objects: {_zoneObjects.Count}/{set.Objects.Count} shapes.");
+        }
+        catch (Exception ex)
+        {
+            Log($"Zone objects load failed: {ex.Message}");
+        }
     }
 
     // ---- Online flow ---------------------------------------------------------
@@ -429,6 +453,19 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
         _sky?.Render(GraphicsDevice, camera);
         _terrain!.Render(GraphicsDevice, camera);
+
+        // Static zone objects (trees, buildings, gates) from the .opd.
+        if (_zoneObjects != null && _characterEffect != null)
+        {
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+            GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
+            _characterEffect.View = camera.View.ToXna();
+            _characterEffect.Projection = camera.Projection.ToXna();
+            _zoneObjects.Tick(camera, _timer);
+            _zoneObjects.Render(GraphicsDevice, _characterEffect, camera);
+        }
 
         if (_character != null && _characterEffect != null)
         {
