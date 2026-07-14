@@ -105,6 +105,36 @@ dotnet build dotnet/OpenKO.slnx -c Release
 dotnet test  dotnet/OpenKO.slnx -c Release
 ```
 
+## Orchestration (.NET Aspire)
+
+The `OpenKO.AppHost` project orchestrates the whole stack — it **creates and
+starts the SQL Server database, brings up all five servers in dependency order,
+and launches the client** — with one command (requires a running Docker engine):
+
+```bash
+dotnet run --project dotnet/OpenKO.AppHost
+```
+
+It provisions a SQL Server container (persistent `openko-sqldata` volume) with a
+`KN_online` database exposed as the `GameDb` connection, then injects
+`ConnectionStrings__GameDb` into each server (overriding their appsettings.json).
+Startup order is enforced with `WaitFor`:
+
+```
+sql (KN_online) → itemmanager, aujard, versionmanager, aiserver
+                → ebenezer (waits for aiserver)
+                → client   (waits for versionmanager + ebenezer)
+```
+
+The Aspire dashboard (printed on startup) shows each resource's logs, health and
+endpoints. **Schema note:** Aspire creates an *empty* `KN_online` database; load
+the OpenKO-db schema + stored procedures into it (e.g. the repo's
+`docker/reset_database.sh` against the Aspire SQL container, or the `OpenKO-db`
+submodule) before the game servers are fully functional. Override the SA
+password / ports via Aspire parameters as usual.
+
+To run a server or the client individually instead, use `dotnet run` directly:
+
 ## Running
 
 ```bash

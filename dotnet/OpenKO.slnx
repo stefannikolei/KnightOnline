@@ -33,4 +33,5 @@
     <Project Path="tools/OpenKO.AssetDump/OpenKO.AssetDump.csproj" />
     <Project Path="tools/OpenKO.TestClient/OpenKO.TestClient.csproj" />
   </Folder>
+  <Project Path="OpenKO.AppHost/OpenKO.AppHost.csproj" />
 </Solution>

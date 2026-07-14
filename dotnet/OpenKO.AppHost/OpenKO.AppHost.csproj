@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Aspire.AppHost.Sdk" Version="13.4.6" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsAspireHost>true</IsAspireHost>
+    <UserSecretsId>openko-apphost-1e0aaf3</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" />
+    <PackageReference Include="Aspire.Hosting.SqlServer" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Servers + client orchestrated by the AppHost (Projects.* metadata is
+         source-generated from these references). -->
+    <ProjectReference Include="..\src\Servers\OpenKO.Servers.VersionManager\OpenKO.Servers.VersionManager.csproj" />
+    <ProjectReference Include="..\src\Servers\OpenKO.Servers.ItemManager\OpenKO.Servers.ItemManager.csproj" />
+    <ProjectReference Include="..\src\Servers\OpenKO.Servers.Aujard\OpenKO.Servers.Aujard.csproj" />
+    <ProjectReference Include="..\src\Servers\OpenKO.Servers.AIServer\OpenKO.Servers.AIServer.csproj" />
+    <ProjectReference Include="..\src\Servers\OpenKO.Servers.Ebenezer\OpenKO.Servers.Ebenezer.csproj" />
+    <ProjectReference Include="..\src\Client\OpenKO.Client\OpenKO.Client.csproj" />
+  </ItemGroup>
+
+</Project>
