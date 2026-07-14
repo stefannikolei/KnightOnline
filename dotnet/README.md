@@ -115,23 +115,46 @@ and launches the client** — with one command (requires a running Docker engine
 dotnet run --project dotnet/OpenKO.AppHost
 ```
 
-It provisions a SQL Server container (persistent `openko-sqldata` volume) with a
-`KN_online` database exposed as the `GameDb` connection, then injects
-`ConnectionStrings__GameDb` into each server (overriding their appsettings.json).
-Startup order is enforced with `WaitFor`:
+It provisions a SQL Server container (named `sqlserver`, persistent
+`openko-sqldata` volume) with a `KN_online` database exposed as the `GameDb`
+connection, then injects `ConnectionStrings__GameDb` into each server (overriding
+their appsettings.json).
+
+The **real game schema** (tables + stored procedures) is loaded automatically by
+the `kodb-util` loader resource — Aspire builds the existing upstream
+`docker/kodb-util` image (a Go tool that fetches the `OpenKO-db` schema from
+GitHub) and runs it against the `sqlserver` container. The import runs **only when
+the database is empty** (guarded by a sentinel in a persistent volume), so
+subsequent restarts are fast. A custom schema health check keeps the loader
+`Unhealthy` until `KN_online` actually contains the imported tables, and the game
+servers `WaitFor` that — so they never start against an empty database. Startup
+order:
 
 ```
-sql (KN_online) → itemmanager, aujard, versionmanager, aiserver
-                → ebenezer (waits for aiserver)
-                → client   (waits for versionmanager + ebenezer)
+sqlserver (KN_online)
+   └─ kodb-util  (imports the real schema; Healthy = schema present)
+         ├─ itemmanager, aujard, versionmanager, aiserver
+         ├─ ebenezer (also waits for aiserver)
+         └─ client   (waits for versionmanager + ebenezer)
 ```
+
+> **First run is slow and needs internet:** the schema is fetched from GitHub the
+> first time. Later runs reuse the persistent volume.
 
 The Aspire dashboard (printed on startup) shows each resource's logs, health and
-endpoints. **Schema note:** Aspire creates an *empty* `KN_online` database; load
-the OpenKO-db schema + stored procedures into it (e.g. the repo's
-`docker/reset_database.sh` against the Aspire SQL container, or the `OpenKO-db`
-submodule) before the game servers are fully functional. Override the SA
-password / ports via Aspire parameters as usual.
+endpoints, and exposes two commands on the **kodb-util** resource (both re-run
+the upstream `cleanImport.sh` inside the loader container, with a confirmation
+prompt):
+
+- **Reset database (clean import)** — drops `KN_online` and re-imports the schema
+  from scratch.
+- **Reload schema (git pull + import)** — pulls the latest `OpenKO-db` schema and
+  re-imports it.
+
+Override the SA password / ports via Aspire parameters as usual (the SA password
+defaults to the `docker/default.env` value and is shared with the loader). The
+`docker/*` files are used unchanged; only the loader's entrypoint is overridden by
+the AppHost to add the import guard.
 
 To run a server or the client individually instead, use `dotnet run` directly:
 

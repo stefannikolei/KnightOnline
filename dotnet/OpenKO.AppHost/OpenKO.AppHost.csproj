@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" />
+    <!-- Brings Microsoft.Data.SqlClient (7.0.1) transitively, used by the
+         schema-readiness health check to probe KN_online directly. -->
     <PackageReference Include="Aspire.Hosting.SqlServer" />
   </ItemGroup>
 
