@@ -40,6 +40,12 @@ public sealed class InGameState(GameContext context) : GameState
 
     public Action<short>? NpcLeft { get; set; }
 
+    /// <summary>Raised on WIZ_HP_CHANGE with (maxHp, hp) for the local player.</summary>
+    public Action<short, short>? HpChanged { get; set; }
+
+    /// <summary>Raised on WIZ_DEAD with the socket/NPC id that died.</summary>
+    public Action<short>? EntityDied { get; set; }
+
     public Action<bool>? ItemMoveResult { get; set; }
 
     public Action<MagicPacket>? MagicReceived { get; set; }
@@ -169,6 +175,30 @@ public sealed class InGameState(GameContext context) : GameState
             {
                 NpcMoveUpdate move = NpcProtocol.ParseNpcMove(payload);
                 World.MoveNpc(move.Id, move.X, move.Y, move.Z);
+                return true;
+            }
+
+            case GameOpcode.WIZ_ROTATE:
+            {
+                (short id, short dir) = WorldProtocol.ParseRotate(payload);
+                World.Rotate(id, dir);
+                return true;
+            }
+
+            case GameOpcode.WIZ_HP_CHANGE:
+            {
+                (short maxHp, short hp) = WorldProtocol.ParseHpChange(payload);
+                World.Local.MaxHp = maxHp;
+                World.Local.Hp = hp;
+                HpChanged?.Invoke(maxHp, hp);
+                return true;
+            }
+
+            case GameOpcode.WIZ_DEAD:
+            {
+                short id = WorldProtocol.ParseDeadId(payload);
+                if (World.MarkDead(id))
+                    EntityDied?.Invoke(id);
                 return true;
             }
 

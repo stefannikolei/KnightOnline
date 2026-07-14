@@ -108,6 +108,9 @@ public sealed class LocalPlayer
 
     /// <summary>The nine skill-master levels (WIZ_MYINFO skill array).</summary>
     public byte[] Skills { get; } = new byte[SkillCount];
+
+    /// <summary>Set by WIZ_DEAD until the player respawns.</summary>
+    public bool IsDead { get; set; }
 }
 
 /// <summary>A visible remote player (from WIZ_USER_INOUT / WIZ_REQ_USERIN).</summary>
@@ -143,6 +146,9 @@ public sealed class RemotePlayer
     /// to assemble the character's appearance.
     /// </summary>
     public uint[] Items { get; } = new uint[8];
+
+    /// <summary>Set by WIZ_DEAD until the player respawns.</summary>
+    public bool IsDead { get; set; }
 }
 
 /// <summary>A visible NPC/monster (from WIZ_NPC_INOUT — CNpc::GetNpcInfo).</summary>
@@ -180,6 +186,9 @@ public sealed class NpcEntity
     public float Y { get; set; }
 
     public float Z { get; set; }
+
+    /// <summary>Set by WIZ_DEAD when the NPC dies.</summary>
+    public bool IsDead { get; set; }
 }
 
 /// <summary>
@@ -229,6 +238,40 @@ public sealed class WorldEntities
             player.Y = y;
             player.Z = z;
         }
+    }
+
+    /// <summary>WIZ_ROTATE — update a remote player's facing (local rotation is client-driven).</summary>
+    public void Rotate(short id, short direction)
+    {
+        if (_players.TryGetValue(id, out RemotePlayer? player))
+            player.Direction = direction;
+    }
+
+    /// <summary>
+    /// WIZ_DEAD — flag the matching player or NPC as dead. Returns true when an
+    /// entity was found (players take priority; the id spaces don't overlap in play).
+    /// </summary>
+    public bool MarkDead(short id)
+    {
+        if (_players.TryGetValue(id, out RemotePlayer? player))
+        {
+            player.IsDead = true;
+            return true;
+        }
+
+        if (id == Local.SocketId)
+        {
+            Local.IsDead = true;
+            return true;
+        }
+
+        if (_npcs.TryGetValue(id, out NpcEntity? npc))
+        {
+            npc.IsDead = true;
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>WIZ_NPC_MOVE — apply a position update to a visible NPC.</summary>

@@ -70,6 +70,34 @@ public static class WorldProtocol
         return w.Written.ToArray();
     }
 
+    /// <summary>WIZ_ROTATE broadcast — [opcode][short id][short direction].</summary>
+    public static (short Id, short Direction) ParseRotate(ReadOnlySpan<byte> payload)
+    {
+        var r = new PacketReader(payload);
+        r.GetByte(); // opcode
+        short id = r.GetShort();
+        short dir = r.GetShort();
+        return (id, dir);
+    }
+
+    /// <summary>WIZ_HP_CHANGE (self) — [opcode][short maxHp][short hp].</summary>
+    public static (short MaxHp, short Hp) ParseHpChange(ReadOnlySpan<byte> payload)
+    {
+        var r = new PacketReader(payload);
+        r.GetByte(); // opcode
+        short maxHp = r.GetShort();
+        short hp = r.GetShort();
+        return (maxHp, hp);
+    }
+
+    /// <summary>WIZ_DEAD — [opcode][short id] (user or NPC).</summary>
+    public static short ParseDeadId(ReadOnlySpan<byte> payload)
+    {
+        var r = new PacketReader(payload);
+        r.GetByte(); // opcode
+        return r.GetShort();
+    }
+
     /// <summary>WIZ_USER_INOUT type byte (in vs out).</summary>
     public static byte ParseInOutType(ReadOnlySpan<byte> payload) => payload[1];
 

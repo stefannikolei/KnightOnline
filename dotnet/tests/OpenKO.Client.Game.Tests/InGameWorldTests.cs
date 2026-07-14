@@ -272,6 +272,40 @@ public class InGameWorldTests
     }
 
     [Fact]
+    public void Rotate_HpChange_Dead_UpdateEntityState()
+    {
+        (GameContext ctx, _) = EnterGame();
+        ctx.InGame.World.Local.SocketId = 77;
+        ctx.Machine.DispatchPacket(UserInPacket(42, "Rival", 6000, 5000, 100, 0));
+
+        // WIZ_ROTATE broadcast updates the remote player's facing.
+        ctx.Machine.DispatchPacket([(byte)GameOpcode.WIZ_ROTATE, 42, 0, 0x2C, 0x01]); // dir = 0x012C = 300
+        Assert.True(ctx.InGame.World.TryGet(42, out RemotePlayer rival));
+        Assert.Equal((short)300, rival.Direction);
+
+        // WIZ_HP_CHANGE sets local HP + max.
+        short? maxHp = null, hp = null;
+        ctx.InGame.HpChanged = (m, h) => { maxHp = m; hp = h; };
+        var hpBuf = new byte[8];
+        var hw = new PacketWriter(hpBuf);
+        hw.SetByte((byte)GameOpcode.WIZ_HP_CHANGE);
+        hw.SetShort(1500);
+        hw.SetShort(640);
+        ctx.Machine.DispatchPacket(hw.Written.ToArray());
+        Assert.Equal((short)1500, ctx.InGame.World.Local.MaxHp);
+        Assert.Equal((short)640, ctx.InGame.World.Local.Hp);
+        Assert.Equal((short)1500, maxHp);
+        Assert.Equal((short)640, hp);
+
+        // WIZ_DEAD flags the remote player.
+        short? died = null;
+        ctx.InGame.EntityDied = id => died = id;
+        ctx.Machine.DispatchPacket([(byte)GameOpcode.WIZ_DEAD, 42, 0]);
+        Assert.True(rival.IsDead);
+        Assert.Equal((short)42, died);
+    }
+
+    [Fact]
     public void Move_UpdatesRemoteAndLocalPositions()
     {
         (GameContext ctx, _) = EnterGame();
