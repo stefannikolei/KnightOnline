@@ -29,6 +29,9 @@ public sealed class InGameState(GameContext context) : GameState
     // In-world observation hooks.
     public Action<ChatMessage>? ChatReceived { get; set; }
 
+    /// <summary>Raised when the full WIZ_MYINFO block populates the local player + inventory.</summary>
+    public Action<LocalPlayer>? MyInfoReceived { get; set; }
+
     public Action<RemotePlayer>? PlayerEntered { get; set; }
 
     public Action<short>? PlayerLeft { get; set; }
@@ -109,7 +112,8 @@ public sealed class InGameState(GameContext context) : GameState
                 return true;
 
             case GameOpcode.WIZ_MYINFO:
-                WorldProtocol.ParseMyInfoInto(payload, World.Local);
+                WorldProtocol.ParseMyInfoInto(payload, World.Local, Inventory);
+                MyInfoReceived?.Invoke(World.Local);
                 return true;
 
             case GameOpcode.WIZ_MOVE:

@@ -455,6 +455,19 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
                 $"Zone {_context.Spawn.Zone}  pos ({l.X:F0}, {l.Y:F0}, {l.Z:F0})  " +
                 $"players nearby: {_context.InGame.World.Players.Count}",
                 new Vector2(16, 62), new Color(180, 255, 200));
+
+            // Full character sheet once the WIZ_MYINFO block has landed (level > 0).
+            if (l.Level > 0)
+            {
+                _spriteBatch.DrawString(body,
+                    $"{l.Name}  Lv {l.Level}   HP {l.Hp}/{l.MaxHp}   MP {l.Mp}/{l.MaxMp}   " +
+                    $"AC {l.TotalAc}   Gold {l.Gold:N0}",
+                    new Vector2(16, 80), new Color(255, 230, 160));
+                _spriteBatch.DrawString(body,
+                    $"STR {l.Str}+{l.ItemStr}  STA {l.Sta}+{l.ItemSta}  DEX {l.Dex}+{l.ItemDex}  " +
+                    $"INT {l.Intel}+{l.ItemIntel}  CHA {l.Cha}+{l.ItemCha}   items {_context.InGame.Inventory.Slots.Count}",
+                    new Vector2(16, 96), new Color(200, 220, 180));
+            }
         }
 
         int y = GraphicsDevice.Viewport.Height - 16 - _log.Count * 16;

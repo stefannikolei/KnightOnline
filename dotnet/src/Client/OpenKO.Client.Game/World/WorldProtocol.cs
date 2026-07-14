@@ -160,12 +160,16 @@ public static class WorldProtocol
         return w.Written.ToArray();
     }
 
+    /// <summary>Equip + backpack slots in the WIZ_MYINFO item array (SLOT_MAX + HAVE_MAX).</summary>
+    public const int InventorySlotCount = 42;
+
     /// <summary>
-    /// The stable prefix of WIZ_MYINFO (SendMyInfo): id, name, position and
-    /// identity. The full stat/skill/inventory block that follows is parsed in a
-    /// later slice; the prefix is enough to place the local player.
+    /// The full WIZ_MYINFO detail blob (CUser::SendMyInfo): identity + position,
+    /// the complete stat block (level/exp/HP-MP/weight/stats+item bonuses/
+    /// resistances/gold), the nine skill-master levels and the 42-slot item
+    /// array. Field order pinned against the C# Ebenezer send side.
     /// </summary>
-    public static void ParseMyInfoInto(ReadOnlySpan<byte> payload, LocalPlayer local)
+    public static void ParseMyInfoInto(ReadOnlySpan<byte> payload, LocalPlayer local, Inventory? inventory = null)
     {
         var r = new PacketReader(payload);
         r.GetByte(); // opcode
@@ -179,8 +183,74 @@ public static class WorldProtocol
         local.Class = r.GetShort();
         local.Face = r.GetByte();
         local.Hair = r.GetByte();
-        r.GetByte(); // rank
-        r.GetByte(); // title
+        local.Rank = r.GetByte();
+        local.Title = r.GetByte();
         local.Level = r.GetByte();
+        local.Points = r.GetByte();
+        local.MaxExp = r.GetDWord();
+        local.Exp = r.GetDWord();
+        local.Loyalty = r.GetDWord();
+        local.LoyaltyMonthly = r.GetDWord();
+        local.City = r.GetByte();
+        local.Knights = r.GetShort();
+        local.Fame = r.GetByte();
+
+        // Clan block (always present; zeros/empty when clan-less).
+        r.GetShort();          // alliance knights
+        r.GetByte();           // flag
+        r.GetVarString(1);     // clan name
+        r.GetByte();           // grade
+        r.GetByte();           // ranking
+        r.GetShort();          // mark version
+        r.GetShort();          // cape
+
+        local.MaxHp = r.GetShort();
+        local.Hp = r.GetShort();
+        local.MaxMp = r.GetShort();
+        local.Mp = r.GetShort();
+        local.MaxWeight = r.GetShort();
+        local.CurWeight = r.GetShort();
+        local.Str = r.GetByte();
+        local.ItemStr = r.GetByte();
+        local.Sta = r.GetByte();
+        local.ItemSta = r.GetByte();
+        local.Dex = r.GetByte();
+        local.ItemDex = r.GetByte();
+        local.Intel = r.GetByte();
+        local.ItemIntel = r.GetByte();
+        local.Cha = r.GetByte();
+        local.ItemCha = r.GetByte();
+        local.TotalHit = r.GetShort();
+        local.TotalAc = r.GetShort();
+        local.FireResist = r.GetByte();
+        local.ColdResist = r.GetByte();
+        local.LightningResist = r.GetByte();
+        local.MagicResist = r.GetByte();
+        local.DiseaseResist = r.GetByte();
+        local.PoisonResist = r.GetByte();
+        local.Gold = (int)r.GetDWord();
+        local.Authority = r.GetByte();
+        r.GetByte(); // knights rank
+        r.GetByte(); // personal rank
+
+        for (int i = 0; i < local.Skills.Length; i++)
+            local.Skills[i] = r.GetByte();
+
+        for (int i = 0; i < InventorySlotCount; i++)
+        {
+            int num = (int)r.GetDWord();
+            short duration = r.GetShort();
+            short count = r.GetShort();
+            r.GetByte();               // flag
+            r.GetShort();              // time remaining
+            if (num != 0)
+                inventory?.Set(i, new InventoryItem(num, count, duration));
+        }
+
+        r.GetByte();                   // account status
+        local.PremiumType = r.GetByte();
+        local.PremiumTime = r.GetShort();
+        r.GetByte();                   // is chicken
+        local.MannerPoint = r.GetDWord();
     }
 }

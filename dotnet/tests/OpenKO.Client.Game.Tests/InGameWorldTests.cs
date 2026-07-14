@@ -60,11 +60,50 @@ public class InGameWorldTests
     }
 
     [Fact]
-    public void MyInfo_SetsLocalIdentity()
+    public void MyInfo_SetsFullStatBlockSkillsAndInventory()
     {
         (GameContext ctx, _) = EnterGame();
+        bool raised = false;
+        ctx.InGame.MyInfoReceived = _ => raised = true;
 
-        var buffer = new byte[64];
+        ctx.Machine.DispatchPacket(MyInfoPacket());
+
+        LocalPlayer local = ctx.InGame.World.Local;
+        Assert.True(raised);
+        Assert.Equal((short)77, local.SocketId);
+        Assert.Equal("Hero", local.Name);
+        Assert.Equal(660f, local.X, 3);
+        Assert.Equal((short)105, local.Class);
+        Assert.Equal((byte)72, local.Level);
+
+        // Full stat block.
+        Assert.Equal((short)1500, local.MaxHp);
+        Assert.Equal((short)1490, local.Hp);
+        Assert.Equal((short)800, local.MaxMp);
+        Assert.Equal((byte)120, local.Str);
+        Assert.Equal((byte)15, local.ItemStr);
+        Assert.Equal((short)350, local.TotalHit);
+        Assert.Equal((short)420, local.TotalAc);
+        Assert.Equal(1_234_567, local.Gold);
+        Assert.Equal(50u, local.Loyalty);
+        Assert.Equal((byte)7, local.PoisonResist);
+
+        // Skills [9].
+        Assert.Equal((byte)9, local.Skills[0]);
+        Assert.Equal((byte)1, local.Skills[8]);
+
+        // Inventory: right-hand weapon in equip slot 6, one backpack stack.
+        InventoryItem? weapon = ctx.InGame.Inventory.Get(6);
+        Assert.NotNull(weapon);
+        Assert.Equal(379001000, weapon!.ItemId);
+        InventoryItem? potion = ctx.InGame.Inventory.Get(14);
+        Assert.NotNull(potion);
+        Assert.Equal(99, potion!.Count);
+    }
+
+    private static byte[] MyInfoPacket()
+    {
+        var buffer = new byte[1024];
         var w = new PacketWriter(buffer);
         w.SetByte((byte)GameOpcode.WIZ_MYINFO);
         w.SetShort(77);                                    // socket id
@@ -80,15 +119,60 @@ public class InGameWorldTests
         w.SetByte(0);                                      // rank
         w.SetByte(0);                                      // title
         w.SetByte(72);                                     // level
+        w.SetByte(5);                                      // points
+        w.SetDWord(9_999_999);                             // max exp
+        w.SetDWord(1_000_000);                             // exp
+        w.SetDWord(50);                                    // loyalty
+        w.SetDWord(20);                                    // loyalty monthly
+        w.SetByte(0);                                      // city
+        w.SetShort(0);                                     // knights
+        w.SetByte(0);                                      // fame
+        // clan block (clan-less form)
+        w.SetShort(0);                                     // alliance knights
+        w.SetByte(0);                                      // flag
+        w.SetString1([]);                                  // clan name
+        w.SetByte(0);                                      // grade
+        w.SetByte(0);                                      // ranking
+        w.SetShort(0);                                     // mark version
+        w.SetShort(-1);                                    // cape
+        w.SetShort(1500);                                  // max hp
+        w.SetShort(1490);                                  // hp
+        w.SetShort(800);                                   // max mp
+        w.SetShort(790);                                   // mp
+        w.SetShort(3000);                                  // max weight
+        w.SetShort(1200);                                  // cur weight
+        w.SetByte(120); w.SetByte(15);                     // str, item str
+        w.SetByte(110); w.SetByte(0);                      // sta, item sta
+        w.SetByte(90); w.SetByte(0);                       // dex, item dex
+        w.SetByte(80); w.SetByte(0);                       // int, item int
+        w.SetByte(70); w.SetByte(0);                       // cha, item cha
+        w.SetShort(350);                                   // total hit
+        w.SetShort(420);                                   // total ac
+        w.SetByte(1); w.SetByte(2); w.SetByte(3);          // fire, cold, lightning
+        w.SetByte(4); w.SetByte(5); w.SetByte(7);          // magic, disease, poison
+        w.SetDWord(1_234_567);                             // gold
+        w.SetByte(1);                                      // authority
+        w.SetByte(0); w.SetByte(0);                        // knights rank, personal rank
+        byte[] skills = [9, 8, 7, 6, 5, 4, 3, 2, 1];
+        foreach (byte s in skills)
+            w.SetByte(s);
+        for (int i = 0; i < WorldProtocol.InventorySlotCount; i++)
+        {
+            uint num = i switch { 6 => 379001000u, 14 => 810004000u, _ => 0u };
+            short count = i == 14 ? (short)99 : (short)0;
+            w.SetDWord(num);
+            w.SetShort(0);                                 // duration
+            w.SetShort(count);                             // count
+            w.SetByte(0);                                  // flag
+            w.SetShort(0);                                 // time remaining
+        }
 
-        ctx.Machine.DispatchPacket(w.Written.ToArray());
-
-        LocalPlayer local = ctx.InGame.World.Local;
-        Assert.Equal((short)77, local.SocketId);
-        Assert.Equal("Hero", local.Name);
-        Assert.Equal(660f, local.X, 3);
-        Assert.Equal((short)105, local.Class);
-        Assert.Equal((byte)72, local.Level);
+        w.SetByte(0);                                      // account status
+        w.SetByte(1);                                      // premium type
+        w.SetShort(300);                                   // premium time
+        w.SetByte(0);                                      // is chicken
+        w.SetDWord(1000);                                  // manner point
+        return w.Written.ToArray();
     }
 
     [Fact]
