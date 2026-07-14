@@ -46,6 +46,12 @@ public sealed class InGameState(GameContext context) : GameState
     /// <summary>Raised on WIZ_DEAD with the socket/NPC id that died.</summary>
     public Action<short>? EntityDied { get; set; }
 
+    /// <summary>Raised on a WIZ_ATTACK broadcast (attacker/target/result).</summary>
+    public Action<AttackEvent>? AttackObserved { get; set; }
+
+    /// <summary>Raised on WIZ_TARGET_HP with the target's health and the damage dealt.</summary>
+    public Action<TargetHpUpdate>? TargetHpReceived { get; set; }
+
     public Action<bool>? ItemMoveResult { get; set; }
 
     public Action<MagicPacket>? MagicReceived { get; set; }
@@ -90,6 +96,10 @@ public sealed class InGameState(GameContext context) : GameState
 
     /// <summary>Sends a magic-process step (CMagicProcess flow).</summary>
     public void SendMagic(MagicPacket packet) => context.Client.Send(MagicProtocol.Build(packet));
+
+    /// <summary>Sends a general attack at a target (CGameProcMain::MsgSend_Attack).</summary>
+    public void SendAttack(short targetId, float interval, float distance) =>
+        context.Client.Send(CombatProtocol.BuildAttack(targetId, interval, distance));
 
     /// <summary>Sends a pre-built group packet (party/exchange/warehouse/knights).</summary>
     public void SendRaw(ReadOnlySpan<byte> payload) => context.Client.Send(payload);
@@ -201,6 +211,19 @@ public sealed class InGameState(GameContext context) : GameState
                     EntityDied?.Invoke(id);
                 return true;
             }
+
+            case GameOpcode.WIZ_ATTACK:
+            {
+                AttackEvent atk = CombatProtocol.ParseAttack(payload);
+                if (atk.Result == CombatProtocol.ResultDeath)
+                    World.MarkDead(atk.TargetId);
+                AttackObserved?.Invoke(atk);
+                return true;
+            }
+
+            case GameOpcode.WIZ_TARGET_HP:
+                TargetHpReceived?.Invoke(CombatProtocol.ParseTargetHp(payload));
+                return true;
 
             case GameOpcode.WIZ_CHAT:
             {

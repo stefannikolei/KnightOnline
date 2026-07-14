@@ -59,7 +59,10 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     private System.Numerics.Matrix4x4 _lastView = System.Numerics.Matrix4x4.Identity;
     private System.Numerics.Matrix4x4 _lastProj = System.Numerics.Matrix4x4.Identity;
     private bool _prevMouseLeft;
+    private bool _prevAttackKey;
     private string _selection = "none";
+    private short? _targetId;
+    private string _targetHp = "";
 
     private readonly List<string> _log = [];
     private int _framesDrawn;
@@ -165,6 +168,14 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         };
 
         WireAutoLogin();
+
+        // Combat feedback: the target's HP + last damage after each hit.
+        _context.InGame.TargetHpReceived = t =>
+            _targetHp = $"HP {t.Hp}/{t.MaxHp}  (-{t.Damage})";
+        _context.InGame.EntityDied = id =>
+        {
+            if (_targetId == id) { _targetHp = "dead"; }
+        };
 
         _netCts = new CancellationTokenSource();
         _ = ConnectAndRunAsync(_options.ServerHost!, _options.ServerPort);
@@ -372,14 +383,27 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
                     : !p.IsNpc && _context.InGame.World.TryGet(p.Id, out var pl) ? pl.Name
                     : $"#{p.Id}";
                 _selection = $"{(p.IsNpc ? "NPC" : "Player")} {name} (id {p.Id}, {p.Distance:F0}m)";
+                _targetId = p.Id;
+                _targetHp = "";
             }
             else
             {
                 _selection = "none";
+                _targetId = null;
             }
         }
 
         _prevMouseLeft = left;
+
+        // Space attacks the selected target (CGameProcMain::MsgSend_Attack).
+        bool attack = Keyboard.GetState().IsKeyDown(Keys.Space);
+        if (attack && !_prevAttackKey && _targetId is { } tid
+            && _network != null && _context != null && _context.Machine.Active == _context.InGame)
+        {
+            _context.InGame.SendAttack(tid, interval: 1.0f, distance: 3.0f);
+        }
+
+        _prevAttackKey = attack;
     }
 
     private void RenderWorld()
@@ -539,7 +563,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         {
             _spriteBatch.DrawString(body, "WASD move · ←→ camera · click target · Esc quit",
                 new Vector2(GraphicsDevice.Viewport.Width - 330, 44), new Color(150, 160, 180));
-            _spriteBatch.DrawString(body, $"Target: {_selection}",
+            _spriteBatch.DrawString(body, $"Target: {_selection}  {_targetHp}",
                 new Vector2(GraphicsDevice.Viewport.Width - 330, 62), new Color(255, 200, 160));
         }
 
