@@ -84,4 +84,47 @@ public sealed class CharacterFactory
             return null;
         }
     }
+
+    /// <summary>
+    /// Build a monster/NPC renderer from NPC_Looks (keyed by proto/model id):
+    /// a baked whole <c>.n3chr</c> when the row carries one, otherwise a runtime
+    /// assembly from the row's skeleton + default parts. Null when unavailable.
+    /// </summary>
+    public ChrRenderer? CreateNpc(int protoId)
+    {
+        if (_npcLooks == null)
+            return null;
+
+        PlayerLooksRow? looks = _npcLooks.Find((uint)protoId);
+        if (looks == null)
+            return null;
+
+        try
+        {
+            var chr = new N3Chr();
+            if (!string.IsNullOrEmpty(looks.ChrFileName))
+            {
+                string? path = _caches.Resolver.Resolve(looks.ChrFileName);
+                if (path == null)
+                    return null;
+                chr.LoadFromFile(path);
+            }
+            else
+            {
+                chr.JointFileName = looks.JointFileName;
+                chr.AniCtrlFileName = looks.AniCtrlFileName;
+                chr.FxPlugFileName = looks.FxPlugFileName;
+                foreach (string part in looks.PartFileNames)
+                    if (!string.IsNullOrEmpty(part))
+                        chr.PartFileNames.Add(part);
+            }
+
+            var renderer = new ChrRenderer(chr, _caches);
+            return renderer.HasSkeleton ? renderer : null;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
 }

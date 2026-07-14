@@ -453,7 +453,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             var l = _context.InGame.World.Local;
             _spriteBatch.DrawString(body,
                 $"Zone {_context.Spawn.Zone}  pos ({l.X:F0}, {l.Y:F0}, {l.Z:F0})  " +
-                $"players nearby: {_context.InGame.World.Players.Count}",
+                $"players: {_context.InGame.World.Players.Count}  npcs: {_context.InGame.World.Npcs.Count}",
                 new Vector2(16, 62), new Color(180, 255, 200));
 
             // Full character sheet once the WIZ_MYINFO block has landed (level > 0).

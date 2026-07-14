@@ -36,6 +36,10 @@ public sealed class InGameState(GameContext context) : GameState
 
     public Action<short>? PlayerLeft { get; set; }
 
+    public Action<NpcEntity>? NpcEntered { get; set; }
+
+    public Action<short>? NpcLeft { get; set; }
+
     public Action<bool>? ItemMoveResult { get; set; }
 
     public Action<MagicPacket>? MagicReceived { get; set; }
@@ -139,6 +143,32 @@ public sealed class InGameState(GameContext context) : GameState
                         PlayerLeft?.Invoke(id);
                 }
 
+                return true;
+            }
+
+            case GameOpcode.WIZ_NPC_INOUT:
+            {
+                byte type = NpcProtocol.ParseInOutType(payload);
+                if (type == 1) // NPC_IN
+                {
+                    NpcEntity npc = NpcProtocol.ParseNpcIn(payload);
+                    World.AddOrUpdateNpc(npc);
+                    NpcEntered?.Invoke(npc);
+                }
+                else // NPC_OUT
+                {
+                    short id = NpcProtocol.ParseInOutId(payload);
+                    if (World.RemoveNpc(id))
+                        NpcLeft?.Invoke(id);
+                }
+
+                return true;
+            }
+
+            case GameOpcode.WIZ_NPC_MOVE:
+            {
+                NpcMoveUpdate move = NpcProtocol.ParseNpcMove(payload);
+                World.MoveNpc(move.Id, move.X, move.Y, move.Z);
                 return true;
             }
 

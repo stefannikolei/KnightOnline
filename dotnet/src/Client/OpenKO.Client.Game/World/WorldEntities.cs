@@ -145,18 +145,58 @@ public sealed class RemotePlayer
     public uint[] Items { get; } = new uint[8];
 }
 
+/// <summary>A visible NPC/monster (from WIZ_NPC_INOUT — CNpc::GetNpcInfo).</summary>
+public sealed class NpcEntity
+{
+    public short Id { get; set; }
+
+    /// <summary>Proto/model id — the NPC_Looks key.</summary>
+    public short ProtoId { get; set; }
+
+    public byte NpcType { get; set; }
+
+    public int SellingGroup { get; set; }
+
+    public short Size { get; set; }
+
+    public int Weapon1 { get; set; }
+
+    public int Weapon2 { get; set; }
+
+    public string Name { get; set; } = string.Empty;
+
+    public byte Group { get; set; }
+
+    public byte Level { get; set; }
+
+    public uint GateOpen { get; set; }
+
+    public byte ObjectType { get; set; }
+
+    public byte Direction { get; set; }
+
+    public float X { get; set; }
+
+    public float Y { get; set; }
+
+    public float Z { get; set; }
+}
+
 /// <summary>
 /// The client-side world roster (the CPlayerOtherMgr analog): the local player
-/// plus the region-visible remote players keyed by their server socket id.
+/// plus the region-visible remote players (by socket id) and NPCs (by Nid).
 /// In-game packet handlers populate it; the renderer walks it.
 /// </summary>
 public sealed class WorldEntities
 {
     private readonly Dictionary<short, RemotePlayer> _players = [];
+    private readonly Dictionary<short, NpcEntity> _npcs = [];
 
     public LocalPlayer Local { get; } = new();
 
     public IReadOnlyDictionary<short, RemotePlayer> Players => _players;
+
+    public IReadOnlyDictionary<short, NpcEntity> Npcs => _npcs;
 
     /// <summary>WIZ_USER_INOUT (in) — add or refresh a visible player.</summary>
     public void AddOrUpdate(RemotePlayer player) => _players[player.Id] = player;
@@ -165,6 +205,14 @@ public sealed class WorldEntities
     public bool Remove(short id) => _players.Remove(id);
 
     public bool TryGet(short id, out RemotePlayer player) => _players.TryGetValue(id, out player!);
+
+    /// <summary>WIZ_NPC_INOUT (in) — add or refresh a visible NPC.</summary>
+    public void AddOrUpdateNpc(NpcEntity npc) => _npcs[npc.Id] = npc;
+
+    /// <summary>WIZ_NPC_INOUT (out) — drop an NPC that left the region.</summary>
+    public bool RemoveNpc(short id) => _npcs.Remove(id);
+
+    public bool TryGetNpc(short id, out NpcEntity npc) => _npcs.TryGetValue(id, out npc!);
 
     /// <summary>WIZ_MOVE — apply a position update to the local or a remote entity.</summary>
     public void Move(short id, float x, float y, float z)
@@ -183,5 +231,20 @@ public sealed class WorldEntities
         }
     }
 
-    public void Clear() => _players.Clear();
+    /// <summary>WIZ_NPC_MOVE — apply a position update to a visible NPC.</summary>
+    public void MoveNpc(short id, float x, float y, float z)
+    {
+        if (_npcs.TryGetValue(id, out NpcEntity? npc))
+        {
+            npc.X = x;
+            npc.Y = y;
+            npc.Z = z;
+        }
+    }
+
+    public void Clear()
+    {
+        _players.Clear();
+        _npcs.Clear();
+    }
 }

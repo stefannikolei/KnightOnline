@@ -209,6 +209,69 @@ public class InGameWorldTests
     }
 
     [Fact]
+    public void NpcInOut_AddsMovesAndRemovesNpc()
+    {
+        (GameContext ctx, _) = EnterGame();
+        NpcEntity? entered = null;
+        short? left = null;
+        ctx.InGame.NpcEntered = n => entered = n;
+        ctx.InGame.NpcLeft = id => left = id;
+
+        ctx.Machine.DispatchPacket(NpcInPacket(500, protoId: 1201, "Kaymar", x: 6200, z: 5100, y: 95));
+        Assert.Single(ctx.InGame.World.Npcs);
+        Assert.NotNull(entered);
+        Assert.Equal("Kaymar", entered!.Name);
+        Assert.Equal((short)1201, entered.ProtoId);
+        Assert.Equal(620f, entered.X, 3);
+
+        // WIZ_NPC_MOVE glides it.
+        var mv = new byte[16];
+        var mw = new PacketWriter(mv);
+        mw.SetByte((byte)GameOpcode.WIZ_NPC_MOVE);
+        mw.SetShort(500);
+        mw.SetShort(6300);
+        mw.SetShort(5200);
+        mw.SetShort(96);
+        mw.SetShort(30);
+        ctx.Machine.DispatchPacket(mw.Written.ToArray());
+        Assert.True(ctx.InGame.World.TryGetNpc(500, out NpcEntity npc));
+        Assert.Equal(630f, npc.X, 3);
+        Assert.Equal(520f, npc.Z, 3);
+
+        // NPC_OUT drops it.
+        ctx.Machine.DispatchPacket([(byte)GameOpcode.WIZ_NPC_INOUT, 0x02, 244, 1]);
+        Assert.Empty(ctx.InGame.World.Npcs);
+        Assert.Equal((short)500, left);
+    }
+
+    private static byte[] NpcInPacket(short id, short protoId, string name, int x, int z, int y)
+    {
+        var buffer = new byte[128];
+        var w = new PacketWriter(buffer);
+        w.SetByte((byte)GameOpcode.WIZ_NPC_INOUT);
+        w.SetByte(0x01);         // NPC_IN
+        w.SetShort(id);
+        w.SetShort(protoId);
+        w.SetByte(1);            // npc type
+        w.SetDWord(0);           // selling group
+        w.SetShort(100);         // size
+        w.SetDWord(0);           // weapon1
+        w.SetDWord(0);           // weapon2
+        w.SetString1(Encoding.Latin1.GetBytes(name));
+        w.SetByte(0);            // group
+        w.SetByte(42);           // level
+        w.SetShort((short)x);
+        w.SetShort((short)z);
+        w.SetShort((short)y);
+        w.SetDWord(0);           // gate open
+        w.SetByte(0);            // object type
+        w.SetShort(0);           // sIDK0
+        w.SetShort(0);           // sIDK1
+        w.SetByte(64);           // direction
+        return w.Written.ToArray();
+    }
+
+    [Fact]
     public void Move_UpdatesRemoteAndLocalPositions()
     {
         (GameContext ctx, _) = EnterGame();
