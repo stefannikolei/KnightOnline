@@ -15,7 +15,18 @@ public static class KoHost
         // Strip flags the C++ servers accept but that have no meaning here.
         string[] filtered = args.Where(a => a is not ("--headless" or "-h")).ToArray();
 
-        var builder = Host.CreateApplicationBuilder(filtered);
+        // Root configuration/content beside the binary (like the C++ AppThread
+        // resolved its INI), so the copied appsettings.json loads regardless of
+        // the working directory — Host.CreateApplicationBuilder otherwise uses CWD.
+        var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
+        {
+            Args = filtered,
+            ContentRootPath = AppContext.BaseDirectory,
+        });
+
+        // Keep the simple single-line console formatter; log levels now come from
+        // the appsettings.json "Logging" section (Host.CreateApplicationBuilder
+        // already bound it — ClearProviders drops providers, not the config filters).
         builder.Logging.ClearProviders();
         builder.Logging.AddSimpleConsole(options =>
         {

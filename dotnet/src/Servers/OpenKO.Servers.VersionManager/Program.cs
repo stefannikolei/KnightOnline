@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OpenKO.Core.Config;
+using Microsoft.Extensions.Options;
 using OpenKO.Data;
 using OpenKO.Hosting;
 
@@ -11,24 +11,20 @@ public static class Program
 {
     public static async Task<int> Main(string[] args)
     {
-        var builder = KoHost.CreateBuilder(args);
+        HostApplicationBuilder builder = KoHost.CreateBuilder(args);
 
-        string configPath = KoHost.ResolveConfigPath("Version.ini");
-        var ini = new IniFile();
-        if (!ini.Load(configPath))
-        {
-            Console.Error.WriteLine($"VersionManager: config not found: {configPath}");
-            return 1;
-        }
+        builder.Services.AddOptions<VersionManagerOptions>()
+            .Bind(builder.Configuration.GetSection(VersionManagerOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
-        VersionManagerConfig? config = VersionManagerConfig.Load(ini, msg => Console.Error.WriteLine(msg));
-        if (config is null)
-            return 1;
+        builder.Services.AddGameDatabase(builder.Configuration);
 
-        builder.Services.AddSingleton(config);
-        builder.Services.AddSingleton(VersionManagerState.FromConfig(config));
-        builder.Services.AddSingleton(SqlConnectionFactory.FromOdbcConfig(
-            config.DataSourceName, config.DataSourceUser, config.DataSourcePassword, config.DataSourceServer));
+        // The wire-ready config is compiled once from the validated options.
+        builder.Services.AddSingleton(sp =>
+            VersionManagerConfig.FromOptions(sp.GetRequiredService<IOptions<VersionManagerOptions>>().Value));
+        builder.Services.AddSingleton(sp =>
+            VersionManagerState.FromConfig(sp.GetRequiredService<VersionManagerConfig>()));
         builder.Services.AddSingleton<IVersionManagerDb, SqlVersionManagerDb>();
         builder.Services.AddSingleton<VersionManagerService>(sp => new VersionManagerService(
             sp.GetRequiredService<VersionManagerState>(),
