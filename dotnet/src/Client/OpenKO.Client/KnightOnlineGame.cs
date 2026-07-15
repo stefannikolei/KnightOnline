@@ -59,8 +59,13 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     private bool _wasMoving;
     private System.Numerics.Matrix4x4 _lastView = System.Numerics.Matrix4x4.Identity;
     private System.Numerics.Matrix4x4 _lastProj = System.Numerics.Matrix4x4.Identity;
-    private bool _prevMouseLeft;
-    private bool _prevAttackKey;
+
+    // Input edge machine (CLocalInput) + interactive UI dispatch.
+    private readonly OpenKO.Client.Engine.Input.InputState _input = new();
+    private readonly bool[] _dikDown = new bool[OpenKO.Client.Engine.Input.InputState.NumKeys];
+    private readonly UiManager _ui = new();
+    private int _prevScrollWheel;
+
     private string _selection = "none";
     private short? _targetId;
     private string _targetHp = "";
@@ -80,6 +85,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         IsMouseVisible = true;
         Window.AllowUserResizing = true;
         Window.Title = "Knight Online — OpenKO C# Port";
+        Window.TextInput += OnTextInput;
     }
 
     protected override void Initialize()
@@ -313,15 +319,64 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
     protected override void Update(GameTime gameTime)
     {
-        if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+        SampleInput(gameTime.TotalGameTime.TotalSeconds);
+
+        if (_input.IsKeyDown(OpenKO.Client.Engine.Input.KeyMap.DIK_ESCAPE))
             Exit();
 
         _timer.Tick(gameTime.ElapsedGameTime.TotalSeconds);
         _network?.Pump(_context.Machine);
         _context?.Machine.TickActive();
-        HandleInput((float)gameTime.ElapsedGameTime.TotalSeconds);
+
+        // Interactive UI first; it consumes input (and text focus) before gameplay.
+        _ui.Tick();
+        bool uiHandled = _ui.Dialogs.Count > 0
+            && (UiInputBridge.Dispatch(_ui, _input) & UiMouseProc.DoneSomething) != 0;
+
+        if (!uiHandled)
+            HandleInput((float)gameTime.ElapsedGameTime.TotalSeconds);
 
         base.Update(gameTime);
+    }
+
+    /// <summary>Feed one device snapshot into the CLocalInput edge machine.</summary>
+    private void SampleInput(double time)
+    {
+        KeyboardState kb = Keyboard.GetState();
+        OpenKO.Client.Engine.Input.KeyMap.FillDikArray(kb.GetPressedKeys(), _dikDown);
+
+        MouseState ms = Mouse.GetState();
+        int wheel = ms.ScrollWheelValue - _prevScrollWheel;
+        _prevScrollWheel = ms.ScrollWheelValue;
+
+        var snapshot = new OpenKO.Client.Engine.Input.InputSnapshot(
+            ms.X, ms.Y,
+            ms.LeftButton == ButtonState.Pressed,
+            ms.MiddleButton == ButtonState.Pressed,
+            ms.RightButton == ButtonState.Pressed,
+            wheel);
+        _input.Tick(_dikDown, snapshot, time);
+    }
+
+    /// <summary>Route text/edit keys to the focused edit box (MonoGame Window.TextInput).</summary>
+    private void OnTextInput(object? sender, TextInputEventArgs e)
+    {
+        if (_ui.FocusedEdit is not { } edit)
+            return;
+
+        switch (e.Key)
+        {
+            case Keys.Back: edit.Backspace(); return;
+            case Keys.Delete: edit.DeleteForward(); return;
+            case Keys.Enter: edit.SubmitReturn(); return;
+            case Keys.Left: edit.MoveCaret(-1); return;
+            case Keys.Right: edit.MoveCaret(1); return;
+            case Keys.Home: edit.CaretHome(); return;
+            case Keys.End: edit.CaretEnd(); return;
+        }
+
+        if (!char.IsControl(e.Character))
+            edit.InsertChar(e.Character);
     }
 
     protected override void Draw(GameTime gameTime)
@@ -349,14 +404,15 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         if (_player == null || _terrainData == null)
             return;
 
-        KeyboardState kb = Keyboard.GetState();
-        if (kb.IsKeyDown(Keys.Left))
+        if (_input.IsKeyDown(OpenKO.Client.Engine.Input.KeyMap.DIK_LEFT))
             _cameraYaw -= dt * 1.6f;
-        if (kb.IsKeyDown(Keys.Right))
+        if (_input.IsKeyDown(OpenKO.Client.Engine.Input.KeyMap.DIK_RIGHT))
             _cameraYaw += dt * 1.6f;
 
-        float forwardInput = (kb.IsKeyDown(Keys.W) ? 1f : 0f) - (kb.IsKeyDown(Keys.S) ? 1f : 0f);
-        float strafeInput = (kb.IsKeyDown(Keys.D) ? 1f : 0f) - (kb.IsKeyDown(Keys.A) ? 1f : 0f);
+        float forwardInput = (_input.IsKeyDown(OpenKO.Client.Engine.Input.KeyMap.DIK_W) ? 1f : 0f)
+            - (_input.IsKeyDown(OpenKO.Client.Engine.Input.KeyMap.DIK_S) ? 1f : 0f);
+        float strafeInput = (_input.IsKeyDown(OpenKO.Client.Engine.Input.KeyMap.DIK_D) ? 1f : 0f)
+            - (_input.IsKeyDown(OpenKO.Client.Engine.Input.KeyMap.DIK_A) ? 1f : 0f);
 
         // Camera-relative basis (forward points away from the camera).
         var forward = new System.Numerics.Vector3(-MathF.Sin(_cameraYaw), 0f, -MathF.Cos(_cameraYaw));
@@ -391,12 +447,11 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     /// <summary>Left-click ray picking against the region entities (CGameProcMain::PickUPC).</summary>
     private void HandlePick()
     {
-        MouseState mouse = Mouse.GetState();
-        bool left = mouse.LeftButton == ButtonState.Pressed;
-        if (left && !_prevMouseLeft && _context != null)
+        bool leftClick = (_input.Mouse & OpenKO.Client.Engine.Input.MouseFlags.LbClick) != 0;
+        if (leftClick && _context != null)
         {
             var ray = OpenKO.Client.Game.World.Picking.ScreenPointToRay(
-                _lastView, _lastProj, mouse.X, mouse.Y,
+                _lastView, _lastProj, _input.MousePos.X, _input.MousePos.Y,
                 GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             OpenKO.Client.Game.World.WorldPicker.Pick? pick =
                 OpenKO.Client.Game.World.WorldPicker.PickNearest(ray, _context.InGame.World);
@@ -417,17 +472,12 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             }
         }
 
-        _prevMouseLeft = left;
-
         // Space attacks the selected target (CGameProcMain::MsgSend_Attack).
-        bool attack = Keyboard.GetState().IsKeyDown(Keys.Space);
-        if (attack && !_prevAttackKey && _targetId is { } tid
+        if (_input.IsKeyPress(OpenKO.Client.Engine.Input.KeyMap.DIK_SPACE) && _targetId is { } tid
             && _network != null && _context != null && _context.Machine.Active == _context.InGame)
         {
             _context.InGame.SendAttack(tid, interval: 1.0f, distance: 3.0f);
         }
-
-        _prevAttackKey = attack;
     }
 
     private void RenderWorld()

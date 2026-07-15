@@ -1,4 +1,5 @@
 using OpenKO.Client.Assets;
+using OpenKO.Core.Text;
 
 namespace OpenKO.Client.Engine.Ui;
 
@@ -25,7 +26,11 @@ public sealed class UiEditControl : UiControl
 
     public bool IsNumberOnly => (Style & UiStyle.EditNumberOnly) != 0;
 
-    /// <summary>Character cap (0 = unlimited). Byte-based CP949 cap is refined in 9.2.</summary>
+    /// <summary>
+    /// Maximum length in CP949 bytes (0 = unlimited) — matches CN3UIEdit::SetMaxString,
+    /// which measures the encoded byte length (a Hangul glyph = 2 bytes). Insertion adds
+    /// whole characters, so a 2-byte glyph is never split.
+    /// </summary>
     public int MaxLength { get; set; }
 
     public int CaretPos { get; private set; }
@@ -37,11 +42,32 @@ public sealed class UiEditControl : UiControl
         get => _text;
         set
         {
-            _text = value ?? string.Empty;
-            if (MaxLength > 0 && _text.Length > MaxLength)
-                _text = _text[..MaxLength];
+            _text = TruncateToMaxBytes(value ?? string.Empty);
             CaretPos = _text.Length;
         }
+    }
+
+    private static int Cp949Bytes(string s) => KoEncoding.Cp949.GetByteCount(s);
+
+    private static int Cp949Bytes(char c) => KoEncoding.Cp949.GetByteCount([c]);
+
+    /// <summary>Drop trailing whole characters until the CP949 byte length fits MaxLength.</summary>
+    private string TruncateToMaxBytes(string s)
+    {
+        if (MaxLength <= 0 || Cp949Bytes(s) <= MaxLength)
+            return s;
+
+        int bytes = 0;
+        int i = 0;
+        for (; i < s.Length; i++)
+        {
+            int cb = Cp949Bytes(s[i]);
+            if (bytes + cb > MaxLength)
+                break;
+            bytes += cb;
+        }
+
+        return s[..i];
     }
 
     /// <summary>What is drawn (password style masks with '*').</summary>
@@ -68,7 +94,7 @@ public sealed class UiEditControl : UiControl
             return false;
         if (IsNumberOnly && !char.IsDigit(c))
             return false;
-        if (MaxLength > 0 && _text.Length >= MaxLength)
+        if (MaxLength > 0 && Cp949Bytes(_text) + Cp949Bytes(c) > MaxLength)
             return false;
 
         _text = _text.Insert(CaretPos, c.ToString());

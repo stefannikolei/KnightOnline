@@ -1,6 +1,11 @@
 namespace OpenKO.Client.Engine.Input;
 
-/// <summary>CLocalInput mouse-flag bits (WarFare/LocalInput.h).</summary>
+/// <summary>
+/// CLocalInput mouse-flag bits — bit-exact with WarFare/LocalInput.h MOUSE_* (and
+/// N3UIDef.h UI_MOUSE_*): the three double-click bits sit at the high end, not
+/// interleaved. Named members are what game code uses; the numeric layout matters
+/// only where the bits cross into the UI layer (see <c>UiInputBridge</c>).
+/// </summary>
 [Flags]
 public enum MouseFlags : uint
 {
@@ -8,14 +13,14 @@ public enum MouseFlags : uint
     LbClick = 0x1,      // left press edge (MOUSE_LBCLICK)
     LbClicked = 0x2,    // left release edge
     LbDown = 0x4,       // left held
-    LbDoubleClick = 0x8,
-    MbClick = 0x10,
-    MbClicked = 0x20,
-    MbDown = 0x40,
-    MbDoubleClick = 0x80,
-    RbClick = 0x100,
-    RbClicked = 0x200,
-    RbDown = 0x400,
+    MbClick = 0x8,
+    MbClicked = 0x10,
+    MbDown = 0x20,
+    RbClick = 0x40,
+    RbClicked = 0x80,
+    RbDown = 0x100,
+    LbDoubleClick = 0x200,
+    MbDoubleClick = 0x400,
     RbDoubleClick = 0x800,
 }
 
@@ -25,7 +30,8 @@ public readonly record struct InputSnapshot(
     int MouseY,
     bool LeftDown,
     bool MiddleDown,
-    bool RightDown);
+    bool RightDown,
+    int WheelDelta = 0);
 
 /// <summary>
 /// Port of the <c>CLocalInput</c> edge machine as a pure class: the device
@@ -58,6 +64,9 @@ public sealed class InputState
     public (int X, int Y) MousePos { get; private set; }
 
     public (int X, int Y) MousePosOld { get; private set; }
+
+    /// <summary>Mouse-wheel delta for this frame (device scroll units; 0 = no scroll).</summary>
+    public int WheelDelta { get; private set; }
 
     public bool IsKeyDown(int dik) => (uint)dik < NumKeys && _down[dik];
 
@@ -96,6 +105,7 @@ public sealed class InputState
         MouseOld = Mouse;
         MousePosOld = MousePos;
         MousePos = (snapshot.MouseX, snapshot.MouseY);
+        WheelDelta = snapshot.WheelDelta;
 
         MouseFlags flags = MouseFlags.None;
         flags |= Button(snapshot.LeftDown, _prev.LeftDown, ref _lastLbDownTime, time,
