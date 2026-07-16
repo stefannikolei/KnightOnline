@@ -65,10 +65,11 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     private readonly bool[] _dikDown = new bool[OpenKO.Client.Engine.Input.InputState.NumKeys];
     private readonly UiManager _ui = new();
     private FrontendUi? _frontend;
+    private InGameUi? _inGameUi;
     private int _prevScrollWheel;
 
-    /// <summary>The manager receiving input/drawing this frame (frontend when open).</summary>
-    private UiManager ActiveUi => _frontend?.Manager ?? _ui;
+    /// <summary>The manager receiving input/drawing this frame (frontend during login, HUD in-game).</summary>
+    private UiManager ActiveUi => _frontend?.Manager ?? _inGameUi?.Manager ?? _ui;
 
     private string _selection = "none";
     private short? _targetId;
@@ -130,6 +131,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             _context.InGame.World.Local.Y = _playerPos.Y;
             _context.InGame.World.Local.Z = _playerPos.Z;
             _context.Machine.SetActive(_context.InGame);
+            EnsureInGameUi();
             Log($"Offline zone '{_options.OfflineZone}' loaded ({_terrainData!.MapSize} tiles).");
         }
         catch (Exception ex)
@@ -232,12 +234,19 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             LoadOnlineZone(spawn);
         };
 
-        // Combat feedback: the target's HP + last damage after each hit.
+        // Combat feedback: the target's HP + last damage after each hit (also drives the
+        // HUD target bar). TargetHpReceived / EntityDied stay owned by the executable so the
+        // HUD's TargetBar.Bind never clobbers them.
         _context.InGame.TargetHpReceived = t =>
+        {
             _targetHp = $"HP {t.Hp}/{t.MaxHp}  (-{t.Damage})";
+            _inGameUi?.TargetBar.UpdateHp(t.Hp, t.MaxHp);
+        };
         _context.InGame.EntityDied = id =>
         {
-            if (_targetId == id) { _targetHp = "dead"; }
+            if (_targetId == id) { _targetHp = "dead"; _inGameUi?.TargetBar.Clear(); }
+            if (id == _context.InGame.World.Local.SocketId)
+                _inGameUi?.Dead.Show();
         };
 
         _netCts = new CancellationTokenSource();
@@ -299,11 +308,42 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
             var spawnPos = new System.Numerics.Vector3(spawn.X / 10f, spawn.Y / 10f, spawn.Z / 10f);
             BuildZoneScene(gtd, resolver, useCentreSpawn: false, spawn: spawnPos);
+            EnsureInGameUi();
             Log($"Zone '{zone?.Name ?? spawn.Zone.ToString()}' rendered at the spawn.");
         }
         catch (Exception ex)
         {
             Log($"Online zone load failed: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Build the in-game HUD once the player is in the world. Requires --data (the .uif
+    /// corpus); degrades to the immediate-mode <see cref="DrawHud"/> when absent, like the
+    /// zone render. Binds only the hooks the executable does not own (MyInfo/HP/chat).
+    /// </summary>
+    private void EnsureInGameUi()
+    {
+        if (_inGameUi != null || _options.DataPath == null)
+            return;
+
+        try
+        {
+            _inGameUi = new InGameUi(_context, GraphicsDevice, _fonts, _options.DataPath);
+            _inGameUi.Log += Log;
+            _inGameUi.Bind(_context.InGame);
+
+            // Entering the world retires the frontend dialogs so ActiveUi routes
+            // input to the HUD (the interactive-login path keeps _frontend live
+            // until here).
+            _frontend?.Dispose();
+            _frontend = null;
+
+            Log("In-game HUD ready.");
+        }
+        catch (Exception ex)
+        {
+            Log($"In-game HUD unavailable: {ex.Message}");
         }
     }
 
@@ -356,6 +396,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         _network?.Pump(_context.Machine);
         _context?.Machine.TickActive();
         _frontend?.Tick();
+        _inGameUi?.Tick();
 
         // Interactive UI first; it consumes input (and text focus) before gameplay.
         UiManager ui = ActiveUi;
@@ -363,8 +404,18 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         bool uiHandled = ui.Dialogs.Count > 0
             && (UiInputBridge.Dispatch(ui, _input) & (UiMouseProc.DoneSomething | UiMouseProc.DialogFocus)) != 0;
 
-        if (_input.IsKeyPress(OpenKO.Client.Engine.Input.KeyMap.DIK_RETURN) && _frontend?.OnReturnKey() == true)
-            uiHandled = true;
+        if (_input.IsKeyPress(OpenKO.Client.Engine.Input.KeyMap.DIK_RETURN))
+        {
+            if (_frontend?.OnReturnKey() == true)
+                uiHandled = true;
+            else if (_inGameUi is { } hud && hud.Manager.FocusedEdit != null)
+            {
+                // Chat edit focused: submit the line (idempotent with the TextInput path,
+                // which already clears the edit on Enter).
+                hud.SubmitChatReturn();
+                uiHandled = true;
+            }
+        }
 
         if (!uiHandled)
             HandleInput((float)gameTime.ElapsedGameTime.TotalSeconds);
@@ -419,7 +470,12 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         if (_terrain != null)
             RenderWorld();
 
-        DrawHud();
+        // The real HUD replaces the immediate-mode overlay once it exists (needs --data);
+        // fall back to DrawHud only when the HUD could not be built.
+        if (_inGameUi != null)
+            _inGameUi.Draw(gameTime.TotalGameTime.TotalSeconds);
+        else
+            DrawHud();
         _frontend?.Draw(gameTime.TotalGameTime.TotalSeconds);
 
         base.Draw(gameTime);
@@ -498,11 +554,17 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
                 _selection = $"{(p.IsNpc ? "NPC" : "Player")} {name} (id {p.Id}, {p.Distance:F0}m)";
                 _targetId = p.Id;
                 _targetHp = "";
+
+                // Show the HUD target bar and ask the server for its HP.
+                _inGameUi?.TargetBar.SetTarget(name);
+                if (_network != null && _context.Machine.Active == _context.InGame)
+                    _context.InGame.SendTargetHpRequest(p.Id);
             }
             else
             {
                 _selection = "none";
                 _targetId = null;
+                _inGameUi?.TargetBar.Clear();
             }
         }
 
@@ -743,6 +805,8 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     protected override void UnloadContent()
     {
         _netCts?.Cancel();
+        _inGameUi?.Dispose();
+        _frontend?.Dispose();
         _terrain?.Dispose();
         _sky?.Dispose();
         _caches?.Textures.Dispose();
