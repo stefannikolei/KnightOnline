@@ -87,6 +87,28 @@ public sealed class UiEditControl : UiControl
         CaretPos = 0;
     }
 
+    // KoEncoding.Cp949 already registered the code-pages provider; derive a strict
+    // (throwing) clone so unrepresentable input is rejected rather than silently
+    // turned into '?'. The original client is CP949/ANSI-only.
+    private static readonly System.Text.Encoding Cp949Strict =
+        System.Text.Encoding.GetEncoding(KoEncoding.Cp949.CodePage,
+            System.Text.EncoderFallback.ExceptionFallback,
+            System.Text.DecoderFallback.ExceptionFallback);
+
+    /// <summary>The original client is CP949/ANSI-only — reject what the wire can't carry.</summary>
+    private static bool IsCp949Encodable(char c)
+    {
+        try
+        {
+            Cp949Strict.GetByteCount([c]);
+            return true;
+        }
+        catch (System.Text.EncoderFallbackException)
+        {
+            return false;
+        }
+    }
+
     /// <summary>Insert a typed character at the caret (respecting number-only / max-length).</summary>
     public bool InsertChar(char c)
     {
@@ -94,12 +116,32 @@ public sealed class UiEditControl : UiControl
             return false;
         if (IsNumberOnly && !char.IsDigit(c))
             return false;
+        if (!IsCp949Encodable(c))
+            return false;
         if (MaxLength > 0 && Cp949Bytes(_text) + Cp949Bytes(c) > MaxLength)
             return false;
 
         _text = _text.Insert(CaretPos, c.ToString());
         CaretPos++;
         return true;
+    }
+
+    /// <summary>
+    /// CN3UIEdit routes its buffer through the child string (m_pBuffOutRef) —
+    /// keep the display child in sync every tick.
+    /// </summary>
+    public override void Tick()
+    {
+        foreach (UiControl child in Children)
+        {
+            if (child is UiStringControl str)
+            {
+                str.Text = DisplayText;
+                break;
+            }
+        }
+
+        base.Tick();
     }
 
     public bool Backspace()

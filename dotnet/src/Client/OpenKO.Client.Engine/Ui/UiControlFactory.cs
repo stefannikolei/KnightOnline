@@ -23,6 +23,7 @@ public static class UiControlFactory
         N3UiList list => new UiListControl(list),
         N3UiScrollBar scroll => new UiScrollBarControl(scroll),
         N3UiEdit edit => new UiEditControl(edit),
+        N3UiString str => new UiStringControl(str),
         _ => new UiControl(node),
     };
 }

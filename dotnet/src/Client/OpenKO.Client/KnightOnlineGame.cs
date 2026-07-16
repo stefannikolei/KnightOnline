@@ -64,7 +64,11 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     private readonly OpenKO.Client.Engine.Input.InputState _input = new();
     private readonly bool[] _dikDown = new bool[OpenKO.Client.Engine.Input.InputState.NumKeys];
     private readonly UiManager _ui = new();
+    private FrontendUi? _frontend;
     private int _prevScrollWheel;
+
+    /// <summary>The manager receiving input/drawing this frame (frontend when open).</summary>
+    private UiManager ActiveUi => _frontend?.Manager ?? _ui;
 
     private string _selection = "none";
     private short? _targetId;
@@ -197,7 +201,36 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             Password = _options.Password,
         };
 
-        WireAutoLogin();
+        // --account keeps the scripted auto-login; otherwise the interactive
+        // frontend (real .uif dialogs) drives login → char-select.
+        if (_options.Account.Length > 0)
+        {
+            WireAutoLogin();
+        }
+        else if (_options.DataPath != null)
+        {
+            try
+            {
+                _frontend = new FrontendUi(_context, GraphicsDevice, _fonts, _options.DataPath);
+                _frontend.Log += Log;
+                _frontend.QuitRequested += Exit;
+                Log("Interactive frontend ready (no --account).");
+            }
+            catch (Exception ex)
+            {
+                Log($"Frontend UI unavailable: {ex.Message}");
+            }
+        }
+        else
+        {
+            Log("No --account and no --data — cannot log in (pass one of them).");
+        }
+
+        _context.EnteredGame = spawn =>
+        {
+            Log($"Entered game — zone {spawn.Zone} at ({spawn.X / 10f}, {spawn.Z / 10f}).");
+            LoadOnlineZone(spawn);
+        };
 
         // Combat feedback: the target's HP + last damage after each hit.
         _context.InGame.TargetHpReceived = t =>
@@ -236,11 +269,6 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             Log(slot >= 0 ? $"Selecting character '{chars[slot].CharId}'." : "No characters on the account.");
             if (slot >= 0)
                 _context.CharSelect.SelectCharacter(slot);
-        };
-        _context.EnteredGame = spawn =>
-        {
-            Log($"Entered game — zone {spawn.Zone} at ({spawn.X / 10f}, {spawn.Z / 10f}).");
-            LoadOnlineZone(spawn);
         };
     }
 
@@ -327,11 +355,16 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         _timer.Tick(gameTime.ElapsedGameTime.TotalSeconds);
         _network?.Pump(_context.Machine);
         _context?.Machine.TickActive();
+        _frontend?.Tick();
 
         // Interactive UI first; it consumes input (and text focus) before gameplay.
-        _ui.Tick();
-        bool uiHandled = _ui.Dialogs.Count > 0
-            && (UiInputBridge.Dispatch(_ui, _input) & UiMouseProc.DoneSomething) != 0;
+        UiManager ui = ActiveUi;
+        ui.Tick();
+        bool uiHandled = ui.Dialogs.Count > 0
+            && (UiInputBridge.Dispatch(ui, _input) & (UiMouseProc.DoneSomething | UiMouseProc.DialogFocus)) != 0;
+
+        if (_input.IsKeyPress(OpenKO.Client.Engine.Input.KeyMap.DIK_RETURN) && _frontend?.OnReturnKey() == true)
+            uiHandled = true;
 
         if (!uiHandled)
             HandleInput((float)gameTime.ElapsedGameTime.TotalSeconds);
@@ -361,7 +394,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     /// <summary>Route text/edit keys to the focused edit box (MonoGame Window.TextInput).</summary>
     private void OnTextInput(object? sender, TextInputEventArgs e)
     {
-        if (_ui.FocusedEdit is not { } edit)
+        if (ActiveUi.FocusedEdit is not { } edit)
             return;
 
         switch (e.Key)
@@ -387,6 +420,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             RenderWorld();
 
         DrawHud();
+        _frontend?.Draw(gameTime.TotalGameTime.TotalSeconds);
 
         base.Draw(gameTime);
 

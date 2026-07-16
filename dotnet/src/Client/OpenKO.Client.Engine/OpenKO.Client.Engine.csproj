@@ -6,6 +6,11 @@
     device layer that hands finished arrays/states to MonoGame.
   -->
 
+  <PropertyGroup>
+    <!-- SdlIme passes an SDL_Rect* into the natively loaded SDL2. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" />
     <PackageReference Include="FontStashSharp.MonoGame" />

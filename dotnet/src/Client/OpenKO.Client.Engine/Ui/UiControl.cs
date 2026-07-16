@@ -60,10 +60,15 @@ public class UiControl
     /// <summary>CN3UIBase::IsIn — inclusive on all edges.</summary>
     public bool IsIn(int x, int y) => UiRectMath.IsIn(Region, x, y);
 
-    /// <summary>ReceiveMessage — the base raises <see cref="Message"/>; subclasses may override.</summary>
+    /// <summary>
+    /// ReceiveMessage — raise <see cref="Message"/>, then bubble to the parent
+    /// (CN3UIBase::ReceiveMessage forwards to m_pParent), so a dialog controller can
+    /// subscribe on the root and still see messages from deeply nested widgets.
+    /// </summary>
     public virtual bool ReceiveMessage(UiControl sender, uint msg)
     {
         Message?.Invoke(sender, msg);
+        Parent?.ReceiveMessage(sender, msg);
         return true;
     }
 

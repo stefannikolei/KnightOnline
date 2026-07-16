@@ -126,6 +126,24 @@ public static class UiRenderer
     /// <summary>Emit this control's own quad/text based on its node type, using the live Region.</summary>
     private static void RenderSelf(UiControl c, List<UiQuadPlan> quads, List<UiTextPlan> texts)
     {
+        // Runtime string overrides the static layout text (SetString/SetColor).
+        if (c is UiStringControl str2 && c.Node is N3UiString strNode)
+        {
+            if (str2.Text.Length > 0)
+                texts.Add(new UiTextPlan(str2.Text, c.Region, strNode.FontName, strNode.FontHeight, strNode.FontFlags, str2.ColorArgb));
+            return;
+        }
+
+        // Edit box: the child string is the display buffer (m_pBuffOutRef, synced in
+        // Tick). Only fall back to drawing directly when the layout has no string child.
+        if (c is UiEditControl edit && c.Node is N3UiEdit)
+        {
+            bool hasStringChild = c.Children.Any(ch => ch is UiStringControl);
+            if (!hasStringChild && edit.DisplayText.Length > 0)
+                texts.Add(new UiTextPlan(edit.DisplayText, c.Region, string.Empty, 12, 0, OpaqueWhite));
+            return;
+        }
+
         switch (c.Node)
         {
             case N3UiImage image when (image.Style & UiStyles.ImageAnimate) != 0:
