@@ -12,6 +12,7 @@ public sealed class UiResourceTable
 {
     // 1-based column positions from GameDef.h (index 0 is the uint id).
     private const int ColLogin = 1;           // 02 szLogIn
+    private const int ColCmd = 2;             // 03 szCmd
     private const int ColChat = 3;            // 04 szChat
     private const int ColMsgOutput = 4;       // 05 szMsgOutput
     private const int ColStateBar = 5;        // 06 szStateBar
@@ -24,6 +25,7 @@ public sealed class UiResourceTable
     private const int ColCharacterCreate = 23; // 24 szCharacterCreate
     private const int ColCharacterSelect = 24; // 25 szCharacterSelect
     private const int ColMessageBox = 26;     // 27 szMessageBox
+    private const int ColDead = 52;           // 53 szDead
     private const int ColNationSelect = 55;   // 56 szNationSelect
     private const int ColLoginIntro = 118;    // 119 szLoginIntro
     private const int ColNationSelectNew = 129; // 130 szNationSelectNew
@@ -43,6 +45,10 @@ public sealed class UiResourceTable
     }
 
     public string Login(int nation) => Get(nation, ColLogin);
+
+    public string Cmd(int nation) => Get(nation, ColCmd);
+
+    public string Dead(int nation) => Get(nation, ColDead);
 
     public string LoginIntro(int nation) => Get(nation, ColLoginIntro);
 

@@ -101,6 +101,27 @@ public static class GameProtocol
         return w.Written.ToArray();
     }
 
+    /// <summary>
+    /// CUIDead::MsgSend_Revival — [WIZ_REGENE][type]. type 1 = return to town,
+    /// 2 = revive at the death spot with a life stone.
+    /// </summary>
+    public static byte[] BuildRevival(byte type) => [(byte)GameOpcode.WIZ_REGENE, type];
+
+    /// <summary>
+    /// CGameProcMain::MsgSend_RequestTargetHP — [WIZ_TARGET_HP][short targetId]
+    /// [byte updateImmediately]. The flag byte is 0x01 (update the bar immediately)
+    /// as sent when a new target is picked; 0x00 asks the server to animate it.
+    /// </summary>
+    public static byte[] BuildTargetHpRequest(short targetId)
+    {
+        var buffer = new byte[4];
+        var w = new PacketWriter(buffer);
+        w.SetByte((byte)GameOpcode.WIZ_TARGET_HP);
+        w.SetShort(targetId);
+        w.SetByte(0x01); // byUpdateImmediately
+        return w.Written.ToArray();
+    }
+
     /// <summary>MsgSend_GameStart phase 1 ([WIZ_GAMESTART][0x01]).</summary>
     public static byte[] BuildGameStartRequest() => [(byte)GameOpcode.WIZ_GAMESTART, 0x01];
 

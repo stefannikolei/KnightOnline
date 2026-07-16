@@ -101,6 +101,13 @@ public sealed class InGameState(GameContext context) : GameState
     public void SendAttack(short targetId, float interval, float distance) =>
         context.Client.Send(CombatProtocol.BuildAttack(targetId, interval, distance));
 
+    /// <summary>CUIDead::MsgSend_Revival — type 1 = return to town, 2 = life-stone revive.</summary>
+    public void SendRevival(byte type) => context.Client.Send(GameProtocol.BuildRevival(type));
+
+    /// <summary>CGameProcMain::MsgSend_RequestTargetHP — ask the server for a target's HP.</summary>
+    public void SendTargetHpRequest(short targetId) =>
+        context.Client.Send(GameProtocol.BuildTargetHpRequest(targetId));
+
     /// <summary>Sends a pre-built group packet (party/exchange/warehouse/knights).</summary>
     public void SendRaw(ReadOnlySpan<byte> payload) => context.Client.Send(payload);
 
