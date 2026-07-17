@@ -120,6 +120,15 @@ public sealed class InGameState(GameContext context) : GameState
         World.Local.Y = Spawn.Y * 0.1f;
 
         // MsgSend_GameStart phase 1 (loading). The zone is assumed loaded here.
+        //
+        // Zone-load gate (slice 9.11d): no explicit "zone ready" flag is needed and
+        // one is deliberately NOT forced (it would only add timing risk to the
+        // working login→in-game flow). The ordering already guarantees the device
+        // scene is up before the phase-2 ack: WIZ_SEL_CHAR calls SetActive(InGame)
+        // (this Init → phase-1 request) and then, synchronously on the same thread,
+        // EnteredGame → KnightOnlineGame.BuildZoneScene builds the terrain/water/FX
+        // device-side. The phase-2 ack (WIZ_GAMESTART handler below) can only be sent
+        // after a server round-trip, by which point that synchronous build is done.
         context.Client.Send(GameProtocol.BuildGameStartRequest());
     }
 

@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using OpenKO.Client.Assets;
 using OpenKO.Client.Assets.Zones;
 using OpenKO.Client.Engine.Audio;
+using OpenKO.Client.Engine.Fx;
 using OpenKO.Client.Engine.Interop;
 using OpenKO.Client.Engine.IO;
 using OpenKO.Client.Engine.Objects;
@@ -13,6 +14,7 @@ using OpenKO.Client.Engine.Scene;
 using OpenKO.Client.Engine.Sky;
 using OpenKO.Client.Engine.Terrain;
 using OpenKO.Client.Engine.Ui;
+using OpenKO.Client.Game.Fx;
 using OpenKO.Client.Game.Net;
 using OpenKO.Client.Game.States;
 using OpenKO.Client.Game.World;
@@ -43,6 +45,19 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     private TerrainRenderer? _terrain;
     private N3Terrain? _terrainData;
     private SkyRenderer? _sky;
+
+    // Water + weather + FX (slice 9.11d): the already-built renderers wired into
+    // the zone scene. _fx is the pure game-side manager (bundles + weather field);
+    // _river/_weather/_fxRenderer are the device layers.
+    private RiverRenderer? _river;
+    private WeatherRenderer? _weather;
+    private FxManager? _fx;
+    private FxRenderer? _fxRenderer;
+    private bool _fxHooksBound;
+
+    // BGM (slice 9.11d): the current town/battle theme key and a re-select throttle.
+    private string? _currentBgm;
+    private float _bgmThrottle;
     private OpenKO.Client.Engine.Objects.ChrRenderer? _character;
     private BasicEffect? _characterEffect;
     private OpenKO.Client.Engine.Objects.ChrAssetCaches? _caches;
@@ -167,6 +182,165 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
         LoadDemoCharacter(resolver);
         LoadZoneObjects(gtdPath);
+        BuildWaterWeatherFx(terrain, resolver);
+
+        // Pick the initial (town) BGM for the newly entered zone (CGameProcMain::InitZone).
+        SelectBgm();
+    }
+
+    /// <summary>
+    /// Construct the water (rivers), the weather field renderer and the FX manager
+    /// for the freshly loaded zone, disposing any previous zone's device layers
+    /// first (guards against leaks on a zone change). Every asset is best-effort:
+    /// missing caustic/snow textures or FX bundles just degrade to nothing.
+    /// </summary>
+    private void BuildWaterWeatherFx(N3Terrain terrain, KoPathResolver resolver)
+    {
+        // Dispose the previous zone's device layers before rebuilding.
+        _river?.Dispose();
+        _weather?.Dispose();
+        _fxRenderer?.Dispose();
+        _river = null;
+        _weather = null;
+        _fxRenderer = null;
+
+        try
+        {
+            // Water: RiverRenderer reads terrain.Rivers itself and loads the caustic
+            // frames (misc\river\caustNN.dxt) via the resolver, degrading if absent.
+            _river = new RiverRenderer(GraphicsDevice, terrain, resolver);
+            if (_river.RiverCount > 0)
+                Log($"Water: {_river.RiverCount} river strip(s).");
+
+            // Weather: the device layer for the global rain/snow field. The flake
+            // texture (misc\Snow.DXT) is null-safe.
+            _weather = new WeatherRenderer(GraphicsDevice)
+            {
+                SnowTexture = _caches?.Textures.Get("misc\\Snow.dxt"),
+            };
+
+            // FX manager + renderer over the client's world roster + asset caches.
+            var locator = new ClientFxEntityLocator(this);
+            var loader = new ClientFxBundleLoader(resolver);
+            _fx = new FxManager(locator, loader);
+            _fxRenderer = new FxRenderer(GraphicsDevice, ResolveFxTexture);
+
+            BindFxHooks();
+        }
+        catch (Exception ex)
+        {
+            Log($"Water/weather/FX init failed: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// FX part frame texture resolver (N3FXPartBase::Load naming:
+    /// <c>{TexName}{frame:0000}.dxt</c>). Degrades to null when the asset is absent.
+    /// </summary>
+    private Texture2D? ResolveFxTexture(OpenKO.Client.Assets.N3FXPartBase part, int frame)
+    {
+        if (_caches == null || string.IsNullOrEmpty(part.TexName))
+            return null;
+        return _caches.Textures.Get($"{part.TexName}{frame:0000}.dxt");
+    }
+
+    /// <summary>
+    /// Bind the online → FX hooks once. The handlers read the live <see cref="_fx"/>
+    /// field (not a captured instance), so a zone change that rebuilds the manager
+    /// keeps working without re-subscribing or leaking delegates.
+    /// Guarded for offline/protocol-only (no server) — the events simply never fire.
+    /// </summary>
+    private void BindFxHooks()
+    {
+        if (_fxHooksBound)
+            return;
+        _fxHooksBound = true;
+
+        InGameState inGame = _context.InGame;
+
+        // WIZ_WEATHER → (re)create the global weather field.
+        inGame.WeatherChanged += w => _fx?.SetWeather((WeatherType)w.Type, w.Amount);
+
+        // WIZ_MAGIC_PROCESS → the cast/fly/hit FX triggers. The magic→(fx1,fx2)
+        // resolver would come from the skill/magic table; that table is not loaded
+        // in the client yet, so it degrades to (0,0) = no FX (documented deferral).
+        inGame.MagicReceived += packet =>
+        {
+            if (_fx is { } fx)
+                FxTriggerBinding.Trigger(fx, packet, MagicFxResolve);
+        };
+    }
+
+    /// <summary>
+    /// magicId → (fx1, fx2) effect ids. The effect table is not wired, so this
+    /// returns (0, 0) (no FX). Wire it to the skill/magic table (dwEffectID1/2)
+    /// once that table is loaded client-side.
+    /// </summary>
+    private static (int Fx1, int Fx2) MagicFxResolve(int magicId) => (0, 0);
+
+    /// <summary>
+    /// CGameProcMain town/battle BGM choice: pick the track for the local nation +
+    /// the current battle state and, on a change, play a matching .wav if the corpus
+    /// has one (only WAV is decodable — <see cref="WavAudio"/>), else just log the
+    /// selection. MP3 BGM streaming stays deferred (no mpg123 decoder).
+    /// </summary>
+    private void SelectBgm()
+    {
+        if (_context == null)
+            return;
+
+        var nation = (BgmNation)_context.InGame.World.Local.Nation;
+        BgmTrack track = BgmSelector.Select(nation, IsNearHostile(), _context.Spawn.Zone);
+        if (track.Name == _currentBgm)
+            return;
+
+        _currentBgm = track.Name;
+        if (!TryPlayBgmWav(track))
+            Log($"BGM: {track.Name} (id {track.Id}) selected — no .wav in corpus (MP3 streaming deferred).");
+    }
+
+    /// <summary>
+    /// UpdateBGM's battle trigger: any NPC within 12 units of the player. The C++
+    /// checks hostility (IsHostileTarget); the client does not carry per-NPC
+    /// hostility, so proximity to any NPC is used as the battle approximation.
+    /// </summary>
+    private bool IsNearHostile()
+    {
+        if (_context == null)
+            return false;
+        var here = new System.Numerics.Vector3(_playerPos.X, _playerPos.Y, _playerPos.Z);
+        foreach (NpcEntity npc in _context.InGame.World.Npcs.Values)
+        {
+            var pos = new System.Numerics.Vector3(npc.X, npc.Y, npc.Z);
+            if (System.Numerics.Vector3.Distance(here, pos) < 12.0f)
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>Play a BGM track from a corpus .wav (Sound\&lt;id&gt;.wav), looping. False if absent/unplayable.</summary>
+    private bool TryPlayBgmWav(BgmTrack track)
+    {
+        if (_options.DataPath == null)
+            return false;
+
+        try
+        {
+            var resolver = new KoPathResolver(_options.DataPath);
+            string? wav = resolver.Resolve($"Sound\\{track.Id}.wav") ?? resolver.Resolve($"Sound\\{track.Name}.wav");
+            if (wav == null)
+                return false;
+
+            if (!_sound.IsRegistered(track.Name))
+                _sound.Register(track.Name, WavAudio.LoadFromFile(wav), SoundType.Stream);
+
+            return _sound.Play(track.Name, gain: 0.6f, loop: true);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
     /// <summary>Loads and prepares the zone's static objects (the sibling .opd of the .gtd).</summary>
@@ -407,6 +581,18 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         _frontend?.Tick();
         _inGameUi?.Tick();
 
+        // Advance the FX bundles + the global weather field (CN3FXMgr::Tick). The
+        // camera XZ/Y the field recentres on is the last camera eye (RenderWorld).
+        _fx?.Tick(_timer.SecPerFrame, _gameCamera.Eye);
+
+        // Re-evaluate the town/battle BGM a couple of times a second (UpdateBGM).
+        _bgmThrottle -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+        if (_terrainData != null && _bgmThrottle <= 0f)
+        {
+            _bgmThrottle = 0.5f;
+            SelectBgm();
+        }
+
         // I toggles the inventory window (CGameProcMain hotkey), when the HUD is up and no chat
         // edit is focused (so typing "i" in chat doesn't open it).
         if (_inGameUi is { } invHud && invHud.Manager.FocusedEdit == null
@@ -637,6 +823,10 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         System.Numerics.Vector3 forward = System.Numerics.Vector3.Normalize(camera.At - camera.Eye);
         _sound.SetListener(camera.Eye, forward, System.Numerics.Vector3.UnitY);
 
+        // Day-night: drive the simulated sun/moon/star arc + fog tint from the game
+        // clock before drawing the sky, then scroll the clouds.
+        _sky?.SetTimeOfDay(DayNightCycle.DayFractionFromSeconds((float)_gameSeconds));
+        _sky?.Tick(_timer.SecPerFrame);
         _sky?.Render(GraphicsDevice, camera);
         _terrain!.Render(GraphicsDevice, camera);
 
@@ -680,6 +870,24 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
                 GraphicsDevice, _characterEffect, camera, _timer,
                 _context.InGame.World, _timer.SecPerFrame);
         }
+
+        // Transparent layers over the opaque world, in the C++ order: water (CN3River),
+        // then the effect bundles (CN3FXMgr::Render, additive/alpha, no Z write), then
+        // the global weather field (CN3GERain/Snow) as the front-most overlay.
+        if (_river != null)
+        {
+            _river.Tick(camera, _timer.SecPerFrame);
+            _river.Render(GraphicsDevice, camera);
+        }
+
+        if (_fx != null && _fxRenderer != null)
+        {
+            foreach (FxBundleGame bundle in _fx.Bundles)
+                _fxRenderer.Render(bundle.Simulator, camera);
+        }
+
+        if (_weather != null && _fx != null)
+            _weather.Render(_fx.Weather, camera);
     }
 
     private void LoadDemoCharacter(KoPathResolver resolver)
@@ -849,11 +1057,97 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         _frontend?.Dispose();
         _terrain?.Dispose();
         _sky?.Dispose();
+        _river?.Dispose();
+        _weather?.Dispose();
+        _fxRenderer?.Dispose();
         _caches?.Textures.Dispose();
         _characterEffect?.Dispose();
         _fonts.Dispose();
         _spriteBatch.Dispose();
         base.UnloadContent();
+    }
+
+    /// <summary>
+    /// CGameProcMain::CharacterGetByID/JointPosGet over the client world roster: the
+    /// local player (<see cref="_playerPos"/>), the region-visible remote players and
+    /// the NPCs. Joints are not exposed by the roster, so a joint offset is ignored
+    /// (origin only); returns false when the entity has left the region.
+    /// </summary>
+    private sealed class ClientFxEntityLocator(KnightOnlineGame game) : IFxEntityLocator
+    {
+        public bool TryGetPosition(int entityId, int joint, out System.Numerics.Vector3 pos)
+        {
+            _ = joint; // Joint offset deferred (the roster exposes origins only).
+            pos = default;
+
+            WorldEntities world = game._context?.InGame.World!;
+            if (world == null)
+                return false;
+
+            // The local player.
+            if (entityId == world.Local.SocketId)
+            {
+                pos = new System.Numerics.Vector3(game._playerPos.X, game._playerPos.Y, game._playerPos.Z);
+                return true;
+            }
+
+            // A region-visible remote player.
+            if (world.TryGet((short)entityId, out RemotePlayer player))
+            {
+                pos = new System.Numerics.Vector3(player.X, player.Y, player.Z);
+                return true;
+            }
+
+            // An NPC.
+            if (world.TryGetNpc((short)entityId, out NpcEntity npc))
+            {
+                pos = new System.Numerics.Vector3(npc.X, npc.Y, npc.Z);
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// The FXID → .fxb loader. The FX effect table (s_pTbl_FXSource) is not wired
+    /// yet, so this resolves a best-effort <c>fx\&lt;FXID&gt;.fxb</c> path through the
+    /// resolver and caches the loaded bundle by its lower-cased filename. Returns
+    /// false (a no-op trigger) when the file is absent — the offline corpus has no
+    /// .fxb, which is expected.
+    /// </summary>
+    private sealed class ClientFxBundleLoader(KoPathResolver resolver) : IFxBundleLoader
+    {
+        private readonly Dictionary<string, OpenKO.Client.Assets.N3FXBundle> _cache =
+            new(StringComparer.OrdinalIgnoreCase);
+
+        public bool TryResolve(int fxId, out string cacheKey, out OpenKO.Client.Assets.N3FXBundle bundle)
+        {
+            cacheKey = $"{fxId}.fxb";
+            if (_cache.TryGetValue(cacheKey, out OpenKO.Client.Assets.N3FXBundle? cached))
+            {
+                bundle = cached;
+                return true;
+            }
+
+            bundle = null!;
+            string? path = resolver.Resolve($"fx\\{fxId}.fxb") ?? resolver.Resolve($"{fxId}.fxb");
+            if (path == null)
+                return false;
+
+            try
+            {
+                var loaded = new OpenKO.Client.Assets.N3FXBundle();
+                loaded.LoadFromFile(path);
+                _cache[cacheKey] = loaded;
+                bundle = loaded;
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }
 
