@@ -71,6 +71,9 @@ public sealed class InGameUi : IDisposable
     /// <summary>The class-change (promotion) dialog — null when the layout failed to load.</summary>
     public ClassChangeDialog? ClassChange { get; }
 
+    /// <summary>The icon hotkey bar — null when the layout or skill table failed to load.</summary>
+    public HotKeyDialog? HotKey { get; }
+
     public event Action<string>? Log;
 
     public InGameUi(GameContext context, GraphicsDevice device, FontService fonts, string dataPath)
@@ -216,6 +219,25 @@ public sealed class InGameUi : IDisposable
             Log?.Invoke("ClassChange layout not found: " + table.ClassChange(nation));
         }
 
+        // Hotkey bar — always visible in-game, anchored bottom-centre above the command bar
+        // (CGameProcMain). Needs the skill table; persists to a per-character file.
+        UiControl? hotkeyRoot = LoadDialog(table.HotKey(nation));
+        if (hotkeyRoot != null && skills != null)
+        {
+            hotkeyRoot.SetPos((w - hotkeyRoot.Width) / 2, h - cmdRoot.Height - hotkeyRoot.Height);
+            IHotkeyStore store = new FileHotkeyStore(context.Account, ResolveCharacterName(context));
+            HotKey = new HotKeyDialog(context, hotkeyRoot, skills, SkillTree, Manager.IconDrag, store);
+            Manager.BindIconDragState(hotkeyRoot);
+        }
+        else if (hotkeyRoot == null)
+        {
+            Log?.Invoke("HotKey layout not found: " + table.HotKey(nation));
+        }
+        else
+        {
+            Log?.Invoke("HotKey skill table not found; hotkey bar disabled.");
+        }
+
         // Register with the manager (last added = topmost = input first). Chat sits above
         // the passive bars so its edit/buttons grab input; the death dialog floats on top.
         Manager.Add(stateRoot);
@@ -240,6 +262,18 @@ public sealed class InGameUi : IDisposable
             Manager.Add(skillRoot);
         if (classRoot != null)
             Manager.Add(classRoot);
+        // Hotkey bar sits with the HUD (always visible), registered so its icons receive input.
+        if (hotkeyRoot != null && skills != null)
+            Manager.Add(hotkeyRoot);
+    }
+
+    /// <summary>The selected character's name (the hotkey store key), or a stable fallback.</summary>
+    private static string ResolveCharacterName(GameContext context)
+    {
+        int i = context.SelectedCharIndex;
+        if (i >= 0 && i < context.Characters.Count && context.Characters[i].CharId.Length > 0)
+            return context.Characters[i].CharId;
+        return context.InGame.World.Local.Name;
     }
 
     /// <summary>
@@ -345,12 +379,16 @@ public sealed class InGameUi : IDisposable
         // Skill tree: rebuild from MyInfo (additive; doesn't clobber the state bar / inventory hooks).
         SkillTree?.Bind(inGame);
 
+        // Hotkey bar: load persisted hotkeys on MyInfo and feed the game clock for drag-casts.
+        HotKey?.Bind(inGame);
+
         // Class change: the server reply drives the dialog; a promotion rebuilds the skill tree.
         if (ClassChange is { } cc)
         {
             inGame.ClassChangeResult += cc.Open;
-            // SEAM: the hotkey slice will subscribe cc.ClassChanged to flush hotkeys. No-op for now.
-            cc.ClassChanged += () => { };
+            // A promotion invalidates the old class's skills → flush the hotkey bar.
+            if (HotKey is { } hk)
+                cc.ClassChanged += hk.FlushAll;
         }
         Dead.RevivalRequested += type =>
         {
@@ -404,8 +442,23 @@ public sealed class InGameUi : IDisposable
             inv.Cursor = new UiPoint(x, y);
         if (DroppedItem is { } drop)
             drop.Cursor = new UiPoint(x, y);
+        if (HotKey is { } hk)
+            hk.Cursor = new UiPoint(x, y);
         UpdateItemTooltip(x, y);
     }
+
+    /// <summary>Feed the current combat target id to the hotkey cast path (-1 = none).</summary>
+    public void SetTarget(short? targetId)
+    {
+        if (HotKey is { } hk)
+            hk.TargetId = targetId ?? -1;
+    }
+
+    /// <summary>
+    /// Route a number key (1-8, zero-based slot) to the hotkey bar's cast pipeline at the given game
+    /// clock. Called by the executable when no chat edit is focused.
+    /// </summary>
+    public void TriggerHotkey(int slot, double gameSeconds) => HotKey?.TriggerSlot(slot, gameSeconds);
 
     /// <summary>
     /// Hover tooltip: while the inventory is open, show the item image-tooltip for the icon under

@@ -74,6 +74,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     private string _selection = "none";
     private short? _targetId;
     private string _targetHp = "";
+    private double _gameSeconds;
 
     private readonly List<string> _log = [];
     private int _framesDrawn;
@@ -333,6 +334,10 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             _inGameUi.Log += Log;
             _inGameUi.Bind(_context.InGame);
 
+            // Feed the game clock to the hotkey bar's drag-cast cooldown gate.
+            if (_inGameUi.HotKey is { } hk)
+                hk.NowSeconds = () => _gameSeconds;
+
             // Populate the inventory from any MyInfo already received before the HUD was built.
             _inGameUi.Inventory?.Populate(_context.InGame.Inventory);
 
@@ -390,6 +395,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
     protected override void Update(GameTime gameTime)
     {
+        _gameSeconds = gameTime.TotalGameTime.TotalSeconds;
         SampleInput(gameTime.TotalGameTime.TotalSeconds);
 
         if (_input.IsKeyDown(OpenKO.Client.Engine.Input.KeyMap.DIK_ESCAPE))
@@ -407,6 +413,16 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             && _input.IsKeyPress(OpenKO.Client.Engine.Input.KeyMap.DIK_I))
         {
             invHud.ToggleInventory();
+        }
+
+        // Number keys 1-8 trigger the hotkey bar slots (no chat edit focused).
+        if (_inGameUi is { HotKey: not null } hkHud && hkHud.Manager.FocusedEdit == null)
+        {
+            for (int i = 0; i < OpenKO.Client.Game.Ui.HotKeyDialog.SlotCount; i++)
+            {
+                if (_input.IsKeyPress(OpenKO.Client.Engine.Input.KeyMap.DIK_1 + i))
+                    hkHud.TriggerHotkey(i, _gameSeconds);
+            }
         }
 
         // Interactive UI first; it consumes input (and text focus) before gameplay.
@@ -579,6 +595,9 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
                 _inGameUi?.TargetBar.Clear();
             }
         }
+
+        // Feed the current target to the hotkey cast pipeline (CGameBase::s_pPlayer->m_iIDTarget).
+        _inGameUi?.SetTarget(_targetId);
 
         // Space attacks the selected target (CGameProcMain::MsgSend_Attack).
         if (_input.IsKeyPress(OpenKO.Client.Engine.Input.KeyMap.DIK_SPACE) && _targetId is { } tid

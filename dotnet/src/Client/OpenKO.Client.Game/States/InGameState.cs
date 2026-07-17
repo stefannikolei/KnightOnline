@@ -23,6 +23,9 @@ public sealed class InGameState(GameContext context) : GameState
     /// <summary>The local player's inventory (filled from MyInfo in a later slice).</summary>
     public Inventory Inventory { get; } = new();
 
+    /// <summary>The cast gate + cooldown tracker shared by the hotkey bar (CMagicSkillMng).</summary>
+    public MagicCastManager Magic { get; } = new();
+
     /// <summary>The spawn zone/position carried over from char select.</summary>
     public SelectCharResult Spawn => context.Spawn;
 
@@ -117,6 +120,22 @@ public sealed class InGameState(GameContext context) : GameState
 
     /// <summary>Sends a magic-process step (CMagicProcess flow).</summary>
     public void SendMagic(MagicPacket packet) => context.Client.Send(MagicProtocol.Build(packet));
+
+    /// <summary>
+    /// CUIHotKeyDlg::DoOperate → CMagicSkillMng::MsgSend_MagicProcess: run the cast gate for a
+    /// skill at <paramref name="targetId"/> and, on success, send the built WIZ_MAGIC_PROCESS
+    /// packet. The caster id/position come from the local player; <paramref name="nowSeconds"/> is
+    /// the injectable game clock the cooldown gate reads. Returns the cast outcome.
+    /// </summary>
+    public CastResult CastSkill(Assets.Player.SkillRow skill, short targetId, double nowSeconds)
+    {
+        LocalPlayer me = World.Local;
+        (short, short, short) pos = ((short)me.X, (short)me.Y, (short)me.Z);
+        CastResult result = Magic.TryCast(skill, me.SocketId, targetId, pos, me, Inventory, nowSeconds);
+        if (result.Success)
+            SendMagic(result.Packet);
+        return result;
+    }
 
     /// <summary>Spends a skill point into a tab (CUISkillTreeDlg::PointPushUpButton).</summary>
     public void SendSkillPoint(byte tab) => context.Client.Send(SkillPointProtocol.Build(tab));

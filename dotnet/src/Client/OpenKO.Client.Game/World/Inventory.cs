@@ -69,6 +69,27 @@ public sealed class Inventory
 
     public InventoryItem? Get(int position) => _slots.GetValueOrDefault(position);
 
+    /// <summary>
+    /// CUIInventory::GetCountInInvByID — the total stack count held for an item id across the
+    /// inventory (the hotkey bar's per-slot consumable count and the cast exhaust-item gate read
+    /// this). Ids are full item ids (base*1000 + ext), so an exact <see cref="InventoryItem.ItemId"/>
+    /// match is equivalent to the C++ base/ext split compare. Returns 0 when the item is absent.
+    /// </summary>
+    public int CountById(int itemId)
+    {
+        if (itemId == 0)
+            return 0;
+
+        int total = 0;
+        foreach (InventoryItem item in _slots.Values)
+        {
+            if (item.ItemId == itemId)
+                total += item.Count;
+        }
+
+        return total;
+    }
+
     /// <summary>The item worn in an equipment slot, or null.</summary>
     public InventoryItem? EquipItem(EquipSlot slot) => _slots.GetValueOrDefault((int)slot);
 
