@@ -89,6 +89,15 @@ public sealed class InGameState(GameContext context) : GameState
 
     public Action<byte, byte[]>? KnightsReceived { get; set; }
 
+    /// <summary>Raised on a WIZ_WARP_LIST reply (the NPC/object teleport menu).</summary>
+    public Action<Net.WarpListReply>? WarpListReceived { get; set; }
+
+    /// <summary>Raised on a WIZ_ITEM_REPAIR reply (NPC blacksmith repair result).</summary>
+    public Action<Net.RepairResult>? ItemRepairReceived { get; set; }
+
+    /// <summary>Group WIZ_ITEM_UPGRADE packets surfaced as (sub-opcode, full payload).</summary>
+    public Action<byte, byte[]>? ItemUpgradeReceived { get; set; }
+
     public override void Init()
     {
         Entered = true;
@@ -169,6 +178,16 @@ public sealed class InGameState(GameContext context) : GameState
 
     /// <summary>Sends a pre-built group packet (party/exchange/warehouse/knights).</summary>
     public void SendRaw(ReadOnlySpan<byte> payload) => context.Client.Send(payload);
+
+    /// <summary>CUIInn::MsgSend_OpenWareHouse — ask the server to open the warehouse.</summary>
+    public void SendWarehouseOpen() => context.Client.Send(WarehouseProtocol.BuildOpen());
+
+    /// <summary>CGameProcMain::MsgSend_Warp — confirm the selected teleport destination.</summary>
+    public void SendWarp(int warpId) => context.Client.Send(WarpProtocol.BuildWarp(warpId));
+
+    /// <summary>CItemRepairMgr::Tick — request the NPC repair of an item at a slot.</summary>
+    public void SendRepair(byte arm, byte order, uint itemId) =>
+        context.Client.Send(RepairProtocol.BuildRepair(arm, order, itemId));
 
     /// <summary>
     /// CGameProcMain::MsgSend_RequestItemBundleOpen — ask the server to open a corpse/box's
@@ -386,6 +405,18 @@ public sealed class InGameState(GameContext context) : GameState
 
             case GameOpcode.WIZ_KNIGHTS_PROCESS:
                 KnightsReceived?.Invoke(KnightsProtocol.Subcommand(payload), payload.ToArray());
+                return true;
+
+            case GameOpcode.WIZ_WARP_LIST:
+                WarpListReceived?.Invoke(WarpProtocol.ParseList(payload));
+                return true;
+
+            case GameOpcode.WIZ_ITEM_REPAIR:
+                ItemRepairReceived?.Invoke(RepairProtocol.ParseResult(payload));
+                return true;
+
+            case GameOpcode.WIZ_ITEM_UPGRADE:
+                ItemUpgradeReceived?.Invoke(UpgradeProtocol.Subcommand(payload), payload.ToArray());
                 return true;
         }
 

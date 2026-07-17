@@ -89,6 +89,18 @@ public sealed class InGameUi : IDisposable
     /// <summary>The in-game shared message box (party/clan confirms) — null when the layout failed to load.</summary>
     public MessageBoxDialog? MessageBox { get; }
 
+    /// <summary>The bank/warehouse window — null when the layout or item tables failed to load.</summary>
+    public WareHouseDialog? WareHouse { get; }
+
+    /// <summary>The NPC/object teleport menu — null when the layout failed to load.</summary>
+    public WarpDialog? Warp { get; }
+
+    /// <summary>The inn-keeper NPC menu — null when the layout failed to load.</summary>
+    public InnDialog? Inn { get; }
+
+    /// <summary>The anvil upgrade-select window — null when the layout failed to load.</summary>
+    public UpgradeDialog? Upgrade { get; }
+
     private short? _targetId;
 
     public event Action<string>? Log;
@@ -314,6 +326,47 @@ public sealed class InGameUi : IDisposable
             CreateClan = new CreateClanDialog(context, createClanRoot);
         }
 
+        // Warehouse (bank) window — centred, needs the item tables; pushed open on the server reply.
+        UiControl? wareRoot = LoadDialog(table.WareHouse(nation));
+        if (wareRoot != null && items != null)
+        {
+            wareRoot.SetPosCenter(w, h);
+            WareHouse = new WareHouseDialog(context, wareRoot, items, Manager.IconDrag, CountableItemEdit);
+            Manager.BindIconDragState(wareRoot);
+        }
+        else if (wareRoot == null)
+        {
+            Log?.Invoke("WareHouse layout not found: " + table.WareHouse(nation));
+        }
+
+        // Warp / teleport menu — centred, pushed open on the WIZ_WARP_LIST reply.
+        UiControl? warpRoot = LoadDialog(table.ZoneChangeOrWarp(nation));
+        if (warpRoot != null)
+        {
+            warpRoot.SetPosCenter(w, h);
+            Warp = new WarpDialog(context, warpRoot);
+        }
+        else
+        {
+            Log?.Invoke("Warp layout not found: " + table.ZoneChangeOrWarp(nation));
+        }
+
+        // Inn-keeper NPC menu — centred, pushed open on the N3_SP_WARE_INN reply.
+        UiControl? innRoot = LoadDialog(table.Inn(nation));
+        if (innRoot != null)
+        {
+            innRoot.SetPosCenter(w, h);
+            Inn = new InnDialog(context, innRoot);
+        }
+
+        // Anvil upgrade-select — centred, pushed open on the ITEM_UPGRADE_REQ reply.
+        UiControl? upgradeRoot = LoadDialog(table.UpgradeSelect(nation));
+        if (upgradeRoot != null)
+        {
+            upgradeRoot.SetPosCenter(w, h);
+            Upgrade = new UpgradeDialog(context, upgradeRoot);
+        }
+
         // Register with the manager (last added = topmost = input first). Chat sits above
         // the passive bars so its edit/buttons grab input; the death dialog floats on top.
         Manager.Add(stateRoot);
@@ -352,6 +405,18 @@ public sealed class InGameUi : IDisposable
             Manager.Add(knightsOpRoot);
         if (createClanRoot != null)
             Manager.Add(createClanRoot);
+
+        // Solo NPC/object interaction windows (warehouse/warp/inn/upgrade) float above the HUD;
+        // the message box stays topmost (modal-ish confirms).
+        if (wareRoot != null && items != null)
+            Manager.Add(wareRoot);
+        if (warpRoot != null)
+            Manager.Add(warpRoot);
+        if (innRoot != null)
+            Manager.Add(innRoot);
+        if (upgradeRoot != null)
+            Manager.Add(upgradeRoot);
+
         if (msgBoxRoot != null)
             Manager.Add(msgBoxRoot);
     }
@@ -459,6 +524,37 @@ public sealed class InGameUi : IDisposable
         Various?.Bind(inGame);
         PartyOrForce?.Bind(inGame);
         KnightsOperation?.Bind(inGame);
+
+        // Solo NPC/object interactions (9.8a): warehouse open reply, warp list, inn menu, upgrade req.
+        WareHouse?.Bind(inGame);
+        Warp?.Bind(inGame);
+        Inn?.Bind(inGame);
+        Upgrade?.Bind(inGame);
+
+        // Warehouse deposits/withdraws refresh both the inventory dialog and the state-bar gold view
+        // once the server confirms; the inventory model is shared, so a re-populate is enough.
+        if (WareHouse is { } ware)
+        {
+            inGame.WarehouseReceived += (sub, _) =>
+            {
+                if (sub is OpenKO.Client.Game.Net.WarehouseProtocol.Input or OpenKO.Client.Game.Net.WarehouseProtocol.Output)
+                    Inventory?.Populate(inGame.Inventory);
+            };
+        }
+
+        // Inn buttons: btn_makeclan opens the found-clan flow; the trade-sell BBS is deferred.
+        if (Inn is { } inn)
+        {
+            inn.FoundClanRequested += () => CreateClan?.Open();
+            inn.SellBoardRequested += () => Log?.Invoke("Trade-sell BBS (CUITradeBBSSelector) is deferred.");
+        }
+
+        // Upgrade select: the item/ring upgrade anvil dialogs are deferred (C++ stubs).
+        if (Upgrade is { } upgrade)
+        {
+            upgrade.ItemUpgradeRequested += npc => Log?.Invoke($"Item upgrade (npc {npc}) deferred: CUIItemUpgrade not implemented.");
+            upgrade.RingUpgradeRequested += npc => Log?.Invoke($"Ring upgrade (npc {npc}) deferred: CUIRingUpgrade not implemented.");
+        }
 
         // Character sheet's Party tab opens the party window; its clan-page invite target and the
         // command bar's party actions share the current combat target.
@@ -568,6 +664,8 @@ public sealed class InGameUi : IDisposable
             drop.Cursor = new UiPoint(x, y);
         if (HotKey is { } hk)
             hk.Cursor = new UiPoint(x, y);
+        if (WareHouse is { } ware)
+            ware.Cursor = new UiPoint(x, y);
         UpdateItemTooltip(x, y);
     }
 

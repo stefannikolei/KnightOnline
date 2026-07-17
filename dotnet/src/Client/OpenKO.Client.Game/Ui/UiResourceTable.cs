@@ -37,6 +37,11 @@ public sealed class UiResourceTable
     private const int ColCharacterCreate = 23; // 24 szCharacterCreate
     private const int ColCharacterSelect = 24; // 25 szCharacterSelect
     private const int ColMessageBox = 26;     // 27 szMessageBox
+    private const int ColZoneChangeOrWarp = 32; // 33 szZoneChangeOrWarp
+    private const int ColExchangeRepair = 33; // 34 szExchangeRepair
+    private const int ColWareHouse = 40;      // 41 szWareHouse
+    private const int ColInn = 43;            // 44 szInn
+    private const int ColUpgradeSelect = 142; // 143 szUpgradeSelect
     private const int ColDead = 52;           // 53 szDead
     private const int ColNationSelect = 55;   // 56 szNationSelect
     private const int ColLoginIntro = 118;    // 119 szLoginIntro
@@ -129,4 +134,19 @@ public sealed class UiResourceTable
 
     /// <summary>szClanPage — the clan cape/emblem page resource.</summary>
     public string ClanPage(int nation) => Get(nation, ColClanPage);
+
+    /// <summary>szWareHouse — the bank/warehouse storage window (CUIWareHouseDlg).</summary>
+    public string WareHouse(int nation) => Get(nation, ColWareHouse);
+
+    /// <summary>szZoneChangeOrWarp — the NPC/object teleport menu (CUIWarp).</summary>
+    public string ZoneChangeOrWarp(int nation) => Get(nation, ColZoneChangeOrWarp);
+
+    /// <summary>szExchangeRepair — the NPC exchange/repair menu (repair via CItemRepairMgr).</summary>
+    public string ExchangeRepair(int nation) => Get(nation, ColExchangeRepair);
+
+    /// <summary>szInn — the inn-keeper NPC menu (CUIInn: warehouse / found-clan / trade board).</summary>
+    public string Inn(int nation) => Get(nation, ColInn);
+
+    /// <summary>szUpgradeSelect — the anvil upgrade-select window (CUIUpgradeSelect).</summary>
+    public string UpgradeSelect(int nation) => Get(nation, ColUpgradeSelect);
 }
