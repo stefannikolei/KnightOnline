@@ -124,4 +124,51 @@ public static class N3BinaryIo
 
     public static void WriteN3FileName(this BinaryWriter writer, string value)
         => writer.WriteN3String(value);
+
+    /// <summary>
+    /// Reads a fixed-width raw byte field (a C++ <c>char[N]</c> member blitted
+    /// verbatim, e.g. m_pTexName[MAX_PATH]). Throws on truncation.
+    /// </summary>
+    public static byte[] ReadFixedBytes(this BinaryReader reader, int count)
+    {
+        byte[] bytes = reader.ReadBytes(count);
+        if (bytes.Length != count)
+            throw new EndOfStreamException("N3 fixed byte field is truncated");
+        return bytes;
+    }
+
+    /// <summary>
+    /// Writes a fixed-width raw byte field, padding with zeros or truncating so
+    /// exactly <paramref name="count"/> bytes are emitted.
+    /// </summary>
+    public static void WriteFixedBytes(this BinaryWriter writer, byte[] value, int count)
+    {
+        if (value.Length == count)
+        {
+            writer.Write(value);
+            return;
+        }
+
+        var buffer = new byte[count];
+        Array.Copy(value, buffer, Math.Min(value.Length, count));
+        writer.Write(buffer);
+    }
+
+    /// <summary>Decodes a fixed char[] field (CP949) up to its first NUL.</summary>
+    public static string DecodeFixedString(byte[] bytes)
+    {
+        int len = Array.IndexOf(bytes, (byte)0);
+        if (len < 0)
+            len = bytes.Length;
+        return KoEncoding.Cp949.GetString(bytes, 0, len);
+    }
+
+    /// <summary>Encodes a string into a fresh zero-padded fixed char[] field of <paramref name="count"/> bytes.</summary>
+    public static byte[] EncodeFixedString(string value, int count)
+    {
+        var buffer = new byte[count];
+        byte[] encoded = KoEncoding.Cp949.GetBytes(value);
+        Array.Copy(encoded, buffer, Math.Min(encoded.Length, count));
+        return buffer;
+    }
 }
