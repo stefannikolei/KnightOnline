@@ -74,6 +74,9 @@ public sealed class InGameState(GameContext context) : GameState
 
     public Action<MagicPacket>? MagicReceived { get; set; }
 
+    /// <summary>Raised on a WIZ_WEATHER push with the new (type, amount) weather state.</summary>
+    public Action<WeatherState>? WeatherChanged { get; set; }
+
     /// <summary>
     /// Raised on a WIZ_CLASS_CHANGE reply with the result sub-opcode (0x00 failure ..
     /// 0x04 item-in-slot). The class-change dialog subscribes it (→ Open).
@@ -407,6 +410,10 @@ public sealed class InGameState(GameContext context) : GameState
 
             case GameOpcode.WIZ_MAGIC_PROCESS:
                 MagicReceived?.Invoke(MagicProtocol.Parse(payload));
+                return true;
+
+            case GameOpcode.WIZ_WEATHER:
+                WeatherChanged?.Invoke(WeatherProtocol.Parse(payload));
                 return true;
 
             case GameOpcode.WIZ_CLASS_CHANGE:
