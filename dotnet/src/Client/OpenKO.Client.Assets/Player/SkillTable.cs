@@ -24,6 +24,27 @@ public sealed class SkillRow
     /// <summary>field 05 — caster start animation.</summary>
     public int SelfAnimId1 { get; init; }
 
+    /// <summary>field 08 — <c>iSelfFX1</c>, first FX id on the caster (0 = none); indexes <c>fx.tbl</c>.</summary>
+    public int SelfFx1 { get; init; }
+
+    /// <summary>field 09 — <c>iSelfPart1</c>, the joint/part the caster's first FX attaches to.</summary>
+    public int SelfPart1 { get; init; }
+
+    /// <summary>field 10 — <c>iSelfFX2</c>, second FX id on the caster (0 = none); indexes <c>fx.tbl</c>.</summary>
+    public int SelfFx2 { get; init; }
+
+    /// <summary>field 11 — <c>iSelfPart2</c>, the joint/part the caster's second FX attaches to.</summary>
+    public int SelfPart2 { get; init; }
+
+    /// <summary>field 12 — <c>iFlyingFX</c>, the projectile FX id flying to the target (0 = none); indexes <c>fx.tbl</c>.</summary>
+    public int FlyingFx { get; init; }
+
+    /// <summary>field 13 — <c>iTargetFX</c>, the FX id spawned on the target (0 = none); indexes <c>fx.tbl</c>.</summary>
+    public int TargetFx { get; init; }
+
+    /// <summary>field 14 — <c>iTargetPart</c>, the joint/part the target FX attaches to.</summary>
+    public int TargetPart { get; init; }
+
     /// <summary>field 15 — target type/moral.</summary>
     public int Target { get; init; }
 
@@ -70,7 +91,14 @@ public sealed class SkillRow
         Name = TblCell.Str(cells, 2),
         Desc = TblCell.Str(cells, 3),
         SelfAnimId1 = TblCell.I32(cells, 4),
-        // 5 iSelfAnimID2 .. 13 iTargetPart
+        // 5 iSelfAnimID2, 6 idwTargetAnimID
+        SelfFx1 = TblCell.I32(cells, 7),
+        SelfPart1 = TblCell.I32(cells, 8),
+        SelfFx2 = TblCell.I32(cells, 9),
+        SelfPart2 = TblCell.I32(cells, 10),
+        FlyingFx = TblCell.I32(cells, 11),
+        TargetFx = TblCell.I32(cells, 12),
+        TargetPart = TblCell.I32(cells, 13),
         Target = TblCell.I32(cells, 14),
         NeedLevel = TblCell.I32(cells, 15),
         NeedSkill = TblCell.I32(cells, 16),

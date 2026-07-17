@@ -47,6 +47,14 @@ public class SkillTableTests
         Assert.Equal("Berserker Rage", row.Name);
         Assert.Equal("A mighty rage.", row.Desc);
         Assert.Equal(10, row.SelfAnimId1);
+        // FX columns (fields 08-14 → indices 7-13); the fixture put 13..19 there.
+        Assert.Equal(13, row.SelfFx1);
+        Assert.Equal(14, row.SelfPart1);
+        Assert.Equal(15, row.SelfFx2);
+        Assert.Equal(16, row.SelfPart2);
+        Assert.Equal(17, row.FlyingFx);
+        Assert.Equal(18, row.TargetFx);
+        Assert.Equal(19, row.TargetPart);
         Assert.Equal(2, row.Target);
         Assert.Equal(60, row.NeedLevel);
         Assert.Equal(45, row.NeedSkill);
