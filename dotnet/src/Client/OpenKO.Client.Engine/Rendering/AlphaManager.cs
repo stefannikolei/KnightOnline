@@ -43,6 +43,15 @@ public sealed class AlphaManager
     }
 
     /// <summary>Back-to-front ordering (farthest first) — pure, pinned by tests.</summary>
+    /// <summary>
+    /// Whether a primitive has drawable geometry. A degenerate part (no vertices, no
+    /// triangles, or a VertexCount past its vertex array) is skipped instead of faulting
+    /// the draw — the alpha-path counterpart of PMeshInstanceRenderer.Render's early-out.
+    /// </summary>
+    public static bool IsDrawable(AlphaPrimitive p)
+        => p.VertexCount > 0 && p.PrimitiveCount > 0 && p.VertexCount <= p.Vertices.Length
+            && (p.Indices == null || p.PrimitiveCount * 3 <= p.Indices.Length);
+
     public static void SortForRender(List<AlphaPrimitive> primitives)
         => primitives.Sort(static (a, b) => b.Distance.CompareTo(a.Distance));
 
@@ -58,6 +67,13 @@ public sealed class AlphaManager
 
         foreach (AlphaPrimitive p in _primitives)
         {
+            // Skip degenerate geometry — an empty/zero-vertex part (e.g. a shape LOD
+            // that collapsed to nothing) would fault DrawUserIndexedPrimitives with a
+            // numVertices-out-of-range. This mirrors the opaque path's early-out
+            // (PMeshInstanceRenderer.Render: NumIndices < 3 || vertices.Length == 0).
+            if (!IsDrawable(p))
+                continue;
+
             device.BlendState = RenderStateMapper.GetBlendState(p.Plan.SrcBlend, p.Plan.DestBlend);
             device.RasterizerState = p.Plan.CullNone
                 ? RasterizerState.CullNone

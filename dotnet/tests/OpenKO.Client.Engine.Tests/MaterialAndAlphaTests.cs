@@ -149,4 +149,29 @@ public class MaterialAndAlphaTests
         Assert.Equal(0x100u, (uint)RenderFlags.NotZWrite);
         Assert.Equal(0x400u, (uint)RenderFlags.NotZBuffer);
     }
+
+    private static AlphaPrimitive Prim(int vertexCount, int vertexArrayLen, int primitiveCount, int? indexLen)
+        => new()
+        {
+            Vertices = new VertexPositionNormalTexture[vertexArrayLen],
+            Indices = indexLen is { } n ? new short[n] : null,
+            VertexCount = vertexCount,
+            PrimitiveCount = primitiveCount,
+            Texture = null,
+            World = Matrix4x4.Identity,
+            Plan = new MaterialPlan(),
+        };
+
+    [Fact]
+    public void AlphaManager_SkipsDegeneratePrimitives()
+    {
+        // A collapsed-to-nothing shape LOD (zero vertices) would fault
+        // DrawUserIndexedPrimitives with numVertices-out-of-range — it must be skipped.
+        Assert.False(AlphaManager.IsDrawable(Prim(0, 0, 0, 0)));       // empty
+        Assert.False(AlphaManager.IsDrawable(Prim(10, 4, 2, 6)));      // VertexCount past the array
+        Assert.False(AlphaManager.IsDrawable(Prim(4, 4, 0, 0)));       // no triangles
+        Assert.False(AlphaManager.IsDrawable(Prim(4, 4, 3, 6)));       // indices too short for 3 tris
+        Assert.True(AlphaManager.IsDrawable(Prim(4, 4, 2, 6)));        // valid indexed
+        Assert.True(AlphaManager.IsDrawable(Prim(6, 6, 2, null)));     // valid non-indexed
+    }
 }
