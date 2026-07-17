@@ -4,9 +4,11 @@ using OpenKO.Client.Engine.Interop;
 
 namespace OpenKO.Client.Engine.Terrain;
 
-/// <summary>One tile inside a level-1 patch: its texture indices and the base
-/// vertex of its four-vertex fan in the patch vertex buffer.</summary>
-public readonly record struct TerrainTile(int Tex1Idx, int Tex2Idx, bool IsTileFull, int BaseVertex);
+/// <summary>One tile inside a level-1 patch: its texture indices, the base
+/// vertex of its four-vertex fan in the patch vertex buffer, and its global
+/// tile coordinate on the map (used to key the per-tile lightmap).</summary>
+public readonly record struct TerrainTile(
+    int Tex1Idx, int Tex2Idx, bool IsTileFull, int BaseVertex, int TileX, int TileZ);
 
 /// <summary>A built level-1 patch: the VNT2 vertices (4 per tile) plus the
 /// per-tile metadata the renderer needs to pick textures/passes.</summary>
@@ -148,7 +150,7 @@ public static class TerrainVertexBuilder
                     vertices[b + 3] = Make(lt, up, u1[0], v1[0], u2[0], v2[0]);
                 }
 
-                tiles[tileCount] = new TerrainTile(tex1Idx, tex2Idx, isTileFull, b);
+                tiles[tileCount] = new TerrainTile(tex1Idx, tex2Idx, isTileFull, b, tx, tz);
                 vertexIdx += 4;
                 tileCount++;
             }

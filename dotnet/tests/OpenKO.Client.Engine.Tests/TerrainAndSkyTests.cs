@@ -166,6 +166,70 @@ public class TerrainAndSkyTests
     }
 
     [Fact]
+    public void TilePassPlanner_NoLightMap_OmitsLightMapPass()
+    {
+        // The default overload leaves the tile list untouched (no .tlt data).
+        IReadOnlyList<TerrainPass> passes = TilePassPlanner.Plan(0, 1, isTileFull: true, numTileTex: 4);
+        Assert.DoesNotContain(passes, p => p.Primary == TerrainTextureSource.LightMap);
+    }
+
+    [Fact]
+    public void TilePassPlanner_LightMap_AppendsAlphaBlendPassLast()
+    {
+        // Two-tile config + lightmap: tile0 opaque, tile1 additive, lightmap alpha-blended last.
+        IReadOnlyList<TerrainPass> passes =
+            TilePassPlanner.Plan(0, 1, isTileFull: true, numTileTex: 4, hasLightMap: true);
+        Assert.Equal(3, passes.Count);
+        Assert.Equal(TerrainTextureSource.Tile0, passes[0].Primary);
+        Assert.Equal(TerrainTextureSource.Tile1, passes[1].Primary);
+        Assert.Equal(TerrainPassBlend.Additive, passes[1].Blend);
+        // The lightmap overlay is the final draw, SRCALPHA/INVSRCALPHA over the tiles.
+        Assert.Equal(TerrainTextureSource.LightMap, passes[2].Primary);
+        Assert.Null(passes[2].Secondary);
+        Assert.Equal(TerrainPassBlend.AlphaBlend, passes[2].Blend);
+    }
+
+    [Fact]
+    public void TilePassPlanner_LightMap_AppendedToColormapAndSingleTileConfigs()
+    {
+        // Colormap tile-less config + lightmap.
+        IReadOnlyList<TerrainPass> colorMap =
+            TilePassPlanner.Plan(1023, 1023, isTileFull: true, numTileTex: 4, hasLightMap: true);
+        Assert.Equal(2, colorMap.Count);
+        Assert.Equal(TerrainTextureSource.ColorMap, colorMap[0].Primary);
+        Assert.Equal(TerrainTextureSource.LightMap, colorMap[1].Primary);
+        Assert.Equal(TerrainPassBlend.AlphaBlend, colorMap[1].Blend);
+
+        // One-tile config + lightmap.
+        IReadOnlyList<TerrainPass> oneTile =
+            TilePassPlanner.Plan(0, 1023, isTileFull: true, numTileTex: 4, hasLightMap: true);
+        Assert.Equal(2, oneTile.Count);
+        Assert.Equal(TerrainTextureSource.Tile0, oneTile[0].Primary);
+        Assert.Equal(TerrainTextureSource.LightMap, oneTile[1].Primary);
+    }
+
+    [Fact]
+    public void BuildLevel1_TilesCarryGlobalCoordinates()
+    {
+        // The renderer keys lightmaps by each tile's global (tx, tz).
+        N3Terrain terrain = MakeTerrain(9, (x, z) => new N3MapData
+        {
+            Height = 0f,
+            Attr = PackAttr(tileFull: true, 0, 0, 0, 1023),
+        });
+
+        TerrainPatchMesh mesh = TerrainVertexBuilder.BuildLevel1(terrain, 8, 16);
+
+        // Tile index = ix*8 + iz; global coord = lbTile + (ix, iz).
+        Assert.Equal(8, mesh.Tiles[0].TileX);
+        Assert.Equal(16, mesh.Tiles[0].TileZ);
+        Assert.Equal(8, mesh.Tiles[1].TileX);   // ix=0, iz=1
+        Assert.Equal(17, mesh.Tiles[1].TileZ);
+        Assert.Equal(9, mesh.Tiles[8].TileX);   // ix=1, iz=0
+        Assert.Equal(16, mesh.Tiles[8].TileZ);
+    }
+
+    [Fact]
     public void SkyFrontFan_TopVerticesAreTransparent_BottomOpaque()
     {
         SkyFanVertex[] front = SkyGeometry.BuildFrontFan(SkyGeometry.DefaultFogColor);

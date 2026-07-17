@@ -14,9 +14,14 @@ namespace OpenKO.Client.Engine.Terrain;
 /// tile textures (.gtt), and draws each tile with the passes chosen by
 /// <see cref="TilePassPlanner"/> — colormap tiles as a DualTexture modulate,
 /// tile-textured cells as opaque + additive draws, exactly like
-/// <c>CN3TerrainPatch::Render</c>. Lightmaps (the runtime .tlt streaming) and
-/// the Misc\Terrain_Base.bmp detail overlay are deferred (documented
-/// deviations for stage 6.7).
+/// <c>CN3TerrainPatch::Render</c>.
+///
+/// The Misc\Terrain_Base.bmp detail overlay (the second stage of the tile-less
+/// draw) and the baked lightmaps streamed from the sibling .tlt file are wired
+/// in here: the lightmaps are loaded whole up front (keyed by global tile) and
+/// each lightmap-carrying tile gets a trailing alpha-blended overlay draw. The
+/// runtime 3×3 sliding-window paging (CN3Terrain::SetLightMap) is not
+/// reproduced — the static full load is equivalent for rendering.
 /// </summary>
 public sealed class TerrainRenderer : IDisposable
 {
@@ -40,6 +45,8 @@ public sealed class TerrainRenderer : IDisposable
     private readonly List<Patch> _patches = [];
     private readonly List<Texture2D> _ownedTextures = [];
     private readonly Texture2D?[] _tileTextures;
+    private readonly Dictionary<(int X, int Z), Texture2D> _lightMaps = [];
+    private readonly Texture2D? _baseDetail;
     private readonly BasicEffect _basic;
     private readonly DualTextureEffect _dual;
 
@@ -51,6 +58,8 @@ public sealed class TerrainRenderer : IDisposable
 
         Texture2D?[] colorMap = LoadColorMap(device, zonePath);
         _tileTextures = LoadTileTextures(device, terrain, resolver, zonePath);
+        _baseDetail = LoadBaseDetail(device, resolver);
+        LoadLightMaps(device, zonePath);
 
         int numColorMap = ColorMapCount();
         for (int px = 0; px < terrain.PatchMapSize; px++)
@@ -122,8 +131,9 @@ public sealed class TerrainRenderer : IDisposable
 
     private void DrawTile(GraphicsDevice device, Patch patch, TerrainTile tile)
     {
+        bool hasLightMap = _lightMaps.ContainsKey((tile.TileX, tile.TileZ));
         IReadOnlyList<TerrainPass> passes = TilePassPlanner.Plan(
-            tile.Tex1Idx, tile.Tex2Idx, tile.IsTileFull, _tileTextures.Length);
+            tile.Tex1Idx, tile.Tex2Idx, tile.IsTileFull, _tileTextures.Length, hasLightMap);
 
         // The tile's four-vertex fan → two triangles referencing the patch VB.
         short[] indices =
@@ -136,9 +146,12 @@ public sealed class TerrainRenderer : IDisposable
         {
             Texture2D? primary = Resolve(patch, pass.Primary, tile);
 
-            device.BlendState = pass.Blend == TerrainPassBlend.Additive
-                ? BlendState.Additive
-                : BlendState.Opaque;
+            device.BlendState = pass.Blend switch
+            {
+                TerrainPassBlend.Additive => BlendState.Additive,
+                TerrainPassBlend.AlphaBlend => BlendState.NonPremultiplied,
+                _ => BlendState.Opaque,
+            };
 
             if (pass.Secondary.HasValue)
             {
@@ -159,9 +172,11 @@ public sealed class TerrainRenderer : IDisposable
     private Texture2D? Resolve(Patch patch, TerrainTextureSource source, TerrainTile tile) => source switch
     {
         TerrainTextureSource.ColorMap => patch.ColorMap,
-        TerrainTextureSource.BaseDetail => null, // Terrain_Base.bmp deferred
+        TerrainTextureSource.BaseDetail => _baseDetail,
         TerrainTextureSource.Tile0 => TileTexture(tile.Tex1Idx),
         TerrainTextureSource.Tile1 => TileTexture(tile.Tex2Idx),
+        TerrainTextureSource.LightMap =>
+            _lightMaps.TryGetValue((tile.TileX, tile.TileZ), out Texture2D? lm) ? lm : null,
         _ => null,
     };
 
@@ -250,6 +265,68 @@ public sealed class TerrainRenderer : IDisposable
         return textures;
     }
 
+    /// <summary>
+    /// Loads Misc\Terrain_Base.bmp, the shared detail overlay
+    /// (CN3Terrain::Load: m_pBaseTex.LoadFromFile). It is a plain 24-bit BMP,
+    /// not an NTF container, so it goes through the image loader rather than
+    /// N3Texture.
+    /// </summary>
+    private Texture2D? LoadBaseDetail(GraphicsDevice device, KoPathResolver resolver)
+    {
+        string? full = resolver.Resolve(@"Misc\Terrain_Base.bmp");
+        if (full == null || !File.Exists(full))
+            return null;
+
+        try
+        {
+            using FileStream stream = File.OpenRead(full);
+            Texture2D texture = Texture2D.FromStream(device, stream);
+            _ownedTextures.Add(texture);
+            return texture;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"{full}: {ex.Message}");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Loads the sibling .tlt lightmap file whole (all patches, not the runtime
+    /// 3×3 window), uploads each baked lightmap and keys it by global tile so
+    /// <see cref="Resolve"/> can bind it for the trailing alpha-blend pass.
+    /// </summary>
+    private void LoadLightMaps(GraphicsDevice device, string zonePath)
+    {
+        if (_terrain.PatchMapSize <= 0)
+            return;
+
+        string tlt = Path.ChangeExtension(zonePath, ".tlt");
+        if (!File.Exists(tlt))
+            return;
+
+        try
+        {
+            var file = new N3TerrainLightMapFile { FileFormatVersion = _terrain.FileFormatVersion };
+            using (FileStream stream = File.OpenRead(tlt))
+            using (var reader = new BinaryReader(stream))
+            {
+                file.Load(reader, _terrain.PatchMapSize);
+            }
+
+            foreach ((int tx, int tz, N3Texture n3) in file.EnumerateGlobalTiles())
+            {
+                Texture2D texture = TextureFactory.FromN3Texture(device, n3);
+                _ownedTextures.Add(texture);
+                _lightMaps[(tx, tz)] = texture;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"{tlt}: {ex.Message}");
+        }
+    }
+
     private static string? ResolveNextToZone(string zoneDir, string source)
     {
         string name = Path.GetFileName(source.Replace('\\', '/'));
@@ -278,6 +355,7 @@ public sealed class TerrainRenderer : IDisposable
         foreach (Texture2D texture in _ownedTextures)
             texture.Dispose();
         _ownedTextures.Clear();
+        _lightMaps.Clear();
         _patches.Clear();
         _basic.Dispose();
         _dual.Dispose();

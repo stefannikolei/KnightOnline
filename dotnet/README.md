@@ -260,3 +260,28 @@ deliberate and documented, not bugs:
   and the day-change colour simulation, and TGA-format cloud textures — so the sky
   currently shows the horizon-glow fans in the day fog colour without the celestial
   bodies. FX particles (`N3FX*`) and audio are later stages.
+
+### Client feature scope + known deviations (text input / IME)
+
+The client accepts text through MonoGame's `TextInput` event, which delivers basic
+Latin plus whatever the OS IME commits. Inline CJK composition — the underlined
+preview drawn at the caret while a syllable is still being assembled — is handled
+in two layers:
+
+- **OS IME (primary).** `SdlIme` (stage 9.3) anchors the OS composition/candidate
+  window at the focused edit box and gates text input on edit focus.
+  `SdlImeComposition` adds an `SDL_AddEventWatch` hook that observes the
+  `SDL_TEXTEDITING` events MonoGame's own loop drops, so the focused edit can render
+  the in-progress composition string. Both bindings resolve the same SDL2 the
+  DesktopGL backend already loaded and **degrade to an inert no-op** when SDL isn't
+  present (headless/tests) — the native watch callback never throws back into SDL.
+- **Dubeolsik automaton (fallback).** `HangulAutomaton` is a pure, headless-testable
+  2-set Korean (두벌식) Jamo→syllable composer for when the Linux OS IME
+  (IBus/Fcitx behind SDL) is unreliable. It maps QWERTY to initial/medial/final jamo
+  and composes precomposed Hangul (U+AC00 block), handling double finals (겹받침),
+  final-consonant reassignment when a vowel follows, and backspace decomposition.
+- **Deviations from the C++.** The original used IMM32 and shipped a CP949 (EUC-KR)
+  build — Korean only. This port matches that scope: **only Korean composition is
+  provided; there is no Chinese or Japanese inline input** (the CP949 client couldn't
+  do those either). Rendering the underlined composition preview on the device-side
+  edit control is a thin executable follow-up on top of the `SdlImeComposition` state.
