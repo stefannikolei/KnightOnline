@@ -211,6 +211,28 @@ public sealed class InventoryDialog
             Populate(_inventory);
     }
 
+    /// <summary>
+    /// The item under a cursor point, for the hover tooltip (CUIInventory::Render highlight →
+    /// CUIImageTooltipDlg). Returns the visible icon whose region contains the point, or null.
+    /// Skips the icon currently being dragged.
+    /// </summary>
+    public InventoryIconItem? HoveredItem(UiPoint cursor)
+    {
+        if (!_root.Visible)
+            return null;
+
+        for (int flat = 0; flat < Inventory.InventorySlotCount; flat++)
+        {
+            UiIconControl? icon = IconAt(flat);
+            if (icon is { Visible: true } && icon.Payload is InventoryIconItem item
+                && !ReferenceEquals(icon, _drag.SelectedIcon.Icon)
+                && UiRectMath.IsIn(icon.Region, cursor.X, cursor.Y))
+                return item;
+        }
+
+        return null;
+    }
+
     // ---- Message routing (CUIInventory::ReceiveMessage) ---------------------
 
     private void OnMessage(UiControl sender, uint msg)

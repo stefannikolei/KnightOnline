@@ -53,6 +53,18 @@ public sealed class InGameUi : IDisposable
     /// <summary>The inventory dialog — null when the layout or item tables failed to load.</summary>
     public InventoryDialog? Inventory { get; }
 
+    /// <summary>The dropped-item (loot box) dialog — null when the layout/tables failed to load.</summary>
+    public DroppedItemDialog? DroppedItem { get; }
+
+    /// <summary>The item image-tooltip — null when the layout failed to load.</summary>
+    public ItemTooltipControl? ItemTooltip { get; }
+
+    /// <summary>The repair tooltip — null when the layout failed to load.</summary>
+    public RepairTooltipControl? RepairTooltip { get; }
+
+    /// <summary>The countable stack-split popup (base_tradeedit) — null when the layout failed to load.</summary>
+    public CountableItemEditDialog? CountableItemEdit { get; }
+
     public event Action<string>? Log;
 
     public InGameUi(GameContext context, GraphicsDevice device, FontService fonts, string dataPath)
@@ -131,6 +143,43 @@ public sealed class InGameUi : IDisposable
             Log?.Invoke("Inventory item tables not found; inventory disabled.");
         }
 
+        // Dropped-item loot box — needs the item tables; hidden until a loot list arrives.
+        UiControl? dropRoot = LoadDialog(table.DroppedItem(nation));
+        if (dropRoot != null && items != null)
+        {
+            DroppedItem = new DroppedItemDialog(context, dropRoot, items, Manager.IconDrag);
+            Manager.BindIconDragState(dropRoot);
+        }
+        else if (dropRoot == null)
+        {
+            Log?.Invoke("DroppedItem layout not found: " + table.DroppedItem(nation));
+        }
+
+        // Item / repair image-tooltips — passive, hidden by default.
+        UiControl? infoRoot = LoadDialog(table.ItemInfo(nation));
+        if (infoRoot != null)
+            ItemTooltip = new ItemTooltipControl(infoRoot);
+        else
+            Log?.Invoke("ItemInfo tooltip layout not found: " + table.ItemInfo(nation));
+
+        UiControl? repairRoot = LoadDialog(table.RepairTooltip(nation));
+        if (repairRoot != null)
+            RepairTooltip = new RepairTooltipControl(repairRoot);
+        else
+            Log?.Invoke("RepairTooltip layout not found: " + table.RepairTooltip(nation));
+
+        // Countable stack-split popup (base_tradeedit) — the reusable modal quantity editor.
+        UiControl? editRoot = LoadDialog(table.CountableItemEdit(nation));
+        if (editRoot != null)
+        {
+            editRoot.SetPosCenter(w, h);
+            CountableItemEdit = new CountableItemEditDialog(Manager, editRoot);
+        }
+        else
+        {
+            Log?.Invoke("CountableItemEdit layout not found: " + table.CountableItemEdit(nation));
+        }
+
         // Register with the manager (last added = topmost = input first). Chat sits above
         // the passive bars so its edit/buttons grab input; the death dialog floats on top.
         Manager.Add(stateRoot);
@@ -139,6 +188,16 @@ public sealed class InGameUi : IDisposable
         Manager.Add(msgRoot);
         Manager.Add(chatRoot);
         Manager.Add(deadRoot);
+
+        // Loot box above the inventory; the tooltips and the modal edit float on top.
+        if (dropRoot != null && items != null)
+            Manager.Add(dropRoot);
+        if (infoRoot != null)
+            Manager.Add(infoRoot);
+        if (repairRoot != null)
+            Manager.Add(repairRoot);
+        if (editRoot != null)
+            Manager.Add(editRoot);
     }
 
     /// <summary>
@@ -198,6 +257,15 @@ public sealed class InGameUi : IDisposable
             };
         }
 
+        // Loot box: a bundle-open reply shows the dialog; a WIZ_ITEM_GET reply routes the pickup
+        // into the inventory and refreshes the inventory dialog through its own populate path.
+        if (DroppedItem is { } drop)
+        {
+            inGame.LootListReceived += bundle => drop.Populate(bundle.BundleId, bundle.Items);
+            inGame.ItemGetReceived += drop.OnGetResult;
+            drop.InventoryChanged += () => Inventory?.Populate(inGame.Inventory);
+        }
+
         // Fold buttons toggle their window's visibility (CUIChat/CUIMessageWnd btn_off).
         Chat.FoldRequested += () => Chat.Root.SetVisible(!Chat.Root.Visible);
         MessageWnd.FoldRequested += () => MessageWnd.Root.SetVisible(!MessageWnd.Root.Visible);
@@ -246,6 +314,33 @@ public sealed class InGameUi : IDisposable
     {
         if (Inventory is { } inv)
             inv.Cursor = new UiPoint(x, y);
+        if (DroppedItem is { } drop)
+            drop.Cursor = new UiPoint(x, y);
+        UpdateItemTooltip(x, y);
+    }
+
+    /// <summary>
+    /// Hover tooltip: while the inventory is open, show the item image-tooltip for the icon under
+    /// the cursor (CUIInventory highlight → CUIImageTooltipDlg::DisplayTooltipsEnable), else hide.
+    /// </summary>
+    private void UpdateItemTooltip(int x, int y)
+    {
+        if (ItemTooltip is not { } tip || Inventory is not { } inv)
+            return;
+
+        if (inv.HoveredItem(new UiPoint(x, y)) is { } item && item.Basic != null && item.Ext != null)
+        {
+            LocalPlayer l = _context.InGame.World.Local;
+            var player = new TooltipPlayer(
+                l.Race, l.Level, l.Rank, l.Title,
+                l.Str + l.ItemStr, l.Sta + l.ItemSta, l.Dex + l.ItemDex,
+                l.Intel + l.ItemIntel, l.Cha + l.ItemCha, l.Gold);
+            tip.Show(item.Basic, item.Ext, item.Durability, item.Count, x, y, player);
+        }
+        else
+        {
+            tip.Hide();
+        }
     }
 
     /// <summary>Draw the dialogs, then paint the chat / message scrollback line by line.</summary>

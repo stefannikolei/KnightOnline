@@ -59,6 +59,16 @@ public sealed class InGameState(GameContext context) : GameState
     /// </summary>
     public Action<Net.ItemMoveResult>? ItemMoveResult { get; set; }
 
+    /// <summary>
+    /// Raised on the WIZ_BUNDLE_OPEN_REQ reply (a corpse/box loot list). The
+    /// <see cref="LootBundle.BundleId"/> is the id carried over from the open request
+    /// (<see cref="SendBundleOpen"/>), since it is not echoed on the wire.
+    /// </summary>
+    public Action<Net.LootBundle>? LootListReceived { get; set; }
+
+    /// <summary>Raised on the WIZ_ITEM_GET reply (a dropped-item pickup result).</summary>
+    public Action<Net.ItemGetResult>? ItemGetReceived { get; set; }
+
     public Action<MagicPacket>? MagicReceived { get; set; }
 
     /// <summary>Group packets surfaced as (sub-command, full payload) for the dialogs.</summary>
@@ -115,6 +125,20 @@ public sealed class InGameState(GameContext context) : GameState
 
     /// <summary>Sends a pre-built group packet (party/exchange/warehouse/knights).</summary>
     public void SendRaw(ReadOnlySpan<byte> payload) => context.Client.Send(payload);
+
+    /// <summary>
+    /// CGameProcMain::MsgSend_RequestItemBundleOpen — ask the server to open a corpse/box's
+    /// loot bundle. Remembers the bundle id so the reply (which does not echo it) can be
+    /// tagged for the dropped-item dialog.
+    /// </summary>
+    public void SendBundleOpen(uint bundleId)
+    {
+        PendingBundleId = bundleId;
+        context.Client.Send(ItemProtocol.BuildBundleOpenRequest(bundleId));
+    }
+
+    /// <summary>The bundle id of the most recent <see cref="SendBundleOpen"/> request.</summary>
+    public uint PendingBundleId { get; set; }
 
     /// <summary>
     /// CGameProcMain::MsgSend_Move request — update the local position and tell the
@@ -284,6 +308,17 @@ public sealed class InGameState(GameContext context) : GameState
                 ItemMoveResult?.Invoke(res);
                 return true;
             }
+
+            case GameOpcode.WIZ_BUNDLE_OPEN_REQ:
+            {
+                IReadOnlyList<Net.LootItem> items = ItemProtocol.ParseBundleOpen(payload);
+                LootListReceived?.Invoke(new Net.LootBundle(PendingBundleId, items));
+                return true;
+            }
+
+            case GameOpcode.WIZ_ITEM_GET:
+                ItemGetReceived?.Invoke(ItemProtocol.ParseItemGetResult(payload));
+                return true;
 
             case GameOpcode.WIZ_MAGIC_PROCESS:
                 MagicReceived?.Invoke(MagicProtocol.Parse(payload));

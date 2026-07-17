@@ -19,6 +19,9 @@ public sealed class UiResourceTable
     private const int ColInventory = 11;      // 12 szInventory
     private const int ColDroppedItem = 13;    // 14 szDroppedItem
     private const int ColTargetBar = 14;      // 15 szTargetBar
+    private const int ColItemInfo = 28;       // 29 szItemInfo (image tooltip)
+    private const int ColCountableEdit = 30;  // 31 szPersonalTradeEdit (base_tradeedit)
+    private const int ColRepairTooltip = 34;  // 35 szRepairTooltip
     private const int ColSkillTree = 16;      // 17 szSkillTree
     private const int ColHotKey = 17;         // 18 szHotKey
     private const int ColMiniMap = 18;        // 19 szMiniMap
@@ -73,6 +76,15 @@ public sealed class UiResourceTable
     public string Inventory(int nation) => Get(nation, ColInventory);
 
     public string DroppedItem(int nation) => Get(nation, ColDroppedItem);
+
+    /// <summary>szItemInfo — the image tooltip dialog (CUIImageTooltipDlg).</summary>
+    public string ItemInfo(int nation) => Get(nation, ColItemInfo);
+
+    /// <summary>szRepairTooltip — the repair tooltip dialog (CUIRepairTooltipDlg).</summary>
+    public string RepairTooltip(int nation) => Get(nation, ColRepairTooltip);
+
+    /// <summary>szPersonalTradeEdit — the countable stack-split popup (base_tradeedit).</summary>
+    public string CountableItemEdit(int nation) => Get(nation, ColCountableEdit);
 
     public string TargetBar(int nation) => Get(nation, ColTargetBar);
 
