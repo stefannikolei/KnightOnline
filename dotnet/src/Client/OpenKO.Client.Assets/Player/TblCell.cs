@@ -17,6 +17,12 @@ internal static class TblCell
     public static int I32(object[] cells, int i) =>
         i >= 0 && i < cells.Length ? Convert.ToInt32(cells[i]) : 0;
 
+    public static short I16(object[] cells, int i) =>
+        i >= 0 && i < cells.Length ? Convert.ToInt16(cells[i]) : (short)0;
+
     public static byte U8(object[] cells, int i) =>
         i >= 0 && i < cells.Length ? Convert.ToByte(cells[i]) : (byte)0;
+
+    /// <summary>Signed 8-bit cell (a C++ <c>char</c> column, e.g. cNeedLevel).</summary>
+    public static sbyte S8(object[] cells, int i) => unchecked((sbyte)U8(cells, i));
 }

@@ -202,6 +202,22 @@ public class UiControl
         return null;
     }
 
+    /// <summary>
+    /// CN3UIWndBase::GetChildAreaByiOrder — the first <see cref="UiAreaControl"/> in this
+    /// subtree whose area type and slot order both match. (The C++ scans direct children;
+    /// descendants is a superset that resolves identically for the usual flat window layouts.)
+    /// </summary>
+    public UiAreaControl? GetChildAreaByOrder(UiAreaType type, int order)
+    {
+        foreach (UiControl d in Descendants())
+        {
+            if (d is UiAreaControl area && area.AreaType == type && area.Order == order)
+                return area;
+        }
+
+        return null;
+    }
+
     /// <summary>Enumerate this control and all descendants (depth-first, front order).</summary>
     public IEnumerable<UiControl> Descendants()
     {

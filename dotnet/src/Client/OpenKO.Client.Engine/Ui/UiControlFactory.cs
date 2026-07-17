@@ -24,6 +24,12 @@ public static class UiControlFactory
         N3UiScrollBar scroll => new UiScrollBarControl(scroll),
         N3UiEdit edit => new UiEditControl(edit),
         N3UiString str => new UiStringControl(str),
+        // N3UiIcon derives from N3UiImage, so it must be matched before any N3UiImage arm.
+        N3UiIcon icon => new UiIconControl(icon),
+        N3UiArea area => new UiAreaControl(area),
+        N3UiTooltip tip => new UiTooltipControl(tip),
+        // IconManager/IconSlot carry no behaviour of their own yet — the generic control
+        // (their layout data lives on the node) is sufficient until a dialog needs more.
         _ => new UiControl(node),
     };
 }

@@ -119,6 +119,11 @@ public static class UiStyle
     // scrollbar
     public const uint ScrollBarHorizontal = 0x00010000;
     public const uint ScrollBarVertical = 0x00020000;
+
+    // icon
+    public const uint IconHighlight = 0x00001000;
+    public const uint DurabilityExhaust = 0x00002000;
+    public const uint DisableSkill = 0x00004000;
 }
 
 /// <summary>A screen point (Win32 POINT).</summary>

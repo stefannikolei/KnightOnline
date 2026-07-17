@@ -18,6 +18,12 @@ public sealed class UiManager
 
     public bool Enabled { get; set; } = true;
 
+    /// <summary>
+    /// The shared icon drag-state (CN3UIWndBase s_sSelectedIconInfo / s_sRecoveryJobInfo /
+    /// s_bWaitFromServer). One instance is handed to every icon this manager builds.
+    /// </summary>
+    public IconDragState IconDrag { get; } = new();
+
     /// <summary>The single focused edit box (CN3UIBase::s_pFocusedEdit).</summary>
     public UiEditControl? FocusedEdit { get; private set; }
 
@@ -47,8 +53,21 @@ public sealed class UiManager
     public UiControl AddFromLayout(N3UiBase layoutRoot)
     {
         UiControl dialog = UiControlFactory.Build(layoutRoot);
+        BindIconDragState(dialog);
         Add(dialog);
         return dialog;
+    }
+
+    /// <summary>Hand the shared <see cref="IconDrag"/> instance to every icon in a subtree.</summary>
+    public void BindIconDragState(UiControl root)
+    {
+        if (root is UiIconControl icon)
+            icon.DragState = IconDrag;
+        foreach (UiControl c in root.Descendants())
+        {
+            if (c is UiIconControl child)
+                child.DragState = IconDrag;
+        }
     }
 
     /// <summary>Bring a dialog to the front (CUIManager::SetFocusedUI z-order move).</summary>

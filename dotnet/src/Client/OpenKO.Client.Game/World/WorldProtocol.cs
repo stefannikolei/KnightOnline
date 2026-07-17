@@ -269,10 +269,10 @@ public static class WorldProtocol
             int num = (int)r.GetDWord();
             short duration = r.GetShort();
             short count = r.GetShort();
-            r.GetByte();               // flag
-            r.GetShort();              // time remaining
+            byte flag = r.GetByte();               // rental/bound flag
+            short timeRemaining = r.GetShort();    // rental seconds left
             if (num != 0)
-                inventory?.Set(i, new InventoryItem(num, count, duration));
+                inventory?.Set(i, new InventoryItem(num, count, duration, flag, timeRemaining));
         }
 
         r.GetByte();                   // account status

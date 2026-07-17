@@ -83,6 +83,10 @@ public class N3UiBase : N3BaseFile
         N3UiType.TrackBar => new N3UiTrackBar(),
         N3UiType.Edit => new N3UiEdit(),
         N3UiType.Area => new N3UiArea(),
+        N3UiType.Tooltip => new N3UiTooltip(),
+        N3UiType.Icon => new N3UiIcon(),
+        N3UiType.IconManager => new N3UiIconMng(),
+        N3UiType.IconSlot => new N3UiIconSlot(),
         N3UiType.List => new N3UiList(),
         _ => throw new InvalidDataException($"Unknown UI type {type}"), // C++ asserts and crashes here
     };
@@ -155,7 +159,7 @@ public class N3UiBase : N3BaseFile
 }
 
 /// <summary>CN3UIImage: texture name, UV rect, animation frame rate.</summary>
-public sealed class N3UiImage : N3UiBase
+public class N3UiImage : N3UiBase
 {
     public override N3UiType UiType => N3UiType.Image;
 
@@ -322,12 +326,36 @@ public sealed class N3UiTrackBar : N3UiBase
     public override N3UiType UiType => N3UiType.TrackBar;
 }
 
+/// <summary>
+/// eUI_AREA_TYPE (Client/N3Base/N3UIArea.h) — the semantic role of a
+/// <see cref="N3UiArea"/> slot region within an icon-manager window.
+/// </summary>
+public enum UiAreaType
+{
+    None = 0,
+    Slot = 1,
+    Inv = 2,
+    TradeNpc = 3,
+    PerTradeMy = 4,
+    PerTradeOther = 5,
+    DropItem = 6,
+    SkillTree = 7,
+    SkillHotkey = 8,
+    RepairInv = 9,
+    RepairNpc = 10,
+    TradeMy = 11,
+    PerTradeInv = 12,
+}
+
 /// <summary>CN3UIArea: the area type int (non-_REPENT build).</summary>
 public sealed class N3UiArea : N3UiBase
 {
     public override N3UiType UiType => N3UiType.Area;
 
     public int AreaType { get; set; }
+
+    /// <summary>Strongly-typed view of <see cref="AreaType"/> (eUI_AREA_TYPE).</summary>
+    public UiAreaType AreaTypeEnum => (UiAreaType)AreaType;
 
     public override void Load(BinaryReader reader)
     {
@@ -340,6 +368,47 @@ public sealed class N3UiArea : N3UiBase
         base.Save(writer);
         writer.Write(AreaType);
     }
+}
+
+/// <summary>
+/// CN3UIIcon (Client/WarFare/N3UIIcon.{h,cpp}) — a draggable item/skill icon.
+/// The class derives from <c>CN3UIImage</c> and adds no <c>Load</c> override, so the
+/// serialized layout is byte-identical to <see cref="N3UiImage"/> (texture, UV rect,
+/// animation frame). The runtime drag/hit-test behaviour lives in the Engine control.
+/// </summary>
+public sealed class N3UiIcon : N3UiImage
+{
+    public override N3UiType UiType => N3UiType.Icon;
+}
+
+/// <summary>
+/// CN3UITooltip (Client/N3Base/N3UITooltip.{h,cpp}) — derives from <c>CN3UIStatic</c>
+/// with no <c>Load</c> override, so its serialized layout is byte-identical to
+/// <see cref="N3UiStatic"/> (one click-sound name; background/text are children).
+/// </summary>
+public sealed class N3UiTooltip : N3UiStatic
+{
+    public override N3UiType UiType => N3UiType.Tooltip;
+}
+
+/// <summary>
+/// CN3UIIconManager (UI_TYPE_ICON_MANAGER) — the icon-owning window role. No dedicated
+/// C++ class survives (the factory branch is commented out); it carries no fields beyond
+/// <see cref="N3UiBase"/>, so it parses exactly like the base node.
+/// </summary>
+public sealed class N3UiIconMng : N3UiBase
+{
+    public override N3UiType UiType => N3UiType.IconManager;
+}
+
+/// <summary>
+/// CN3UIIconSlot (UI_TYPE_ICONSLOT) — a _REPENT-only node whose C++ source is absent
+/// from this tree. It adds no observed fields beyond <see cref="N3UiBase"/>, so it parses
+/// like the base node; revisit if a _REPENT corpus ever surfaces extra bytes.
+/// </summary>
+public sealed class N3UiIconSlot : N3UiBase
+{
+    public override N3UiType UiType => N3UiType.IconSlot;
 }
 
 /// <summary>CN3UIList: list font block (name, height, color, bold, italic as 4-byte BOOLs).</summary>
