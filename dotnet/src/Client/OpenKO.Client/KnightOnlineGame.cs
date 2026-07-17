@@ -415,6 +415,15 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             invHud.ToggleInventory();
         }
 
+        // C toggles the character sheet (Various), G the clan browse/join window — HUD up, no chat edit.
+        if (_inGameUi is { } sheetHud && sheetHud.Manager.FocusedEdit == null)
+        {
+            if (_input.IsKeyPress(OpenKO.Client.Engine.Input.KeyMap.DIK_C))
+                sheetHud.ToggleVarious();
+            if (_input.IsKeyPress(OpenKO.Client.Engine.Input.KeyMap.DIK_G))
+                sheetHud.ToggleKnightsOperation();
+        }
+
         // Number keys 1-8 trigger the hotkey bar slots (no chat edit focused).
         if (_inGameUi is { HotKey: not null } hkHud && hkHud.Manager.FocusedEdit == null)
         {

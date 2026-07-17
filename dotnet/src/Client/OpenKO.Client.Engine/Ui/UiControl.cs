@@ -185,12 +185,16 @@ public class UiControl
     /// <summary>CN3UIBase::SetVisible.</summary>
     public virtual void SetVisible(bool visible) => Visible = visible;
 
-    /// <summary>CN3UIBase::GetChildByID — first control (this subtree) matching the id.</summary>
+    /// <summary>
+    /// CN3UIBase::GetChildByID — first control (this subtree) matching the id. The match is
+    /// case-insensitive, mirroring the original's <c>_strnicmp</c> (the shipped .uif files are
+    /// inconsistent about id casing, e.g. <c>Text_Id</c> vs the source's <c>Text_ID</c>).
+    /// </summary>
     public UiControl? GetChildById(string id)
     {
         foreach (UiControl child in Children)
         {
-            if (child.Id == id)
+            if (string.Equals(child.Id, id, StringComparison.OrdinalIgnoreCase))
                 return child;
             UiControl? hit = child.GetChildById(id);
             if (hit != null)
@@ -200,12 +204,12 @@ public class UiControl
         return null;
     }
 
-    /// <summary>Typed GetChildByID — first control matching id and type T.</summary>
+    /// <summary>Typed GetChildByID — first control matching id (case-insensitive) and type T.</summary>
     public T? GetChildById<T>(string id) where T : UiControl
     {
         foreach (UiControl child in Children)
         {
-            if (child is T typed && child.Id == id)
+            if (child is T typed && string.Equals(child.Id, id, StringComparison.OrdinalIgnoreCase))
                 return typed;
             T? hit = child.GetChildById<T>(id);
             if (hit != null)

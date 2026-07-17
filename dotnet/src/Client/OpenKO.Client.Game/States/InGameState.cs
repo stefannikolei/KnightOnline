@@ -140,6 +140,18 @@ public sealed class InGameState(GameContext context) : GameState
     /// <summary>Spends a skill point into a tab (CUISkillTreeDlg::PointPushUpButton).</summary>
     public void SendSkillPoint(byte tab) => context.Client.Send(SkillPointProtocol.Build(tab));
 
+    /// <summary>
+    /// Spends a stat bonus point (CUIState::MsgSendAblityPointChange): type 1=Str, 2=Sta,
+    /// 3=Dex, 4=Int, 5=MagicAttack; delta is +1 per press.
+    /// </summary>
+    public void SendStatPoint(byte type, short delta) => context.Client.Send(StatPointProtocol.Build(type, delta));
+
+    /// <summary>Sends a pre-built WIZ_PARTY packet (party window / cmd-bar party actions).</summary>
+    public void SendParty(ReadOnlySpan<byte> payload) => context.Client.Send(payload);
+
+    /// <summary>Sends a pre-built WIZ_KNIGHTS_PROCESS packet (clan dialogs).</summary>
+    public void SendKnights(ReadOnlySpan<byte> payload) => context.Client.Send(payload);
+
     /// <summary>Requests a class change/promotion (CUIClassChange Btn_Class).</summary>
     public void SendClassChangeRequest(short newClass) =>
         context.Client.Send(ClassChangeProtocol.BuildRequest(newClass));

@@ -16,6 +16,14 @@ public sealed class UiResourceTable
     private const int ColChat = 3;            // 04 szChat
     private const int ColMsgOutput = 4;       // 05 szMsgOutput
     private const int ColStateBar = 5;        // 06 szStateBar
+    private const int ColVarious = 6;         // 07 szVarious (multi-page sheet frame)
+    private const int ColState = 7;           // 08 szState (the CUIState status page)
+    private const int ColKnights = 8;         // 09 szKnights (the CUIKnights clan page)
+    private const int ColPartyOrForce = 19;   // 20 szPartyOrForce
+    private const int ColPartyBBS = 20;       // 21 szPartyBBS (recruitment board — dialog deferred)
+    private const int ColKnightsOperation = 37; // 38 szKnightsOperation
+    private const int ColInputClanName = 44;  // 45 szInputClanName (CUICreateClanName)
+    private const int ColClanPage = 72;       // 73 szClanPage
     private const int ColInventory = 11;      // 12 szInventory
     private const int ColDroppedItem = 13;    // 14 szDroppedItem
     private const int ColTargetBar = 14;      // 15 szTargetBar
@@ -97,4 +105,28 @@ public sealed class UiResourceTable
     public string HotKey(int nation) => Get(nation, ColHotKey);
 
     public string MiniMap(int nation) => Get(nation, ColMiniMap);
+
+    /// <summary>szVarious — the multi-page character sheet frame (CUIVarious).</summary>
+    public string Various(int nation) => Get(nation, ColVarious);
+
+    /// <summary>szState — the status page loaded into the Various frame (CUIState).</summary>
+    public string State(int nation) => Get(nation, ColState);
+
+    /// <summary>szKnights — the clan page loaded into the Various frame (CUIKnights).</summary>
+    public string Knights(int nation) => Get(nation, ColKnights);
+
+    /// <summary>szPartyOrForce — the party/force member window (CUIPartyOrForce).</summary>
+    public string PartyOrForce(int nation) => Get(nation, ColPartyOrForce);
+
+    /// <summary>szPartyBBS — the party recruitment board (CUIPartyBBS — dialog deferred to a later slice).</summary>
+    public string PartyBBS(int nation) => Get(nation, ColPartyBBS);
+
+    /// <summary>szKnightsOperation — the clan browse/create/join window (CUIKnightsOperation).</summary>
+    public string KnightsOperation(int nation) => Get(nation, ColKnightsOperation);
+
+    /// <summary>szInputClanName — the clan-name entry popup (CUICreateClanName).</summary>
+    public string InputClanName(int nation) => Get(nation, ColInputClanName);
+
+    /// <summary>szClanPage — the clan cape/emblem page resource.</summary>
+    public string ClanPage(int nation) => Get(nation, ColClanPage);
 }

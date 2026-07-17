@@ -74,6 +74,23 @@ public sealed class InGameUi : IDisposable
     /// <summary>The icon hotkey bar — null when the layout or skill table failed to load.</summary>
     public HotKeyDialog? HotKey { get; }
 
+    /// <summary>The multi-page character sheet (status + clan) — null when the layout failed to load.</summary>
+    public VariousDialog? Various { get; }
+
+    /// <summary>The party/force member window — null when the layout failed to load.</summary>
+    public PartyOrForceDialog? PartyOrForce { get; }
+
+    /// <summary>The clan browse/create/join window — null when the layout failed to load.</summary>
+    public KnightsOperationDialog? KnightsOperation { get; }
+
+    /// <summary>The clan-name entry popup — null when the layout failed to load.</summary>
+    public CreateClanDialog? CreateClan { get; }
+
+    /// <summary>The in-game shared message box (party/clan confirms) — null when the layout failed to load.</summary>
+    public MessageBoxDialog? MessageBox { get; }
+
+    private short? _targetId;
+
     public event Action<string>? Log;
 
     public InGameUi(GameContext context, GraphicsDevice device, FontService fonts, string dataPath)
@@ -238,6 +255,65 @@ public sealed class InGameUi : IDisposable
             Log?.Invoke("HotKey skill table not found; hotkey bar disabled.");
         }
 
+        // Character sheet (Various) — the szState + szKnights pages load into the szVarious frame
+        // (CGameProcMain::InitUI); adding them as children lets one controller resolve both.
+        UiControl? variousRoot = LoadDialog(table.Various(nation));
+        UiControl? variousStateRoot = LoadDialog(table.State(nation));
+        UiControl? variousClanRoot = LoadDialog(table.Knights(nation));
+        if (variousRoot != null)
+        {
+            if (variousStateRoot != null)
+                variousRoot.AddChild(variousStateRoot);
+            if (variousClanRoot != null)
+                variousRoot.AddChild(variousClanRoot);
+            variousRoot.SetPos(0, 80); // slides in from the left (CUIVarious)
+            Various = new VariousDialog(context, variousRoot, variousStateRoot, variousClanRoot);
+        }
+        else
+        {
+            Log?.Invoke("Various layout not found: " + table.Various(nation));
+        }
+
+        // Party/force member window — right side, auto-shows when a party forms.
+        UiControl? partyRoot = LoadDialog(table.PartyOrForce(nation));
+        if (partyRoot != null)
+        {
+            partyRoot.SetPos(w - partyRoot.Width, 100);
+            PartyOrForce = new PartyOrForceDialog(context, partyRoot);
+        }
+        else
+        {
+            Log?.Invoke("PartyOrForce layout not found: " + table.PartyOrForce(nation));
+        }
+
+        // In-game shared message box for party/clan confirms (its own instance).
+        UiControl? msgBoxRoot = LoadDialog(table.MessageBox(nation));
+        if (msgBoxRoot != null)
+        {
+            msgBoxRoot.SetPosCenter(w, h);
+            MessageBox = new MessageBoxDialog(msgBoxRoot);
+        }
+
+        // Clan browse/create/join window — centred, hidden until opened.
+        UiControl? knightsOpRoot = LoadDialog(table.KnightsOperation(nation));
+        if (knightsOpRoot != null)
+        {
+            knightsOpRoot.SetPosCenter(w, h);
+            KnightsOperation = new KnightsOperationDialog(context, knightsOpRoot, MessageBox);
+        }
+        else
+        {
+            Log?.Invoke("KnightsOperation layout not found: " + table.KnightsOperation(nation));
+        }
+
+        // Clan-name entry popup — centred, hidden until Btn_Create.
+        UiControl? createClanRoot = LoadDialog(table.InputClanName(nation));
+        if (createClanRoot != null)
+        {
+            createClanRoot.SetPosCenter(w, h);
+            CreateClan = new CreateClanDialog(context, createClanRoot);
+        }
+
         // Register with the manager (last added = topmost = input first). Chat sits above
         // the passive bars so its edit/buttons grab input; the death dialog floats on top.
         Manager.Add(stateRoot);
@@ -265,6 +341,19 @@ public sealed class InGameUi : IDisposable
         // Hotkey bar sits with the HUD (always visible), registered so its icons receive input.
         if (hotkeyRoot != null && skills != null)
             Manager.Add(hotkeyRoot);
+
+        // Party window sits with the HUD; the character sheet / clan windows float above it,
+        // the clan-name popup and the message box are topmost (modal-ish confirms).
+        if (partyRoot != null)
+            Manager.Add(partyRoot);
+        if (variousRoot != null)
+            Manager.Add(variousRoot);
+        if (knightsOpRoot != null)
+            Manager.Add(knightsOpRoot);
+        if (createClanRoot != null)
+            Manager.Add(createClanRoot);
+        if (msgBoxRoot != null)
+            Manager.Add(msgBoxRoot);
     }
 
     /// <summary>The selected character's name (the hotkey store key), or a stable fallback.</summary>
@@ -366,6 +455,35 @@ public sealed class InGameUi : IDisposable
         Chat.FoldRequested += () => Chat.Root.SetVisible(!Chat.Root.Visible);
         MessageWnd.FoldRequested += () => MessageWnd.Root.SetVisible(!MessageWnd.Root.Visible);
 
+        // Character sheet + clan/party windows (9.7).
+        Various?.Bind(inGame);
+        PartyOrForce?.Bind(inGame);
+        KnightsOperation?.Bind(inGame);
+
+        // Character sheet's Party tab opens the party window; its clan-page invite target and the
+        // command bar's party actions share the current combat target.
+        if (Various is { } various)
+            various.PartyPageRequested += () => PartyOrForce?.Root.SetVisible(PartyOrForce.MemberCount > 0);
+
+        // Clan-name popup: Btn_Create in the operation window opens it; on confirm the cost box
+        // gates the actual WIZ_KNIGHTS_PROCESS create (CUICreateClanName::MakeClan → MB_YESNO).
+        if (KnightsOperation is { } knightsOp && CreateClan is { } createClan)
+            knightsOp.CreateRequested += () => createClan.Open();
+        if (CreateClan is { } cc2)
+        {
+            cc2.ConfirmRequested += name =>
+            {
+                if (MessageBox is { } box)
+                    box.Show($"Found the clan \"{name}\"?", string.Empty, MessageBoxStyle.YesNo, r =>
+                    {
+                        if (r == MessageBoxResult.Yes)
+                            cc2.Send();
+                    });
+                else
+                    cc2.Send();
+            };
+        }
+
         // Command buttons / revival: logged for now; real behaviour lands in later slices.
         CmdBar.Command += id => Log?.Invoke($"Command: {id}");
         CmdBar.Command += id =>
@@ -374,6 +492,12 @@ public sealed class InGameUi : IDisposable
                 ToggleInventory();
             else if (id == "btn_skill")
                 ToggleSkillTree();
+            else if (id == "btn_character")
+                ToggleVarious();
+            else if (id == "btn_invite")
+                InviteTargetToParty();
+            else if (id == "btn_disband")
+                PartyOrForce?.Leave(_targetId ?? -1);
         };
 
         // Skill tree: rebuild from MyInfo (additive; doesn't clobber the state bar / inventory hooks).
@@ -450,8 +574,45 @@ public sealed class InGameUi : IDisposable
     /// <summary>Feed the current combat target id to the hotkey cast path (-1 = none).</summary>
     public void SetTarget(short? targetId)
     {
+        _targetId = targetId;
         if (HotKey is { } hk)
             hk.TargetId = targetId ?? -1;
+        if (Various is { } various)
+            various.TargetId = targetId ?? -1;
+    }
+
+    /// <summary>Toggle the character sheet (Various), refreshing its status page from MyInfo when opening.</summary>
+    public void ToggleVarious()
+    {
+        if (Various is not { } various)
+            return;
+        various.Toggle();
+        if (various.Root.Visible)
+            Manager.SetFocusedUi(various.Root);
+    }
+
+    /// <summary>Toggle the clan browse/create/join window, requesting the clan list when opening.</summary>
+    public void ToggleKnightsOperation()
+    {
+        if (KnightsOperation is not { } knightsOp)
+            return;
+        knightsOp.Toggle();
+        if (knightsOp.Root.Visible)
+            Manager.SetFocusedUi(knightsOp.Root);
+    }
+
+    /// <summary>
+    /// CGameProcMain::MsgSend_PartyOrForceCreate — invite the current target into the party by
+    /// name (CREATE when solo, INSERT once a party of 2+ exists). No-op without a player target.
+    /// </summary>
+    public void InviteTargetToParty()
+    {
+        if (_targetId is not short id || !_context.InGame.World.Players.TryGetValue(id, out RemotePlayer? player))
+            return;
+        bool haveParty = PartyOrForce is { MemberCount: >= 2 };
+        _context.InGame.SendParty(haveParty
+            ? OpenKO.Client.Game.Net.PartyProtocol.BuildInvite(player.Name)
+            : OpenKO.Client.Game.Net.PartyProtocol.BuildCreate(player.Name));
     }
 
     /// <summary>
