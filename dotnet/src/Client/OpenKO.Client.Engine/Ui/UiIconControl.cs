@@ -17,9 +17,38 @@ namespace OpenKO.Client.Engine.Ui;
 /// </summary>
 public sealed class UiIconControl : UiControl
 {
+    /// <summary>CN3UIIcon::SetUVRect(0,0, 45/64, 45/64) — the fixed item-icon UV window.</summary>
+    public static readonly N3UiRectF ItemIconUv = new()
+    {
+        Left = 0f,
+        Top = 0f,
+        Right = 45f / 64f,
+        Bottom = 45f / 64f,
+    };
+
     public UiIconControl(N3UiIcon node) : base(node)
     {
         IconTexture = node.TexFileName;
+    }
+
+    /// <summary>
+    /// Build a runtime icon widget for a slot that has no <c>.uif</c> icon node (the
+    /// inventory/hotkey icons the C++ creates at runtime in <c>InitIconUpdate</c>). Synthesizes
+    /// a minimal <see cref="N3UiIcon"/> node placed at <paramref name="region"/> with the fixed
+    /// item-icon UV, so the widget behaves exactly like a parsed one (draggable, hit-tested
+    /// against its move rect). The caller assigns <see cref="IconTexture"/> / <see cref="Payload"/>
+    /// and a <see cref="DragState"/>.
+    /// </summary>
+    public static UiIconControl CreateRuntime(in N3UiRect region, int itemSkillId = 0)
+    {
+        var node = new N3UiIcon
+        {
+            Region = region,
+            Movable = region,
+            UvRect = ItemIconUv,
+            TexFileName = string.Empty,
+        };
+        return new UiIconControl(node) { ItemSkillId = itemSkillId };
     }
 
     /// <summary>
@@ -39,6 +68,12 @@ public sealed class UiIconControl : UiControl
 
     /// <summary>Runtime UISTYLE_ICON_HIGHLIGHT bit — hover highlight while the window is idle.</summary>
     public bool Highlight { get; private set; }
+
+    /// <summary>
+    /// Runtime UISTYLE_DURABILITY_EXHAUST bit — the item's durability has hit 0. The device
+    /// renderer tints the icon red while this is set (CUIInventory::InitIconUpdate).
+    /// </summary>
+    public bool DurabilityExhausted { get; set; }
 
     /// <summary>CN3UIIcon::GetMoveRect — the icon's clickable/draggable rect.</summary>
     public N3UiRect MoveRect => Movable;

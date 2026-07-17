@@ -333,6 +333,9 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             _inGameUi.Log += Log;
             _inGameUi.Bind(_context.InGame);
 
+            // Populate the inventory from any MyInfo already received before the HUD was built.
+            _inGameUi.Inventory?.Populate(_context.InGame.Inventory);
+
             // Entering the world retires the frontend dialogs so ActiveUi routes
             // input to the HUD (the interactive-login path keeps _frontend live
             // until here).
@@ -398,9 +401,18 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         _frontend?.Tick();
         _inGameUi?.Tick();
 
+        // I toggles the inventory window (CGameProcMain hotkey), when the HUD is up and no chat
+        // edit is focused (so typing "i" in chat doesn't open it).
+        if (_inGameUi is { } invHud && invHud.Manager.FocusedEdit == null
+            && _input.IsKeyPress(OpenKO.Client.Engine.Input.KeyMap.DIK_I))
+        {
+            invHud.ToggleInventory();
+        }
+
         // Interactive UI first; it consumes input (and text focus) before gameplay.
         UiManager ui = ActiveUi;
         ui.Tick();
+        _inGameUi?.SetCursor(_input.MousePos.X, _input.MousePos.Y);
         bool uiHandled = ui.Dialogs.Count > 0
             && (UiInputBridge.Dispatch(ui, _input) & (UiMouseProc.DoneSomething | UiMouseProc.DialogFocus)) != 0;
 

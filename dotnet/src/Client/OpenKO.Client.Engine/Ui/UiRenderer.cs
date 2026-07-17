@@ -27,6 +27,9 @@ public static class UiRenderer
 {
     public const uint OpaqueWhite = 0xFFFFFFFF;
 
+    /// <summary>Red tint applied to an icon whose item durability is exhausted (UISTYLE_DURABILITY_EXHAUST).</summary>
+    public const uint DurabilityExhaustTint = 0xFFFF6060;
+
     public static (List<UiQuadPlan> Quads, List<UiTextPlan> Texts) BuildPlans(N3UiBase root)
     {
         var quads = new List<UiQuadPlan>();
@@ -108,6 +111,10 @@ public static class UiRenderer
                 RenderButton(button, quads, texts);
                 return;
 
+            case UiIconControl icon:
+                RenderIcon(icon, quads);
+                return;
+
             case UiListControl list:
                 RenderSelf(list, quads, texts);
                 RenderListRows(list, texts);
@@ -165,6 +172,22 @@ public static class UiRenderer
                     texts.Add(new UiTextPlan(str.Text, c.Region, str.FontName, str.FontHeight, str.FontFlags, str.Color));
                 break;
         }
+    }
+
+    /// <summary>
+    /// Draw a runtime item/skill icon (CN3UIIcon::Render). Emits a single quad using the
+    /// live <see cref="UiIconControl.IconTexture"/> (retargeted per slot, not the node's
+    /// texture), the fixed 45/64 item-icon UV window and the live (possibly dragged) Region.
+    /// A durability-exhausted item is drawn with a red tint. Empty (hidden) slots carry no
+    /// texture and emit nothing.
+    /// </summary>
+    private static void RenderIcon(UiIconControl icon, List<UiQuadPlan> quads)
+    {
+        if (icon.IconTexture.Length == 0)
+            return;
+
+        uint color = icon.DurabilityExhausted ? DurabilityExhaustTint : OpaqueWhite;
+        quads.Add(new UiQuadPlan(icon.IconTexture, icon.Region, UiIconControl.ItemIconUv, color));
     }
 
     /// <summary>CN3UIButton::Render — draw the state image, then non-state children tail-first.</summary>

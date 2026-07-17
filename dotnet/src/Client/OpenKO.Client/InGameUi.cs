@@ -2,12 +2,14 @@ using FontStashSharp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKO.Client.Assets;
+using OpenKO.Client.Assets.Player;
 using OpenKO.Client.Engine.Interop;
 using OpenKO.Client.Engine.IO;
 using OpenKO.Client.Engine.Rendering;
 using OpenKO.Client.Engine.Ui;
 using OpenKO.Client.Game.States;
 using OpenKO.Client.Game.Ui;
+using OpenKO.Client.Game.World;
 
 namespace OpenKO.Client;
 
@@ -47,6 +49,9 @@ public sealed class InGameUi : IDisposable
     public CmdBarDialog CmdBar { get; }
 
     public DeadDialog Dead { get; }
+
+    /// <summary>The inventory dialog — null when the layout or item tables failed to load.</summary>
+    public InventoryDialog? Inventory { get; }
 
     public event Action<string>? Log;
 
@@ -106,6 +111,26 @@ public sealed class InGameUi : IDisposable
         _chatOutput = chatRoot.GetChildById("text0");
         _msgOutput = msgRoot.GetChildById("text_message");
 
+        // Inventory — centred, hidden until toggled (btn_inventory / hotkey). Needs the item
+        // tables; degrades gracefully (no dialog) when the layout or tables are missing.
+        UiControl? invRoot = LoadDialog(table.Inventory(nation));
+        ItemTableSet? items = TryLoadItems(_resolver);
+        if (invRoot != null && items != null)
+        {
+            invRoot.SetPosCenter(w, h);
+            Inventory = new InventoryDialog(context, invRoot, items, Manager.IconDrag);
+            Manager.BindIconDragState(invRoot);
+            Manager.Add(invRoot);
+        }
+        else if (invRoot == null)
+        {
+            Log?.Invoke("Inventory layout not found: " + table.Inventory(nation));
+        }
+        else
+        {
+            Log?.Invoke("Inventory item tables not found; inventory disabled.");
+        }
+
         // Register with the manager (last added = topmost = input first). Chat sits above
         // the passive bars so its edit/buttons grab input; the death dialog floats on top.
         Manager.Add(stateRoot);
@@ -114,6 +139,35 @@ public sealed class InGameUi : IDisposable
         Manager.Add(msgRoot);
         Manager.Add(chatRoot);
         Manager.Add(deadRoot);
+    }
+
+    /// <summary>
+    /// Load the item tables (Data\Item_Org_us.tbl + Item_Ext_i_us.tbl), mirroring
+    /// <c>CharacterFactory.TryLoad</c>. Returns null when the base table is missing.
+    /// </summary>
+    private static ItemTableSet? TryLoadItems(KoPathResolver resolver, string lang = "us")
+    {
+        string? itemPath = resolver.Resolve($"Data\\Item_Org_{lang}.tbl");
+        if (itemPath == null)
+            return null;
+
+        try
+        {
+            var basic = N3TableFile.LoadFromFile(itemPath);
+            var exts = new N3TableFile?[ItemTableSet.MaxItemExtension];
+            for (int i = 0; i < ItemTableSet.MaxItemExtension; i++)
+            {
+                string? extPath = resolver.Resolve($"Data\\Item_Ext_{i}_{lang}.tbl");
+                if (extPath != null)
+                    exts[i] = N3TableFile.LoadFromFile(extPath);
+            }
+
+            return new ItemTableSet(basic, exts);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     /// <summary>
@@ -126,12 +180,35 @@ public sealed class InGameUi : IDisposable
         StateBar.Bind(inGame);   // MyInfoReceived + HpChanged
         Chat.Bind(inGame);       // ChatReceived
 
+        // Inventory: repopulate on MyInfo (additive, doesn't clobber the state bar's hook) and
+        // commit/rollback the drag on the WIZ_ITEM_MOVE reply, refreshing the HP/MP bars whose
+        // maxima the equip change recomputed.
+        if (Inventory is { } inv)
+        {
+            inv.Bind(inGame);
+            inGame.ItemMoveResult += res =>
+            {
+                inv.OnItemMoveResult(res.Success);
+                if (res.Success)
+                {
+                    LocalPlayer l = inGame.World.Local;
+                    StateBar.UpdateHp(l.Hp, l.MaxHp);
+                    StateBar.UpdateMp(l.Mp, l.MaxMp);
+                }
+            };
+        }
+
         // Fold buttons toggle their window's visibility (CUIChat/CUIMessageWnd btn_off).
         Chat.FoldRequested += () => Chat.Root.SetVisible(!Chat.Root.Visible);
         MessageWnd.FoldRequested += () => MessageWnd.Root.SetVisible(!MessageWnd.Root.Visible);
 
         // Command buttons / revival: logged for now; real behaviour lands in later slices.
         CmdBar.Command += id => Log?.Invoke($"Command: {id}");
+        CmdBar.Command += id =>
+        {
+            if (id == "btn_inventory")
+                ToggleInventory();
+        };
         Dead.RevivalRequested += type =>
         {
             Log?.Invoke($"Revival requested (type {type}).");
@@ -149,6 +226,26 @@ public sealed class InGameUi : IDisposable
         StateBar.UpdateMp(l.Mp, l.MaxMp);
         StateBar.UpdateExp(l.Exp, l.MaxExp);
         StateBar.UpdatePosition(l.X, l.Z);
+    }
+
+    /// <summary>Toggle the inventory window and repopulate it from the current model when opening.</summary>
+    public void ToggleInventory()
+    {
+        if (Inventory is not { } inv)
+            return;
+        inv.Toggle();
+        if (inv.Root.Visible)
+        {
+            inv.Populate(_context.InGame.Inventory);
+            Manager.SetFocusedUi(inv.Root);
+        }
+    }
+
+    /// <summary>Feed the live cursor to the inventory drag flow (mirrors CLocalInput MouseGetPos).</summary>
+    public void SetCursor(int x, int y)
+    {
+        if (Inventory is { } inv)
+            inv.Cursor = new UiPoint(x, y);
     }
 
     /// <summary>Draw the dialogs, then paint the chat / message scrollback line by line.</summary>

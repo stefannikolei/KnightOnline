@@ -81,6 +81,39 @@ public class UiRendererTests
     }
 
     [Fact]
+    public void BuildPlans_RuntimeIconEmitsQuadWithItsTextureAndIconUv()
+    {
+        var root = new UiControl(new N3UiBase { Id = "WND", Region = new N3UiRect { Right = 400, Bottom = 400 } });
+        UiIconControl icon = UiIconControl.CreateRuntime(new N3UiRect { Left = 10, Top = 20, Right = 55, Bottom = 65 });
+        root.AddChild(icon);
+
+        // No texture yet → nothing drawn even though the widget is visible.
+        (List<UiQuadPlan> empty, _) = UiRenderer.BuildPlans(root);
+        Assert.Empty(empty);
+
+        icon.IconTexture = @"UI\ItemIcon_1_0002_03_4.dxt";
+        (List<UiQuadPlan> quads, _) = UiRenderer.BuildPlans(root);
+        UiQuadPlan quad = Assert.Single(quads);
+
+        Assert.Equal(@"UI\ItemIcon_1_0002_03_4.dxt", quad.TexFileName);
+        Assert.Equal(10, quad.Screen.Left);
+        Assert.Equal(65, quad.Screen.Bottom);
+        Assert.Equal(45f / 64f, quad.Uv.Right);   // fixed item-icon UV window
+        Assert.Equal(UiRenderer.OpaqueWhite, quad.ColorArgb);
+
+        // Durability-exhausted items are drawn with the red tint.
+        icon.DurabilityExhausted = true;
+        (List<UiQuadPlan> tinted, _) = UiRenderer.BuildPlans(root);
+        Assert.Equal(UiRenderer.DurabilityExhaustTint, Assert.Single(tinted).ColorArgb);
+
+        // Hidden slot → nothing.
+        icon.DurabilityExhausted = false;
+        icon.SetVisible(false);
+        (List<UiQuadPlan> hidden, _) = UiRenderer.BuildPlans(root);
+        Assert.Empty(hidden);
+    }
+
+    [Fact]
     public void HitTest_ReturnsTheTopmostWidget()
     {
         var root = new N3UiBase

@@ -92,7 +92,7 @@ public class ItemMagicTests
 
         // Server confirmation raises the result event.
         bool? result = null;
-        ctx.InGame.ItemMoveResult = ok => result = ok;
+        ctx.InGame.ItemMoveResult = res => result = res.Success;
         ctx.Machine.DispatchPacket([(byte)GameOpcode.WIZ_ITEM_MOVE, 0x01]);
         Assert.True(result);
     }

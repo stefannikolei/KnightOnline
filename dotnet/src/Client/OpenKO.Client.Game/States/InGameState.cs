@@ -52,7 +52,12 @@ public sealed class InGameState(GameContext context) : GameState
     /// <summary>Raised on WIZ_TARGET_HP with the target's health and the damage dealt.</summary>
     public Action<TargetHpUpdate>? TargetHpReceived { get; set; }
 
-    public Action<bool>? ItemMoveResult { get; set; }
+    /// <summary>
+    /// Raised on the WIZ_ITEM_MOVE reply (parsed stat blob). The local stat block is applied
+    /// to <see cref="WorldEntities.Local"/> before the event fires, so subscribers (inventory
+    /// dialog commit/rollback, state bar refresh) see the updated maxima.
+    /// </summary>
+    public Action<Net.ItemMoveResult>? ItemMoveResult { get; set; }
 
     public Action<MagicPacket>? MagicReceived { get; set; }
 
@@ -125,6 +130,38 @@ public sealed class InGameState(GameContext context) : GameState
 
     /// <summary>CGameProcMain::MsgSend_Rotation request — tell the server the new facing.</summary>
     public void SendRotation(float yaw) => context.Client.Send(WorldProtocol.BuildRotate(yaw));
+
+    /// <summary>
+    /// Apply the WIZ_ITEM_MOVE 0x01 stat blob to the local player (the equip change recomputed
+    /// attack/guard/weight/HP/MP maxima, item-stat deltas and resistances), clamping HP/MP to
+    /// the new maxima like CGameProcMain::MsgRecv_ItemMove.
+    /// </summary>
+    private void ApplyItemMoveStats(Net.ItemMoveResult res)
+    {
+        LocalPlayer l = World.Local;
+        l.TotalHit = res.Attack;
+        l.TotalAc = res.Guard;
+        l.MaxWeight = res.WeightMax;
+        l.MaxHp = res.HpMax;
+        l.MaxMp = res.MspMax;
+        if (l.Hp > l.MaxHp)
+            l.Hp = l.MaxHp;
+        if (l.Mp > l.MaxMp)
+            l.Mp = l.MaxMp;
+
+        l.ItemStr = (byte)res.StrDelta;
+        l.ItemSta = (byte)res.StaDelta;
+        l.ItemDex = (byte)res.DexDelta;
+        l.ItemIntel = (byte)res.IntDelta;
+        l.ItemCha = (byte)res.MagicAttackDelta;
+
+        l.FireResist = (byte)res.ResistFire;
+        l.ColdResist = (byte)res.ResistCold;
+        l.LightningResist = (byte)res.ResistLight;
+        l.MagicResist = (byte)res.ResistMagic;
+        l.DiseaseResist = (byte)res.ResistCurse;
+        l.PoisonResist = (byte)res.ResistPoison;
+    }
 
     public override bool ProcessPacket(ReadOnlySpan<byte> payload)
     {
@@ -240,8 +277,13 @@ public sealed class InGameState(GameContext context) : GameState
             }
 
             case GameOpcode.WIZ_ITEM_MOVE:
-                ItemMoveResult?.Invoke(ItemProtocol.ParseItemMoveSucceeded(payload));
+            {
+                Net.ItemMoveResult res = ItemProtocol.ParseItemMoveResult(payload);
+                if (res.Success)
+                    ApplyItemMoveStats(res);
+                ItemMoveResult?.Invoke(res);
                 return true;
+            }
 
             case GameOpcode.WIZ_MAGIC_PROCESS:
                 MagicReceived?.Invoke(MagicProtocol.Parse(payload));
