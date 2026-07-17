@@ -101,6 +101,9 @@ public sealed class InGameUi : IDisposable
     /// <summary>The anvil upgrade-select window — null when the layout failed to load.</summary>
     public UpgradeDialog? Upgrade { get; }
 
+    /// <summary>The player-to-player trade window — null when the layout or item tables failed to load.</summary>
+    public PerTradeDialog? PerTrade { get; }
+
     private short? _targetId;
 
     public event Action<string>? Log;
@@ -367,6 +370,20 @@ public sealed class InGameUi : IDisposable
             Upgrade = new UpgradeDialog(context, upgradeRoot);
         }
 
+        // Player-to-player trade window — needs the item tables; anchored top-right like the
+        // C++ (CSubProcPerTrade::InitPerTradeDlg), pushed open on the WIZ_EXCHANGE agree path.
+        UiControl? perTradeRoot = LoadDialog(table.PersonalTrade(nation));
+        if (perTradeRoot != null && items != null)
+        {
+            perTradeRoot.SetPos(w - perTradeRoot.Width, 10);
+            PerTrade = new PerTradeDialog(context, perTradeRoot, items, Manager.IconDrag, CountableItemEdit, MessageBox);
+            Manager.BindIconDragState(perTradeRoot);
+        }
+        else if (perTradeRoot == null)
+        {
+            Log?.Invoke("PerTrade layout not found: " + table.PersonalTrade(nation));
+        }
+
         // Register with the manager (last added = topmost = input first). Chat sits above
         // the passive bars so its edit/buttons grab input; the death dialog floats on top.
         Manager.Add(stateRoot);
@@ -416,6 +433,8 @@ public sealed class InGameUi : IDisposable
             Manager.Add(innRoot);
         if (upgradeRoot != null)
             Manager.Add(upgradeRoot);
+        if (perTradeRoot != null && items != null)
+            Manager.Add(perTradeRoot);
 
         if (msgBoxRoot != null)
             Manager.Add(msgBoxRoot);
@@ -530,6 +549,16 @@ public sealed class InGameUi : IDisposable
         Warp?.Bind(inGame);
         Inn?.Bind(inGame);
         Upgrade?.Bind(inGame);
+
+        // Player-to-player trade (9.8b): the WIZ_EXCHANGE state machine. The bound MessageBox
+        // drives the incoming-request permit prompt; a completed/cancelled trade repopulates the
+        // inventory dialog from the (now updated) shared model.
+        if (PerTrade is { } perTrade)
+        {
+            perTrade.Bind(inGame);
+            perTrade.TradeFinished += _ => Inventory?.Populate(inGame.Inventory);
+            perTrade.WaitingForResponse += id => Log?.Invoke($"Trade requested with {id}; waiting for reply.");
+        }
 
         // Warehouse deposits/withdraws refresh both the inventory dialog and the state-bar gold view
         // once the server confirms; the inventory model is shared, so a re-populate is enough.
@@ -666,6 +695,8 @@ public sealed class InGameUi : IDisposable
             hk.Cursor = new UiPoint(x, y);
         if (WareHouse is { } ware)
             ware.Cursor = new UiPoint(x, y);
+        if (PerTrade is { } perTrade)
+            perTrade.Cursor = new UiPoint(x, y);
         UpdateItemTooltip(x, y);
     }
 
@@ -718,6 +749,19 @@ public sealed class InGameUi : IDisposable
     /// clock. Called by the executable when no chat edit is focused.
     /// </summary>
     public void TriggerHotkey(int slot, double gameSeconds) => HotKey?.TriggerSlot(slot, gameSeconds);
+
+    /// <summary>
+    /// CGameProcMain::MsgSend_PerTradeReq — ask the current combat target (a player) to trade.
+    /// No-op without a player target or when a trade is already active.
+    /// </summary>
+    public void RequestTradeWithTarget()
+    {
+        if (PerTrade is not { } perTrade || _targetId is not short id)
+            return;
+        if (!_context.InGame.World.Players.ContainsKey(id))
+            return;
+        perTrade.RequestTrade(id);
+    }
 
     /// <summary>
     /// Hover tooltip: while the inventory is open, show the item image-tooltip for the icon under

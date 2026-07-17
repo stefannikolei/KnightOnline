@@ -179,6 +179,13 @@ public sealed class InGameState(GameContext context) : GameState
     /// <summary>Sends a pre-built group packet (party/exchange/warehouse/knights).</summary>
     public void SendRaw(ReadOnlySpan<byte> payload) => context.Client.Send(payload);
 
+    /// <summary>Sends a pre-built WIZ_EXCHANGE packet (player-to-player trade dialog).</summary>
+    public void SendExchange(ReadOnlySpan<byte> payload) => context.Client.Send(payload);
+
+    /// <summary>CGameProcMain::MsgSend_PerTradeReq — ask a target player to trade (near/normal).</summary>
+    public void SendPerTradeRequest(short targetId) =>
+        context.Client.Send(ExchangeProtocol.BuildRequest(targetId, ExchangeProtocol.TradeTypeNormal));
+
     /// <summary>CUIInn::MsgSend_OpenWareHouse — ask the server to open the warehouse.</summary>
     public void SendWarehouseOpen() => context.Client.Send(WarehouseProtocol.BuildOpen());
 

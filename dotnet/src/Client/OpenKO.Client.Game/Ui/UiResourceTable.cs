@@ -28,6 +28,7 @@ public sealed class UiResourceTable
     private const int ColDroppedItem = 13;    // 14 szDroppedItem
     private const int ColTargetBar = 14;      // 15 szTargetBar
     private const int ColItemInfo = 28;       // 29 szItemInfo (image tooltip)
+    private const int ColPersonalTrade = 29;  // 30 szPersonalTrade (CUIPerTradeDlg)
     private const int ColCountableEdit = 30;  // 31 szPersonalTradeEdit (base_tradeedit)
     private const int ColRepairTooltip = 34;  // 35 szRepairTooltip
     private const int ColSkillTree = 16;      // 17 szSkillTree
@@ -96,6 +97,9 @@ public sealed class UiResourceTable
 
     /// <summary>szRepairTooltip — the repair tooltip dialog (CUIRepairTooltipDlg).</summary>
     public string RepairTooltip(int nation) => Get(nation, ColRepairTooltip);
+
+    /// <summary>szPersonalTrade — the player-to-player trade window (CUIPerTradeDlg).</summary>
+    public string PersonalTrade(int nation) => Get(nation, ColPersonalTrade);
 
     /// <summary>szPersonalTradeEdit — the countable stack-split popup (base_tradeedit).</summary>
     public string CountableItemEdit(int nation) => Get(nation, ColCountableEdit);
