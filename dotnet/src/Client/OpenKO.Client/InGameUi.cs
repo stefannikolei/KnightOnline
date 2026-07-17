@@ -104,6 +104,27 @@ public sealed class InGameUi : IDisposable
     /// <summary>The player-to-player trade window — null when the layout or item tables failed to load.</summary>
     public PerTradeDialog? PerTrade { get; }
 
+    /// <summary>The NPC quest menu — null when the layout failed to load.</summary>
+    public QuestMenuDialog? QuestMenu { get; }
+
+    /// <summary>The NPC talk window — null when the layout failed to load.</summary>
+    public QuestTalkDialog? QuestTalk { get; }
+
+    /// <summary>The NPC event/vendor entry menu — null when the layout failed to load.</summary>
+    public NpcEventDialog? NpcEvent { get; }
+
+    /// <summary>The in-game exit menu — null when the layout failed to load.</summary>
+    public ExitMenuDialog? ExitMenu { get; }
+
+    /// <summary>The notice banner — null when the layout failed to load.</summary>
+    public NoticeDialog? Notice { get; }
+
+    /// <summary>The paged help window — null when the layout failed to load.</summary>
+    public HelpDialog? Help { get; }
+
+    /// <summary>The level-based quest guide — null when the layout failed to load.</summary>
+    public LevelGuideDialog? LevelGuide { get; }
+
     private short? _targetId;
 
     public event Action<string>? Log;
@@ -384,6 +405,89 @@ public sealed class InGameUi : IDisposable
             Log?.Invoke("PerTrade layout not found: " + table.PersonalTrade(nation));
         }
 
+        // Quest menu / talk (9.9) — centred like the C++ (CUIQuestMenu::Open recentres); pushed open
+        // on the WIZ_SELECT_MSG / WIZ_NPC_SAY replies.
+        UiControl? questMenuRoot = LoadDialog(table.QuestMenu(nation));
+        if (questMenuRoot != null)
+        {
+            questMenuRoot.SetPosCenter(w, h);
+            QuestMenu = new QuestMenuDialog(context, questMenuRoot);
+        }
+        else
+        {
+            Log?.Invoke("QuestMenu layout not found: " + table.QuestMenu(nation));
+        }
+
+        UiControl? questTalkRoot = LoadDialog(table.QuestTalk(nation));
+        if (questTalkRoot != null)
+        {
+            questTalkRoot.SetPosCenter(w, h);
+            QuestTalk = new QuestTalkDialog(context, questTalkRoot);
+        }
+        else
+        {
+            Log?.Invoke("QuestTalk layout not found: " + table.QuestTalk(nation));
+        }
+
+        // NPC event / vendor entry menu — centred, pushed open on an NPC click event.
+        UiControl? npcEventRoot = LoadDialog(table.NpcEvent(nation));
+        if (npcEventRoot != null)
+        {
+            npcEventRoot.SetPosCenter(w, h);
+            NpcEvent = new NpcEventDialog(context, npcEventRoot);
+        }
+        else
+        {
+            Log?.Invoke("NpcEvent layout not found: " + table.NpcEvent(nation));
+        }
+
+        // Exit menu (ESC) — centred, hidden until toggled.
+        UiControl? exitMenuRoot = LoadDialog(table.ExitMenu(nation));
+        if (exitMenuRoot != null)
+        {
+            exitMenuRoot.SetPosCenter(w, h);
+            ExitMenu = new ExitMenuDialog(context, exitMenuRoot);
+        }
+        else
+        {
+            Log?.Invoke("ExitMenu layout not found: " + table.ExitMenu(nation));
+        }
+
+        // Notice banner — centred, pushed open on the WIZ_NOTICE push.
+        UiControl? noticeRoot = LoadDialog(table.Notice(nation));
+        if (noticeRoot != null)
+        {
+            noticeRoot.SetPosCenter(w, h);
+            Notice = new NoticeDialog(context, noticeRoot);
+        }
+        else
+        {
+            Log?.Invoke("Notice layout not found: " + table.Notice(nation));
+        }
+
+        // Help + level guide — static toggle windows, centred, hidden until opened.
+        UiControl? helpRoot = LoadDialog(table.Help(nation));
+        if (helpRoot != null)
+        {
+            helpRoot.SetPosCenter(w, h);
+            Help = new HelpDialog(context, helpRoot);
+        }
+        else
+        {
+            Log?.Invoke("Help layout not found: " + table.Help(nation));
+        }
+
+        UiControl? levelGuideRoot = LoadDialog(table.LevelGuide(nation));
+        if (levelGuideRoot != null)
+        {
+            levelGuideRoot.SetPosCenter(w, h);
+            LevelGuide = new LevelGuideDialog(context, levelGuideRoot);
+        }
+        else
+        {
+            Log?.Invoke("LevelGuide layout not found: " + table.LevelGuide(nation));
+        }
+
         // Register with the manager (last added = topmost = input first). Chat sits above
         // the passive bars so its edit/buttons grab input; the death dialog floats on top.
         Manager.Add(stateRoot);
@@ -435,6 +539,22 @@ public sealed class InGameUi : IDisposable
             Manager.Add(upgradeRoot);
         if (perTradeRoot != null && items != null)
             Manager.Add(perTradeRoot);
+
+        // Quest / NPC-event / menu windows float above the HUD (9.9).
+        if (questMenuRoot != null)
+            Manager.Add(questMenuRoot);
+        if (questTalkRoot != null)
+            Manager.Add(questTalkRoot);
+        if (npcEventRoot != null)
+            Manager.Add(npcEventRoot);
+        if (noticeRoot != null)
+            Manager.Add(noticeRoot);
+        if (helpRoot != null)
+            Manager.Add(helpRoot);
+        if (levelGuideRoot != null)
+            Manager.Add(levelGuideRoot);
+        if (exitMenuRoot != null)
+            Manager.Add(exitMenuRoot);
 
         if (msgBoxRoot != null)
             Manager.Add(msgBoxRoot);
@@ -583,6 +703,33 @@ public sealed class InGameUi : IDisposable
         {
             upgrade.ItemUpgradeRequested += npc => Log?.Invoke($"Item upgrade (npc {npc}) deferred: CUIItemUpgrade not implemented.");
             upgrade.RingUpgradeRequested += npc => Log?.Invoke($"Ring upgrade (npc {npc}) deferred: CUIRingUpgrade not implemented.");
+        }
+
+        // Quest / notice (9.9): the server replies push each window open.
+        QuestMenu?.Bind(inGame); // WIZ_SELECT_MSG
+        QuestTalk?.Bind(inGame); // WIZ_NPC_SAY
+        Notice?.Bind(inGame);    // WIZ_NOTICE
+
+        // NPC event menu: the vendor transaction / inventory-repair UIs are deferred (later slice).
+        if (NpcEvent is { } npcEvent)
+        {
+            npcEvent.SaleRequested += trade => Log?.Invoke($"Vendor transaction (trade {trade}) deferred: CUITransactionDlg not implemented.");
+            npcEvent.RepairRequested += () => Log?.Invoke("Inventory repair mode deferred: CUIInventory INV_STATE_REPAIR not implemented.");
+        }
+
+        // Exit menu: the return-to-select / quit actions are Windows-specific in the C++; log for now.
+        if (ExitMenu is { } exitMenu)
+        {
+            exitMenu.CharSelectRequested += () => Log?.Invoke("Return to character selection requested (socket reconnect deferred to host).");
+            exitMenu.OptionRequested += () => Log?.Invoke("Option app requested (Windows-only ShellExecute deferred).");
+            exitMenu.ExitRequested += () => Log?.Invoke("Client exit requested (PostQuitMessage deferred to host).");
+        }
+
+        // Level guide: the __TABLE_HELP quest population is deferred (host fills rows on paging).
+        if (LevelGuide is { } levelGuide)
+        {
+            levelGuide.PageRequested += page => Log?.Invoke($"Level guide page {page} requested (quest table population deferred).");
+            levelGuide.SearchRequested += level => Log?.Invoke($"Level guide search for level {level} (quest table population deferred).");
         }
 
         // Character sheet's Party tab opens the party window; its clan-page invite target and the

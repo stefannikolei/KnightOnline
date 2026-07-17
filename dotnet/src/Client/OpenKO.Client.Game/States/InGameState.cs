@@ -98,6 +98,15 @@ public sealed class InGameState(GameContext context) : GameState
     /// <summary>Group WIZ_ITEM_UPGRADE packets surfaced as (sub-opcode, full payload).</summary>
     public Action<byte, byte[]>? ItemUpgradeReceived { get; set; }
 
+    /// <summary>Raised on a WIZ_SELECT_MSG reply (the NPC quest menu).</summary>
+    public Action<Net.QuestMenuData>? QuestMenuReceived { get; set; }
+
+    /// <summary>Raised on a WIZ_NPC_SAY reply (the NPC talk sequence).</summary>
+    public Action<Net.QuestTalkData>? QuestTalkReceived { get; set; }
+
+    /// <summary>Raised on a WIZ_NOTICE push (the notice banner lines).</summary>
+    public Action<IReadOnlyList<string>>? NoticeReceived { get; set; }
+
     public override void Init()
     {
         Entered = true;
@@ -195,6 +204,12 @@ public sealed class InGameState(GameContext context) : GameState
     /// <summary>CItemRepairMgr::Tick — request the NPC repair of an item at a slot.</summary>
     public void SendRepair(byte arm, byte order, uint itemId) =>
         context.Client.Send(RepairProtocol.BuildRepair(arm, order, itemId));
+
+    /// <summary>CGameProcMain::MsgSend_NPCEvent — tell the server the player clicked an NPC.</summary>
+    public void SendNpcEvent(short targetId) => context.Client.Send(QuestProtocol.BuildNpcEvent(targetId));
+
+    /// <summary>CUIQuestMenu::MsgSend_SelectMenu — reply with the picked quest-menu index.</summary>
+    public void SendSelectMsg(byte index) => context.Client.Send(QuestProtocol.BuildSelectMenu(index));
 
     /// <summary>
     /// CGameProcMain::MsgSend_RequestItemBundleOpen — ask the server to open a corpse/box's
@@ -424,6 +439,18 @@ public sealed class InGameState(GameContext context) : GameState
 
             case GameOpcode.WIZ_ITEM_UPGRADE:
                 ItemUpgradeReceived?.Invoke(UpgradeProtocol.Subcommand(payload), payload.ToArray());
+                return true;
+
+            case GameOpcode.WIZ_SELECT_MSG:
+                QuestMenuReceived?.Invoke(QuestProtocol.ParseSelectMsg(payload));
+                return true;
+
+            case GameOpcode.WIZ_NPC_SAY:
+                QuestTalkReceived?.Invoke(QuestProtocol.ParseNpcSay(payload));
+                return true;
+
+            case GameOpcode.WIZ_NOTICE:
+                NoticeReceived?.Invoke(NoticeProtocol.ParseNotice(payload));
                 return true;
         }
 

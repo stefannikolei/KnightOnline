@@ -47,6 +47,13 @@ public sealed class UiResourceTable
     private const int ColNationSelect = 55;   // 56 szNationSelect
     private const int ColLoginIntro = 118;    // 119 szLoginIntro
     private const int ColNationSelectNew = 129; // 130 szNationSelectNew
+    private const int ColHelp = 21;           // 22 szHelp
+    private const int ColNotice = 22;         // 23 szNotice
+    private const int ColNpcEvent = 31;       // 32 szNpcEvent
+    private const int ColQuestMenu = 49;      // 50 szQuestMenu
+    private const int ColQuestTalk = 50;      // 51 szQuestTalk
+    private const int ColLevelGuide = 79;     // 80 szLvlGuide
+    private const int ColExitMenu = 84;       // 85 szExitMenu
 
     private readonly N3TableFile _table;
 
@@ -153,4 +160,25 @@ public sealed class UiResourceTable
 
     /// <summary>szUpgradeSelect — the anvil upgrade-select window (CUIUpgradeSelect).</summary>
     public string UpgradeSelect(int nation) => Get(nation, ColUpgradeSelect);
+
+    /// <summary>szHelp — the paged help window (CUIHelp).</summary>
+    public string Help(int nation) => Get(nation, ColHelp);
+
+    /// <summary>szNotice — the login/update notice banner (CUINotice).</summary>
+    public string Notice(int nation) => Get(nation, ColNotice);
+
+    /// <summary>szNpcEvent — the NPC event/vendor entry menu (CUINPCEvent).</summary>
+    public string NpcEvent(int nation) => Get(nation, ColNpcEvent);
+
+    /// <summary>szQuestMenu — the NPC quest menu (CUIQuestMenu).</summary>
+    public string QuestMenu(int nation) => Get(nation, ColQuestMenu);
+
+    /// <summary>szQuestTalk — the NPC talk window (CUIQuestTalk).</summary>
+    public string QuestTalk(int nation) => Get(nation, ColQuestTalk);
+
+    /// <summary>szLvlGuide — the level-based quest guide (CUILevelGuide).</summary>
+    public string LevelGuide(int nation) => Get(nation, ColLevelGuide);
+
+    /// <summary>szExitMenu — the in-game exit menu (CUIExitMenu).</summary>
+    public string ExitMenu(int nation) => Get(nation, ColExitMenu);
 }
