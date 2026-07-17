@@ -57,6 +57,19 @@ public class UiControl
         Children.Add(child);
     }
 
+    /// <summary>
+    /// CN3UIBase::RemoveChild — detach a runtime-created child (the skill-tree /
+    /// hotkey icons the controller rebuilds). No-op when it is not a child.
+    /// </summary>
+    public bool RemoveChild(UiControl child)
+    {
+        if (!Children.Remove(child))
+            return false;
+        if (ReferenceEquals(child.Parent, this))
+            child.Parent = null;
+        return true;
+    }
+
     /// <summary>CN3UIBase::IsIn — inclusive on all edges.</summary>
     public bool IsIn(int x, int y) => UiRectMath.IsIn(Region, x, y);
 

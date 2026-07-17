@@ -24,6 +24,7 @@ public sealed class UiResourceTable
     private const int ColRepairTooltip = 34;  // 35 szRepairTooltip
     private const int ColSkillTree = 16;      // 17 szSkillTree
     private const int ColHotKey = 17;         // 18 szHotKey
+    private const int ColClassChange = 38;    // 39 szClassChange
     private const int ColMiniMap = 18;        // 19 szMiniMap
     private const int ColCharacterCreate = 23; // 24 szCharacterCreate
     private const int ColCharacterSelect = 24; // 25 szCharacterSelect
@@ -89,6 +90,9 @@ public sealed class UiResourceTable
     public string TargetBar(int nation) => Get(nation, ColTargetBar);
 
     public string SkillTree(int nation) => Get(nation, ColSkillTree);
+
+    /// <summary>szClassChange — the promotion dialog (CUIClassChange).</summary>
+    public string ClassChange(int nation) => Get(nation, ColClassChange);
 
     public string HotKey(int nation) => Get(nation, ColHotKey);
 

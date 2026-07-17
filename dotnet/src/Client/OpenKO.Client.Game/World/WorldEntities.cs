@@ -109,6 +109,20 @@ public sealed class LocalPlayer
     /// <summary>The nine skill-master levels (WIZ_MYINFO skill array).</summary>
     public byte[] Skills { get; } = new byte[SkillCount];
 
+    /// <summary>
+    /// Unspent skill points — <c>Skills[0]</c> (the skill tree's <c>string_skillpoint</c>,
+    /// <c>m_iSkillInfo[0]</c>). Read-only view over <see cref="Skills"/>.
+    /// </summary>
+    public byte UnspentSkillPoints => Skills[0];
+
+    /// <summary>
+    /// The mastery pool for a specialization tab (1st/2nd/3rd/master → tab 1..4),
+    /// <c>Skills[4 + tab]</c> i.e. <c>Skills[5..8]</c> (the C++ <c>m_iSkillInfo[5..8]</c>).
+    /// A skill in that tab unlocks when its required level is at or below this pool.
+    /// Returns 0 for a tab outside 1..4.
+    /// </summary>
+    public byte TabMastery(int tab) => tab is >= 1 and <= 4 ? Skills[4 + tab] : (byte)0;
+
     /// <summary>Set by WIZ_DEAD until the player respawns.</summary>
     public bool IsDead { get; set; }
 }

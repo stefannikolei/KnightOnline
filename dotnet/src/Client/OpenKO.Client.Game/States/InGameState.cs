@@ -71,6 +71,12 @@ public sealed class InGameState(GameContext context) : GameState
 
     public Action<MagicPacket>? MagicReceived { get; set; }
 
+    /// <summary>
+    /// Raised on a WIZ_CLASS_CHANGE reply with the result sub-opcode (0x00 failure ..
+    /// 0x04 item-in-slot). The class-change dialog subscribes it (→ Open).
+    /// </summary>
+    public Action<byte>? ClassChangeResult { get; set; }
+
     /// <summary>Group packets surfaced as (sub-command, full payload) for the dialogs.</summary>
     public Action<byte, byte[]>? PartyReceived { get; set; }
 
@@ -111,6 +117,13 @@ public sealed class InGameState(GameContext context) : GameState
 
     /// <summary>Sends a magic-process step (CMagicProcess flow).</summary>
     public void SendMagic(MagicPacket packet) => context.Client.Send(MagicProtocol.Build(packet));
+
+    /// <summary>Spends a skill point into a tab (CUISkillTreeDlg::PointPushUpButton).</summary>
+    public void SendSkillPoint(byte tab) => context.Client.Send(SkillPointProtocol.Build(tab));
+
+    /// <summary>Requests a class change/promotion (CUIClassChange Btn_Class).</summary>
+    public void SendClassChangeRequest(short newClass) =>
+        context.Client.Send(ClassChangeProtocol.BuildRequest(newClass));
 
     /// <summary>Sends a general attack at a target (CGameProcMain::MsgSend_Attack).</summary>
     public void SendAttack(short targetId, float interval, float distance) =>
@@ -322,6 +335,10 @@ public sealed class InGameState(GameContext context) : GameState
 
             case GameOpcode.WIZ_MAGIC_PROCESS:
                 MagicReceived?.Invoke(MagicProtocol.Parse(payload));
+                return true;
+
+            case GameOpcode.WIZ_CLASS_CHANGE:
+                ClassChangeResult?.Invoke(ClassChangeProtocol.ParseResult(payload));
                 return true;
 
             case GameOpcode.WIZ_PARTY:

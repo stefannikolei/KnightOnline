@@ -65,6 +65,12 @@ public sealed class InGameUi : IDisposable
     /// <summary>The countable stack-split popup (base_tradeedit) — null when the layout failed to load.</summary>
     public CountableItemEditDialog? CountableItemEdit { get; }
 
+    /// <summary>The skill-tree window — null when the layout or skill table failed to load.</summary>
+    public SkillTreeDialog? SkillTree { get; }
+
+    /// <summary>The class-change (promotion) dialog — null when the layout failed to load.</summary>
+    public ClassChangeDialog? ClassChange { get; }
+
     public event Action<string>? Log;
 
     public InGameUi(GameContext context, GraphicsDevice device, FontService fonts, string dataPath)
@@ -180,6 +186,36 @@ public sealed class InGameUi : IDisposable
             Log?.Invoke("CountableItemEdit layout not found: " + table.CountableItemEdit(nation));
         }
 
+        // Skill tree — needs the skill table; hidden until btn_skill toggles it.
+        UiControl? skillRoot = LoadDialog(table.SkillTree(nation));
+        SkillTableSet? skills = TryLoadSkills(_resolver);
+        if (skillRoot != null && skills != null)
+        {
+            skillRoot.SetPos(w - skillRoot.Width, 10); // slides in from the right edge
+            SkillTree = new SkillTreeDialog(context, skillRoot, skills, Manager.IconDrag);
+            Manager.BindIconDragState(skillRoot);
+        }
+        else if (skillRoot == null)
+        {
+            Log?.Invoke("SkillTree layout not found: " + table.SkillTree(nation));
+        }
+        else
+        {
+            Log?.Invoke("SkillTree skill table not found; skill tree disabled.");
+        }
+
+        // Class-change dialog — driven by the server reply; hidden by default.
+        UiControl? classRoot = LoadDialog(table.ClassChange(nation));
+        if (classRoot != null)
+        {
+            classRoot.SetPosCenter(w, h);
+            ClassChange = new ClassChangeDialog(context, classRoot) { SkillTree = SkillTree };
+        }
+        else
+        {
+            Log?.Invoke("ClassChange layout not found: " + table.ClassChange(nation));
+        }
+
         // Register with the manager (last added = topmost = input first). Chat sits above
         // the passive bars so its edit/buttons grab input; the death dialog floats on top.
         Manager.Add(stateRoot);
@@ -198,6 +234,32 @@ public sealed class InGameUi : IDisposable
             Manager.Add(repairRoot);
         if (editRoot != null)
             Manager.Add(editRoot);
+
+        // Skill tree + class change float above the HUD.
+        if (skillRoot != null && skills != null)
+            Manager.Add(skillRoot);
+        if (classRoot != null)
+            Manager.Add(classRoot);
+    }
+
+    /// <summary>
+    /// Load the skill table (Data\skill_magic_main_us.tbl), mirroring <see cref="TryLoadItems"/>.
+    /// Returns null when the table is missing/unreadable.
+    /// </summary>
+    private static SkillTableSet? TryLoadSkills(KoPathResolver resolver, string lang = "us")
+    {
+        string? path = resolver.Resolve($"Data\\skill_magic_main_{lang}.tbl");
+        if (path == null)
+            return null;
+
+        try
+        {
+            return SkillTableSet.LoadFromFile(path);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     /// <summary>
@@ -276,7 +338,20 @@ public sealed class InGameUi : IDisposable
         {
             if (id == "btn_inventory")
                 ToggleInventory();
+            else if (id == "btn_skill")
+                ToggleSkillTree();
         };
+
+        // Skill tree: rebuild from MyInfo (additive; doesn't clobber the state bar / inventory hooks).
+        SkillTree?.Bind(inGame);
+
+        // Class change: the server reply drives the dialog; a promotion rebuilds the skill tree.
+        if (ClassChange is { } cc)
+        {
+            inGame.ClassChangeResult += cc.Open;
+            // SEAM: the hotkey slice will subscribe cc.ClassChanged to flush hotkeys. No-op for now.
+            cc.ClassChanged += () => { };
+        }
         Dead.RevivalRequested += type =>
         {
             Log?.Invoke($"Revival requested (type {type}).");
@@ -306,6 +381,19 @@ public sealed class InGameUi : IDisposable
         {
             inv.Populate(_context.InGame.Inventory);
             Manager.SetFocusedUi(inv.Root);
+        }
+    }
+
+    /// <summary>Toggle the skill-tree window and rebuild it from the current player state when opening.</summary>
+    public void ToggleSkillTree()
+    {
+        if (SkillTree is not { } tree)
+            return;
+        tree.Toggle();
+        if (tree.Root.Visible)
+        {
+            tree.Rebuild();
+            Manager.SetFocusedUi(tree.Root);
         }
     }
 

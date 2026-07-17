@@ -75,6 +75,13 @@ public sealed class UiIconControl : UiControl
     /// </summary>
     public bool DurabilityExhausted { get; set; }
 
+    /// <summary>
+    /// Runtime UISTYLE_DISABLE_SKILL bit — the skill is not yet learnable (required
+    /// level / mastery not met). The skill-tree draws it dimmed (the enigma icon), the
+    /// C++ sets it via <c>SetStyle(UISTYLE_ICON_SKILL | UISTYLE_DISABLE_SKILL)</c>.
+    /// </summary>
+    public bool SkillDisabled { get; set; }
+
     /// <summary>CN3UIIcon::GetMoveRect — the icon's clickable/draggable rect.</summary>
     public N3UiRect MoveRect => Movable;
 
