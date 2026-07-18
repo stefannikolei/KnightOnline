@@ -51,7 +51,14 @@ public sealed class UiScreenRenderer(GraphicsDevice device, TextureCache texture
         bool caretOn = manager.FocusedEdit is { } edit
             && timeSeconds % CaretBlinkPeriod < CaretBlinkPeriod / 2;
 
-        if (texts.Count > 0 || caretOn)
+        // A live IME composition overlays the underlined preview at the caret; draw it
+        // (and its underline) regardless of the caret blink.
+        UiEditControl.CompositionLayout? composition = manager.FocusedEdit is { } focus
+            ? focus.GetCompositionLayout(SdlImeComposition.CompositionText, SdlImeComposition.CompositionCursor)
+            : null;
+        bool hasComposition = composition is { HasComposition: true };
+
+        if (texts.Count > 0 || caretOn || hasComposition)
         {
             _spriteBatch.Begin();
             foreach (UiTextPlan text in texts)
@@ -63,7 +70,9 @@ public sealed class UiScreenRenderer(GraphicsDevice device, TextureCache texture
                     ColorInterop.FromArgb(text.ColorArgb));
             }
 
-            if (caretOn)
+            if (hasComposition)
+                DrawComposition(manager.FocusedEdit!, composition!.Value, caretOn);
+            else if (caretOn)
                 DrawCaret(manager.FocusedEdit!);
 
             _spriteBatch.End();
@@ -82,6 +91,45 @@ public sealed class UiScreenRenderer(GraphicsDevice device, TextureCache texture
             _white,
             new Rectangle((int)x, edit.Region.Top + 2, 1, height),
             Color.White);
+    }
+
+    /// <summary>
+    /// Draws the in-progress IME composition (N3UIEdit's IMM32 look): the composition
+    /// string spliced in at the caret, a flat underline beneath it, and the
+    /// intra-composition caret. Clause-segment (thick) underlines need SDL attribute
+    /// data SDL2 does not surface, so the whole span is a single underline.
+    /// </summary>
+    private void DrawComposition(UiEditControl edit, UiEditControl.CompositionLayout layout, bool caretOn)
+    {
+        _white ??= CreateWhite();
+        DynamicSpriteFont font = fonts.GetUiFont(12);
+
+        float Measure(int end) => end > 0 ? font.MeasureString(layout.Text[..end]).X : 0f;
+
+        int top = edit.Region.Top;
+        // Overlay the composition glyphs (unmasked) starting at the caret base.
+        float startX = edit.Region.Left + Measure(layout.UnderlineStart);
+        string compo = layout.Text.Substring(layout.UnderlineStart, layout.UnderlineLength);
+        _spriteBatch.DrawString(font, compo, new Vector2(startX, top), Color.White);
+
+        // Flat underline spanning the composition.
+        float endX = edit.Region.Left + Measure(layout.UnderlineStart + layout.UnderlineLength);
+        int underlineY = Math.Max(top + 2, edit.Region.Bottom - 2);
+        _spriteBatch.Draw(
+            _white,
+            new Rectangle((int)startX, underlineY, Math.Max(1, (int)(endX - startX)), 1),
+            Color.White);
+
+        // Intra-composition caret.
+        if (caretOn)
+        {
+            float caretX = edit.Region.Left + Measure(layout.CaretIndex);
+            int height = Math.Max(12, edit.Region.Bottom - top - 4);
+            _spriteBatch.Draw(
+                _white,
+                new Rectangle((int)caretX, top + 2, 1, height),
+                Color.White);
+        }
     }
 
     private Texture2D CreateWhite()

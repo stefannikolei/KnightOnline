@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using OpenKO.Client.Assets;
+using OpenKO.Client.Assets.Audio;
 using OpenKO.Client.Assets.Zones;
 using OpenKO.Client.Engine.Audio;
 using OpenKO.Client.Engine.Fx;
@@ -132,7 +133,19 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _fonts = FontService.FromBaseDirectory(AppContext.BaseDirectory);
-        _sound = new SoundManager(new MonoGameAudioBackend());
+        // Audio + streaming BGM: resolve sound.tbl (id → Snd\*.mp3) and a data-relative
+        // file opener so PlayBgm can stream the MP3 tracks (CN3SndMgr CreateStreamObj).
+        SoundTable? soundTable = null;
+        Func<string, Stream?>? bgmOpener = null;
+        if (_options.DataPath is { } dataPath)
+        {
+            var res = new KoPathResolver(dataPath);
+            if (res.Resolve("Data\\sound.tbl") is { } tbl)
+                soundTable = SoundTable.LoadFromFile(tbl);
+            bgmOpener = fn => res.Resolve(fn) is { } p ? File.OpenRead(p) : null;
+        }
+
+        _sound = new SoundManager(new MonoGameAudioBackend(), soundTable, bgmOpener);
         Log(_sound.Backend.IsAvailable ? "Audio: OpenAL device ready." : "Audio: no device (silent).");
 
         if (_options.OfflineZone != null && _options.DataPath != null)
@@ -447,8 +460,9 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             return;
 
         _currentBgm = track.Name;
-        if (!TryPlayBgmWav(track))
-            Log($"BGM: {track.Name} (id {track.Id}) selected — no .wav in corpus (MP3 streaming deferred).");
+        // Stream the MP3 track (id → Snd\*.mp3 via sound.tbl; fall back to the track name),
+        // looping with a short cross-fade (CGameProcMain::UpdateBGM town/battle switch).
+        _sound.PlayBgm(_sound.ResolveBgm(track) ?? $"snd\\{track.Name}.mp3", loop: true);
     }
 
     /// <summary>
@@ -471,29 +485,6 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         return false;
     }
 
-    /// <summary>Play a BGM track from a corpus .wav (Sound\&lt;id&gt;.wav), looping. False if absent/unplayable.</summary>
-    private bool TryPlayBgmWav(BgmTrack track)
-    {
-        if (_options.DataPath == null)
-            return false;
-
-        try
-        {
-            var resolver = new KoPathResolver(_options.DataPath);
-            string? wav = resolver.Resolve($"Sound\\{track.Id}.wav") ?? resolver.Resolve($"Sound\\{track.Name}.wav");
-            if (wav == null)
-                return false;
-
-            if (!_sound.IsRegistered(track.Name))
-                _sound.Register(track.Name, WavAudio.LoadFromFile(wav), SoundType.Stream);
-
-            return _sound.Play(track.Name, gain: 0.6f, loop: true);
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-    }
 
     /// <summary>Loads and prepares the zone's static objects (the sibling .opd of the .gtd).</summary>
     private void LoadZoneObjects(string gtdPath)
@@ -788,7 +779,9 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     protected override void Update(GameTime gameTime)
     {
         _gameSeconds = gameTime.TotalGameTime.TotalSeconds;
-        _gameClock.Advance((float)gameTime.ElapsedGameTime.TotalSeconds);
+        float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        _gameClock.Advance(dt);
+        _sound?.UpdateBgm(dt); // stream buffer top-up + fade ramps
         SampleInput(gameTime.TotalGameTime.TotalSeconds);
 
         if (_input.IsKeyDown(OpenKO.Client.Engine.Input.KeyMap.DIK_ESCAPE))

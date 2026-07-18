@@ -83,6 +83,21 @@ public sealed class MonoGameAudioBackend : IAudioBackend
         _listener.Up = up.ToXna();
     }
 
+    public IStreamingVoice? OpenStreamingVoice(int sampleRate, int channels)
+    {
+        if (!IsAvailable)
+            return null;
+
+        try
+        {
+            return new MonoGameStreamingVoice(sampleRate, channels);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
     private void PruneStopped()
     {
         for (int i = _active.Count - 1; i >= 0; i--)
@@ -94,4 +109,54 @@ public sealed class MonoGameAudioBackend : IAudioBackend
             }
         }
     }
+}
+
+/// <summary>
+/// The production <see cref="IStreamingVoice"/> over MonoGame's
+/// <c>DynamicSoundEffectInstance</c> — the buffer-queue BGM sink
+/// (<c>StreamedAudioHandle</c>). <c>SubmitBuffer</c> copies the PCM synchronously, so
+/// <see cref="BgmStream"/>'s reused chunk buffer is safe.
+/// </summary>
+internal sealed class MonoGameStreamingVoice : IStreamingVoice
+{
+    private readonly DynamicSoundEffectInstance _instance;
+
+    public MonoGameStreamingVoice(int sampleRate, int channels)
+    {
+        AudioChannels ch = channels >= 2 ? AudioChannels.Stereo : AudioChannels.Mono;
+        _instance = new DynamicSoundEffectInstance(sampleRate, ch);
+    }
+
+    public int PendingBufferCount => _instance.PendingBufferCount;
+
+    public float Volume
+    {
+        get => _instance.Volume;
+        set => _instance.Volume = Math.Clamp(value, 0f, 1f);
+    }
+
+    public void QueuePcm(byte[] pcm, int count)
+    {
+        if (count <= 0)
+            return;
+
+        // DynamicSoundEffectInstance copies the bytes into its own queue synchronously.
+        _instance.SubmitBuffer(pcm, 0, count);
+    }
+
+    public void Play() => _instance.Play();
+
+    public void Stop()
+    {
+        try
+        {
+            _instance.Stop();
+        }
+        catch (Exception)
+        {
+            // Stopping an already-disposed/stopped voice must not throw.
+        }
+    }
+
+    public void Dispose() => _instance.Dispose();
 }

@@ -73,6 +73,54 @@ public sealed class UiEditControl : UiControl
     /// <summary>What is drawn (password style masks with '*').</summary>
     public string DisplayText => IsPassword ? new string('*', _text.Length) : _text;
 
+    /// <summary>
+    /// The composition-aware draw layout for the focused edit — the in-progress IME
+    /// string overlaid (underlined) at the caret before it is committed. The C++ host
+    /// uses a native EDIT + IMM32 (Client/N3Base/N3UIEdit.cpp), which draws the standard
+    /// underlined composition; this reproduces that look for the pure model so the
+    /// device renderer can draw it. When there is no live composition the display is the
+    /// plain <see cref="DisplayText"/> and the underline span is empty.
+    /// </summary>
+    /// <param name="text">The display string to draw (committed text with the composition spliced in at the caret).</param>
+    /// <param name="caretIndex">The caret glyph index within <paramref name="text"/> (intra-composition while composing).</param>
+    /// <param name="underlineStart">The glyph index where the composition underline begins.</param>
+    /// <param name="underlineLength">The composition length in glyphs (0 = no underline).</param>
+    public readonly record struct CompositionLayout(
+        string Text,
+        int CaretIndex,
+        int UnderlineStart,
+        int UnderlineLength)
+    {
+        /// <summary>True when there is a live composition to underline.</summary>
+        public bool HasComposition => UnderlineLength > 0;
+    }
+
+    /// <summary>
+    /// Splices a live IME composition string into the display at the caret and reports
+    /// where to draw the underline + intra-composition caret. The composition is <b>not</b>
+    /// committed to <see cref="Text"/> — it is an overlay at <see cref="CaretPos"/>.
+    /// <para>
+    /// Clause-segment styling (thick vs. thin underlines per IMM clause) needs
+    /// <c>SDL_TEXTEDITING_EXT</c> attribute data, which SDL2 does not expose, so this
+    /// approximates the whole composition with a single flat underline.
+    /// </para>
+    /// </summary>
+    /// <param name="compositionText">The IME composition string ("" or null when idle).</param>
+    /// <param name="compositionCursor">The IME's caret offset within the composition string.</param>
+    public CompositionLayout GetCompositionLayout(string? compositionText, int compositionCursor)
+    {
+        string display = DisplayText;
+        int caret = Math.Clamp(CaretPos, 0, display.Length);
+
+        if (string.IsNullOrEmpty(compositionText))
+            return new CompositionLayout(display, caret, caret, 0);
+
+        // Overlay the (unmasked) composition at the caret; committed text stays as-is.
+        string spliced = display[..caret] + compositionText + display[caret..];
+        int cursor = Math.Clamp(compositionCursor, 0, compositionText.Length);
+        return new CompositionLayout(spliced, caret + cursor, caret, compositionText.Length);
+    }
+
     public void SetFocus()
     {
         State = UiState.EditActive;

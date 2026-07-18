@@ -14,6 +14,7 @@
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" />
     <PackageReference Include="FontStashSharp.MonoGame" />
+    <PackageReference Include="NLayer" />
   </ItemGroup>
 
   <ItemGroup>
