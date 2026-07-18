@@ -188,6 +188,23 @@ public static class WorldProtocol
         return w.Written.ToArray();
     }
 
+    /// <summary>
+    /// CGameProcMain::MsgSend_ChatSelectTarget — pick a 1:1 whisper target:
+    /// <c>[WIZ_CHAT_TARGET=0x35][0x01][s16 len][name]</c>. Names longer than 20 chars are ignored.
+    /// </summary>
+    public static byte[]? BuildChatTarget(string name)
+    {
+        if (name.Length == 0 || name.Length > 20)
+            return null;
+
+        var buffer = new byte[4 + name.Length];
+        var w = new PacketWriter(buffer);
+        w.SetByte((byte)GameOpcode.WIZ_CHAT_TARGET);
+        w.SetByte(0x01);
+        w.SetString2(Ascii.GetBytes(name));
+        return w.Written.ToArray();
+    }
+
     /// <summary>Equip + backpack slots in the WIZ_MYINFO item array (SLOT_MAX + HAVE_MAX).</summary>
     public const int InventorySlotCount = 42;
 

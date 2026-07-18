@@ -19,6 +19,7 @@ public sealed class UiResourceTable
     private const int ColVarious = 6;         // 07 szVarious (multi-page sheet frame)
     private const int ColState = 7;           // 08 szState (the CUIState status page)
     private const int ColKnights = 8;         // 09 szKnights (the CUIKnights clan page)
+    private const int ColFriends = 10;        // 11 szFriends (the CUIFriends page)
     private const int ColPartyOrForce = 19;   // 20 szPartyOrForce
     private const int ColPartyBBS = 20;       // 21 szPartyBBS (recruitment board — dialog deferred)
     private const int ColKnightsOperation = 37; // 38 szKnightsOperation
@@ -134,6 +135,9 @@ public sealed class UiResourceTable
 
     /// <summary>szKnights — the clan page loaded into the Various frame (CUIKnights).</summary>
     public string Knights(int nation) => Get(nation, ColKnights);
+
+    /// <summary>szFriends — the friends-list page loaded into the Various frame (CUIFriends).</summary>
+    public string Friends(int nation) => Get(nation, ColFriends);
 
     /// <summary>szPartyOrForce — the party/force member window (CUIPartyOrForce).</summary>
     public string PartyOrForce(int nation) => Get(nation, ColPartyOrForce);

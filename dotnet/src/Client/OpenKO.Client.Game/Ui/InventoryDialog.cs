@@ -8,6 +8,16 @@ using OpenKO.Client.Game.World;
 
 namespace OpenKO.Client.Game.Ui;
 
+/// <summary>The inventory sub-state (CUIInventory INV_STATE_*): normal drag/drop or NPC repair.</summary>
+public enum InventoryMode
+{
+    /// <summary>INV_STATE_NORMAL — the ordinary drag/drop + right-click equip inventory.</summary>
+    Normal = 0,
+
+    /// <summary>INV_STATE_REPAIR — the blacksmith repair mode (CItemRepairMgr drives clicks).</summary>
+    Repair = 1,
+}
+
 /// <summary>
 /// Controller for the inventory dialog — port of <c>CUIInventory</c>
 /// (Client/WarFare/UIInventory.cpp). The shipped <c>*_inventory_*.uif</c> carries only the
@@ -59,6 +69,11 @@ public sealed class InventoryDialog
     private InventoryIconItem? _destroyItem;
     private int _destroyFlat = -1;
 
+    // Repair mode (CItemRepairMgr): the pressed icon, and the in-flight repair (item + flat slot).
+    private InventoryMode _mode = InventoryMode.Normal;
+    private UiIconControl? _repairPressIcon;
+    private int _repairPendingFlat = -1;
+
     /// <summary>The opaque per-icon payload (the __IconItemSkill analog).</summary>
     public sealed record InventoryIconItem(
         int ItemId, int Count, short Durability, byte Flag, ItemBasicRow? Basic, ItemExtRow? Ext);
@@ -94,6 +109,22 @@ public sealed class InventoryDialog
 
     /// <summary>True while the area_samma destroy-confirm is pending (real send is deferred).</summary>
     public bool DestroyConfirmPending => _destroyItem != null;
+
+    /// <summary>The current inventory sub-state (normal drag/drop vs blacksmith repair).</summary>
+    public InventoryMode Mode => _mode;
+
+    /// <summary>
+    /// The repair image-tooltip driven by <see cref="TickRepair"/> in repair mode
+    /// (CUIRepairTooltipDlg). Set by the executable; null in headless tests.
+    /// </summary>
+    public RepairTooltipControl? RepairTooltip { get; set; }
+
+    /// <summary>Raised when a repair click is blocked by insufficient gold (IDS_REPAIR_LACK_GOLD).</summary>
+    public event Action? RepairLackGold;
+
+    /// <summary>The hover result in repair mode: the item under the cursor and its repair price.</summary>
+    public readonly record struct RepairHoverInfo(
+        InventoryIconItem Item, byte Arm, int Order, int Cost, bool HaveEnough);
 
     /// <summary>The 14 equip-slot icon widgets (index = e_ItemSlot).</summary>
     public IReadOnlyList<UiIconControl?> EquipIcons => _equip;
@@ -237,6 +268,27 @@ public sealed class InventoryDialog
 
     private void OnMessage(UiControl sender, uint msg)
     {
+        // Repair mode (CItemRepairMgr::Tick): a click on an item repairs it; drag/equip are off.
+        if (_mode == InventoryMode.Repair)
+        {
+            switch (msg)
+            {
+                case UiMsg.ButtonClick:
+                    OnButton(sender); // btn_close still works
+                    break;
+                case UiMsg.IconDownFirst:
+                    _repairPressIcon = sender as UiIconControl;
+                    break;
+                case UiMsg.IconUp:
+                    if (sender is UiIconControl up && ReferenceEquals(up, _repairPressIcon))
+                        DoRepairClick(up);
+                    _repairPressIcon = null;
+                    break;
+            }
+
+            return;
+        }
+
         switch (msg)
         {
             case UiMsg.ButtonClick:
@@ -642,11 +694,151 @@ public sealed class InventoryDialog
             icon.SetIconRegion(area.Region);
     }
 
+    // ---- Repair mode (CItemRepairMgr) --------------------------------------
+
+    /// <summary>
+    /// CItemRepairMgr::Tick (display half) — while in repair mode, show the repair price tooltip
+    /// for the item under the cursor (red when unaffordable), or hide it. No-op without a bound
+    /// <see cref="RepairTooltip"/> or outside repair mode.
+    /// </summary>
+    public void TickRepair(UiPoint cursor)
+    {
+        if (RepairTooltip is not { } tip)
+            return;
+
+        if (RepairHover(cursor) is { } info)
+            tip.Show(info.Item.Basic, info.Item.Ext, info.Item.Durability, info.Cost, info.HaveEnough, cursor.X, cursor.Y);
+        else
+            tip.Hide();
+    }
+
+    /// <summary>
+    /// The item under the cursor and its computed repair price (CItemRepairMgr::CalcRepairGold),
+    /// or null when not in repair mode / not hovering a repairable item. Equipped slots are
+    /// probed first (arm 0x01), then backpack cells (arm 0x02), mirroring the C++ scan order.
+    /// </summary>
+    public RepairHoverInfo? RepairHover(UiPoint cursor)
+    {
+        if (_mode != InventoryMode.Repair || !_root.Visible)
+            return null;
+
+        for (int i = 0; i < Inventory.EquipSlotCount; i++)
+        {
+            if (RepairAt(_equip[i], i, cursor) is { } info)
+                return info;
+        }
+
+        for (int i = 0; i < Inventory.BackpackSlotCount; i++)
+        {
+            if (RepairAt(_backpack[i], Inventory.EquipSlotCount + i, cursor) is { } info)
+                return info;
+        }
+
+        return null;
+    }
+
+    private RepairHoverInfo? RepairAt(UiIconControl? icon, int flat, UiPoint cursor)
+    {
+        if (icon is not { Visible: true } || icon.Payload is not InventoryIconItem item
+            || !UiRectMath.IsIn(icon.Region, cursor.X, cursor.Y))
+            return null;
+        return RepairFor(item, flat);
+    }
+
+    private RepairHoverInfo? RepairFor(InventoryIconItem item, int flat)
+    {
+        if (item.Basic == null)
+            return null;
+
+        int maxDur = item.Basic.MaxDurability + (item.Ext?.MaxDurability ?? 0);
+        float allPrice = item.Basic.Price * (float)(item.Ext?.PriceMultiply ?? 0);
+        int cost = RepairCost.Calc(allPrice, item.Durability, maxDur);
+
+        byte arm = Inventory.IsEquipSlot(flat) ? RepairProtocol.ArmEquip : RepairProtocol.ArmInventory;
+        int order = Inventory.IsEquipSlot(flat) ? flat : flat - Inventory.EquipSlotCount;
+        bool haveEnough = _local == null || cost <= _local.Gold;
+        return new RepairHoverInfo(item, arm, order, cost, haveEnough);
+    }
+
+    /// <summary>
+    /// CItemRepairMgr::Tick (click half) — a completed left-click on a repairable item. With a
+    /// positive price and enough gold, sends WIZ_ITEM_REPAIR and locks input until the reply;
+    /// with too little gold, raises <see cref="RepairLackGold"/> and sends nothing.
+    /// </summary>
+    private void DoRepairClick(UiIconControl icon)
+    {
+        int flat = FindSlot(icon);
+        if (flat < 0 || icon.Payload is not InventoryIconItem item || RepairFor(item, flat) is not { } repair)
+            return;
+
+        if (repair.Cost <= 0)
+            return;
+
+        if (!repair.HaveEnough)
+        {
+            RepairLackGold?.Invoke();
+            return;
+        }
+
+        _repairPendingFlat = flat;
+        _drag.WaitFromServer = true;
+        _context.Client.Send(RepairProtocol.BuildRepair(repair.Arm, (byte)repair.Order, (uint)repair.Item.ItemId));
+    }
+
+    /// <summary>
+    /// CItemRepairMgr::ReceiveResultFromServer — on success restore the repaired item to full
+    /// durability, clear its UISTYLE_DURABILITY_EXHAUST icon style and repopulate; always update
+    /// the player's gold and release the input lock.
+    /// </summary>
+    public void OnRepairResult(RepairResult result)
+    {
+        if (result.Success && _repairPendingFlat >= 0 && _inventory?.Get(_repairPendingFlat) is { } item)
+        {
+            (ItemBasicRow? basic, ItemExtRow? ext) = _items.Find((uint)item.ItemId);
+            short maxDur = (short)((basic?.MaxDurability ?? 0) + (ext?.MaxDurability ?? 0));
+            _inventory.SetDurability(_repairPendingFlat, maxDur);
+        }
+
+        if (_local != null)
+            _local.Gold = (int)result.Gold;
+
+        _repairPendingFlat = -1;
+        _drag.WaitFromServer = false;
+        if (_inventory != null)
+            Populate(_inventory);
+    }
+
     // ---- Show/hide ---------------------------------------------------------
 
-    public void Show() => _root.SetVisible(true);
+    /// <summary>
+    /// CUIInventory::Open — show the window in the requested sub-state (normal, or the
+    /// blacksmith repair mode entered from the NPC-event menu's Btn_Repair).
+    /// </summary>
+    public void Open(bool repair = false)
+    {
+        _mode = repair ? InventoryMode.Repair : InventoryMode.Normal;
+        _repairPressIcon = null;
+        _drag.SelectedIcon.Clear();
+        _root.SetVisible(true);
+        if (_inventory != null)
+            Populate(_inventory);
+    }
 
-    public void Hide() => _root.SetVisible(false);
+    public void Show()
+    {
+        _mode = InventoryMode.Normal;
+        _root.SetVisible(true);
+    }
 
-    public void Toggle() => _root.SetVisible(!_root.Visible);
+    public void Hide()
+    {
+        _mode = InventoryMode.Normal;
+        _root.SetVisible(false);
+    }
+
+    public void Toggle()
+    {
+        _mode = InventoryMode.Normal;
+        _root.SetVisible(!_root.Visible);
+    }
 }

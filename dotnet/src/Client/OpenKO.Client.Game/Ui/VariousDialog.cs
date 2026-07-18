@@ -87,14 +87,53 @@ public sealed class VariousDialog
     private readonly UiControl? _btnAppoint;
     private readonly UiControl? _btnRemove;
 
+    // Friends-page controls (CUIFriends) — a client-local list persisted to a text file.
+    private readonly UiControl _friendsPage;
+    private readonly UiListControl? _listFriends;
+    private readonly UiStringControl? _friendPageText;
+    private readonly UiControl? _btnFriendAdd;
+    private readonly UiControl? _btnFriendDelete;
+    private readonly UiControl? _btnFriendWhisper;
+    private readonly UiControl? _btnFriendParty;
+    private readonly UiControl? _btnFriendRefresh;
+    private readonly UiControl? _btnFriendPageUp;
+    private readonly UiControl? _btnFriendPageDown;
+
+    private readonly IFriendStore _friendStore;
+    private readonly List<FriendEntry> _friends = [];
+    private int _friendPage;
+
+    // CUIFriends iLinePerPage — the C++ hard-codes 10 (the region-derived height is commented out).
+    private const int FriendsPerPage = 10;
+
     private LocalPlayer? _local;
 
-    public VariousDialog(GameContext context, UiControl root, UiControl? statePage = null, UiControl? clanPage = null)
+    /// <summary>One friend as tracked client-side (__FriendsInfo). Status stays inert (server no-op).</summary>
+    private sealed class FriendEntry
+    {
+        public required string Name { get; init; }
+
+        public short Id { get; set; } = -1;
+
+        public bool Online { get; set; }
+
+        public bool InParty { get; set; }
+    }
+
+    public VariousDialog(
+        GameContext context,
+        UiControl root,
+        UiControl? statePage = null,
+        UiControl? clanPage = null,
+        UiControl? friendsPage = null,
+        IFriendStore? friendStore = null)
     {
         _context = context;
         _root = root;
         _statePage = statePage ?? root;
         _clanPage = clanPage ?? root;
+        _friendsPage = friendsPage ?? root;
+        _friendStore = friendStore ?? new InMemoryFriendStore();
 
         _id = _statePage.GetChildById<UiStringControl>("Text_ID");
         _class = _statePage.GetChildById<UiStringControl>("Text_Class");
@@ -136,11 +175,31 @@ public sealed class VariousDialog
         _btnAppoint = _clanPage.GetChildById("btn_clan_Appoint");
         _btnRemove = _clanPage.GetChildById("btn_clan_Remove");
 
+        // Resolve the friends-page controls only when the page actually carries the friends list.
+        // Btn_Party lowercases to the same id as the CUIVarious "btn_party" page tab, so binding it
+        // on a plain frame root (missing szFriends page) would hijack the tab — guard against that.
+        _listFriends = _friendsPage.GetChildById<UiListControl>("List_Friends");
+        if (_listFriends != null)
+        {
+            _friendPageText = _friendsPage.GetChildById<UiStringControl>("String_Page");
+            _btnFriendAdd = _friendsPage.GetChildById("Btn_Add");
+            _btnFriendDelete = _friendsPage.GetChildById("Btn_Delete");
+            _btnFriendWhisper = _friendsPage.GetChildById("Btn_Whisper");
+            _btnFriendParty = _friendsPage.GetChildById("Btn_Party");
+            _btnFriendRefresh = _friendsPage.GetChildById("Btn_Refresh");
+            _btnFriendPageUp = _friendsPage.GetChildById("Btn_Page_Up");
+            _btnFriendPageDown = _friendsPage.GetChildById("Btn_Page_Down");
+        }
+
         _statePage.Message += OnMessage;
         if (!ReferenceEquals(_clanPage, _statePage))
             _clanPage.Message += OnMessage;
-        if (!ReferenceEquals(_root, _statePage) && !ReferenceEquals(_root, _clanPage))
+        if (!ReferenceEquals(_friendsPage, _statePage) && !ReferenceEquals(_friendsPage, _clanPage))
+            _friendsPage.Message += OnMessage;
+        if (!ReferenceEquals(_root, _statePage) && !ReferenceEquals(_root, _clanPage) && !ReferenceEquals(_root, _friendsPage))
             _root.Message += OnMessage;
+
+        LoadFriendsFromStore();
 
         ShowStatePage();
         ChangeUiByDuty();
@@ -169,12 +228,13 @@ public sealed class VariousDialog
             FillState(_local);
     }
 
-    /// <summary>Wire MyInfo (status refresh) and the clan member broadcast.</summary>
+    /// <summary>Wire MyInfo (status refresh), the clan member broadcast and the friend status reply.</summary>
     public void Bind(InGameState inGame)
     {
         _local = inGame.World.Local;
         inGame.MyInfoReceived += FillState;
         inGame.KnightsReceived += OnKnights;
+        inGame.FriendsReceived += OnFriendStatus;
     }
 
     /// <summary>Set the local clan duty and re-gate the management buttons.</summary>
@@ -305,6 +365,7 @@ public sealed class VariousDialog
             return; // single combined tree (tests) — nothing to toggle
         _statePage.SetVisible(true);
         _clanPage.SetVisible(false);
+        HideFriendsPage();
     }
 
     private void ShowClanPage()
@@ -313,9 +374,218 @@ public sealed class VariousDialog
         {
             _statePage.SetVisible(false);
             _clanPage.SetVisible(true);
+            HideFriendsPage();
         }
 
         RequestMemberList();
+    }
+
+    /// <summary>Hide the friends page when it is a distinct .uif (never the shared frame root).</summary>
+    private void HideFriendsPage()
+    {
+        if (!ReferenceEquals(_friendsPage, _root)
+            && !ReferenceEquals(_friendsPage, _statePage)
+            && !ReferenceEquals(_friendsPage, _clanPage))
+            _friendsPage.SetVisible(false);
+    }
+
+    /// <summary>CUIVarious page tab → CUIFriends: show the friends page, refresh and query status.</summary>
+    private void ShowFriendsPage()
+    {
+        if (!ReferenceEquals(_friendsPage, _root))
+        {
+            _statePage.SetVisible(false);
+            _clanPage.SetVisible(false);
+            _friendsPage.SetVisible(true);
+        }
+
+        UpdateFriendList();
+        SendFriendQuery();
+    }
+
+    // ---- Friends list (CUIFriends) -----------------------------------------
+
+    /// <summary>The friend names currently tracked (client-local; sorted like the C++ std::map).</summary>
+    public IReadOnlyList<string> FriendNames => _friends.Select(f => f.Name).ToList();
+
+    /// <summary>The current friends page index (0-based).</summary>
+    public int FriendPage => _friendPage;
+
+    private void LoadFriendsFromStore()
+    {
+        foreach (string name in _friendStore.Load())
+            MemberAdd(name, -1, false, false);
+        UpdateFriendList();
+    }
+
+    /// <summary>CUIFriends::MemberAdd — insert a friend (sorted, no duplicates). Returns true on add.</summary>
+    public bool MemberAdd(string name, short id, bool online, bool inParty)
+    {
+        if (string.IsNullOrEmpty(name) || _friends.Any(f => f.Name == name))
+            return false;
+
+        var entry = new FriendEntry { Name = name, Id = id, Online = online, InParty = inParty };
+        int idx = _friends.FindIndex(f => string.CompareOrdinal(f.Name, name) > 0);
+        if (idx < 0)
+            _friends.Add(entry);
+        else
+            _friends.Insert(idx, entry);
+        return true;
+    }
+
+    /// <summary>CUIFriends::MemberDelete — erase a friend by name. Returns true on removal.</summary>
+    public bool MemberDelete(string name)
+    {
+        int idx = _friends.FindIndex(f => f.Name == name);
+        if (idx < 0)
+            return false;
+        _friends.RemoveAt(idx);
+        return true;
+    }
+
+    /// <summary>CUIFriends::UpdateList — fill the visible page of the friends list control.</summary>
+    public void UpdateFriendList()
+    {
+        if (_listFriends == null)
+            return;
+
+        int prevSel = _listFriends.CurSel;
+        _listFriends.ResetContent();
+        if (_friends.Count == 0)
+            return;
+
+        int pageMax = _friends.Count / FriendsPerPage;
+        if (_friendPage < 0 || _friendPage > pageMax)
+            return;
+
+        int skip = _friendPage * FriendsPerPage;
+        if (skip >= _friends.Count)
+            return;
+
+        if (_friendPageText != null)
+            _friendPageText.Text = (_friendPage + 1).ToString(CultureInfo.InvariantCulture);
+
+        for (int i = 0; i < FriendsPerPage && skip + i < _friends.Count; i++)
+            _listFriends.AddString(_friends[skip + i].Name);
+
+        _listFriends.SetCurSel(prevSel);
+    }
+
+    /// <summary>
+    /// CUIFriends::MsgRecv_MemberInfo — apply the online/party status reply. Strict 1:1: the server
+    /// is a no-op upstream (<c>#if 0</c>), so this is never actually invoked in play; kept faithful.
+    /// </summary>
+    public void OnFriendStatus(IReadOnlyList<FriendStatus> statuses)
+    {
+        foreach (FriendStatus s in statuses)
+        {
+            FriendEntry? entry = _friends.Find(f => f.Name == s.Name);
+            if (entry == null)
+                continue;
+            entry.Id = s.Id;
+            entry.Online = s.Online;
+            entry.InParty = s.InParty;
+        }
+
+        UpdateFriendList();
+    }
+
+    private void SendFriendQuery()
+    {
+        if (_friends.Count == 0)
+            return;
+        _context.Client.Send(FriendProtocol.BuildRequest(FriendNames));
+    }
+
+    private bool HandleFriendButton(UiControl sender)
+    {
+        if (ReferenceEquals(sender, _btnFriendAdd))
+            AddFriend();
+        else if (ReferenceEquals(sender, _btnFriendDelete))
+            DeleteFriend();
+        else if (ReferenceEquals(sender, _btnFriendWhisper))
+            WhisperFriend();
+        else if (ReferenceEquals(sender, _btnFriendParty))
+            InviteFriendToParty();
+        else if (ReferenceEquals(sender, _btnFriendRefresh))
+            SendFriendQuery();
+        else if (ReferenceEquals(sender, _btnFriendPageUp))
+            ChangeFriendPage(-1);
+        else if (ReferenceEquals(sender, _btnFriendPageDown))
+            ChangeFriendPage(+1);
+        else
+            return false;
+        return true;
+    }
+
+    /// <summary>CUIFriends btn_add — add the current target by name, persist and query its status.</summary>
+    public bool AddFriend()
+    {
+        if (TargetId < 0 || !_context.InGame.World.TryGet(TargetId, out RemotePlayer target)
+            || target.Name.Length == 0)
+            return false;
+
+        if (!MemberAdd(target.Name, TargetId, true, false))
+            return false;
+
+        _friendStore.Save(FriendNames);
+        _context.Client.Send(FriendProtocol.BuildRequest([target.Name]));
+        UpdateFriendList();
+        return true;
+    }
+
+    /// <summary>CUIFriends btn_delete — erase the selected friend and persist.</summary>
+    public bool DeleteFriend()
+    {
+        if (SelectedFriendName() is not { Length: > 0 } name || !MemberDelete(name))
+            return false;
+        _friendStore.Save(FriendNames);
+        UpdateFriendList();
+        return true;
+    }
+
+    /// <summary>CUIFriends btn_whisper — pick the selected friend as the 1:1 chat target.</summary>
+    private void WhisperFriend()
+    {
+        if (SelectedFriendName() is { Length: > 0 } name
+            && WorldProtocol.BuildChatTarget(name) is { } packet)
+            _context.Client.Send(packet);
+    }
+
+    /// <summary>CUIFriends btn_Party — invite the selected friend into a party.</summary>
+    private void InviteFriendToParty()
+    {
+        if (SelectedFriendName() is { Length: > 0 } name)
+            _context.Client.Send(PartyProtocol.BuildCreate(name));
+    }
+
+    private void ChangeFriendPage(int delta)
+    {
+        int prev = _friendPage;
+        _friendPage += delta;
+        if (_friendPage < 0)
+        {
+            _friendPage = 0;
+        }
+        else
+        {
+            int pageMax = (_friends.Count / FriendsPerPage) + 1;
+            if (_friendPage >= pageMax)
+                _friendPage = pageMax - 1;
+        }
+
+        if (_friendPage != prev)
+        {
+            UpdateFriendList();
+            SendFriendQuery();
+        }
+    }
+
+    private string? SelectedFriendName()
+    {
+        if (_listFriends is not { } list)
+            return null;
+        return list.GetString(list.CurSel, out string name) ? name : null;
     }
 
     /// <summary>Request the full clan member list (CUIKnights::MsgSend_MemberInfoAll).</summary>
@@ -324,6 +594,11 @@ public sealed class VariousDialog
     private void OnMessage(UiControl sender, uint msg)
     {
         if (msg != UiMsg.ButtonClick)
+            return;
+
+        // Friends-page buttons share lowercased ids with the page tabs (Btn_Party), so resolve
+        // them by control reference first (CUIFriends is a distinct .uif page).
+        if (HandleFriendButton(sender))
             return;
 
         // The shipped .uif ids are inconsistently cased (e.g. btn_state vs Btn_clan_Remove), so
@@ -359,7 +634,8 @@ public sealed class VariousDialog
                 break;
             case "btn_quest": // quest page deferred (light)
                 break;
-            case "btn_friends": // TODO 9.9: friends list (Btn_Add/Delete/Whisper + List_Friends) deferred
+            case "btn_friends":
+                ShowFriendsPage();
                 break;
             case "btn_close":
                 Hide();

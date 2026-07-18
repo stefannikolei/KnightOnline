@@ -74,8 +74,11 @@ public sealed class InGameUi : IDisposable
     /// <summary>The icon hotkey bar — null when the layout or skill table failed to load.</summary>
     public HotKeyDialog? HotKey { get; }
 
-    /// <summary>The multi-page character sheet (status + clan) — null when the layout failed to load.</summary>
+    /// <summary>The multi-page character sheet (status + clan + friends) — null when the layout failed to load.</summary>
     public VariousDialog? Various { get; }
+
+    /// <summary>The party-recruitment board — null when the layout failed to load.</summary>
+    public PartyBbsDialog? PartyBbs { get; }
 
     /// <summary>The party/force member window — null when the layout failed to load.</summary>
     public PartyOrForceDialog? PartyOrForce { get; }
@@ -294,23 +297,41 @@ public sealed class InGameUi : IDisposable
             Log?.Invoke("HotKey skill table not found; hotkey bar disabled.");
         }
 
-        // Character sheet (Various) — the szState + szKnights pages load into the szVarious frame
-        // (CGameProcMain::InitUI); adding them as children lets one controller resolve both.
+        // Character sheet (Various) — the szState + szKnights + szFriends pages load into the
+        // szVarious frame (CGameProcMain::InitUI); adding them as children lets one controller
+        // resolve all three.
         UiControl? variousRoot = LoadDialog(table.Various(nation));
         UiControl? variousStateRoot = LoadDialog(table.State(nation));
         UiControl? variousClanRoot = LoadDialog(table.Knights(nation));
+        UiControl? variousFriendsRoot = LoadDialog(table.Friends(nation));
         if (variousRoot != null)
         {
             if (variousStateRoot != null)
                 variousRoot.AddChild(variousStateRoot);
             if (variousClanRoot != null)
                 variousRoot.AddChild(variousClanRoot);
+            if (variousFriendsRoot != null)
+                variousRoot.AddChild(variousFriendsRoot);
             variousRoot.SetPos(0, 80); // slides in from the left (CUIVarious)
-            Various = new VariousDialog(context, variousRoot, variousStateRoot, variousClanRoot);
+            IFriendStore friendStore = new FileFriendStore(context.Account, context.ServerName);
+            Various = new VariousDialog(
+                context, variousRoot, variousStateRoot, variousClanRoot, variousFriendsRoot, friendStore);
         }
         else
         {
             Log?.Invoke("Various layout not found: " + table.Various(nation));
+        }
+
+        // Party-recruitment board (CUIPartyBBS) — centred, opened from the party-window entry.
+        UiControl? partyBbsRoot = LoadDialog(table.PartyBBS(nation));
+        if (partyBbsRoot != null)
+        {
+            partyBbsRoot.SetPosCenter(w, h);
+            PartyBbs = new PartyBbsDialog(context, partyBbsRoot);
+        }
+        else
+        {
+            Log?.Invoke("PartyBBS layout not found: " + table.PartyBBS(nation));
         }
 
         // Party/force member window — right side, auto-shows when a party forms.
@@ -539,6 +560,8 @@ public sealed class InGameUi : IDisposable
             Manager.Add(partyRoot);
         if (variousRoot != null)
             Manager.Add(variousRoot);
+        if (partyBbsRoot != null)
+            Manager.Add(partyBbsRoot);
         if (knightsOpRoot != null)
             Manager.Add(knightsOpRoot);
         if (createClanRoot != null)
@@ -741,7 +764,8 @@ public sealed class InGameUi : IDisposable
         inGame.TradeStartReceived += tradeId =>
             NpcEvent?.Open(NpcEventKind.ItemTrade, (int)tradeId, _targetId ?? 0);
 
-        // NPC event menu: Btn_Sale opens the vendor window; the inventory-repair UI is deferred (10.3).
+        // NPC event menu: Btn_Sale opens the vendor window; Btn_Repair enters inventory repair
+        // mode (10.3 — CUIInventory INV_STATE_REPAIR + CItemRepairMgr).
         if (NpcEvent is { } npcEvent)
         {
             npcEvent.SaleRequested += trade =>
@@ -751,8 +775,37 @@ public sealed class InGameUi : IDisposable
                 else
                     Log?.Invoke($"Vendor transaction (trade {trade}) unavailable: layout/tables missing.");
             };
-            npcEvent.RepairRequested += () => Log?.Invoke("Inventory repair mode deferred: CUIInventory INV_STATE_REPAIR not implemented.");
+            npcEvent.RepairRequested += () =>
+            {
+                if (Inventory is { } inv)
+                {
+                    inv.Open(repair: true);
+                    Manager.SetFocusedUi(inv.Root);
+                }
+                else
+                {
+                    Log?.Invoke("Inventory repair mode unavailable: layout/tables missing.");
+                }
+            };
         }
+
+        // Repair mode plumbing: the tooltip drives the hover price; the WIZ_ITEM_REPAIR reply
+        // restores durability + gold; an unaffordable click surfaces the lack-of-gold message.
+        if (Inventory is { } inventory)
+        {
+            inventory.RepairTooltip = RepairTooltip;
+            inventory.RepairLackGold += () => Log?.Invoke("Not enough coins to repair this item.");
+            inGame.ItemRepairReceived += r =>
+            {
+                inventory.OnRepairResult(r);
+                LocalPlayer l = inGame.World.Local;
+                StateBar.UpdateHp(l.Hp, l.MaxHp);
+                StateBar.UpdateMp(l.Mp, l.MaxMp);
+            };
+        }
+
+        // Party-recruitment board (CUIPartyBBS): the WIZ_PARTY_BBS reply fills the page.
+        PartyBbs?.Bind(inGame);
 
         // Exit menu: the return-to-select / quit actions are Windows-specific in the C++; log for now.
         if (ExitMenu is { } exitMenu)
@@ -807,6 +860,8 @@ public sealed class InGameUi : IDisposable
                 InviteTargetToParty();
             else if (id == "btn_disband")
                 PartyOrForce?.Leave(_targetId ?? -1);
+            else if (id is "btn_partybbs" or "btn_party_bbs")
+                OpenPartyBbs();
         };
 
         // Skill tree: rebuild from MyInfo (additive; doesn't clobber the state bar / inventory hooks).
@@ -883,6 +938,11 @@ public sealed class InGameUi : IDisposable
             perTrade.Cursor = new UiPoint(x, y);
         if (Transaction is { } transaction)
             transaction.Cursor = new UiPoint(x, y);
+
+        // Repair mode drives the repair-price tooltip from the cursor (CItemRepairMgr::Tick).
+        if (Inventory is { Mode: InventoryMode.Repair } repairInv)
+            repairInv.TickRepair(new UiPoint(x, y));
+
         UpdateItemTooltip(x, y);
     }
 
@@ -904,6 +964,15 @@ public sealed class InGameUi : IDisposable
         various.Toggle();
         if (various.Root.Visible)
             Manager.SetFocusedUi(various.Root);
+    }
+
+    /// <summary>Open the party-recruitment board and request its first page (CUIPartyBBS).</summary>
+    public void OpenPartyBbs()
+    {
+        if (PartyBbs is not { } bbs)
+            return;
+        bbs.Open();
+        Manager.SetFocusedUi(bbs.Root);
     }
 
     /// <summary>Toggle the clan browse/create/join window, requesting the clan list when opening.</summary>
@@ -957,6 +1026,13 @@ public sealed class InGameUi : IDisposable
     {
         if (ItemTooltip is not { } tip || Inventory is not { } inv)
             return;
+
+        // In repair mode the repair tooltip owns the hover; the item tooltip stays hidden.
+        if (inv.Mode == InventoryMode.Repair)
+        {
+            tip.Hide();
+            return;
+        }
 
         if (inv.HoveredItem(new UiPoint(x, y)) is { } item && item.Basic != null && item.Ext != null)
         {

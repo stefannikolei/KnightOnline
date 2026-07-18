@@ -116,6 +116,15 @@ public sealed class InGameState(GameContext context) : GameState
     /// <summary>Raised on a WIZ_NOTICE push (the notice banner lines).</summary>
     public Action<IReadOnlyList<string>>? NoticeReceived { get; set; }
 
+    /// <summary>Raised on a WIZ_PARTY_BBS reply (one page of the party-recruitment board).</summary>
+    public Action<Net.PartyBbsPage>? PartyBbsReceived { get; set; }
+
+    /// <summary>
+    /// Raised on a WIZ_FRIEND_PROCESS reply (friend online/party status). The server is a no-op
+    /// upstream, so this never fires in play — kept for parity and driven only by tests.
+    /// </summary>
+    public Action<IReadOnlyList<Net.FriendStatus>>? FriendsReceived { get; set; }
+
     public override void Init()
     {
         Entered = true;
@@ -481,6 +490,15 @@ public sealed class InGameState(GameContext context) : GameState
 
             case GameOpcode.WIZ_NOTICE:
                 NoticeReceived?.Invoke(NoticeProtocol.ParseNotice(payload));
+                return true;
+
+            case GameOpcode.WIZ_PARTY_BBS:
+                PartyBbsReceived?.Invoke(PartyBbsProtocol.ParseList(payload));
+                return true;
+
+            case GameOpcode.WIZ_FRIEND_PROCESS:
+                // No-op upstream (#if 0) — never sent by the server; parsed for parity if it ever is.
+                FriendsReceived?.Invoke(FriendProtocol.ParseReply(payload));
                 return true;
         }
 
