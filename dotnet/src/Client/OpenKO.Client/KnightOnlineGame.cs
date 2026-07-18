@@ -92,6 +92,9 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     private readonly UiManager _ui = new();
     private FrontendUi? _frontend;
     private InGameUi? _inGameUi;
+    private TextureCache? _minimapTextures;
+    private string? _minimapFile;
+    private readonly List<OpenKO.Client.Engine.Ui.MinimapDot> _minimapDots = [];
     private int _prevScrollWheel;
 
     /// <summary>The manager receiving input/drawing this frame (frontend during login, HUD in-game).</summary>
@@ -146,6 +149,9 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         {
             string gtd = Path.Combine(_options.DataPath!, "Zones", _options.OfflineZone + ".gtd");
             var resolver = new KoPathResolver(_options.DataPath!);
+
+            // Zone minimap texture (CUIStateBar::LoadMap) — the zone .dxt beside the terrain.
+            _minimapFile = $"Zones\\{_options.OfflineZone}.dxt";
 
             // Place the player at the map centre, on the terrain surface.
             float centre = 0f;
@@ -612,6 +618,11 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
                     ?? Path.Combine(_options.DataPath, "Zones", zone.TerrainFileName)
                 : Path.Combine(_options.DataPath, "Zones", $"{spawn.Zone}.gtd");
 
+            // Zone minimap texture (CUIStateBar::LoadMap) from Zones.tbl col 07.
+            _minimapFile = zone != null && !string.IsNullOrEmpty(zone.MiniMapFileName)
+                ? zone.MiniMapFileName
+                : $"Zones\\{spawn.Zone}.dxt";
+
             var spawnPos = new System.Numerics.Vector3(spawn.X / 10f, spawn.Y / 10f, spawn.Z / 10f);
             BuildZoneScene(gtd, resolver, useCentreSpawn: false, spawn: spawnPos);
             EnsureInGameUi();
@@ -639,9 +650,16 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             _inGameUi.Log += Log;
             _inGameUi.Bind(_context.InGame);
 
-            // Feed the game clock to the hotkey bar's drag-cast cooldown gate.
+            // Feed the game clock to the hotkey bar's drag-cast cooldown gate + enable the
+            // cooldown-pie renderer (CUIHotKeyDlg::RenderCooldown).
             if (_inGameUi.HotKey is { } hk)
+            {
                 hk.NowSeconds = () => _gameSeconds;
+                hk.EnableCooldownRendering(GraphicsDevice);
+            }
+
+            // Minimap (CUIStateBar::LoadMap): load the zone .dxt and reveal Group_MiniMap.
+            EnableMinimap();
 
             // Populate the inventory from any MyInfo already received before the HUD was built.
             _inGameUi.Inventory?.Populate(_context.InGame.Inventory);
@@ -658,6 +676,60 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         {
             Log($"In-game HUD unavailable: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// CUIStateBar::LoadMap — resolve the zone minimap .dxt to a texture and hand it, with the
+    /// world map size, to the state bar's minimap. A missing texture leaves the group hidden.
+    /// </summary>
+    private void EnableMinimap()
+    {
+        if (_inGameUi == null || _options.DataPath == null || _minimapFile == null)
+            return;
+
+        try
+        {
+            _minimapTextures ??= new TextureCache(GraphicsDevice, new KoPathResolver(_options.DataPath));
+            Texture2D? mapTex = _minimapTextures.Get(_minimapFile);
+            _inGameUi.StateBar.EnableMinimap(GraphicsDevice, mapTex, _mapWorldSize, _mapWorldSize);
+            Log(mapTex != null
+                ? $"Minimap loaded ({_minimapFile})."
+                : $"Minimap texture not found: {_minimapFile} (minimap hidden).");
+        }
+        catch (Exception ex)
+        {
+            Log($"Minimap load failed: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Per-frame minimap feed (CUIStateBar::UpdatePosition + PositionInfoAdd): the local player's
+    /// position/facing plus a dot per remote player (ally/enemy by nation) and NPC.
+    /// </summary>
+    private void UpdateMinimapFrame()
+    {
+        if (_inGameUi == null || _context == null)
+            return;
+
+        LocalPlayer l = _context.InGame.World.Local;
+        float yaw = _player?.Facing ?? _cameraYaw;
+
+        _minimapDots.Clear();
+        foreach (RemotePlayer p in _context.InGame.World.Players.Values)
+        {
+            uint color = p.Nation == l.Nation ? 0xFF00FF00u : 0xFFFF0000u; // ally green / enemy red
+            _minimapDots.Add(new OpenKO.Client.Engine.Ui.MinimapDot(
+                new System.Numerics.Vector3(p.X, p.Y, p.Z), color));
+        }
+
+        foreach (NpcEntity npc in _context.InGame.World.Npcs.Values)
+        {
+            _minimapDots.Add(new OpenKO.Client.Engine.Ui.MinimapDot(
+                new System.Numerics.Vector3(npc.X, npc.Y, npc.Z), 0xFFFFFF00u)); // yellow
+        }
+
+        _inGameUi.StateBar.UpdateMinimap(l.X, l.Z, yaw, _minimapDots);
+        _inGameUi.StateBar.TickBuffs((float)_timer.SecPerFrame);
     }
 
     private async Task ConnectAndRunAsync(string host, int port)
@@ -711,6 +783,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         _context?.Machine.TickActive();
         _frontend?.Tick();
         _inGameUi?.Tick();
+        UpdateMinimapFrame();
 
         // Advance the FX bundles + the global weather field (CN3FXMgr::Tick). The
         // camera XZ/Y the field recentres on is the last camera eye (RenderWorld).
@@ -827,7 +900,13 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         // The real HUD replaces the immediate-mode overlay once it exists (needs --data);
         // fall back to DrawHud only when the HUD could not be built.
         if (_inGameUi != null)
+        {
             _inGameUi.Draw(gameTime.TotalGameTime.TotalSeconds);
+            // Minimap map/dots/arrow + skill cooldown pies draw on top of the HUD frame
+            // (CUIStateBar::Render / CUIHotKeyDlg::RenderCooldown draw over the base UI).
+            _inGameUi.StateBar.DrawMinimap();
+            _inGameUi.HotKey?.DrawCooldowns(gameTime.TotalGameTime.TotalSeconds);
+        }
         else
             DrawHud();
         _frontend?.Draw(gameTime.TotalGameTime.TotalSeconds);

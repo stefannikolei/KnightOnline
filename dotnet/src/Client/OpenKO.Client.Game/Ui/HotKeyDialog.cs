@@ -1,9 +1,13 @@
 using System.Globalization;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using OpenKO.Client.Assets;
 using OpenKO.Client.Assets.Player;
+using OpenKO.Client.Engine.Interop;
 using OpenKO.Client.Engine.Ui;
 using OpenKO.Client.Game.States;
 using OpenKO.Client.Game.World;
+using Vector2 = System.Numerics.Vector2;
 
 namespace OpenKO.Client.Game.Ui;
 
@@ -23,7 +27,7 @@ namespace OpenKO.Client.Game.Ui;
 /// (the registry replacement) and reloads on open, validating each entry. Pure/headless — the cast
 /// gate lives in <see cref="MagicCastManager"/>, invoked through <see cref="InGameState.CastSkill"/>.
 /// </summary>
-public sealed class HotKeyDialog
+public sealed class HotKeyDialog : IDisposable
 {
     /// <summary>MAX_SKILL_HOTKEY_PAGE.</summary>
     public const int PageCount = 8;
@@ -52,6 +56,10 @@ public sealed class HotKeyDialog
     private int _curPage;
     private int _dragSrcOrder = -1;
     private bool _loaded;
+
+    // Cooldown pie rendering (CUIHotKeyDlg::RenderCooldown).
+    private GraphicsDevice? _device;
+    private UiPrimitiveBatcher? _prims;
 
     public HotKeyDialog(
         GameContext context,
@@ -488,4 +496,69 @@ public sealed class HotKeyDialog
 
     private static bool InBounds(int page, int slot) =>
         page is >= 0 and < PageCount && slot is >= 0 and < SlotCount;
+
+    // ---- Cooldown pie (CUIHotKeyDlg::RenderCooldown) -----------------------
+
+    /// <summary>Create the primitive batcher used to draw the cooldown pies (executable wiring).</summary>
+    public void EnableCooldownRendering(GraphicsDevice device)
+    {
+        _device = device;
+        _prims ??= new UiPrimitiveBatcher(device);
+    }
+
+    /// <summary>
+    /// CMagicSkillMng::GetCooldown as a 0..1 sweep fraction for a slot on the current page: the
+    /// remaining cooldown over the skill's full ReCastTime (read from the shared cast manager, so
+    /// InGameState is untouched). 0 = ready / empty slot.
+    /// </summary>
+    public double SlotCooldown(int slot, double nowSeconds)
+    {
+        if (slot is < 0 or >= SlotCount || _inGame == null)
+            return 0;
+        uint id = _skillId[_curPage, slot];
+        if (id == 0)
+            return 0;
+        return _inGame.Magic.Cooldown(id, nowSeconds);
+    }
+
+    /// <summary>
+    /// Draw the red radial cooldown pie over each cooling icon on the current page — a 12 o'clock,
+    /// clockwise TRIANGLEFAN of colour <c>0x80FF0000</c>, scissor-clipped to the icon square. Called
+    /// by the executable after the HUD dialogs are drawn.
+    /// </summary>
+    public void DrawCooldowns(double nowSeconds)
+    {
+        if (_device == null || _prims == null || _inGame == null)
+            return;
+
+        Color color = ColorInterop.FromArgb(CooldownArc.FillColorArgb);
+
+        for (int slot = 0; slot < SlotCount; slot++)
+        {
+            if (_icon[_curPage, slot] is not { Visible: true } icon)
+                continue;
+
+            double progress = SlotCooldown(slot, nowSeconds);
+            if (progress <= 0)
+                continue;
+
+            N3UiRect rc = icon.Region;
+            float centerX = (rc.Left + rc.Right) / 2f;
+            float centerY = (rc.Top + rc.Bottom) / 2f;
+            float halfW = centerX - rc.Left;
+            float halfH = centerY - rc.Top;
+            float radius = CooldownArc.CornerRadius(halfW, halfH);
+
+            Vector2[] pie = CooldownArc.BuildPie(centerX, centerY, radius, (float)progress);
+            if (pie.Length < 3)
+                continue;
+
+            var scissor = new Rectangle(rc.Left, rc.Top, rc.Right - rc.Left, rc.Bottom - rc.Top);
+            _prims.Begin(scissor);
+            _prims.FillTriangleFan(pie, color);
+            _prims.End();
+        }
+    }
+
+    public void Dispose() => _prims?.Dispose();
 }
