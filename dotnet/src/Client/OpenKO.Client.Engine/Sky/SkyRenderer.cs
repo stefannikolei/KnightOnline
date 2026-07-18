@@ -33,8 +33,11 @@ public sealed class SkyRenderer : IDisposable
 
     private readonly VertexPositionColorTexture[] _cloud = new VertexPositionColorTexture[SkyGeometry.CloudVertexCount];
     private readonly Texture2D? _cloudTexture;
-    private readonly Texture2D? _sunTexture;
+    private readonly Texture2D? _sunDisk;
+    private readonly Texture2D? _sunGlow;
+    private readonly Texture2D? _sunFlare;
     private readonly Texture2D? _moonTexture;
+    private readonly SunPartLayout _sunLayout = SkyBodies.SunLayout(SunHalfSize);
 
     private readonly VertexPositionColorTexture[] _bodyQuad = new VertexPositionColorTexture[4];
     private readonly StarPoint[] _starField;
@@ -48,17 +51,22 @@ public sealed class SkyRenderer : IDisposable
     private Vector3 _sunDir = Vector3.Up;
     private Vector3 _moonDir = Vector3.Down;
     private float _starAlpha;
+    private UvRect _moonUv = SkyBodies.MoonPhaseUv(0);
 
     public SkyRenderer(
         GraphicsDevice device,
         Texture2D? cloudTexture = null,
-        Texture2D? sunTexture = null,
+        Texture2D? sunDisk = null,
+        Texture2D? sunGlow = null,
+        Texture2D? sunFlare = null,
         Texture2D? moonTexture = null,
         int starSeed = 0x5EED)
     {
         _effect = new BasicEffect(device) { VertexColorEnabled = true, LightingEnabled = false };
         _cloudTexture = cloudTexture;
-        _sunTexture = sunTexture;
+        _sunDisk = sunDisk;
+        _sunGlow = sunGlow;
+        _sunFlare = sunFlare;
         _moonTexture = moonTexture;
 
         _starField = DayNightCycle.GenerateStarField(starSeed);
@@ -94,6 +102,12 @@ public sealed class SkyRenderer : IDisposable
         _moonDir = DayNightCycle.MoonDirection(dayFraction).ToXna();
         _starAlpha = DayNightCycle.StarAlpha(dayFraction);
     }
+
+    /// <summary>
+    /// Select the moon phase sub-image from the phase strip (CN3Moon::SetMoonPhase):
+    /// <paramref name="phaseIndex"/> is <c>month*30 + day</c>, taken mod 24.
+    /// </summary>
+    public void SetMoonPhase(int phaseIndex) => _moonUv = SkyBodies.MoonPhaseUv(phaseIndex);
 
     /// <summary>CN3Cloud::Tick — scroll the cloud UVs (the two layers drift apart).</summary>
     public void Tick(float secPerFrame)
@@ -139,8 +153,8 @@ public sealed class SkyRenderer : IDisposable
         _effect.World = Matrix.Identity;
 
         RenderStars(device, right, up);
-        RenderBody(device, _moonDir, MoonHalfSize, _moonTexture, Color.White, BlendState.AlphaBlend, right, up);
-        RenderBody(device, _sunDir, SunHalfSize, _sunTexture, Color.White, BlendState.Additive, right, up);
+        RenderBody(device, _moonDir, MoonHalfSize, _moonTexture, Color.White, BlendState.AlphaBlend, right, up, _moonUv);
+        RenderSun(device, right, up);
 
         // Cloud dome (textured, modulated by vertex colour).
         _effect.World = SkyGeometry.CameraYaw(camera.Eye, camera.At);
@@ -199,9 +213,26 @@ public sealed class SkyRenderer : IDisposable
         }
     }
 
+    // CN3Sun::Render — the sun is three concentric additive billboards
+    // (disk + glow + flare, ONE/ONE blend). Their half-sizes keep the C++
+    // 0.1/0.25/0.13 delta proportions (SkyBodies.SunLayout). Each part is
+    // null-safe: an absent texture falls back to the flat additive quad so the
+    // disk is still visible.
+    private void RenderSun(GraphicsDevice device, Vector3 right, Vector3 up)
+    {
+        if (_sunDir.Y <= 0f)
+            return;
+
+        RenderBody(device, _sunDir, _sunLayout.DiskHalfSize, _sunDisk, Color.White, BlendState.Additive, right, up, FullUv);
+        RenderBody(device, _sunDir, _sunLayout.GlowHalfSize, _sunGlow, Color.White, BlendState.Additive, right, up, FullUv);
+        RenderBody(device, _sunDir, _sunLayout.FlareHalfSize, _sunFlare, Color.White, BlendState.Additive, right, up, FullUv);
+    }
+
+    private static readonly UvRect FullUv = new(0f, 0f, 1f, 1f);
+
     private void RenderBody(
         GraphicsDevice device, Vector3 direction, float halfSize, Texture2D? texture,
-        Color color, BlendState blend, Vector3 right, Vector3 up)
+        Color color, BlendState blend, Vector3 right, Vector3 up, UvRect uv)
     {
         // Only draw a body that is above the horizon (Y > 0), matching the C++
         // 2D-projection clip that discards bodies behind the camera/below.
@@ -211,10 +242,10 @@ public sealed class SkyRenderer : IDisposable
         Vector3 center = direction * BodyRadius;
         Vector3 offR = right * halfSize;
         Vector3 offU = up * halfSize;
-        _bodyQuad[0] = new VertexPositionColorTexture(center - offR + offU, color, new Vector2(0f, 0f));
-        _bodyQuad[1] = new VertexPositionColorTexture(center + offR + offU, color, new Vector2(1f, 0f));
-        _bodyQuad[2] = new VertexPositionColorTexture(center + offR - offU, color, new Vector2(1f, 1f));
-        _bodyQuad[3] = new VertexPositionColorTexture(center - offR - offU, color, new Vector2(0f, 1f));
+        _bodyQuad[0] = new VertexPositionColorTexture(center - offR + offU, color, new Vector2(uv.U0, uv.V0));
+        _bodyQuad[1] = new VertexPositionColorTexture(center + offR + offU, color, new Vector2(uv.U1, uv.V0));
+        _bodyQuad[2] = new VertexPositionColorTexture(center + offR - offU, color, new Vector2(uv.U1, uv.V1));
+        _bodyQuad[3] = new VertexPositionColorTexture(center - offR - offU, color, new Vector2(uv.U0, uv.V1));
 
         device.BlendState = blend;
         if (texture != null)

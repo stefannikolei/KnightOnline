@@ -46,6 +46,9 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     private N3Terrain? _terrainData;
     private SkyRenderer? _sky;
 
+    /// <summary>The authoritative game clock (seeded by WIZ_TIME, advanced ~10× real).</summary>
+    private readonly GameClock _gameClock = new();
+
     // Water + weather + FX (slice 9.11d): the already-built renderers wired into
     // the zone scene. _fx is the pure game-side manager (bundles + weather field);
     // _river/_weather/_fxRenderer are the device layers.
@@ -185,7 +188,11 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         terrain.LoadFromFile(gtdPath);
         _terrain = new TerrainRenderer(GraphicsDevice, terrain, resolver, gtdPath);
         _terrainData = terrain;
-        _sky = new SkyRenderer(GraphicsDevice);
+        // Sun (3-part disk/glow/flare) + moon (phase strip) textures from misc\sky\*
+        // (CN3SkyMng::InitToDefaultHardCoding); each is best-effort/null-safe.
+        SkyBodyTextures sky = SkyBodyTextures.Load(GraphicsDevice, resolver);
+        _sky = new SkyRenderer(GraphicsDevice, sunDisk: sky.SunDisk, sunGlow: sky.SunGlow,
+            sunFlare: sky.SunFlare, moonTexture: sky.Moon);
         _mapWorldSize = terrain.MapSize * TerrainVertexBuilder.TileSize;
 
         float x = useCentreSpawn ? _mapWorldSize * 0.5f : spawn.X;
@@ -280,6 +287,14 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
         // WIZ_WEATHER → (re)create the global weather field.
         inGame.WeatherChanged += w => _fx?.SetWeather((WeatherType)w.Type, w.Amount);
+
+        // WIZ_TIME → anchor the authoritative game clock (hour/minute) + moon phase
+        // (month*30+day), which drives the day-night sky (CN3SkyMng::SetGameTime).
+        inGame.TimeChanged += t =>
+        {
+            _gameClock.SetFromServer(t.Hour, t.Minute);
+            _sky?.SetMoonPhase(SkyBodies.MoonPhaseIndex(t.Month, t.Day));
+        };
 
         // WIZ_MAGIC_PROCESS → the cast/fly/hit FX triggers. The magic → skill-FX
         // resolver reads the loaded skill table (fx.tbl ids); an absent table or
@@ -773,6 +788,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     protected override void Update(GameTime gameTime)
     {
         _gameSeconds = gameTime.TotalGameTime.TotalSeconds;
+        _gameClock.Advance((float)gameTime.ElapsedGameTime.TotalSeconds);
         SampleInput(gameTime.TotalGameTime.TotalSeconds);
 
         if (_input.IsKeyDown(OpenKO.Client.Engine.Input.KeyMap.DIK_ESCAPE))
@@ -1035,7 +1051,12 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
 
         // Day-night: drive the simulated sun/moon/star arc + fog tint from the game
         // clock before drawing the sky, then scroll the clouds.
-        _sky?.SetTimeOfDay(DayNightCycle.DayFractionFromSeconds((float)_gameSeconds));
+        // Once the server clock (WIZ_TIME) has arrived it is authoritative; offline
+        // (or pre-first-packet) falls back to the free-running frame clock.
+        float dayFraction = _gameClock.HasServerTime
+            ? _gameClock.DayFraction
+            : DayNightCycle.DayFractionFromSeconds((float)_gameSeconds);
+        _sky?.SetTimeOfDay(dayFraction);
         _sky?.Tick(_timer.SecPerFrame);
         _sky?.Render(GraphicsDevice, camera);
         _terrain!.Render(GraphicsDevice, camera);
