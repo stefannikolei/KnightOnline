@@ -104,6 +104,9 @@ public sealed class InGameUi : IDisposable
     /// <summary>The player-to-player trade window — null when the layout or item tables failed to load.</summary>
     public PerTradeDialog? PerTrade { get; }
 
+    /// <summary>The NPC-vendor buy/sell window — null when the layout or item tables failed to load.</summary>
+    public TransactionDialog? Transaction { get; }
+
     /// <summary>The NPC quest menu — null when the layout failed to load.</summary>
     public QuestMenuDialog? QuestMenu { get; }
 
@@ -405,6 +408,20 @@ public sealed class InGameUi : IDisposable
             Log?.Invoke("PerTrade layout not found: " + table.PersonalTrade(nation));
         }
 
+        // NPC-vendor buy/sell window (10.2) — needs the item tables + the countable popup; centred,
+        // pushed open through the NPC-event menu's Btn_Sale (CGameProcMain::DoCommercialTransaction).
+        UiControl? transRoot = LoadDialog(table.Transaction(nation));
+        if (transRoot != null && items != null && CountableItemEdit != null)
+        {
+            transRoot.SetPosCenter(w, h);
+            Transaction = new TransactionDialog(context, transRoot, items, Manager.IconDrag, CountableItemEdit);
+            Manager.BindIconDragState(transRoot);
+        }
+        else if (transRoot == null)
+        {
+            Log?.Invoke("Transaction layout not found: " + table.Transaction(nation));
+        }
+
         // Quest menu / talk (9.9) — centred like the C++ (CUIQuestMenu::Open recentres); pushed open
         // on the WIZ_SELECT_MSG / WIZ_NPC_SAY replies.
         UiControl? questMenuRoot = LoadDialog(table.QuestMenu(nation));
@@ -539,6 +556,8 @@ public sealed class InGameUi : IDisposable
             Manager.Add(upgradeRoot);
         if (perTradeRoot != null && items != null)
             Manager.Add(perTradeRoot);
+        if (transRoot != null && items != null && CountableItemEdit != null)
+            Manager.Add(transRoot);
 
         // Quest / NPC-event / menu windows float above the HUD (9.9).
         if (questMenuRoot != null)
@@ -710,10 +729,28 @@ public sealed class InGameUi : IDisposable
         QuestTalk?.Bind(inGame); // WIZ_NPC_SAY
         Notice?.Bind(inGame);    // WIZ_NOTICE
 
-        // NPC event menu: the vendor transaction / inventory-repair UIs are deferred (later slice).
+        // NPC-vendor transaction (10.2): the server's WIZ_TRADE_NPC push opens the NPC-event menu
+        // (MsgRecv_ItemTradeStart → CUINPCEvent), whose Btn_Sale opens the vendor window
+        // (DoCommercialTransaction). The buy packet carries the current target NPC id (m_iNpcID).
+        if (Transaction is { } transaction)
+        {
+            transaction.Bind(inGame); // WIZ_ITEM_TRADE result → gold + inventory
+            transaction.InventoryChanged += () => Inventory?.Populate(inGame.Inventory);
+        }
+
+        inGame.TradeStartReceived += tradeId =>
+            NpcEvent?.Open(NpcEventKind.ItemTrade, (int)tradeId, _targetId ?? 0);
+
+        // NPC event menu: Btn_Sale opens the vendor window; the inventory-repair UI is deferred (10.3).
         if (NpcEvent is { } npcEvent)
         {
-            npcEvent.SaleRequested += trade => Log?.Invoke($"Vendor transaction (trade {trade}) deferred: CUITransactionDlg not implemented.");
+            npcEvent.SaleRequested += trade =>
+            {
+                if (Transaction is { } t)
+                    t.Open(trade, _targetId ?? 0);
+                else
+                    Log?.Invoke($"Vendor transaction (trade {trade}) unavailable: layout/tables missing.");
+            };
             npcEvent.RepairRequested += () => Log?.Invoke("Inventory repair mode deferred: CUIInventory INV_STATE_REPAIR not implemented.");
         }
 
@@ -844,6 +881,8 @@ public sealed class InGameUi : IDisposable
             ware.Cursor = new UiPoint(x, y);
         if (PerTrade is { } perTrade)
             perTrade.Cursor = new UiPoint(x, y);
+        if (Transaction is { } transaction)
+            transaction.Cursor = new UiPoint(x, y);
         UpdateItemTooltip(x, y);
     }
 

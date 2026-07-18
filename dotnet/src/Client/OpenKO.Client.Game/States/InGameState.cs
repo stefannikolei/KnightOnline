@@ -90,6 +90,12 @@ public sealed class InGameState(GameContext context) : GameState
 
     public Action<byte, byte[]>? WarehouseReceived { get; set; }
 
+    /// <summary>Raised on a WIZ_ITEM_TRADE reply (NPC-vendor buy/sell/move result).</summary>
+    public Action<Net.TransactionResult>? ItemTradeReceived { get; set; }
+
+    /// <summary>Raised on a WIZ_TRADE_NPC push (the vendor's selling-group trade id) — opens the NPC-event menu.</summary>
+    public Action<uint>? TradeStartReceived { get; set; }
+
     public Action<byte, byte[]>? KnightsReceived { get; set; }
 
     /// <summary>Raised on a WIZ_WARP_LIST reply (the NPC/object teleport menu).</summary>
@@ -439,6 +445,14 @@ public sealed class InGameState(GameContext context) : GameState
 
             case GameOpcode.WIZ_WAREHOUSE:
                 WarehouseReceived?.Invoke(WarehouseProtocol.Subcommand(payload), payload.ToArray());
+                return true;
+
+            case GameOpcode.WIZ_ITEM_TRADE:
+                ItemTradeReceived?.Invoke(TransactionProtocol.ParseResult(payload));
+                return true;
+
+            case GameOpcode.WIZ_TRADE_NPC:
+                TradeStartReceived?.Invoke(TransactionProtocol.ParseTradeStart(payload));
                 return true;
 
             case GameOpcode.WIZ_KNIGHTS_PROCESS:

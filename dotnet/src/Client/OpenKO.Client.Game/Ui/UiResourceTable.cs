@@ -25,6 +25,7 @@ public sealed class UiResourceTable
     private const int ColInputClanName = 44;  // 45 szInputClanName (CUICreateClanName)
     private const int ColClanPage = 72;       // 73 szClanPage
     private const int ColInventory = 11;      // 12 szInventory
+    private const int ColTransaction = 12;    // 13 szTransaction (CUITransactionDlg — NPC vendor)
     private const int ColDroppedItem = 13;    // 14 szDroppedItem
     private const int ColTargetBar = 14;      // 15 szTargetBar
     private const int ColItemInfo = 28;       // 29 szItemInfo (image tooltip)
@@ -96,6 +97,9 @@ public sealed class UiResourceTable
     public string StateBar(int nation) => Get(nation, ColStateBar);
 
     public string Inventory(int nation) => Get(nation, ColInventory);
+
+    /// <summary>szTransaction — the NPC vendor buy/sell window (CUITransactionDlg).</summary>
+    public string Transaction(int nation) => Get(nation, ColTransaction);
 
     public string DroppedItem(int nation) => Get(nation, ColDroppedItem);
 

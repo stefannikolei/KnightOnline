@@ -374,6 +374,46 @@ public sealed class ItemTableSet
     }
 
     /// <summary>
+    /// Port of <c>CUITransactionDlg::EnterTransactionState</c> (UITransactionDlg.cpp:259):
+    /// build an NPC vendor's grid locally by scanning the basic item table for every row whose
+    /// <see cref="ItemBasicRow.SellGroup"/> equals <c>tradeId/1000</c>, paired with the ext row
+    /// <c>tradeId%1000</c> inside that row's ext table. The vendor list is never sent over the
+    /// wire — it is reproduced entirely from the shipped item tables. Each entry's full item id
+    /// (for the buy packet) is <c>basic.Id + ext.Id</c>.
+    /// </summary>
+    public IReadOnlyList<(ItemBasicRow Basic, ItemExtRow Ext)> VendorItems(int tradeId)
+    {
+        int org = tradeId / 1000;
+        int extId = tradeId % 1000;
+
+        var result = new List<(ItemBasicRow, ItemExtRow)>();
+        foreach (object[] cells in _basic.Rows)
+        {
+            var basic = ItemBasicRow.FromCells(cells);
+
+            // byExtIndex range guard + bySellGroup filter (the exact C++ predicate order).
+            if (basic.ExtIndex >= MaxItemExtension)
+                continue;
+            if (basic.SellGroup != org)
+                continue;
+            if (_exts[basic.ExtIndex] is not { } extTable)
+                continue;
+
+            object[]? extCells = extTable.Find((uint)extId);
+            if (extCells == null)
+                continue;
+
+            var ext = ItemExtRow.FromCells(extCells);
+            if (ext.Id != (uint)extId)
+                continue;
+
+            result.Add((basic, ext));
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Port of <c>__IconItemSkill::GetBuyPrice</c> (IconItemSkill.cpp): the vendor
     /// purchase price is <c>basic.Price * ext.PriceMultiply</c>. Returns 0 when
     /// either row is missing (the C++ null-guards both).
