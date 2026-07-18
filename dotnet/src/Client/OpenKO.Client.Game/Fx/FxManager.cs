@@ -28,6 +28,9 @@ public sealed class FxManager
 
         public required N3FXBundle Bundle { get; init; }
 
+        /// <summary>__TABLE_FX::dwSoundID — the sound played when a copy triggers (0 = none).</summary>
+        public uint SoundId { get; init; }
+
         public int Num { get; set; }
 
         public float LimitedTime { get; set; }
@@ -190,12 +193,12 @@ public sealed class FxManager
 
     private BundleOrigin? ResolveOrigin(int fxId)
     {
-        if (!_loader.TryResolve(fxId, out string cacheKey, out N3FXBundle bundle))
+        if (!_loader.TryResolve(fxId, out string cacheKey, out uint soundId, out N3FXBundle bundle))
             return null;
 
         if (!_origins.TryGetValue(cacheKey, out BundleOrigin? origin))
         {
-            origin = new BundleOrigin { Key = cacheKey, Bundle = bundle };
+            origin = new BundleOrigin { Key = cacheKey, Bundle = bundle, SoundId = soundId };
             _origins[cacheKey] = origin;
         }
 
@@ -214,6 +217,7 @@ public sealed class FxManager
             SourceJoint = sourceJoint,
             MoveType = moveType,
             CacheKey = origin.Key,
+            SoundId = origin.SoundId,
         };
     }
 }

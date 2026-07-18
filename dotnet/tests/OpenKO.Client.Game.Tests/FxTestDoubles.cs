@@ -26,25 +26,27 @@ internal sealed class FakeLocator : IFxEntityLocator
 /// </summary>
 internal sealed class FakeBundleLoader : IFxBundleLoader
 {
-    private readonly Dictionary<int, (string Key, N3FXBundle Bundle)> _bundles = [];
+    private readonly Dictionary<int, (string Key, uint SoundId, N3FXBundle Bundle)> _bundles = [];
 
     /// <summary>Register an FXID → bundle mapping. A shared <paramref name="key"/> dedupes origins.</summary>
-    public FakeBundleLoader Add(int fxId, float life0 = 0f, float velocity = 10f, string? key = null)
+    public FakeBundleLoader Add(int fxId, float life0 = 0f, float velocity = 10f, string? key = null, uint soundId = 0)
     {
-        _bundles[fxId] = (key ?? $"fx{fxId}", FxTestBundles.Build(life0, velocity));
+        _bundles[fxId] = (key ?? $"fx{fxId}", soundId, FxTestBundles.Build(life0, velocity));
         return this;
     }
 
-    public bool TryResolve(int fxId, out string cacheKey, out N3FXBundle bundle)
+    public bool TryResolve(int fxId, out string cacheKey, out uint soundId, out N3FXBundle bundle)
     {
-        if (_bundles.TryGetValue(fxId, out (string Key, N3FXBundle Bundle) entry))
+        if (_bundles.TryGetValue(fxId, out (string Key, uint SoundId, N3FXBundle Bundle) entry))
         {
             cacheKey = entry.Key;
+            soundId = entry.SoundId;
             bundle = entry.Bundle;
             return true;
         }
 
         cacheKey = string.Empty;
+        soundId = 0;
         bundle = null!;
         return false;
     }

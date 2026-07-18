@@ -55,6 +55,17 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     private FxRenderer? _fxRenderer;
     private bool _fxHooksBound;
 
+    // FX tables (slice 10.4): fx.tbl (FXID → .fxb + sound) and the skill table
+    // (magic id → self/flying/target FX ids), loaded once via the resolver, plus the
+    // resolved FX shape/pmesh caches for mesh-part rendering. All degrade to null
+    // (no FX) when the table/asset is absent from the corpus.
+    private OpenKO.Client.Assets.Effects.FxSourceTable? _fxTable;
+    private OpenKO.Client.Assets.Player.SkillTableSet? _fxSkills;
+    private OpenKO.Client.Engine.IO.KoPathResolver? _resolver;
+    private readonly Dictionary<string, FxShapeInstance?> _fxShapeCache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, OpenKO.Client.Assets.N3FXPMesh?> _fxPMeshCache =
+        new(StringComparer.OrdinalIgnoreCase);
+
     // BGM (slice 9.11d): the current town/battle theme key and a re-select throttle.
     private string? _currentBgm;
     private float _bgmThrottle;
@@ -220,10 +231,13 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             };
 
             // FX manager + renderer over the client's world roster + asset caches.
+            // fx.tbl / skill table drive the bundle + skill-FX resolution (slice 10.4).
+            _resolver = resolver;
+            EnsureFxTables(resolver);
             var locator = new ClientFxEntityLocator(this);
-            var loader = new ClientFxBundleLoader(resolver);
+            var loader = new ClientFxBundleLoader(resolver, _fxTable);
             _fx = new FxManager(locator, loader);
-            _fxRenderer = new FxRenderer(GraphicsDevice, ResolveFxTexture);
+            _fxRenderer = new FxRenderer(GraphicsDevice, ResolveFxTexture, ResolveFxShape);
 
             BindFxHooks();
         }
@@ -261,9 +275,9 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         // WIZ_WEATHER → (re)create the global weather field.
         inGame.WeatherChanged += w => _fx?.SetWeather((WeatherType)w.Type, w.Amount);
 
-        // WIZ_MAGIC_PROCESS → the cast/fly/hit FX triggers. The magic→(fx1,fx2)
-        // resolver would come from the skill/magic table; that table is not loaded
-        // in the client yet, so it degrades to (0,0) = no FX (documented deferral).
+        // WIZ_MAGIC_PROCESS → the cast/fly/hit FX triggers. The magic → skill-FX
+        // resolver reads the loaded skill table (fx.tbl ids); an absent table or
+        // unknown id degrades to no FX.
         inGame.MagicReceived += packet =>
         {
             if (_fx is { } fx)
@@ -272,11 +286,128 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     }
 
     /// <summary>
-    /// magicId → (fx1, fx2) effect ids. The effect table is not wired, so this
-    /// returns (0, 0) (no FX). Wire it to the skill/magic table (dwEffectID1/2)
-    /// once that table is loaded client-side.
+    /// magicId → the skill's fx.tbl ids (self/flying/target FX + parts) from the
+    /// skill table (CMagicSkillMng reads <c>pSkill-&gt;iSelfFX1/iFlyingFX/iTargetFX</c>).
+    /// Null when the table is absent or the id is unknown = no FX.
     /// </summary>
-    private static (int Fx1, int Fx2) MagicFxResolve(int magicId) => (0, 0);
+    private SkillFxInfo? MagicFxResolve(int magicId)
+    {
+        if (_fxSkills?.Find((uint)magicId) is not { } row)
+            return null;
+
+        return new SkillFxInfo(
+            row.SelfFx1, row.SelfPart1, row.SelfFx2, row.SelfPart2,
+            row.FlyingFx, row.TargetFx, row.TargetPart);
+    }
+
+    /// <summary>
+    /// Load the FX effect table (Data\fx.tbl) and the skill table
+    /// (Data\skill_magic_main_us.tbl) once, via the resolver. Both are best-effort:
+    /// an absent table leaves the field null and the FX simply never resolves.
+    /// </summary>
+    private void EnsureFxTables(OpenKO.Client.Engine.IO.KoPathResolver resolver)
+    {
+        if (_fxTable == null)
+        {
+            try
+            {
+                string? path = resolver.Resolve("Data\\fx.tbl");
+                if (path != null)
+                    _fxTable = OpenKO.Client.Assets.Effects.FxSourceTable.LoadFromFile(path);
+            }
+            catch (Exception ex)
+            {
+                Log($"fx.tbl load failed: {ex.Message}");
+            }
+        }
+
+        if (_fxSkills == null)
+        {
+            try
+            {
+                string? path = resolver.Resolve("Data\\skill_magic_main_us.tbl");
+                if (path != null)
+                    _fxSkills = OpenKO.Client.Assets.Player.SkillTableSet.LoadFromFile(path);
+            }
+            catch (Exception ex)
+            {
+                Log($"skill table load failed: {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Resolve (and cache by shape file name) the FX shape geometry a mesh part
+    /// draws — the port of CN3FXPartMesh loading its CN3FXShape + FXPMesh parts.
+    /// Null (skip) when the shape/mesh is absent from the corpus.
+    /// </summary>
+    private FxShapeInstance? ResolveFxShape(OpenKO.Client.Assets.N3FXPartMesh part)
+    {
+        string shapeFile = part.ShapeFileName;
+        if (_resolver == null || _caches == null || string.IsNullOrWhiteSpace(shapeFile))
+            return null;
+
+        if (_fxShapeCache.TryGetValue(shapeFile, out FxShapeInstance? cached))
+            return cached;
+
+        FxShapeInstance? instance = null;
+        try
+        {
+            string? path = _resolver.Resolve(shapeFile);
+            if (path != null)
+            {
+                var shape = new OpenKO.Client.Assets.N3FXShape();
+                shape.LoadFromFile(path);
+                instance = new FxShapeInstance(shape, ResolveFxPMesh, ResolveFxShapeTexture);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log($"FX shape '{shapeFile}' load failed: {ex.Message}");
+            instance = null;
+        }
+
+        _fxShapeCache[shapeFile] = instance;
+        return instance;
+    }
+
+    /// <summary>FX shape-part mesh file name → the loaded FXPMesh (cached), or null.</summary>
+    private OpenKO.Client.Assets.N3FXPMesh? ResolveFxPMesh(string meshName)
+    {
+        if (_resolver == null || string.IsNullOrWhiteSpace(meshName))
+            return null;
+
+        if (_fxPMeshCache.TryGetValue(meshName, out OpenKO.Client.Assets.N3FXPMesh? cached))
+            return cached;
+
+        OpenKO.Client.Assets.N3FXPMesh? mesh = null;
+        try
+        {
+            string? path = _resolver.Resolve(meshName);
+            if (path != null)
+            {
+                mesh = new OpenKO.Client.Assets.N3FXPMesh();
+                mesh.LoadFromFile(path);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log($"FX pmesh '{meshName}' load failed: {ex.Message}");
+            mesh = null;
+        }
+
+        _fxPMeshCache[meshName] = mesh;
+        return mesh;
+    }
+
+    /// <summary>FX shape-part animation-frame texture → the corpus texture, or null.</summary>
+    private Texture2D? ResolveFxShapeTexture(OpenKO.Client.Assets.N3FXShapePart part, int frame)
+    {
+        if (_caches == null || frame < 0 || frame >= part.TexNames.Count)
+            return null;
+        string name = part.TexNames[frame];
+        return string.IsNullOrWhiteSpace(name) ? null : _caches.Textures.Get(name);
+    }
 
     /// <summary>
     /// CGameProcMain town/battle BGM choice: pick the track for the local nation +
@@ -1068,16 +1199,17 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     }
 
     /// <summary>
-    /// CGameProcMain::CharacterGetByID/JointPosGet over the client world roster: the
-    /// local player (<see cref="_playerPos"/>), the region-visible remote players and
-    /// the NPCs. Joints are not exposed by the roster, so a joint offset is ignored
-    /// (origin only); returns false when the entity has left the region.
+    /// CGameProcMain::CharacterGetByID + CPlayerBase::JointPosGet over the client
+    /// world roster: the local player (<see cref="_playerPos"/>), the region-visible
+    /// remote players and the NPCs. When <paramref name="joint"/> is non-negative and
+    /// the entity has a rendered character, returns the joint's world position
+    /// (<see cref="FxJointMath.WorldPos"/>); otherwise the entity origin. Returns
+    /// false when the entity has left the region.
     /// </summary>
     private sealed class ClientFxEntityLocator(KnightOnlineGame game) : IFxEntityLocator
     {
         public bool TryGetPosition(int entityId, int joint, out System.Numerics.Vector3 pos)
         {
-            _ = joint; // Joint offset deferred (the roster exposes origins only).
             pos = default;
 
             WorldEntities world = game._context?.InGame.World!;
@@ -1087,51 +1219,87 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             // The local player.
             if (entityId == world.Local.SocketId)
             {
-                pos = new System.Numerics.Vector3(game._playerPos.X, game._playerPos.Y, game._playerPos.Z);
+                var origin = new System.Numerics.Vector3(game._playerPos.X, game._playerPos.Y, game._playerPos.Z);
+                pos = JointWorld(game._character, joint) ?? origin;
                 return true;
             }
 
             // A region-visible remote player.
             if (world.TryGet((short)entityId, out RemotePlayer player))
             {
-                pos = new System.Numerics.Vector3(player.X, player.Y, player.Z);
+                var origin = new System.Numerics.Vector3(player.X, player.Y, player.Z);
+                pos = JointWorld(game._remotePlayers?.TryGetRenderer((short)entityId), joint) ?? origin;
                 return true;
             }
 
             // An NPC.
             if (world.TryGetNpc((short)entityId, out NpcEntity npc))
             {
-                pos = new System.Numerics.Vector3(npc.X, npc.Y, npc.Z);
+                var origin = new System.Numerics.Vector3(npc.X, npc.Y, npc.Z);
+                pos = JointWorld(game._remotePlayers?.TryGetRenderer((short)entityId), joint) ?? origin;
                 return true;
             }
 
             return false;
         }
+
+        /// <summary>
+        /// The joint world position (JointPosGet) for a rendered character, or null to
+        /// fall back to the origin: joint &lt; 0, no character, or the index is out of
+        /// range (guarded).
+        /// </summary>
+        private static System.Numerics.Vector3? JointWorld(
+            OpenKO.Client.Engine.Objects.ChrRenderer? chr, int joint)
+        {
+            if (chr == null || joint < 0)
+                return null;
+
+            IReadOnlyList<System.Numerics.Matrix4x4> joints = chr.JointMatrices;
+            if (joint >= joints.Count)
+                return null;
+
+            return FxJointMath.WorldPos(joints[joint], chr.Chr.Matrix);
+        }
     }
 
     /// <summary>
-    /// The FXID → .fxb loader. The FX effect table (s_pTbl_FXSource) is not wired
-    /// yet, so this resolves a best-effort <c>fx\&lt;FXID&gt;.fxb</c> path through the
-    /// resolver and caches the loaded bundle by its lower-cased filename. Returns
-    /// false (a no-op trigger) when the file is absent — the offline corpus has no
-    /// .fxb, which is expected.
+    /// The FXID → .fxb loader (CN3FXMgr::TriggerBundle): look the FXID up in
+    /// <c>fx.tbl</c> (<see cref="OpenKO.Client.Assets.Effects.FxSourceTable"/>),
+    /// normalize its <c>szFN</c> to the lower-cased <c>.fxb</c> cache key
+    /// (<see cref="OpenKO.Client.Assets.Effects.FxFileName"/>), load + cache the
+    /// bundle, and surface the row's <c>dwSoundID</c>. An unknown FXID (or absent
+    /// table/file) → false = a no-op trigger, matching the C++ early-out.
     /// </summary>
-    private sealed class ClientFxBundleLoader(KoPathResolver resolver) : IFxBundleLoader
+    private sealed class ClientFxBundleLoader(
+        KoPathResolver resolver, OpenKO.Client.Assets.Effects.FxSourceTable? table) : IFxBundleLoader
     {
-        private readonly Dictionary<string, OpenKO.Client.Assets.N3FXBundle> _cache =
+        private readonly Dictionary<string, (OpenKO.Client.Assets.N3FXBundle Bundle, uint SoundId)> _cache =
             new(StringComparer.OrdinalIgnoreCase);
 
-        public bool TryResolve(int fxId, out string cacheKey, out OpenKO.Client.Assets.N3FXBundle bundle)
+        public bool TryResolve(
+            int fxId, out string cacheKey, out uint soundId, out OpenKO.Client.Assets.N3FXBundle bundle)
         {
-            cacheKey = $"{fxId}.fxb";
-            if (_cache.TryGetValue(cacheKey, out OpenKO.Client.Assets.N3FXBundle? cached))
+            cacheKey = string.Empty;
+            soundId = 0;
+            bundle = null!;
+
+            if (table == null || !table.TryGet((uint)fxId, out OpenKO.Client.Assets.Effects.FxSourceRow row))
+                return false;
+
+            cacheKey = OpenKO.Client.Assets.Effects.FxFileName.Normalize(row.FileName);
+            if (cacheKey.Length == 0)
+                return false;
+
+            soundId = row.SoundId;
+
+            if (_cache.TryGetValue(cacheKey, out (OpenKO.Client.Assets.N3FXBundle Bundle, uint SoundId) cached))
             {
-                bundle = cached;
+                bundle = cached.Bundle;
+                soundId = cached.SoundId;
                 return true;
             }
 
-            bundle = null!;
-            string? path = resolver.Resolve($"fx\\{fxId}.fxb") ?? resolver.Resolve($"{fxId}.fxb");
+            string? path = resolver.Resolve(cacheKey) ?? resolver.Resolve($"fx\\{cacheKey}");
             if (path == null)
                 return false;
 
@@ -1139,7 +1307,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             {
                 var loaded = new OpenKO.Client.Assets.N3FXBundle();
                 loaded.LoadFromFile(path);
-                _cache[cacheKey] = loaded;
+                _cache[cacheKey] = (loaded, soundId);
                 bundle = loaded;
                 return true;
             }

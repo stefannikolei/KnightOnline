@@ -32,6 +32,20 @@ public sealed class RemotePlayerRenderer(CharacterFactory factory)
     private readonly Dictionary<short, Entry> _npcs = [];
     private readonly List<short> _stale = [];
 
+    /// <summary>
+    /// The runtime-assembled <see cref="ChrRenderer"/> for a region-visible entity id
+    /// (a remote player or an NPC), or null when it is not currently rendered. Used by
+    /// the FX joint locator to read a target's joint matrices.
+    /// </summary>
+    public ChrRenderer? TryGetRenderer(short id)
+    {
+        if (_players.TryGetValue(id, out Entry? player))
+            return player.Renderer;
+        if (_npcs.TryGetValue(id, out Entry? npc))
+            return npc.Renderer;
+        return null;
+    }
+
     public void SyncAndRender(
         GraphicsDevice device, BasicEffect effect, N3EngineCamera camera,
         FrameTimer timer, WorldEntities world, float dt)

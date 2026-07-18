@@ -30,15 +30,25 @@ public sealed class FxRenderer : IDisposable
     private readonly BasicEffect _effect;
     private readonly N3VertexXyzColorT1[] _quad = new N3VertexXyzColorT1[FxParticleVertexBuilder.VerticesPerParticle];
     private VertexPositionColorTexture[] _scratch = new VertexPositionColorTexture[256];
+    private short[] _indexScratch = new short[384];
 
     /// <param name="textureProvider">
     /// part + texture-frame index → the frame texture (or null). Wire it with
     /// <c>TextureFactory</c> at the host.
     /// </param>
-    public FxRenderer(GraphicsDevice device, Func<N3FXPartBase, int, Texture2D?> textureProvider)
+    /// <param name="shapeProvider">
+    /// mesh-part descriptor → the resolved <see cref="FxShapeInstance"/> (or null).
+    /// Wire it at the host over the FX shape/pmesh loaders (cached by shape file
+    /// name); leave null to skip mesh-part rendering (particles/boards still draw).
+    /// </param>
+    public FxRenderer(
+        GraphicsDevice device,
+        Func<N3FXPartBase, int, Texture2D?> textureProvider,
+        Func<N3FXPartMesh, FxShapeInstance?>? shapeProvider = null)
     {
         _device = device;
         TextureProvider = textureProvider;
+        ShapeProvider = shapeProvider;
         _effect = new BasicEffect(device)
         {
             VertexColorEnabled = true,
@@ -48,6 +58,9 @@ public sealed class FxRenderer : IDisposable
     }
 
     public Func<N3FXPartBase, int, Texture2D?> TextureProvider { get; set; }
+
+    /// <summary>mesh-part descriptor → resolved shape geometry (null = mesh parts skipped).</summary>
+    public Func<N3FXPartMesh, FxShapeInstance?>? ShapeProvider { get; set; }
 
     /// <summary>
     /// Draws every live part of a bundle. Call after the opaque world; FX is
@@ -88,14 +101,83 @@ public sealed class FxRenderer : IDisposable
                 case FxBottomBoardSimulator bottom:
                     RenderBottomBoard(bottom);
                     break;
-
-                // Mesh parts render through the PMesh renderers (slice 9.10c).
+                case FxMeshSimulator mesh:
+                    RenderMesh(mesh);
+                    break;
             }
         }
 
+        _effect.World = Matrix.Identity;
         _device.DepthStencilState = DepthStencilState.Default;
         _device.BlendState = BlendState.Opaque;
         _device.RasterizerState = RasterizerState.CullCounterClockwise;
+    }
+
+    /// <summary>
+    /// CN3FXPartMesh::Render → CN3FXShape/CN3FXSPart::Render: draw the resolved
+    /// shape's parts under the sim's parent matrix. The FX pass is a separate
+    /// additive/no-Z-write layer here (the same pipeline particles/boards use), so
+    /// both alpha and opaque shape parts draw inline with the FX part's blend, tinted
+    /// by the fade colour (m_dwCurrColor). Queuing alpha parts into a shared
+    /// AlphaManager to sort against the world alpha is deferred — the client's FX
+    /// pass carries no such queue.
+    /// </summary>
+    private void RenderMesh(FxMeshSimulator mesh)
+    {
+        FxShapeInstance? shape = ShapeProvider?.Invoke(mesh.Descriptor);
+        if (shape == null || shape.Parts.Count == 0)
+            return;
+
+        N3FXPartMesh desc = mesh.Descriptor;
+        _device.BlendState = RenderStateMapper.GetBlendState(desc.SrcBlend, desc.DestBlend);
+
+        Microsoft.Xna.Framework.Color color = ColorInterop.FromArgb(mesh.CurrColor);
+
+        foreach (FxShapeInstance.Part part in shape.Parts)
+        {
+            // CN3FXSPart::Tick — m_WorldMtx = Translation(pivot) * m_mtxParent.
+            System.Numerics.Matrix4x4 world = System.Numerics.Matrix4x4.CreateTranslation(part.Pivot)
+                * mesh.ParentMatrix;
+
+            int vertCount = part.Vertices.Length;
+            int indexCount = part.Indices.Length - part.Indices.Length % 3;
+            if (vertCount == 0 || indexCount < 3)
+                continue;
+
+            EnsureScratch(vertCount);
+            for (int i = 0; i < vertCount; i++)
+            {
+                ref readonly N3VertexXyzColorT1 v = ref part.Vertices[i];
+                _scratch[i] = new VertexPositionColorTexture(v.Position.ToXna(), color, new Vector2(v.Tu, v.Tv));
+            }
+
+            EnsureIndexScratch(indexCount);
+            for (int i = 0; i < indexCount; i++)
+                _indexScratch[i] = (short)part.Indices[i];
+
+            Texture2D? texture = CurrentFrameTexture(part, mesh.CurrFrame);
+            _effect.Texture = texture;
+            _effect.TextureEnabled = texture != null;
+            _effect.World = world.ToXna();
+
+            foreach (EffectPass pass in _effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                _device.DrawUserIndexedPrimitives(
+                    PrimitiveType.TriangleList, _scratch, 0, vertCount, _indexScratch, 0, indexCount / 3);
+            }
+        }
+
+        _effect.World = Matrix.Identity;
+    }
+
+    private static Texture2D? CurrentFrameTexture(FxShapeInstance.Part part, float frame)
+    {
+        int count = part.Textures.Length;
+        if (count == 0)
+            return null;
+        int index = (int)MathF.Max(0f, frame) % count;
+        return part.Textures[index];
     }
 
     private void RenderParticles(FxParticleSimulator particles, in System.Numerics.Matrix4x4 viewInverse)
@@ -188,6 +270,12 @@ public sealed class FxRenderer : IDisposable
     {
         if (_scratch.Length < count)
             _scratch = new VertexPositionColorTexture[Math.Max(count, _scratch.Length * 2)];
+    }
+
+    private void EnsureIndexScratch(int count)
+    {
+        if (_indexScratch.Length < count)
+            _indexScratch = new short[Math.Max(count, _indexScratch.Length * 2)];
     }
 
     public void Dispose() => _effect.Dispose();

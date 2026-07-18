@@ -1,3 +1,4 @@
+using System.Numerics;
 using OpenKO.Client.Assets;
 
 namespace OpenKO.Client.Engine.Fx;
@@ -33,6 +34,18 @@ public sealed class FxMeshSimulator : IFxPart
     /// <summary>The shape animation frame this tick (currLife * meshFPS).</summary>
     public float CurrFrame { get; private set; }
 
+    /// <summary>The mesh part descriptor (shape file name, unit scale, render flags).</summary>
+    public N3FXPartMesh Descriptor => _desc;
+
+    /// <summary>
+    /// m_pShape-&gt;m_mtxParent — the part's world transform this tick, driven from the
+    /// bundle position + the part's own position/velocity and the scaled unit size.
+    /// The device layer renders the resolved shape's parts under this matrix. This
+    /// is the pure Move-mode transform (the Rotate/curve act's parent orientation is
+    /// deferred, as is the frame-rate-dependent scale-acceleration integration).
+    /// </summary>
+    public Matrix4x4 ParentMatrix { get; private set; } = Matrix4x4.Identity;
+
     public FxPartLifeState State => _state.State;
 
     public void Start() => _state.Start();
@@ -42,7 +55,32 @@ public sealed class FxMeshSimulator : IFxPart
     public void Stop() => _state.Stop();
 
     public bool Advance(float secPerFrame, FxBundleContext bundle, float? cameraDistance)
-        => Tick(secPerFrame);
+    {
+        bool alive = Tick(secPerFrame);
+        ParentMatrix = ComputeParentMatrix(bundle);
+        return alive;
+    }
+
+    /// <summary>
+    /// CN3FXPartMesh::Tick (Move) — the shape's parent transform: scale by
+    /// <c>unitScale + scaleVel * currLife</c> (times the bundle target scale when
+    /// <c>DependScale</c>), translated to <c>bundlePos + partPos + partVel*currLife</c>.
+    /// </summary>
+    private Matrix4x4 ComputeParentMatrix(in FxBundleContext bundle)
+    {
+        float currLife = _state.CurrLife;
+
+        Vector3 scale = _desc.UnitScale + _desc.ScaleVelocity * currLife;
+        if (bundle.DependScale)
+            scale *= bundle.TargetScale;
+        scale = Vector3.Max(scale, Vector3.Zero);
+
+        Vector3 pos = bundle.Pos + _desc.Pos + _desc.Velocity * currLife;
+
+        Matrix4x4 m = Matrix4x4.CreateScale(scale);
+        m.Translation = pos;
+        return m;
+    }
 
     /// <summary>CN3FXPartMesh::Tick — fade colour + animation frame (transform/render deferred).</summary>
     public bool Tick(float secPerFrame)

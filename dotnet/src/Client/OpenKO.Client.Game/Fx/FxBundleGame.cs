@@ -67,6 +67,13 @@ public sealed class FxBundleGame
     /// <summary>The lower-cased .fxb filename this bundle's origin is cached under.</summary>
     public string CacheKey { get; set; } = string.Empty;
 
+    /// <summary>
+    /// __TABLE_FX::dwSoundID — the sound.tbl id the C++ <c>TriggerBundle</c> plays
+    /// with this effect (0 = none). Carried here so the executable can play it; the
+    /// one-shot 3D playback is left to the host audio wiring (deferred).
+    /// </summary>
+    public uint SoundId { get; set; }
+
     /// <summary>m_vPos — the current bundle position (mirrors the sim's Position).</summary>
     public Vector3 Position => _sim.Position;
 

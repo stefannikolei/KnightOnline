@@ -9,7 +9,9 @@ namespace OpenKO.Client.Game.Fx;
 /// <c>LoadFromFile</c> that reads the <c>.fxb</c>. The returned
 /// <see cref="cacheKey"/> is the lower-cased <c>.fxb</c> filename the C++ keys its
 /// <c>m_OriginBundle</c> cache by, so two FXIDs that share a file dedupe onto one
-/// origin.
+/// origin. <see cref="soundId"/> surfaces <c>__TABLE_FX::dwSoundID</c> — the
+/// <c>sound.tbl</c> id the C++ passes into <c>TriggerBundle</c> alongside the
+/// bundle (0 = no sound).
 /// <para>
 /// The executable implements this over the FX effect table + the asset loader
 /// (with its own bundle cache); tests use a fake returning a synthetic bundle.
@@ -19,5 +21,5 @@ namespace OpenKO.Client.Game.Fx;
 /// </summary>
 public interface IFxBundleLoader
 {
-    bool TryResolve(int fxId, out string cacheKey, out N3FXBundle bundle);
+    bool TryResolve(int fxId, out string cacheKey, out uint soundId, out N3FXBundle bundle);
 }
