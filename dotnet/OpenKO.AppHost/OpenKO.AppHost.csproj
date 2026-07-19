@@ -1,15 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <Sdk Name="Aspire.AppHost.Sdk" Version="13.4.6" />
-
+<Project Sdk="Aspire.AppHost.Sdk/13.4.6">
   <PropertyGroup>
-    <!-- Redundant with Directory.Build.props, but stated explicitly here: Rider's
-         Aspire run-configuration UI reads TargetFramework via a shallow scan of
-         this file rather than a full MSBuild evaluation, and reports "Target
-         Framework not specified" for the AppHost when it isn't inline. -->
-    <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <IsAspireHost>true</IsAspireHost>
     <UserSecretsId>openko-apphost-1e0aaf3</UserSecretsId>
   </PropertyGroup>
 
@@ -24,6 +15,7 @@
   <ItemGroup>
     <!-- Servers + client orchestrated by the AppHost (Projects.* metadata is
          source-generated from these references). -->
+    <ProjectReference Include="..\src\Client\OpenKO.Client\OpenKO.Client.csproj" />
     <ProjectReference Include="..\src\Servers\OpenKO.Servers.VersionManager\OpenKO.Servers.VersionManager.csproj" />
     <ProjectReference Include="..\src\Servers\OpenKO.Servers.ItemManager\OpenKO.Servers.ItemManager.csproj" />
     <ProjectReference Include="..\src\Servers\OpenKO.Servers.Aujard\OpenKO.Servers.Aujard.csproj" />
@@ -31,5 +23,4 @@
     <ProjectReference Include="..\src\Servers\OpenKO.Servers.Ebenezer\OpenKO.Servers.Ebenezer.csproj" />
     <ProjectReference Include="..\src\Client\OpenKO.Client.Dev\OpenKO.Client.Dev.csproj" />
   </ItemGroup>
-
 </Project>

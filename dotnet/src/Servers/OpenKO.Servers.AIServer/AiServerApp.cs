@@ -36,6 +36,9 @@ public sealed class AiServerApp(
     private int _reconnectSocketCount;
     private double _reconnectStartTime;
 
+    // SendThreadMain::_nextRoundRobinSocketId.
+    private int _nextSendLink;
+
     /// <summary>_mapEventNpcCount: serials taken by map object-event NPCs.</summary>
     public int MapEventNpcCount { get; private set; }
 
@@ -422,8 +425,10 @@ public sealed class AiServerApp(
     }
 
     /// <summary>
-    /// AIServerApp::Send — routes a packet to the game-server socket serving
-    /// <paramref name="zone"/>. Drops everything until all sockets are connected
+    /// AIServerApp::Send / SendThreadMain::tick — the zone is NOT a routing key:
+    /// the Ebenezer sockets are parallel pipes to the same host, so packets go
+    /// out round-robin over whichever links are up (falling through to the next
+    /// on a send failure). Drops everything until all sockets are connected
     /// (_firstServerFlag), like the C++.
     /// </summary>
     public int Send(int zone, byte[] payload)
@@ -434,8 +439,18 @@ public sealed class AiServerApp(
         if (payload.Length <= 0)
             return 0;
 
-        if (_links.TryGetValue((short)zone, out EbenezerLink? link))
-            link.Send(payload);
+        EbenezerLink[] links = [.. _links.Values];
+        for (int attempt = 0; attempt < links.Length; attempt++)
+        {
+            _nextSendLink %= links.Length;
+            EbenezerLink link = links[_nextSendLink++];
+            if (link.Send(payload))
+                return 0;
+        }
+
+        if (links.Length > 0)
+            logger.LogError("Send: all {Count} Ebenezer links failed, packet dropped (opcode={Opcode:X2})",
+                links.Length, payload[0]);
 
         return 0;
     }

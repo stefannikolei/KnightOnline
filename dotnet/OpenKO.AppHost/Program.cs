@@ -51,7 +51,12 @@ builder
         new SchemaHealthCheck(ct =>
             ((IResourceWithConnectionString)gameDb.Resource).GetConnectionStringAsync(ct)
         )
-    );
+    )
+    // Readiness gates for the raw game-server sockets: the processes report
+    // "Running" long before they listen (Ebenezer opens :15001 only after the
+    // AIServer NPC download), so the clients WaitFor these port probes.
+    .AddCheck("versionmanager-listening", new TcpPortHealthCheck(15100))
+    .AddCheck("ebenezer-listening", new TcpPortHealthCheck(15001));
 
 // kodb-util loader — builds the upstream docker/kodb-util image (Go tool that
 // clones + imports the real OpenKO-db schema from GitHub) and runs it as a
@@ -100,16 +105,14 @@ var kodb = builder
 builder.AddProject<Projects.OpenKO_Servers_ItemManager>("itemmanager");
 
 // Aujard standalone host — validates DB connectivity (normally embedded in Ebenezer).
-builder
-    .AddProject<Projects.OpenKO_Servers_Aujard>("aujard")
-    .WithReference(gameDb)
-    .WaitFor(kodb);
+builder.AddProject<Projects.OpenKO_Servers_Aujard>("aujard").WithReference(gameDb).WaitFor(kodb);
 
 // VersionManager (login server, :15100).
 var versionManager = builder
     .AddProject<Projects.OpenKO_Servers_VersionManager>("versionmanager")
     .WithReference(gameDb)
-    .WaitFor(kodb);
+    .WaitFor(kodb)
+    .WithHealthCheck("versionmanager-listening");
 
 // AIServer (NPC zones) must be up before Ebenezer, which connects to it on start.
 var aiServer = builder
@@ -122,15 +125,18 @@ var ebenezer = builder
     .AddProject<Projects.OpenKO_Servers_Ebenezer>("ebenezer")
     .WithReference(gameDb)
     .WaitFor(kodb)
-    .WaitFor(aiServer);
+    .WaitFor(aiServer)
+    .WithHealthCheck("ebenezer-listening");
 
 // The client connects to the login server first, then to Ebenezer. Orchestration
 // uses the dev exe for the scripted --account auto-login (the clean OpenKO.Client
 // takes no args).
 builder
-    .AddProject<Projects.OpenKO_Client_Dev>("client")
+    .AddProject<Projects.OpenKO_Client_Dev>("dev-client")
     .WithArgs("--server", "127.0.0.1:15100", "--account", "test", "--password", "test")
     .WaitFor(versionManager)
     .WaitFor(ebenezer);
+
+builder.AddProject<Projects.OpenKO_Client>("client").WaitFor(versionManager).WaitFor(ebenezer);
 
 builder.Build().Run();

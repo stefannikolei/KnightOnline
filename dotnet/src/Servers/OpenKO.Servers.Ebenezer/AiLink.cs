@@ -597,12 +597,16 @@ public sealed partial class AiLink(int socketIndex, EbenezerWorld world, ILogger
     /// <summary>CAISocket::RecvGateOpen — WIZ_OBJECT_EVENT for gate NPCs.</summary>
     private void RecvGateOpen(ReadOnlySpan<byte> body)
     {
+        // Wire format is short nid + byte gateOpen (CNpc::NpcStanding, CUser
+        // gate handlers). The C++ receiver reads an extra short here — an
+        // out-of-bounds read it survives silently; we take the event id from
+        // the NPC itself instead.
         var reader = new PacketReader(body);
         short instanceId = reader.GetShort();
-        short npcId = reader.GetShort();
         byte gateFlag = reader.GetByte();
 
         GameNpc? npc = world.Npcs.GetValueOrDefault(instanceId);
+        short npcId = npc?.Sid ?? -1;
         if (npc is null)
         {
             logger.LogError("AiLink: Npc not found [serial={Serial} npcId={NpcId}]", instanceId, npcId);

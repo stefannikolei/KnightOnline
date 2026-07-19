@@ -47,9 +47,13 @@ public sealed class LoginState(GameContext context) : GameState
             case LoginOpcode.LS_LOGIN_REQ:
             {
                 AccountLoginResult result = LoginProtocol.ParseAccountLogin(payload);
-                context.AccountLoginResult?.Invoke(result);
+                // The news request must go out on the login-server link BEFORE the
+                // callback: an auto-login callback may call ConnectToGameServer,
+                // which swaps the connection to Ebenezer — a login opcode arriving
+                // there after the crypt handshake closes the session.
                 if (result.Success)
                     context.Client.Send(LoginProtocol.BuildNewsRequest());
+                context.AccountLoginResult?.Invoke(result);
                 return true;
             }
 
