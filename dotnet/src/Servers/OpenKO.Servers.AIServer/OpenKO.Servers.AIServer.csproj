@@ -25,4 +25,12 @@
     <Content Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <!-- Game map data (.smd/.evt) lives in the legacy C++ server's asset store;
+       copy it beside the binary so KoHost.ResolveConfigPath("MAP") finds it
+       there (AiServerApp treats a missing map as fatal, unlike Ebenezer's
+       best-effort stub-zone fallback). -->
+  <ItemGroup>
+    <Content Include="..\..\..\..\Server\bin\MAP\**\*.*" Link="MAP\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

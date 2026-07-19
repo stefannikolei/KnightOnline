@@ -40,12 +40,14 @@ public static class KoHost
     /// <summary>
     /// The C++ servers resolve their INI relative to the executable directory
     /// (AppThread::GetProgPath); tests and `dotnet run` use the working directory
-    /// as fallback when no file exists next to the binary.
+    /// as fallback when no file exists next to the binary. Callers pass both file
+    /// names (e.g. an .ini) and directory names (e.g. "MAP"), so both must be
+    /// checked — File.Exists alone always returns false for a directory.
     /// </summary>
     public static string ResolveConfigPath(string fileName)
     {
         string besideBinary = Path.Combine(AppContext.BaseDirectory, fileName);
-        if (File.Exists(besideBinary))
+        if (File.Exists(besideBinary) || Directory.Exists(besideBinary))
             return besideBinary;
 
         return Path.Combine(Environment.CurrentDirectory, fileName);

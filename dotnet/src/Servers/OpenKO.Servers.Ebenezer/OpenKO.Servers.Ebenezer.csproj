@@ -26,4 +26,13 @@
     <Content Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <!-- Game map/quest data lives in the legacy C++ server's asset store; copy it
+       beside the binary so KoHost.ResolveConfigPath("MAP"/"QUESTS") finds it
+       there. Missing files degrade gracefully here (stub zones), but real data
+       is what makes zones/quests actually work instead of running as stubs. -->
+  <ItemGroup>
+    <Content Include="..\..\..\..\Server\bin\MAP\**\*.*" Link="MAP\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\..\Server\bin\QUESTS\**\*.*" Link="QUESTS\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
