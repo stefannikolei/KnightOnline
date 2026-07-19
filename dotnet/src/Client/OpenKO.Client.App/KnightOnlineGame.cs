@@ -539,6 +539,14 @@ public class KnightOnlineGame : Microsoft.Xna.Framework.Game
         // The dev subclass overrides SetupLoginUi to script the --account login.
         SetupLoginUi();
 
+        // The login/intro melody (CGameProcLogIn_1298::Init → Snd\Intro_Sound.mp3,
+        // looping). Plays on the login screen; the zone's town/battle BGM hard-cuts
+        // it on entry (SelectBgm). Best-effort: null-safe when the asset/device is absent.
+        _sound.PlayBgm("Snd\\Intro_Sound.mp3", loop: true);
+        Log(_sound.CurrentBgm != null
+            ? "BGM: playing Snd\\Intro_Sound.mp3 (intro melody)."
+            : "BGM: intro melody not started (no audio device or Snd\\Intro_Sound.mp3 missing).");
+
         _context.EnteredGame = spawn =>
         {
             Log($"Entered game — zone {spawn.Zone} at ({spawn.X / 10f}, {spawn.Z / 10f}).");
