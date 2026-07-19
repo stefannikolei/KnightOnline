@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The dev/debug client exe. Subclasses the shared KnightOnlineGame and re-adds
+    all the CLI/debug capabilities the clean game (OpenKO.Client) deliberately
+    drops: the offline zone renderer, screenshot dump, scripted account auto-login
+    and the immediate-mode text HUD. Same asset/font copies as the App so it runs.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKO.Client.App\OpenKO.Client.App.csproj" />
+    <ProjectReference Include="..\OpenKO.Client.Engine\OpenKO.Client.Engine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reuse the bundled Noto fonts from the viewer (SIL OFL). -->
+    <Content Include="..\OpenKO.Client.Viewer\Assets\Fonts\*">
+      <Link>Assets\Fonts\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

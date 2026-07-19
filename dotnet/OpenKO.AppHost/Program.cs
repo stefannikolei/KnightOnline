@@ -124,9 +124,11 @@ var ebenezer = builder
     .WaitFor(kodb)
     .WaitFor(aiServer);
 
-// The client connects to the login server first, then to Ebenezer.
+// The client connects to the login server first, then to Ebenezer. Orchestration
+// uses the dev exe for the scripted --account auto-login (the clean OpenKO.Client
+// takes no args).
 builder
-    .AddProject<Projects.OpenKO_Client>("client")
+    .AddProject<Projects.OpenKO_Client_Dev>("client")
     .WithArgs("--server", "127.0.0.1:15100", "--account", "test", "--password", "test")
     .WaitFor(versionManager)
     .WaitFor(ebenezer);

@@ -24,7 +24,7 @@
     <ProjectReference Include="..\src\Servers\OpenKO.Servers.Aujard\OpenKO.Servers.Aujard.csproj" />
     <ProjectReference Include="..\src\Servers\OpenKO.Servers.AIServer\OpenKO.Servers.AIServer.csproj" />
     <ProjectReference Include="..\src\Servers\OpenKO.Servers.Ebenezer\OpenKO.Servers.Ebenezer.csproj" />
-    <ProjectReference Include="..\src\Client\OpenKO.Client\OpenKO.Client.csproj" />
+    <ProjectReference Include="..\src\Client\OpenKO.Client.Dev\OpenKO.Client.Dev.csproj" />
   </ItemGroup>
 
 </Project>

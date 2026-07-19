@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Shared client runtime (the MonoGame host + game UI). Referenced by the clean
+    game exe (OpenKO.Client) and the dev/debug exe (OpenKO.Client.Dev). The base
+    KnightOnlineGame here plays the game straight; the debug/CLI modes live in Dev.
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKO.Client.Game\OpenKO.Client.Game.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reuse the bundled Noto fonts from the viewer (SIL OFL). -->
+    <Content Include="..\OpenKO.Client.Viewer\Assets\Fonts\*">
+      <Link>Assets\Fonts\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

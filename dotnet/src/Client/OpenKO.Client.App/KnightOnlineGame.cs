@@ -23,15 +23,16 @@ using OpenKO.Client.Game.World;
 namespace OpenKO.Client;
 
 /// <summary>
-/// The runnable client host: a MonoGame game loop that owns the
+/// The runnable game client: a MonoGame game loop that owns the
 /// <see cref="GameStateMachine"/>, drives the client network layer and renders
-/// the world plus a status HUD. With <c>--server</c> it connects and auto-runs
-/// the login→char-select→in-game flow; with <c>--offline &lt;zone&gt;</c> it renders a
-/// zone directly (no server needed).
+/// the world plus the real HUD. It launches straight into the interactive
+/// login → char-select → in-game flow against the configured server. The debug/CLI
+/// modes (offline zone, scripted auto-login, screenshot, text HUD) live in the
+/// separate <c>OpenKO.Client.Dev</c> subclass via the protected seam below.
 /// </summary>
-public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
+public class KnightOnlineGame : Microsoft.Xna.Framework.Game
 {
-    private readonly ClientOptions _options;
+    private readonly ClientConfig _config;
     private readonly GraphicsDeviceManager _graphics;
 
     private SpriteBatch _spriteBatch = null!;
@@ -110,11 +111,59 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     private double _gameSeconds;
 
     private readonly List<string> _log = [];
-    private int _framesDrawn;
 
-    public KnightOnlineGame(ClientOptions options)
+    // ---- Protected seam for OpenKO.Client.Dev -------------------------------
+    // The minimal surface the debug/CLI subclass needs to re-add the offline
+    // zone, scripted auto-login, screenshot dump and text HUD. Kept as small as
+    // possible; the clean game never touches any of this.
+
+    /// <summary>Server endpoint + data path bound from configuration.</summary>
+    protected ClientConfig Config => _config;
+
+    /// <summary>The game context (state machine + network + world). Set by the online/offline start.</summary>
+    protected GameContext Context
     {
-        _options = options;
+        get => _context;
+        set => _context = value;
+    }
+
+    /// <summary>The sprite batch (for the debug text HUD).</summary>
+    protected SpriteBatch SpriteBatch => _spriteBatch;
+
+    /// <summary>The UI font service (for the debug text HUD).</summary>
+    protected FontService Fonts => _fonts;
+
+    /// <summary>The loaded zone terrain, or null before a zone is entered.</summary>
+    protected N3Terrain? TerrainData => _terrainData;
+
+    /// <summary>The local player's world position (set by <see cref="BuildZoneScene"/>).</summary>
+    protected System.Numerics.Vector3 PlayerPos => _playerPos;
+
+    /// <summary>The zone's world size in units (set by <see cref="BuildZoneScene"/>).</summary>
+    protected float MapWorldSize => _mapWorldSize;
+
+    /// <summary>The zone minimap texture file (CUIStateBar::LoadMap); set before <see cref="EnsureInGameUi"/>.</summary>
+    protected string? MinimapFile
+    {
+        get => _minimapFile;
+        set => _minimapFile = value;
+    }
+
+    /// <summary>True once the real in-game HUD (needs --data) has been built.</summary>
+    protected bool HasInGameHud => _inGameUi != null;
+
+    /// <summary>The current pick selection text (debug HUD only).</summary>
+    protected string Selection => _selection;
+
+    /// <summary>The current target's HP text (debug HUD only).</summary>
+    protected string TargetHp => _targetHp;
+
+    /// <summary>The rolling log lines (debug HUD only).</summary>
+    protected IReadOnlyList<string> LogLines => _log;
+
+    public KnightOnlineGame(ClientConfig config)
+    {
+        _config = config;
         _graphics = new GraphicsDeviceManager(this)
         {
             PreferredBackBufferWidth = 1024,
@@ -137,7 +186,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         // file opener so PlayBgm can stream the MP3 tracks (CN3SndMgr CreateStreamObj).
         SoundTable? soundTable = null;
         Func<string, Stream?>? bgmOpener = null;
-        if (_options.DataPath is { } dataPath)
+        if (Config.DataPath is { } dataPath)
         {
             var res = new KoPathResolver(dataPath);
             if (res.Resolve("Data\\sound.tbl") is { } tbl)
@@ -148,53 +197,22 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         _sound = new SoundManager(new MonoGameAudioBackend(), soundTable, bgmOpener);
         Log(_sound.Backend.IsAvailable ? "Audio: OpenAL device ready." : "Audio: no device (silent).");
 
-        if (_options.OfflineZone != null && _options.DataPath != null)
-            StartOfflineZone();
-        else if (_options.ServerHost != null)
-            StartOnline();
-        else
-            Log("No --server or --offline given — idle title screen.");
+        OnStart();
     }
 
-    // ---- Offline zone demo ---------------------------------------------------
-
-    private void StartOfflineZone()
-    {
-        _context = new GameContext(new NullGameClient());
-        try
-        {
-            string gtd = Path.Combine(_options.DataPath!, "Zones", _options.OfflineZone + ".gtd");
-            var resolver = new KoPathResolver(_options.DataPath!);
-
-            // Zone minimap texture (CUIStateBar::LoadMap) — the zone .dxt beside the terrain.
-            _minimapFile = $"Zones\\{_options.OfflineZone}.dxt";
-
-            // Place the player at the map centre, on the terrain surface.
-            float centre = 0f;
-            BuildZoneScene(gtd, resolver, useCentreSpawn: true, spawn: default);
-            centre = _mapWorldSize * 0.5f;
-
-            _context.Spawn = new SelectCharResult(
-                1, 0, (ushort)(centre * 10f), (ushort)(centre * 10f), (short)(_playerPos.Y * 10f), 1);
-            _context.InGame.World.Local.X = _playerPos.X;
-            _context.InGame.World.Local.Y = _playerPos.Y;
-            _context.InGame.World.Local.Z = _playerPos.Z;
-            _context.Machine.SetActive(_context.InGame);
-            EnsureInGameUi();
-            Log($"Offline zone '{_options.OfflineZone}' loaded ({_terrainData!.MapSize} tiles).");
-        }
-        catch (Exception ex)
-        {
-            Log($"Zone load failed: {ex.Message}");
-        }
-    }
+    /// <summary>
+    /// Entry point after the device/audio setup. The clean game goes straight
+    /// online into the interactive login screen; the dev subclass overrides this
+    /// to add the offline zone / scripted auto-login modes.
+    /// </summary>
+    protected virtual void OnStart() => StartOnline();
 
     /// <summary>
     /// Loads a zone's terrain/sky and the player character, then places the
     /// player. Shared by the offline demo (centre spawn) and the online flow
     /// (server spawn). Requires --data for the asset corpus.
     /// </summary>
-    private void BuildZoneScene(
+    protected void BuildZoneScene(
         string gtdPath, KoPathResolver resolver, bool useCentreSpawn, System.Numerics.Vector3 spawn)
     {
         var terrain = new N3Terrain();
@@ -515,36 +533,11 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         _connection = new KoClientConnection();
         _network = new NetworkGameClient(_connection);
         _network.ConnectRequested += OnConnectRequested;
-        _context = new GameContext(_network)
-        {
-            Account = _options.Account,
-            Password = _options.Password,
-        };
+        _context = new GameContext(_network);
 
-        // --account keeps the scripted auto-login; otherwise the interactive
-        // frontend (real .uif dialogs) drives login → char-select.
-        if (_options.Account.Length > 0)
-        {
-            WireAutoLogin();
-        }
-        else if (_options.DataPath != null)
-        {
-            try
-            {
-                _frontend = new FrontendUi(_context, GraphicsDevice, _fonts, _options.DataPath);
-                _frontend.Log += Log;
-                _frontend.QuitRequested += Exit;
-                Log("Interactive frontend ready (no --account).");
-            }
-            catch (Exception ex)
-            {
-                Log($"Frontend UI unavailable: {ex.Message}");
-            }
-        }
-        else
-        {
-            Log("No --account and no --data — cannot log in (pass one of them).");
-        }
+        // The interactive frontend (real .uif dialogs) drives login → char-select.
+        // The dev subclass overrides SetupLoginUi to script the --account login.
+        SetupLoginUi();
 
         _context.EnteredGame = spawn =>
         {
@@ -568,35 +561,36 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         };
 
         _netCts = new CancellationTokenSource();
-        _ = ConnectAndRunAsync(_options.ServerHost!, _options.ServerPort);
+        _ = ConnectAndRunAsync(Config.ServerHost, Config.ServerPort);
         _context.Machine.SetActive(_context.Login);
-        Log($"Connecting to login server {_options.ServerHost}:{_options.ServerPort} …");
+        Log($"Connecting to login server {Config.ServerHost}:{Config.ServerPort} …");
     }
 
-    private void WireAutoLogin()
+    /// <summary>
+    /// Build the login UI. The clean game shows the interactive frontend (real .uif
+    /// dialogs) so the player logs in on screen. The dev subclass overrides this to
+    /// script the <c>--account</c> auto-login instead. Requires the asset corpus
+    /// (DataPath); without it there is no login screen.
+    /// </summary>
+    protected virtual void SetupLoginUi()
     {
-        _context.ServerListReceived = servers =>
+        if (Config.DataPath == null)
         {
-            Log($"Server list: {servers.Count} server(s).");
-            _context.Login.SubmitAccountLogin(_options.Account, _options.Password);
-        };
-        _context.AccountLoginResult = result =>
-        {
-            Log($"Account login: result {result.Result}.");
-            if (result.Success && _context.Servers.Count > 0)
-                _context.Login.ConnectToGameServer(_context.Servers[0]);
-        };
-        _context.NationResolved = nation => Log($"Nation: {nation}.");
-        _context.CharactersReceived = chars =>
-        {
-            int slot = -1;
-            for (int i = 0; i < chars.Count; i++)
-                if (!chars[i].IsEmpty) { slot = i; break; }
+            Log("No data path — cannot show the login screen.");
+            return;
+        }
 
-            Log(slot >= 0 ? $"Selecting character '{chars[slot].CharId}'." : "No characters on the account.");
-            if (slot >= 0)
-                _context.CharSelect.SelectCharacter(slot);
-        };
+        try
+        {
+            _frontend = new FrontendUi(_context, GraphicsDevice, _fonts, Config.DataPath);
+            _frontend.Log += Log;
+            _frontend.QuitRequested += Exit;
+            Log("Interactive frontend ready.");
+        }
+        catch (Exception ex)
+        {
+            Log($"Frontend UI unavailable: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -606,26 +600,26 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     /// </summary>
     private void LoadOnlineZone(SelectCharResult spawn)
     {
-        if (_options.DataPath == null)
+        if (Config.DataPath == null)
         {
-            Log("Zone render skipped — no --data path (protocol only).");
+            Log("Zone render skipped — no data path (protocol only).");
             return;
         }
 
         try
         {
-            var resolver = new KoPathResolver(_options.DataPath);
+            var resolver = new KoPathResolver(Config.DataPath);
             string? tblPath = resolver.Resolve("Data\\Zones.tbl");
             ZoneRow? zone = tblPath != null ? ZoneTable.LoadFromFile(tblPath).Find(spawn.Zone) : null;
 
             // Resolve the .gtd from Zones.tbl, falling back to <zoneId>.gtd.
             string gtd = zone != null && !string.IsNullOrEmpty(zone.TerrainFileName)
                 ? resolver.Resolve(zone.TerrainFileName) ?? resolver.Resolve($"Zones\\{zone.TerrainFileName}")
-                    ?? Path.Combine(_options.DataPath, "Zones", zone.TerrainFileName)
-                : Path.Combine(_options.DataPath, "Zones", $"{spawn.Zone}.gtd");
+                    ?? Path.Combine(Config.DataPath, "Zones", zone.TerrainFileName)
+                : Path.Combine(Config.DataPath, "Zones", $"{spawn.Zone}.gtd");
 
             // Zone minimap texture (CUIStateBar::LoadMap) from Zones.tbl col 07.
-            _minimapFile = zone != null && !string.IsNullOrEmpty(zone.MiniMapFileName)
+            MinimapFile = zone != null && !string.IsNullOrEmpty(zone.MiniMapFileName)
                 ? zone.MiniMapFileName
                 : $"Zones\\{spawn.Zone}.dxt";
 
@@ -641,18 +635,18 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     }
 
     /// <summary>
-    /// Build the in-game HUD once the player is in the world. Requires --data (the .uif
-    /// corpus); degrades to the immediate-mode <see cref="DrawHud"/> when absent, like the
-    /// zone render. Binds only the hooks the executable does not own (MyInfo/HP/chat).
+    /// Build the in-game HUD once the player is in the world. Requires the data path (the
+    /// .uif corpus); when absent the HUD is simply not built. Binds only the hooks the
+    /// executable does not own (MyInfo/HP/chat).
     /// </summary>
-    private void EnsureInGameUi()
+    protected void EnsureInGameUi()
     {
-        if (_inGameUi != null || _options.DataPath == null)
+        if (_inGameUi != null || Config.DataPath == null)
             return;
 
         try
         {
-            _inGameUi = new InGameUi(_context, GraphicsDevice, _fonts, _options.DataPath);
+            _inGameUi = new InGameUi(_context, GraphicsDevice, _fonts, Config.DataPath);
             _inGameUi.Log += Log;
             _inGameUi.Bind(_context.InGame);
 
@@ -690,12 +684,12 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
     /// </summary>
     private void EnableMinimap()
     {
-        if (_inGameUi == null || _options.DataPath == null || _minimapFile == null)
+        if (_inGameUi == null || Config.DataPath == null || _minimapFile == null)
             return;
 
         try
         {
-            _minimapTextures ??= new TextureCache(GraphicsDevice, new KoPathResolver(_options.DataPath));
+            _minimapTextures ??= new TextureCache(GraphicsDevice, new KoPathResolver(Config.DataPath));
             Texture2D? mapTex = _minimapTextures.Get(_minimapFile);
             _inGameUi.StateBar.EnableMinimap(GraphicsDevice, mapTex, _mapWorldSize, _mapWorldSize);
             Log(mapTex != null
@@ -906,8 +900,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         if (_terrain != null)
             RenderWorld();
 
-        // The real HUD replaces the immediate-mode overlay once it exists (needs --data);
-        // fall back to DrawHud only when the HUD could not be built.
+        // The real HUD, once it exists (needs the data path for the .uif corpus).
         if (_inGameUi != null)
         {
             _inGameUi.Draw(gameTime.TotalGameTime.TotalSeconds);
@@ -916,18 +909,20 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             _inGameUi.StateBar.DrawMinimap();
             _inGameUi.HotKey?.DrawCooldowns(gameTime.TotalGameTime.TotalSeconds);
         }
-        else
-            DrawHud();
         _frontend?.Draw(gameTime.TotalGameTime.TotalSeconds);
 
         base.Draw(gameTime);
 
-        if (_options.ScreenshotPath != null && ++_framesDrawn == 30)
-        {
-            SaveScreenshot(_options.ScreenshotPath);
-            Console.WriteLine($"Screenshot: {_options.ScreenshotPath}");
-            Exit();
-        }
+        // Debug overlay / screenshot dump hook (no-op in the clean game).
+        OnAfterDraw(gameTime);
+    }
+
+    /// <summary>
+    /// Called after the frame is drawn (before Present). The clean game does nothing
+    /// here; the dev subclass draws the immediate-mode debug HUD and the screenshot dump.
+    /// </summary>
+    protected virtual void OnAfterDraw(GameTime gameTime)
+    {
     }
 
     /// <summary>WASD movement (camera-relative) + Left/Right camera orbit + wheel zoom.</summary>
@@ -1168,7 +1163,7 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         var opts = new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive };
         foreach ((string dir, string pattern) in new[] { ("ChrSelect", "upc_*.n3chr"), ("Chr", "*.n3chr") })
         {
-            string full = Path.Combine(_options.DataPath!, dir);
+            string full = Path.Combine(Config.DataPath!, dir);
             if (!Directory.Exists(full))
                 continue;
             foreach (string path in Directory.EnumerateFiles(full, pattern, opts).Order(StringComparer.OrdinalIgnoreCase))
@@ -1203,75 +1198,13 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
         }
     }
 
-    private void DrawHud()
-    {
-        DynamicSpriteFont title = _fonts.GetUiFont(18);
-        DynamicSpriteFont body = _fonts.GetUiFont(11);
-
-        _spriteBatch.Begin();
-        _spriteBatch.DrawString(title, "Knight Online — OpenKO C# Port", new Vector2(16, 12), Color.White);
-
-        string state = _context?.Machine.Active?.Name ?? "—";
-        _spriteBatch.DrawString(body, $"State: {state}", new Vector2(16, 44), new Color(180, 210, 255));
-
-        if (_terrainData != null)
-        {
-            _spriteBatch.DrawString(body, "WASD move · ←→ camera · click target · Esc quit",
-                new Vector2(GraphicsDevice.Viewport.Width - 330, 44), new Color(150, 160, 180));
-            _spriteBatch.DrawString(body, $"Target: {_selection}  {_targetHp}",
-                new Vector2(GraphicsDevice.Viewport.Width - 330, 62), new Color(255, 200, 160));
-        }
-
-        if (_context?.Machine.Active == _context?.InGame && _context != null)
-        {
-            var l = _context.InGame.World.Local;
-            _spriteBatch.DrawString(body,
-                $"Zone {_context.Spawn.Zone}  pos ({l.X:F0}, {l.Y:F0}, {l.Z:F0})  " +
-                $"players: {_context.InGame.World.Players.Count}  npcs: {_context.InGame.World.Npcs.Count}",
-                new Vector2(16, 62), new Color(180, 255, 200));
-
-            // Full character sheet once the WIZ_MYINFO block has landed (level > 0).
-            if (l.Level > 0)
-            {
-                _spriteBatch.DrawString(body,
-                    $"{l.Name}  Lv {l.Level}   HP {l.Hp}/{l.MaxHp}   MP {l.Mp}/{l.MaxMp}   " +
-                    $"AC {l.TotalAc}   Gold {l.Gold:N0}",
-                    new Vector2(16, 80), new Color(255, 230, 160));
-                _spriteBatch.DrawString(body,
-                    $"STR {l.Str}+{l.ItemStr}  STA {l.Sta}+{l.ItemSta}  DEX {l.Dex}+{l.ItemDex}  " +
-                    $"INT {l.Intel}+{l.ItemIntel}  CHA {l.Cha}+{l.ItemCha}   items {_context.InGame.Inventory.Slots.Count}",
-                    new Vector2(16, 96), new Color(200, 220, 180));
-            }
-        }
-
-        int y = GraphicsDevice.Viewport.Height - 16 - _log.Count * 16;
-        foreach (string line in _log)
-        {
-            _spriteBatch.DrawString(body, line, new Vector2(16, y), new Color(200, 200, 200));
-            y += 16;
-        }
-
-        _spriteBatch.End();
-    }
-
-    private void Log(string message)
+    /// <summary>Append a line to the console + the rolling on-screen log buffer.</summary>
+    protected void Log(string message)
     {
         Console.WriteLine(message);
         _log.Add(message);
         if (_log.Count > 12)
             _log.RemoveAt(0);
-    }
-
-    private void SaveScreenshot(string path)
-    {
-        int w = GraphicsDevice.PresentationParameters.BackBufferWidth;
-        int h = GraphicsDevice.PresentationParameters.BackBufferHeight;
-        var data = new Color[w * h];
-        GraphicsDevice.GetBackBufferData(data);
-        using var tex = new Texture2D(GraphicsDevice, w, h);
-        tex.SetData(data);
-        using FileStream fs = File.Create(path);
-        tex.SaveAsPng(fs, w, h);
     }
 
     protected override void UnloadContent()
@@ -1410,16 +1343,4 @@ public sealed class KnightOnlineGame : Microsoft.Xna.Framework.Game
             }
         }
     }
-}
-
-/// <summary>A no-op client for the offline zone demo (no networking).</summary>
-internal sealed class NullGameClient : IGameClient
-{
-    public bool CryptionEnabled => false;
-
-    public void Send(ReadOnlySpan<byte> payload) { }
-
-    public void Connect(string host, int port) { }
-
-    public void EnableCryption(ulong publicKey) { }
 }

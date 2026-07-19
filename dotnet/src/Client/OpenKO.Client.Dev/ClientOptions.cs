@@ -21,6 +21,18 @@ public sealed class ClientOptions
     /// <summary>Dump a screenshot after a few frames and exit.</summary>
     public string? ScreenshotPath { get; set; }
 
+    /// <summary>
+    /// Project the parsed options onto the shared <see cref="ClientConfig"/> the base
+    /// game consumes. <c>ServerHost</c> falls back to the default loopback when
+    /// <c>--server</c> was not given so the online flow always has an endpoint.
+    /// </summary>
+    public ClientConfig ToConfig() => new()
+    {
+        ServerHost = ServerHost ?? "127.0.0.1",
+        ServerPort = ServerPort,
+        DataPath = DataPath,
+    };
+
     public static ClientOptions Parse(string[] args)
     {
         var options = new ClientOptions();

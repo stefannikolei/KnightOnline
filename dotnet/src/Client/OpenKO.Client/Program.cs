@@ -1,18 +1,19 @@
+using Microsoft.Extensions.Configuration;
 using OpenKO.Client;
 
-if (args.Contains("--help"))
-{
-    Console.WriteLine(
-        "usage: OpenKO.Client [--data <Client/Data>]\n" +
-        "                     [--server <host[:port]> --account <id> --password <pw>]\n" +
-        "                     [--offline <zone>] [--screenshot <png>]\n" +
-        "  --server   connect and auto-run the login → char-select → in-game flow\n" +
-        "  --offline  render a zone (e.g. 'moradon') with no server\n" +
-        "  Esc quits.");
-    return 0;
-}
+// The clean game takes no CLI args: the server endpoint + data path come from
+// appsettings.json (section "Client") and Client__* environment variables.
+IConfiguration configuration = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+    .AddEnvironmentVariables()
+    .Build();
 
-ClientOptions options = ClientOptions.Parse(args);
-using var game = new KnightOnlineGame(options);
+ClientConfig config = configuration.GetSection("Client").Get<ClientConfig>() ?? new ClientConfig();
+
+// Auto-detect the asset corpus (walk up to Client/Data) when it is not configured.
+config.DataPath ??= ClientConfig.FindDataPath();
+
+using var game = new KnightOnlineGame(config);
 game.Run();
 return 0;
