@@ -45,7 +45,7 @@ public sealed class EbenezerDb(SqlConnectionFactory connectionFactory, ILogger l
             "ServerNo, ZoneNo, strZoneName, InitX, InitZ, InitY, Type, RoomEvent",
             static reader => new ZoneInfo
             {
-                ServerId = (byte)reader.GetInt16(0),
+                ServerId = reader.GetByte(0),
                 ZoneId = reader.GetInt16(1),
                 Name = reader.IsDBNull(2) ? string.Empty : reader.GetString(2).TrimEnd(),
                 InitX = reader.GetInt32(3),
