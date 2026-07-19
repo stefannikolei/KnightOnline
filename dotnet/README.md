@@ -255,11 +255,13 @@ deliberate and documented, not bugs:
   mid-range.
 - **UI −0.5 px offset dropped.** The D3D9 half-texel RHW offset is gone under GL
   raster rules (`UiQuadBatcher`).
-- **Deferred (not yet ported):** runtime terrain lightmaps (`.tlt` streaming), the
-  `Terrain_Base.bmp` detail overlay (a `.bmp`, not an NTF `.dxt`), sky sun/moon/stars
-  and the day-change colour simulation, and TGA-format cloud textures — so the sky
-  currently shows the horizon-glow fans in the day fog colour without the celestial
-  bodies. FX particles (`N3FX*`) and audio are later stages.
+- **Terrain lightmaps + detail overlay** (`.tlt` streaming, `Terrain_Base.bmp`) are
+  ported (stage 9.11); the `.tlt` is loaded whole rather than paged in a 3×3 patch
+  window (equivalent render, higher memory).
+- **Sky sun/moon/stars + day-night** are ported (stages 9.11 / 10.5): the sun renders
+  as 3 additive billboards (disk/glow/flare), the moon samples its phase strip, stars
+  fade in at night, and the day-change colour sim is driven by the server clock
+  (`WIZ_TIME`). Falls back to a free-running frame clock offline.
 
 ### Client feature scope + known deviations (text input / IME)
 
@@ -280,8 +282,58 @@ in two layers:
   (IBus/Fcitx behind SDL) is unreliable. It maps QWERTY to initial/medial/final jamo
   and composes precomposed Hangul (U+AC00 block), handling double finals (겹받침),
   final-consonant reassignment when a vowel follows, and backspace decomposition.
+- **Composition preview (rendered).** The focused edit draws the in-progress
+  composition inline at the caret with a flat underline (stage 10.7,
+  `UiEditControl.GetCompositionLayout` → `UiScreenRenderer`). The original's per-clause
+  (thick/thin) underline segments are approximated by one flat underline —
+  `SDL_TEXTEDITING` surfaces no per-clause attributes, and the modernised C++ itself
+  hosts a native EDIT+IMM32 (no custom draw to copy).
 - **Deviations from the C++.** The original used IMM32 and shipped a CP949 (EUC-KR)
   build — Korean only. This port matches that scope: **only Korean composition is
   provided; there is no Chinese or Japanese inline input** (the CP949 client couldn't
-  do those either). Rendering the underlined composition preview on the device-side
-  edit control is a thin executable follow-up on top of the `SdlImeComposition` state.
+  do those either).
+
+### Client feature scope (stages 9–10): 1:1 WarFare parity
+
+The C# client is a functional, playable 1:1 port of the WarFare client. Interactive
+`.uif` dialogs drive the whole flow — login → server list → nation → character
+select/create → in-game — and in-world it renders terrain (with lightmaps), sky
+(day-night, sun/moon/stars), water, weather, zone objects, and CPU-skinned animated
+characters, with WASD movement and a third-person camera.
+
+Implemented in-game systems (all wired to the byte-exact server protocol):
+
+- **HUD** — state bar (HP/MP/EXP/position), target bar, chat (channels + scrollback),
+  command bar, death/revival, and the **minimap** (UV-scrolled zone map, party/NPC/
+  enemy dots, rotated player arrow, buff-icon strip).
+- **Inventory & items** — grid + equipment slots, drag/drop moves, loot boxes, item
+  tooltips, countable stack-split, and **NPC blacksmith repair** (hover price → repair).
+- **Skills & magic** — skill tree, class change, the hotkey bar with **radial
+  cooldown rings**, and real FX: spells resolve `Data\fx.tbl` effects (particle /
+  billboard / mesh parts) that follow caster/target joints.
+- **Social** — party/force, Knights (clan create/join/browse + clan pages), the
+  character sheet, the **party-recruitment BBS**, and a client-local **friends list**.
+- **Trade** — the **NPC vendor store** (buy/sell), player-to-player trade, the
+  warehouse, warp/teleport, the inn, and the upgrade anvil.
+- **Quests & menus** — NPC quest menu/talk, NPC-event, notice banner, options/exit,
+  help, level guide.
+- **Audio** — 3D positional SFX and **streaming MP3 BGM** (NLayer) with town/battle
+  track switching, looping, and fade.
+
+Known deviations — all **faithful to the C++ 1.298 original or its own limits** (the
+project's rule is strict 1:1, mirroring upstream stubs rather than "fixing" them):
+
+- **Friends online/party status is inert.** The upstream `WIZ_FRIEND_PROCESS` server
+  handler is a no-op (`#if 0`), so the C++ client's friend list never lights up online
+  either; the port shows the list + local add/remove/whisper and leaves status dead.
+- **Item/ring upgrade send is a stub** — it is a stub in the C++ client too
+  (`CUIUpgradeSelect` only opens; the enchant send path is empty upstream).
+- **IME clause-segment styling** is a single flat underline (see above).
+- **FX fine detail** — the FXPMesh LOD collapse walk and per-component `DependScale`
+  target sizing are not ported (full-detail draw, scalar scale); visually identical at
+  gameplay distance.
+
+Verification is per-slice: pure interaction/layout/protocol logic is unit-tested
+headless (`dotnet test … Category!=Database`), protocol builders/parsers are pinned
+byte-for-byte against the C# Ebenezer server, and the executable is smoke-rendered
+under `xvfb` via `--offline <zone> --screenshot`.
