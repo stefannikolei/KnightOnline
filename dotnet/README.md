@@ -186,12 +186,22 @@ dotnet run --project dotnet/tools/OpenKO.TestClient -- 127.0.0.1:15100 version
 dotnet run --project dotnet/tools/OpenKO.TestClient -- 127.0.0.1:15100 serverlist
 dotnet run --project dotnet/tools/OpenKO.TestClient -- 127.0.0.1:15100 login account pw
 
-# Runnable game client (MonoGame window + game loop; Esc quits).
-dotnet run --project dotnet/src/Client/OpenKO.Client -- --offline moradon           # zone + player model, third-person cam, no server
-dotnet run --project dotnet/src/Client/OpenKO.Client -- --server 127.0.0.1:15100 --account acct --password pw
+# Clean game client (MonoGame window + game loop; Esc quits). Takes no CLI args —
+# the server endpoint + data path come from appsettings.json (section "Client")
+# and graphics/sound from options.json next to the binary (see the settings tool).
+dotnet run --project dotnet/src/Client/OpenKO.Client
+
+# Debug/CLI client (OpenKO.Client.Dev) — the offline zone / scripted login / screenshot modes.
+dotnet run --project dotnet/src/Client/OpenKO.Client.Dev -- --offline moradon        # zone + player model, third-person cam, no server
+dotnet run --project dotnet/src/Client/OpenKO.Client.Dev -- --server 127.0.0.1:15100 --account acct --password pw
 # Headless smoke (Linux/CI): render one frame to a PNG under xvfb + llvmpipe.
-LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a dotnet run --project dotnet/src/Client/OpenKO.Client -c Release -- \
+LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a dotnet run --project dotnet/src/Client/OpenKO.Client.Dev -c Release -- \
     --offline moradon --screenshot /tmp/client.png
+
+# Settings tool (Option.exe equivalent): an Avalonia GUI that writes options.json.
+# --path points it at the game's binary directory so the game reads what it wrote;
+# the in-game exit menu launches it automatically. Settings apply at the next start.
+dotnet run --project dotnet/src/Client/OpenKO.Client.Settings -- --path dotnet/src/Client/OpenKO.Client/bin/Debug/net10.0
 ```
 
 ### Parity harness
@@ -337,3 +347,36 @@ Verification is per-slice: pure interaction/layout/protocol logic is unit-tested
 headless (`dotnet test … Category!=Database`), protocol builders/parsers are pinned
 byte-for-byte against the C# Ebenezer server, and the executable is smoke-rendered
 under `xvfb` via `--offline <zone> --screenshot`.
+
+### Client executables + settings tool (Option.exe equivalent)
+
+Like the C++ (`WarFare.exe` + `Option.exe`), the client ships as separate executables:
+
+- **`OpenKO.Client`** — the clean game. No CLI args; it goes straight into the
+  interactive login screen. The server endpoint + data path come from
+  `appsettings.json` (section `Client`); graphics/sound from `options.json` next
+  to the binary.
+- **`OpenKO.Client.Dev`** — the debug/CLI build (`--offline <zone>`, scripted
+  `--server/--account/--password` auto-login, `--screenshot`, text HUD). None of
+  this is compiled into the clean game.
+- **`OpenKO.Client.Settings`** — the settings tool, a cross-platform Avalonia GUI
+  standing in for `Option.exe`. It reads/writes `options.json` (a
+  `System.Text.Json` file next to the exe, the counterpart of the C++ `Option.ini`)
+  via the shared `OpenKO.Client.Configuration` library, so the game and the tool
+  agree on one model. The in-game **exit menu launches it** (`SettingsLauncher`,
+  the port of `ShellExecute("Option.exe")`), passing `--path <game dir>` so the
+  file lands where the game reads it. **Settings apply at the next game start** —
+  a resolution change needs a restart, exactly as in the original.
+
+**Which knobs take effect now** (the `WarFareMain.cpp:45-118` read/clamp logic is
+mirrored in `GameSettings.Normalize`):
+
+- **Applied:** resolution (width/height), fullscreen, VSync, BGM on/off, SFX
+  on/off, and the port-added BGM/SFX volume sliders.
+- **Stored but inert** (kept for the 1:1 `Option.ini` contract, ready for later
+  engine features): texture LOD (Chr/Shape/Terrain), shadows, view distance,
+  colour depth, sound distance, window cursor.
+
+The tool defaults to windowed (the current client's default; the original release
+build defaulted to fullscreen). On Linux/CI only the build and the store/ViewModel
+round-trip tests run headless — the GUI itself is exercised manually on macOS.

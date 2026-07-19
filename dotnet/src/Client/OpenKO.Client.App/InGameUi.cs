@@ -811,7 +811,15 @@ public sealed class InGameUi : IDisposable
         if (ExitMenu is { } exitMenu)
         {
             exitMenu.CharSelectRequested += () => Log?.Invoke("Return to character selection requested (socket reconnect deferred to host).");
-            exitMenu.OptionRequested += () => Log?.Invoke("Option app requested (Windows-only ShellExecute deferred).");
+            exitMenu.OptionRequested += () =>
+            {
+                // Launch the standalone settings tool (WarFare.exe → ShellExecute("Option.exe")),
+                // pointing it at this game's base directory so options.json lands where we read it.
+                bool started = SettingsLauncher.Launch(AppContext.BaseDirectory);
+                Log?.Invoke(started
+                    ? "Settings tool launched (changes apply at next start)."
+                    : "Settings tool not found (build OpenKO.Client.Settings beside the game).");
+            };
             exitMenu.ExitRequested += () => Log?.Invoke("Client exit requested (PostQuitMessage deferred to host).");
         }
 
