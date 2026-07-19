@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The graphics/sound settings tool — the cross-platform Avalonia counterpart of the
+    C++ Option.exe (Client/Option). It reads/writes options.json next to the game exe
+    (GameSettingsStore) so the game picks the settings up at its next start, exactly
+    like the C++ Option.ini contract.
+  -->
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKO.Client.Configuration\OpenKO.Client.Configuration.csproj" />
+  </ItemGroup>
+
+</Project>

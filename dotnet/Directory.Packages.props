@@ -24,7 +24,16 @@
     <PackageVersion Include="NLayer" Version="2.0.1" />
   </ItemGroup>
 
+  <!-- Settings tool (stage 11.3): cross-platform Avalonia GUI (Option.exe equivalent) -->
+  <ItemGroup>
+    <PackageVersion Include="Avalonia" Version="11.3.18" />
+    <PackageVersion Include="Avalonia.Desktop" Version="11.3.18" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.18" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.18" />
+  </ItemGroup>
+
   <!-- .NET Aspire orchestration (AppHost) -->
+
   <ItemGroup>
     <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.4.6" />
     <PackageVersion Include="CommunityToolkit.Aspire.Hosting.SqlServer.Extensions" Version="13.4.0" />

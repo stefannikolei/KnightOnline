@@ -1,0 +1,78 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:OpenKO.Client.Settings"
+        x:Class="OpenKO.Client.Settings.MainWindow"
+        x:DataType="vm:SettingsViewModel"
+        Title="Knight Online — Einstellungen"
+        Width="440" Height="640"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen">
+
+  <ScrollViewer>
+    <StackPanel Margin="18" Spacing="16">
+
+      <TextBlock Text="Grafik" FontSize="16" FontWeight="Bold" />
+      <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto" RowSpacing="8">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Auflösung" VerticalAlignment="Center" />
+        <ComboBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch"
+                  ItemsSource="{Binding Resolutions}"
+                  SelectedItem="{Binding SelectedResolution}" />
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Farbtiefe" VerticalAlignment="Center" />
+        <ComboBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch"
+                  ItemsSource="{Binding ColorDepths}"
+                  SelectedItem="{Binding SelectedColorDepth}" />
+      </Grid>
+
+      <CheckBox Content="Vollbild" IsChecked="{Binding Fullscreen}" />
+      <CheckBox Content="Vertikale Synchronisation (VSync)" IsChecked="{Binding VSync}" />
+      <CheckBox Content="Schatten" IsChecked="{Binding Shadows}" />
+      <CheckBox Content="Fenster-Cursor (Betriebssystem-Cursor)" IsChecked="{Binding WindowCursor}" />
+
+      <StackPanel Spacing="4">
+        <TextBlock Text="Textur-Detail (aktiv = niedrig)" />
+        <CheckBox Content="Charaktere niedrig" IsChecked="{Binding TexLodChrLow}" />
+        <CheckBox Content="Objekte niedrig" IsChecked="{Binding TexLodShapeLow}" />
+        <CheckBox Content="Terrain niedrig" IsChecked="{Binding TexLodTerrainLow}" />
+      </StackPanel>
+
+      <StackPanel Spacing="4">
+        <TextBlock Text="{Binding ViewDistance, StringFormat='Sichtweite: {0}'}" />
+        <Slider Minimum="256" Maximum="512" TickFrequency="16" IsSnapToTickEnabled="True"
+                Value="{Binding ViewDistance}" />
+      </StackPanel>
+
+      <Separator />
+
+      <TextBlock Text="Sound" FontSize="16" FontWeight="Bold" />
+      <CheckBox Content="Hintergrundmusik (BGM)" IsChecked="{Binding BgmEnabled}" />
+      <CheckBox Content="Soundeffekte (SFX)" IsChecked="{Binding SfxEnabled}" />
+
+      <StackPanel Spacing="4">
+        <TextBlock Text="{Binding BgmVolume, StringFormat='Musiklautstärke: {0:P0}'}" />
+        <Slider Minimum="0" Maximum="1" Value="{Binding BgmVolume}" />
+      </StackPanel>
+
+      <StackPanel Spacing="4">
+        <TextBlock Text="{Binding SfxVolume, StringFormat='Effektlautstärke: {0:P0}'}" />
+        <Slider Minimum="0" Maximum="1" Value="{Binding SfxVolume}" />
+      </StackPanel>
+
+      <StackPanel Spacing="4">
+        <TextBlock Text="{Binding SoundDistance, StringFormat='Sound-Distanz: {0}'}" />
+        <Slider Minimum="20" Maximum="48" TickFrequency="1" IsSnapToTickEnabled="True"
+                Value="{Binding SoundDistance}" />
+      </StackPanel>
+
+      <TextBlock Text="{Binding Status}" Foreground="#3aa757" TextWrapping="Wrap" FontSize="11" />
+
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,4,0,0">
+        <Button Name="OkButton" Content="OK" Width="90" Click="OnOk" />
+        <Button Name="ApplyButton" Content="Übernehmen" Width="110" Click="OnApply" />
+        <Button Name="CancelButton" Content="Abbrechen" Width="90" Click="OnCancel" />
+      </StackPanel>
+
+    </StackPanel>
+  </ScrollViewer>
+
+</Window>

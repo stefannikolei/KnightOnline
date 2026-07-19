@@ -11,6 +11,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Client\OpenKO.Client.Game\OpenKO.Client.Game.csproj" />
     <ProjectReference Include="..\..\src\Client\OpenKO.Client.Configuration\OpenKO.Client.Configuration.csproj" />
+    <!-- The settings-tool ViewModel is Avalonia-free logic (round-trip pinnable headless). -->
+    <ProjectReference Include="..\..\src\Client\OpenKO.Client.Settings\OpenKO.Client.Settings.csproj" />
     <!-- Cross-check the client crypto/framing against the real server core. -->
     <ProjectReference Include="..\..\src\Servers\OpenKO.Servers.Ebenezer\OpenKO.Servers.Ebenezer.csproj" />
   </ItemGroup>
