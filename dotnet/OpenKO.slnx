@@ -8,6 +8,7 @@
   </Folder>
   <Folder Name="/src/Client/">
     <Project Path="src/Client/OpenKO.Client.Assets/OpenKO.Client.Assets.csproj" />
+    <Project Path="src/Client/OpenKO.Client.Configuration/OpenKO.Client.Configuration.csproj" />
     <Project Path="src/Client/OpenKO.Client.Engine/OpenKO.Client.Engine.csproj" />
     <Project Path="src/Client/OpenKO.Client.Game/OpenKO.Client.Game.csproj" />
     <Project Path="src/Client/OpenKO.Client.App/OpenKO.Client.App.csproj" />

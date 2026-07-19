@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Shared client settings model (stage 11): the graphics/sound options the
+    settings tool writes to options.json and the game reads at startup — the
+    C# counterpart of the C++ Option.ini contract (Client/Option + WarFareMain.cpp).
+    Deliberately dependency-light (System.Text.Json only) so the Avalonia settings
+    tool can reference it without pulling in the MonoGame runtime.
+  -->
+
+</Project>
