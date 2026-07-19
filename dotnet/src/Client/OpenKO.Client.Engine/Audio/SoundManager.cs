@@ -50,6 +50,24 @@ public sealed class SoundManager
     private string? _currentBgmFile;
 
     /// <summary>
+    /// Music on/off (Option.ini <c>Sound/Bgm</c>). When false, <see cref="PlayBgm(string,bool,float)"/>
+    /// is a no-op and any playing BGM is left to fade/finish. Applied from <c>GameSettings</c>.
+    /// </summary>
+    public bool BgmEnabled { get; set; } = true;
+
+    /// <summary>
+    /// Sound effects on/off (Option.ini <c>Sound/Effect</c>). When false, <see cref="Play"/> is a
+    /// no-op. Applied from <c>GameSettings</c>.
+    /// </summary>
+    public bool SfxEnabled { get; set; } = true;
+
+    /// <summary>BGM volume [0..1] — the fade-in target for a newly started stream. Applied from <c>GameSettings</c>.</summary>
+    public float BgmVolume { get; set; } = 1f;
+
+    /// <summary>SFX volume [0..1] — scales the per-play gain. Applied from <c>GameSettings</c>.</summary>
+    public float SfxVolume { get; set; } = 1f;
+
+    /// <summary>
     /// Creates the sound manager.
     /// </summary>
     /// <param name="backend">The device seam (uploads/plays PCM).</param>
@@ -94,10 +112,13 @@ public sealed class SoundManager
     /// <summary>Plays a registered sound at a world position (ignored for 2D). Returns false if unplayable.</summary>
     public bool Play(string name, float gain, Vector3 position = default, bool loop = false)
     {
+        if (!SfxEnabled)
+            return false;
         if (!_sounds.TryGetValue(name, out Sound? sound) || sound.Buffer is null)
             return false;
 
-        var settings = new SoundSettings { CurrentGain = gain, MaxGain = gain, IsLooping = loop };
+        float scaled = gain * SfxVolume;
+        var settings = new SoundSettings { CurrentGain = scaled, MaxGain = scaled, IsLooping = loop };
         backend.Play(sound.Buffer, settings, sound.Type, position);
         return true;
     }
@@ -143,7 +164,7 @@ public sealed class SoundManager
     /// </summary>
     public void PlayBgm(string fileName, bool loop = true, float fadeInSeconds = 1f)
     {
-        if (string.IsNullOrWhiteSpace(fileName) || _bgmFileOpener == null)
+        if (!BgmEnabled || string.IsNullOrWhiteSpace(fileName) || _bgmFileOpener == null)
             return;
 
         // Already streaming this exact file and not fading out → leave it.
@@ -185,9 +206,10 @@ public sealed class SoundManager
             return;
         }
 
-        // Swap out the previous stream immediately (hard cut — the new track fades in).
+        // Swap out the previous stream immediately (hard cut — the new track fades in
+        // toward the configured BGM volume).
         _bgm?.Dispose();
-        _bgm = new BgmStream(decoder, voice, loop, fadeInSeconds);
+        _bgm = new BgmStream(decoder, voice, loop, fadeInSeconds, maxVolume: BgmVolume);
         _currentBgmFile = fileName;
         _bgm.Start();
     }

@@ -13,6 +13,10 @@ if (args.Contains("--help"))
 }
 
 ClientOptions options = ClientOptions.Parse(args);
-using var game = new DevClientGame(options);
+
+// Graphics/sound settings from options.json next to the exe (Option.ini equivalent).
+OpenKO.Client.Configuration.GameSettings settings = OpenKO.Client.Configuration.GameSettingsStore.Load();
+
+using var game = new DevClientGame(options, settings);
 game.Run();
 return 0;

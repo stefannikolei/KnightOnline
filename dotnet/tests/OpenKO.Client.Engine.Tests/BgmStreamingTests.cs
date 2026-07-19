@@ -255,6 +255,74 @@ public class BgmStreamingTests
         Assert.True(backend.LastVoice.Stopped);
     }
 
+    // ---- Stage-11.2: settings gates + volume --------------------------------
+
+    [Fact]
+    public void SoundManager_BgmDisabled_PlayBgmIsNoOp()
+    {
+        var backend = new FakeStreamBackend();
+        var mgr = new SoundManager(
+            backend,
+            soundTable: null,
+            bgmFileOpener: _ => new MemoryStream(new byte[16]),
+            bgmDecoderFactory: _ => new FakeDecoder(readsBeforeEos: 1000))
+        {
+            BgmEnabled = false,
+        };
+
+        mgr.PlayBgm("snd\\bgm_co_town.mp3", loop: true, fadeInSeconds: 0f);
+
+        Assert.Null(mgr.CurrentBgm);
+        Assert.Null(backend.LastVoice); // never opened a voice
+    }
+
+    [Fact]
+    public void SoundManager_BgmVolume_IsTheFadeInTarget()
+    {
+        var backend = new FakeStreamBackend();
+        var mgr = new SoundManager(
+            backend,
+            soundTable: null,
+            bgmFileOpener: _ => new MemoryStream(new byte[16]),
+            bgmDecoderFactory: _ => new FakeDecoder(readsBeforeEos: 1000))
+        {
+            BgmVolume = 0.3f,
+        };
+
+        // Zero fade-in snaps straight to the configured BGM volume, not 1.0.
+        mgr.PlayBgm("snd\\bgm_co_town.mp3", loop: true, fadeInSeconds: 0f);
+
+        Assert.NotNull(backend.LastVoice);
+        Assert.Equal(0.3f, backend.LastVoice!.Volume, 4);
+    }
+
+    private static WavAudio SilentWav() =>
+        new() { Channels = 1, SampleRate = 44100, BitsPerSample = 16, Pcm = new byte[8] };
+
+    [Fact]
+    public void SoundManager_SfxDisabled_PlayReturnsFalse()
+    {
+        var backend = new FakeStreamBackend();
+        var mgr = new SoundManager(backend) { SfxEnabled = false };
+        mgr.Register("hit", SilentWav(), SoundType.Sound2D);
+
+        Assert.False(mgr.Play("hit", 1f));
+        Assert.Null(backend.LastPlaySettings);
+    }
+
+    [Fact]
+    public void SoundManager_SfxVolume_ScalesTheGain()
+    {
+        var backend = new FakeStreamBackend();
+        var mgr = new SoundManager(backend) { SfxVolume = 0.5f };
+        mgr.Register("hit", SilentWav(), SoundType.Sound2D);
+
+        Assert.True(mgr.Play("hit", 0.8f));
+        Assert.NotNull(backend.LastPlaySettings);
+        Assert.Equal(0.4f, backend.LastPlaySettings!.CurrentGain, 4);
+        Assert.Equal(0.4f, backend.LastPlaySettings!.MaxGain, 4);
+    }
+
     // ---- Fakes --------------------------------------------------------------
 
     /// <summary>A decoder that yields a fixed number of full reads, then EOS; seek rewinds.</summary>
@@ -322,11 +390,14 @@ public class BgmStreamingTests
     {
         public FakeVoice? LastVoice { get; private set; }
 
+        public SoundSettings? LastPlaySettings { get; private set; }
+
         public bool IsAvailable => true;
 
         public object? UploadBuffer(WavAudio audio) => new object();
 
-        public void Play(object buffer, SoundSettings settings, SoundType type, Vector3 position) { }
+        public void Play(object buffer, SoundSettings settings, SoundType type, Vector3 position)
+            => LastPlaySettings = settings;
 
         public void SetListener(Vector3 position, Vector3 forward, Vector3 up) { }
 

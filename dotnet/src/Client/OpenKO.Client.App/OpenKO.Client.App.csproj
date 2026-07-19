@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpenKO.Client.Game\OpenKO.Client.Game.csproj" />
+    <ProjectReference Include="..\OpenKO.Client.Configuration\OpenKO.Client.Configuration.csproj" />
   </ItemGroup>
 
   <ItemGroup>

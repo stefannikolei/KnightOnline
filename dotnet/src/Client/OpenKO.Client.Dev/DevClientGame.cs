@@ -14,8 +14,8 @@ namespace OpenKO.Client;
 /// the <c>--screenshot</c> dump and the immediate-mode text HUD. All of this lives
 /// here so none of it is compiled into the clean <c>OpenKO.Client</c> exe.
 /// </summary>
-public sealed class DevClientGame(ClientOptions options)
-    : KnightOnlineGame(options.ToConfig())
+public sealed class DevClientGame(ClientOptions options, OpenKO.Client.Configuration.GameSettings settings)
+    : KnightOnlineGame(options.ToConfig(), settings)
 {
     private readonly ClientOptions _options = options;
     private int _framesDrawn;

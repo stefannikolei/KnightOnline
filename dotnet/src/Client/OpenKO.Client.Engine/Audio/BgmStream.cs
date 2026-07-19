@@ -65,6 +65,7 @@ public sealed class BgmStream : IDisposable
     private readonly bool _loop;
     private readonly byte[] _chunk;
     private readonly float _fadeInSeconds;
+    private readonly float _maxVolume;
 
     private float _fadeElapsed;
     private float _fadeFrom;
@@ -76,29 +77,32 @@ public sealed class BgmStream : IDisposable
     /// <summary>
     /// Creates the consumer. <paramref name="chunkFrames"/> is the number of sample
     /// frames per submitted buffer (bytes = frames × channels × 2). The default gives
-    /// roughly a fifth of a second at 44.1 kHz stereo.
+    /// roughly a fifth of a second at 44.1 kHz stereo. <paramref name="maxVolume"/> is the
+    /// fade-in target (the configured BGM volume), clamped to [0..1].
     /// </summary>
     public BgmStream(
         IPcmStreamDecoder decoder,
         IStreamingVoice voice,
         bool loop = true,
         float fadeInSeconds = 1f,
-        int chunkFrames = 8192)
+        int chunkFrames = 8192,
+        float maxVolume = 1f)
     {
         _decoder = decoder;
         _voice = voice;
         _loop = loop;
         _fadeInSeconds = Math.Max(0f, fadeInSeconds);
+        _maxVolume = Math.Clamp(maxVolume, 0f, 1f);
 
         int channels = Math.Max(1, decoder.Channels);
         ChunkBytes = Math.Max(channels * 2, chunkFrames * channels * 2);
         _chunk = new byte[ChunkBytes];
 
-        // Prime the fade-in (0 → 1). A zero fade snaps to full volume immediately.
+        // Prime the fade-in (0 → maxVolume). A zero fade snaps to full volume immediately.
         _fadeFrom = 0f;
-        _fadeTo = 1f;
+        _fadeTo = _maxVolume;
         _fadeDuration = _fadeInSeconds;
-        _voice.Volume = _fadeInSeconds > 0f ? 0f : 1f;
+        _voice.Volume = _fadeInSeconds > 0f ? 0f : _maxVolume;
     }
 
     /// <summary>Bytes per submitted PCM buffer.</summary>

@@ -33,6 +33,7 @@ namespace OpenKO.Client;
 public class KnightOnlineGame : Microsoft.Xna.Framework.Game
 {
     private readonly ClientConfig _config;
+    private readonly OpenKO.Client.Configuration.GameSettings _settings;
     private readonly GraphicsDeviceManager _graphics;
 
     private SpriteBatch _spriteBatch = null!;
@@ -162,19 +163,35 @@ public class KnightOnlineGame : Microsoft.Xna.Framework.Game
     protected IReadOnlyList<string> LogLines => _log;
 
     public KnightOnlineGame(ClientConfig config)
+        : this(config, new OpenKO.Client.Configuration.GameSettings())
+    {
+    }
+
+    public KnightOnlineGame(ClientConfig config, OpenKO.Client.Configuration.GameSettings settings)
     {
         _config = config;
+        _settings = settings;
+        _settings.Normalize();
+
+        // Apply the effective graphics knobs from options.json (WarFareMain read logic):
+        // resolution, fullscreen and vsync. The LOD/shadow/view-distance/colour-depth/
+        // cursor knobs are stored but not yet honoured by the engine (documented in
+        // GameSettings) so they are intentionally not touched here.
         _graphics = new GraphicsDeviceManager(this)
         {
-            PreferredBackBufferWidth = 1024,
-            PreferredBackBufferHeight = 768,
-            SynchronizeWithVerticalRetrace = true,
+            PreferredBackBufferWidth = _settings.Width,
+            PreferredBackBufferHeight = _settings.Height,
+            IsFullScreen = _settings.Fullscreen,
+            SynchronizeWithVerticalRetrace = _settings.VSync,
         };
         IsMouseVisible = true;
         Window.AllowUserResizing = true;
         Window.Title = "Knight Online — OpenKO C# Port";
         Window.TextInput += OnTextInput;
     }
+
+    /// <summary>The applied graphics/sound settings (options.json).</summary>
+    protected OpenKO.Client.Configuration.GameSettings Settings => _settings;
 
     protected override void Initialize()
     {
@@ -194,7 +211,13 @@ public class KnightOnlineGame : Microsoft.Xna.Framework.Game
             bgmOpener = fn => res.Resolve(fn) is { } p ? File.OpenRead(p) : null;
         }
 
-        _sound = new SoundManager(new MonoGameAudioBackend(), soundTable, bgmOpener);
+        _sound = new SoundManager(new MonoGameAudioBackend(), soundTable, bgmOpener)
+        {
+            BgmEnabled = _settings.BgmEnabled,
+            SfxEnabled = _settings.SfxEnabled,
+            BgmVolume = _settings.BgmVolume,
+            SfxVolume = _settings.SfxVolume,
+        };
         Log(_sound.Backend.IsAvailable ? "Audio: OpenAL device ready." : "Audio: no device (silent).");
 
         OnStart();
