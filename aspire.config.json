@@ -1,0 +1,5 @@
+{
+  "appHost": {
+    "path": "dotnet/OpenKO.AppHost/OpenKO.AppHost.csproj"
+  }
+}

@@ -9,10 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" />
     <!-- Brings Microsoft.Data.SqlClient (7.0.1) transitively, used by the
          schema-readiness health check to probe KN_online directly. -->
     <PackageReference Include="Aspire.Hosting.SqlServer" />
+    <!-- DbGate web UI, pre-wired to the SQL Server container. -->
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.SqlServer.Extensions" />
   </ItemGroup>
 
   <ItemGroup>
