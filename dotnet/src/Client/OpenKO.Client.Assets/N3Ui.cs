@@ -106,13 +106,21 @@ public class N3UiBase : N3BaseFile
             childCount = reader.ReadInt32();
         }
 
+        // CN3UIBase::AddChild does m_Children.push_front(pChild) (N3UIBase.h), so the
+        // in-memory list ends up in REVERSE file order — the last widget written is
+        // Children[0]. Render()/MouseProc() walk this list back-to-front
+        // (rbegin→rend / forward respectively), so Children[0] ends up drawn last —
+        // i.e. on top. Insert-at-front here mirrors that; a plain Add (append) would
+        // leave later-authored widgets (like an account-panel group appended after
+        // its background tiles) buried under the earlier ones instead of layered
+        // on top of them.
         Children.Clear();
         for (int i = 0; i < childCount; i++)
         {
             var type = (N3UiType)reader.ReadInt32();
             N3UiBase child = CreateByType(type);
             child.FileFormatVersion = FileFormatVersion;
-            Children.Add(child);
+            Children.Insert(0, child);
             child.Load(reader);
         }
 
@@ -140,8 +148,11 @@ public class N3UiBase : N3BaseFile
             writer.Write(Children.Count);
         }
 
-        foreach (N3UiBase child in Children)
+        // Mirror image of the Load()-side push_front: write back-to-front so a
+        // Save() → Load() round trip restores the same in-memory Children order.
+        for (int i = Children.Count - 1; i >= 0; i--)
         {
+            N3UiBase child = Children[i];
             writer.Write((int)child.UiType);
             child.FileFormatVersion = FileFormatVersion;
             child.Save(writer);

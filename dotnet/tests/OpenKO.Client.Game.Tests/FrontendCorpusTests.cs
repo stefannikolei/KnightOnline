@@ -53,8 +53,10 @@ public class FrontendCorpusTests
         return UiControlFactory.Build(layout);
     }
 
-    [Fact]
-    public void RealLoginLayout_ExposesTheControlsTheDialogBindsTo()
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    public void RealLoginLayout_ExposesTheControlsTheDialogBindsTo(int nation)
     {
         string? root = FindDataRoot();
         if (root == null)
@@ -63,7 +65,7 @@ public class FrontendCorpusTests
         var resolver = new KoPathResolver(root);
         var table = UiResourceTable.LoadFromFile(Path.Combine(root, "Data", "UIs_us.tbl"));
 
-        UiControl? dialog = LoadDialog(resolver, table.LoginIntro(1));
+        UiControl? dialog = LoadDialog(resolver, table.LoginIntro(nation));
         Assert.NotNull(dialog);
 
         UiControl? login = dialog!.GetChildById("Group_LogIn");
